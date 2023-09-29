@@ -151,5 +151,3 @@ try:
 
 except cnx.Error as e:
         print("ERROR:", e)  
-
-#SELECT MONTH(dataInizio), YEAR(dataInizio), AVG(((YEAR(dataFine) - YEAR(dataInizio)) * 365) + ((MONTH(dataFine) - MONTH(dataInizio)) * 30) + DAY(dataFine) - DAY(dataInizio)) FROM tribunalisemplice.processifiniti GROUP BY MONTH(dataInizio), YEAR(dataInizio)           
