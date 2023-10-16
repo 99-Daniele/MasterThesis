@@ -38,7 +38,7 @@ def displayScatter(x_label, y_label, title, min, max):
     plt.subplots_adjust(0.07, 0.07, 0.97, 0.95) 
     plt.margins(0, 0)
     plt.xlim(min, max)  
-    plt.yticks([], []) 
+    #plt.yticks([], []) 
     plt.xlabel(x_label)  
     plt.ylabel(y_label)
     plt.title(title) 
@@ -115,6 +115,43 @@ def getAllProcessEvents(cursor):
     processes = sorted(processes, key = itemgetter(1)) 
     return [processes[0][1], processes[-1][1]] 
 
+def displayAllProcessDuration(cursor):
+    start = tm.time()
+    [min, max] = getAllProcessDuration(cursor)
+    displayScatter("[giorni]", "Data inizio processo", "Durata processi in base alla data di inizio", min, max)
+    print("--- %s seconds ---" % (tm.time() - start))
+
+def getAllProcessDuration(cursor):
+    findProcesses = "SELECT p.dataInizio, MIN(DATEDIFF(e.data, p.datainizio)), e.fase FROM eventi AS e, processifiniti AS p WHERE e.numProcesso IN (SELECT numProcesso FROM processifiniti) AND e.numProcesso = p.numProcesso AND ((e.statofinale = 'DF' AND e.statoiniziale <> 'DF' AND e.fase = 4) OR (e.statofinale = 'AS' AND e.statoiniziale <> 'AS')) GROUP BY p.dataInizio, e.fase"
+    cursor.execute(findProcesses)
+    processes = cursor.fetchall()
+    with alive_bar(int(len(processes))) as bar:
+        for p in processes:
+            if p[2] == 4:
+                plt.scatter(p[0], p[1], s = 20, c = colors[4]) 
+            else:    
+                plt.scatter(p[0], p[1], s = 20, c = colors[p[2] - 1]) 
+            bar()    
+    processes = sorted(processes, key = itemgetter(0)) 
+    return [processes[0][0], processes[-1][0]]
+
+def displayAllProcessDurations(cursor):
+    start = tm.time()
+    [min, max] = getAllProcessDurations(cursor)
+    displayScatter("[giorni]", "Data inizio processo", "Durata fasi in base alla data di inizio", min, max)
+    print("--- %s seconds ---" % (tm.time() - start))
+
+def getAllProcessDurations(cursor):
+    findProcesses = "SELECT p.dataInizio, MIN(DATEDIFF(e.data, p.datainizio)), e.fase FROM eventi AS e, processifiniti AS p WHERE e.numProcesso IN (SELECT numProcesso FROM processifiniti) AND e.numProcesso = p.numProcesso GROUP BY p.dataInizio, e.fase"
+    cursor.execute(findProcesses)
+    processes = cursor.fetchall()
+    with alive_bar(int(len(processes))) as bar:
+        for p in processes:
+            plt.scatter(p[0], p[1], s = 20, c = colors[p[2] - 1]) 
+            bar()    
+    processes = sorted(processes, key = itemgetter(0)) 
+    return [processes[0][0], processes[-1][0] * 0.67]
+
 def displayProcessesOfYear(cursor, year):
     start = tm.time()
     [min, max] = getProcessesOfYear(cursor, year)
@@ -160,6 +197,43 @@ def getProcessEventsOfYear(cursor, year):
             bar()    
     processes = sorted(processes, key = itemgetter(1)) 
     return [processes[0][1], processes[-1][1]]  
+
+def displayProcessDurationOfYear(cursor, year):
+    start = tm.time()
+    [min, max] = getProcessDurationOfYear(cursor, year)
+    displayScatter("Data evento", "[giorni]", "Processi iniziati nell'anno " + str(year), min, max)
+    print("--- %s seconds ---" % (tm.time() - start))
+
+def getProcessDurationOfYear(cursor, year):
+    findProcesses = "SELECT p.dataInizio, MIN(DATEDIFF(e.data, p.datainizio)), e.fase FROM eventi AS e, processifiniti AS p WHERE e.numProcesso IN (SELECT numProcesso FROM processifiniti WHERE anno = " + str(year) + ") AND e.numProcesso = p.numProcesso AND ((e.statofinale = 'DF' AND e.statoiniziale <> 'DF' AND e.fase = 4) OR (e.statofinale = 'AS' AND e.statoiniziale <> 'AS')) GROUP BY p.dataInizio, e.fase"
+    cursor.execute(findProcesses)
+    processes = cursor.fetchall()
+    with alive_bar(int(len(processes))) as bar:
+        for p in processes:
+            if p[2] == 4:
+                plt.scatter(p[1], p[0], s = 20, c = colors[4]) 
+            else:    
+                plt.scatter(p[1], p[0], s = 20, c = colors[p[2] - 1]) 
+            bar()    
+    processes = sorted(processes, key = itemgetter(1)) 
+    return [processes[0][1], processes[-1][1]]
+
+def displayProcessDurationsOfYear(cursor, year):
+    start = tm.time()
+    [min, max] = getProcessDurationsOfYear(cursor, year)
+    displayScatter("Data evento", "[giorni]", "Processi iniziati nell'anno " + str(year), min, max)
+    print("--- %s seconds ---" % (tm.time() - start))
+
+def getProcessDurationsOfYear(cursor, year):
+    findProcesses = "SELECT p.dataInizio, MIN(DATEDIFF(e.data, p.datainizio)), e.fase FROM eventi AS e, processifiniti AS p WHERE e.numProcesso IN (SELECT numProcesso FROM processifiniti WHERE anno = " + str(year) + ") AND e.numProcesso = p.numProcesso GROUP BY p.dataInizio, e.fase"
+    cursor.execute(findProcesses)
+    processes = cursor.fetchall()
+    with alive_bar(int(len(processes))) as bar:
+        for p in processes:
+            plt.scatter(p[1], p[0], s = 20, c = colors[p[2] - 1]) 
+            bar()    
+    processes = sorted(processes, key = itemgetter(1)) 
+    return [processes[0][1], processes[-1][1] * 0.67]
 
 def displayAvgProcessDurationByWeek(cursor):
     start = tm.time()
@@ -627,9 +701,7 @@ def displayEventDurationPercProcessDuration(cursor):
     plt.title("Event duration percentage of process duration") 
     plt.show()
 
-try:
-    connection = connectToDatabase()
-    cursor = connection.cursor(buffered = True)
+def startApp():
     window = tk.Tk()
     #width = window.winfo_screenwidth()               
     #height = window.winfo_screenheight()               
@@ -658,6 +730,11 @@ try:
 
     window.mainloop()
 
+try:
+    connection = connectToDatabase()
+    cursor = connection.cursor(buffered = True)
+    #insert function
+    displayAllProcessDuration(cursor)
+
 except cnx.Error as e:
         print("ERROR:", e)  
-
