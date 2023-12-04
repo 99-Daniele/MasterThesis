@@ -24,7 +24,7 @@ def connectToDatabase():
         #database = input("Inserisci database: "),
         user = "root",
         password = "Ropswot_@222",
-        database = "tribunalisemplice",
+        database = "tribunali2020",
         auth_plugin = 'mysql_native_password'
     )
     return connection
@@ -730,11 +730,91 @@ def startApp():
 
     window.mainloop()
 
+def getProcessSequence(connection):
+    cursor = connection.cursor(buffered = True)
+    findProcesses = "SELECT numProcesso, sequenzaOriginale FROM processicondurata"
+    findTranslation = "SELECT * FROM statinome"
+    cursor.execute(findProcesses)
+    processes = cursor.fetchall()
+    cursor.execute(findTranslation)
+    stateTranslation = cursor.fetchall()
+    with alive_bar(int(len(processes))) as bar:
+        for p in processes:
+            states = p[1].split(',')
+            sequence = []
+            for s in states:
+                sequence.append(translateState(s, stateTranslation)) 
+            sequence = filterSequence(sequence)     
+            sequence = findRestart(sequence, stateTranslation)
+            stringSequence = ",".join(str(e) for e in sequence)
+            updateProcesses = "UPDATE processicondurata SET sequenzaTradotta = %s WHERE numProcesso = %s"     
+            values = (stringSequence, p[0])
+            cursor.execute(updateProcesses, values)
+            bar()
+    connection.commit()  
+
+def translateState(state, states):
+    for s in states:
+        if s[1] == state:
+            return s[3]   
+        
+def findPhase(state, states): 
+    for s in states:
+        if s[3] == state:
+            return s[2] 
+
+def filterSequence(sequence):
+    s = sequence[0]
+    newSequence = [s]
+    i = 0
+    while i < len(sequence):
+        if sequence[i] != s:
+            newSequence.append(sequence[i])
+            s = sequence[i]
+        i = i + 1
+    return newSequence   
+
+def findRestart(sequence, states):
+    newSequence = [sequence[0]]
+    i = 1
+    prevPhase = 0
+    while i < len(sequence):
+        phase = findPhase(sequence[i], states)
+        if phase != "-":
+            if int(phase) < int(prevPhase):
+                newSequence.append('REST')
+                i = i + 1
+                while i < len(sequence):
+                    if findPhase(sequence[i], states) == "-" or int(findPhase(sequence[i], states)) <= int(prevPhase):
+                        i = i + 1
+                    else:
+                        break
+                if i < len(sequence):
+                    newSequence.append(sequence[i])        
+            else:
+                newSequence.append(sequence[i])  
+            prevPhase = phase 
+            if phase == 5:
+                break
+        else:
+            if sequence[i] == 'REST':
+                newSequence.append('REST')
+                i = i + 1
+                while i < len(sequence):
+                    if findPhase(sequence[i], states) == "-" or int(findPhase(sequence[i], states)) <= int(prevPhase):
+                        i = i + 1
+                    else:
+                        break
+                if i < len(sequence):
+                    newSequence.append(sequence[i])   
+            else:    
+                newSequence.append(sequence[i]) 
+        i = i + 1       
+    return newSequence                  
+
 try:
     connection = connectToDatabase()
     cursor = connection.cursor(buffered = True)
-    #insert function
-    displayAllProcessDuration(cursor)
 
 except cnx.Error as e:
         print("ERROR:", e)  
