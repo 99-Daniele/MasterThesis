@@ -10,6 +10,8 @@ from operator import itemgetter
 from alive_progress import alive_bar
 from matplotlib.widgets import Slider
 
+import pyqtgraph as pg
+
 colors = ['blue', 'orange', 'red', 'green', 'purple']
 daysOfYear = ['01/01', '02/01', '03/01', '04/01', '05/01', '06/01', '07/01', '08/01', '09/01', '10/01', '11/01', '12/01', '13/01', '14/01', '15/01', '16/01', '17/01', '18/01', '19/01', '20/01', '21/01', '22/01', '23/01', '24/01', '25/01', '26/01', '27/01', '28/01', '29/01', '30/01', '31/01', '01/02', '02/02', '03/02', '04/02', '05/02', '06/02', '07/02', '08/02', '09/02', '10/02', '11/02', '12/02', '13/02', '14/02', '15/02', '16/02', '17/02', '18/02', '19/02', '20/02', '21/02', '22/02', '23/02', '24/02', '25/02', '26/02', '27/02', '28/02', '29/02', '01/03', '02/03', '03/03', '04/03', '05/03', '06/03', '07/03', '08/03', '09/03', '10/03', '11/03', '12/03', '13/03', '14/03', '15/03', '16/03', '17/03', '18/03', '19/03', '20/03', '21/03', '22/03', '23/03', '24/03', '25/03', '26/03', '27/03', '28/03', '29/03', '30/03', '31/03', '01/04', '02/04', '03/04', '04/04', '05/04', '06/04', '07/04', '08/04', '09/04', '10/04', '11/04', '12/04', '13/04', '14/04', '15/04', '16/04', '17/04', '18/04', '19/04', '20/04', '21/04', '22/04', '23/04', '24/04', '25/04', '26/04', '27/04', '28/04', '29/04', '30/04', '01/05', '02/05', '03/05', '04/05', '05/05', '06/05', '07/05', '08/05', '09/05', '10/05', '11/05', '12/05', '13/05', '14/05', '15/05', '16/05', '17/05', '18/05', '19/05', '20/05', '21/05', '22/05', '23/05', '24/05', '25/05', '26/05', '27/05', '28/05', '29/05', '30/05', '31/05', '01/06', '02/06', '03/06', '04/06', '05/06', '06/06', '07/06', '08/06', '09/06', '10/06', '11/06', '12/06', '13/06', '14/06', '15/06', '16/06', '17/06', '18/06', '19/06', '20/06', '21/06', '22/06', '23/06', '24/06', '25/06', '26/06', '27/06', '28/06', '29/06', '30/06', '01/07', '02/07', '03/07', '04/07', '05/07', '06/07', '07/07', '08/07', '09/07', '10/07', '11/07', '12/07', '13/07', '14/07', '15/07', '16/07', '17/07', '18/07', '19/07', '20/07', '21/07', '22/07', '23/07', '24/07', '25/07', '26/07', '27/07', '28/07', '29/07', '30/07', '31/07', '01/08', '02/08', '03/08', '04/08', '05/08', '06/08', '07/08', '08/08', '09/08', '10/08', '11/08', '12/08', '13/08', '14/08', '15/08', '16/08', '17/08', '18/08', '19/08', '20/08', '21/08', '22/08', '23/08', '24/08', '25/08', '26/08', '27/08', '28/08', '29/08', '30/08', '31/08', '01/09', '02/09', '03/09', '04/09', '05/09', '06/09', '07/09', '08/09', '09/09', '10/09', '11/09', '12/09', '13/09', '14/09', '15/09', '16/09', '17/09', '18/09', '19/09', '20/09', '21/09', '22/09', '23/09', '24/09', '25/09', '26/09', '27/09', '28/09', '29/09', '30/09', '01/10', '02/10', '03/10', '04/10', '05/10', '06/10', '07/10', '08/10', '09/10', '10/10', '11/10', '12/10', '13/10', '14/10', '15/10', '16/10', '17/10', '18/10', '19/10', '20/10', '21/10', '22/10', '23/10', '24/10', '25/10', '26/10', '27/10', '28/10', '29/10', '30/10', '31/10', '01/11', '02/11', '03/11', '04/11', '05/11', '06/11', '07/11', '08/11', '09/11', '10/11', '11/11', '12/11', '13/11', '14/11', '15/11', '16/11', '17/11', '18/11', '19/11', '20/11', '21/11', '22/11', '23/11', '24/11', '25/11', '26/11', '27/11', '28/11', '29/11', '30/11', '01/12', '02/12', '03/12', '04/12', '05/12', '06/12', '07/12', '08/12', '09/12', '10/12', '11/12', '12/12', '13/12', '14/12', '15/12', '16/12', '17/12', '18/12', '19/12', '20/12', '21/12', '22/12', '23/12', '24/12', '25/12', '26/12', '27/12', '28/12', '29/12', '30/12', '31/12']
 weeks = ['02/01', '08/01', '15/01', '22/01', '29/01', '05/02', '12/02', '19/02', '26/02', '05/03', '12/03', '19/03', '26/03', '02/04', '09/04', '16/04', '23/04', '30/04', '07/05', '14/05', '21/05', '28/05', '04/06', '11/06', '18/06', '25/06', '02/07', '09/07', '16/07', '23/07', '30/07', '06/08', '13/08', '20/08', '27/08', '03/09', '10/09', '17/09', '24/09', '01/10', '08/10', '15/10', '22/10', '29/10', '05/11', '12/11', '19/11', '26/11', '03/12', '10/12', '17/12', '24/12', '31/12']
@@ -33,27 +35,34 @@ def getDataFromDatabase(cursor, query):
     cursor.execute(query)
     return cursor.fetchall()
 
-def displayScatter(x_label, y_label, title, min, max):
+def displayScatter(x_label, y_label, title):
     plt.grid()
     plt.subplots_adjust(0.07, 0.07, 0.97, 0.95) 
-    plt.margins(0, 0)
-    plt.xlim(min, max)  
+    plt.margins(0, 0) 
     #plt.yticks([], []) 
     plt.xlabel(x_label)  
     plt.ylabel(y_label)
     plt.title(title) 
     plt.show()  
 
-def displayPlot(x, y, x_fontsize, x_label, y_label, title):
+def displayPlot(x_label, y_label, title):
     plt.grid()
     plt.subplots_adjust(0.07, 0.07, 0.97, 0.95) 
     plt.margins(0, 0)   
-    plt.plot(x, y, c = 'black')
-    plt.xticks(fontsize = x_fontsize)
-    plt.yticks(range(int(min(y)), int(max(y)),  int(((max(y) - min(y)) / 20))))
-    plt.xlabel(x_label)         
+    plt.xlabel(x_label)  
     plt.ylabel(y_label)
     plt.title(title) 
+    plt.show()  
+
+def displayBoxPlot(x, x_fontsize, x_label, y_label, title):
+    plt.grid()
+    plt.subplots_adjust(0.07, 0.07, 0.97, 0.95) 
+    plt.margins(0, 0)
+    plt.xticks(fontsize = x_fontsize)
+    plt.xlabel(x_label)         
+    plt.ylabel(y_label)
+    plt.title(title)
+    plt.boxplot(x, showfliers=False)
     plt.show()
 
 def displayTable(x, y, x_title, y_title, nr):
@@ -69,19 +78,19 @@ def displayTable(x, y, x_title, y_title, nr):
     plt.table(cellText = table, colLabels = (x_title, y_title), loc='center')
     plt.show()
                
-def displayAllProcesses(cursor):
+def displayAllProcesses(cursor, startDate, endDate):
     start = tm.time()
-    [min, max] = getAllProcesses(cursor)
-    displayScatter("Data inizio e fine processo", "Codice processo", "Processi tribunale di Milano", min, max)
+    getAllProcesses(cursor, startDate, endDate)
+    displayScatter("Data inizio e fine processo", "Codice processo", "Processi tribunale di Milano")
     print("--- %s seconds ---" % (tm.time() - start))
 
-def getAllProcesses(cursor):
-    findProcesses = "SELECT numProcesso, data FROM eventi WHERE ((statofinale = 'AS' AND codice = 'IA') OR (statofinale = 'DF' AND statofinale <> statoIniziale AND fase = 4)) AND numProcesso IN (SELECT numProcesso FROM processifiniti) ORDER BY numProcesso"
+def getAllProcesses(cursor, startDate, endDate):
+    findProcesses = "SELECT numProcesso, data FROM udienze WHERE data >= '" + startDate + "' AND data <= '" + endDate + "' ORDER BY numProcesso"
     cursor.execute(findProcesses)
     processes = cursor.fetchall()
     color = list(col.to_rgb('cyan'))
     i = 0
-    with alive_bar(int(len(processes) / 10) + 1) as bar:
+    with alive_bar(int(len(processes))) as bar:
         while i < len(processes):
             p1 = processes[i][0]
             p2 = processes[i + 1][0]
@@ -90,30 +99,40 @@ def getAllProcesses(cursor):
             color[0] = color[0] + 1.0 / len(processes)
             plt.scatter(d1, p1, s = 20, color = col.hsv_to_rgb(color)) 
             plt.scatter(d2, p2, s = 20, color = col.hsv_to_rgb(color))
-            i = i + 10
+            i = i + 1
             bar()
-    processes = sorted(processes, key = itemgetter(1)) 
-    return [processes[0][1], processes[-1][1]]    
 
-def displayAllProcessEvents(cursor):
+def displayAllProcessEvents(cursor, startDate, endDate):
     start = tm.time()
-    [min, max] = getAllProcessEvents(cursor)
-    displayScatter("Data evento", "Codice processo", "Processi tribunale di Milano", min, max)
+    getAllProcessEvents(cursor, startDate, endDate)
+    displayPlot("Data evento", "Codice processo", "Processi tribunale di Milano")
     print("--- %s seconds ---" % (tm.time() - start))
 
-def getAllProcessEvents(cursor):
-    findProcesses = "SELECT numProcesso, data, fase, statoFinale FROM eventi WHERE statoiniziale <> statofinale AND fase < 5 AND numProcesso IN (SELECT numProcesso FROM processifiniti)"
+def getAllProcessEvents(cursor, startDate, endDate):
+    findProcesses = "SELECT numProcesso, data, fase, id FROM udienze WHERE data >= '" + startDate + "' AND numProcesso IN (SELECT numProcesso FROM processicondurata WHERE dataInizioProcesso >= '" + startDate + "' AND dataInizioProcesso <= '" + endDate + "')"
     cursor.execute(findProcesses)
     processes = cursor.fetchall()
-    with alive_bar(int(len(processes) / 20) + 1) as bar:
-        for p in processes[::50]:
-            if p[3] == 'DF':
-                plt.scatter(p[1], p[0], s = 20, c = colors[p[2]]) 
+    pIds = []
+    dates = []
+    currentPhase = 0
+    with alive_bar(int(len(processes))) as bar:
+        for p in processes:
+            if p[2] == None:
+                p[2] = 1
+            if len(pIds) == 0:
+                pIds.append(p[0])
+                dates.append(p[1])  
+                currentPhase = int(p[2]) - 1
             else:
-                plt.scatter(p[1], p[0], s = 20, c = colors[p[2] - 1]) 
-            bar()    
-    processes = sorted(processes, key = itemgetter(1)) 
-    return [processes[0][1], processes[-1][1]] 
+                if p[0] != pIds[0] or p[2] != (currentPhase + 1):
+                    pIds.append(p[0])
+                    dates.append(p[1])
+                    plt.plot(dates, pIds, '-o', linewidth = 0, color = colors[currentPhase])   
+                    pIds = [p[0]]
+                    dates = [p[1]]
+                    currentPhase = int(p[2]) - 1
+            #plt.scatter(p[1], p[0], s = 20, c = colors[phase - 1]) 
+            bar()   
 
 def displayAllProcessDuration(cursor):
     start = tm.time()
@@ -224,7 +243,7 @@ def displayProcessDurationsOfYear(cursor, year):
     displayScatter("Data evento", "[giorni]", "Processi iniziati nell'anno " + str(year), min, max)
     print("--- %s seconds ---" % (tm.time() - start))
 
-def getProcessDurationsOfYear(cursor, year):
+def getProcessDurationsOfYear(cursor, year, type):
     findProcesses = "SELECT p.dataInizio, MIN(DATEDIFF(e.data, p.datainizio)), e.fase FROM eventi AS e, processifiniti AS p WHERE e.numProcesso IN (SELECT numProcesso FROM processifiniti WHERE anno = " + str(year) + ") AND e.numProcesso = p.numProcesso GROUP BY p.dataInizio, e.fase"
     cursor.execute(findProcesses)
     processes = cursor.fetchall()
@@ -237,49 +256,39 @@ def getProcessDurationsOfYear(cursor, year):
 
 def displayAvgProcessDurationByWeek(cursor):
     start = tm.time()
-    [weeks, avgs] = getAvgProcessDurationByWeek(cursor)
-    displayPlot(weeks, avgs, 5, "Settimana inizio processo", "[giorni]", "Durata media processi in base alla settimana di inizio")
+    [durations, avgs] = getAvgProcessDurationByWeek(cursor)
+    displayPlot(weeks, avgs, 10, "", "", "")
+    displayBoxPlot(durations, 5, "Settimana inizio processo", "[giorni]", "Durata media processi in base alla settimana di inizio")
     print("--- %s seconds ---" % (tm.time() - start))
 
 def getAvgProcessDurationByWeek(cursor):
-    tot_avg = float(getDataFromDatabase(cursor, "SELECT AVG(DATEDIFF((SELECT e.data FROM eventi AS e WHERE e.numProcesso = p.numProcesso AND e.statoFinale = 'DF' AND e.statoIniziale <> 'DF' AND e.fase = 4), dataInizio)) AS durata FROM processifiniti AS p")[0][0])
-    [years, y_avgs] = getAvgProcessDurationByYear(cursor)
-    processes = getDataFromDatabase(cursor, "SELECT WEEK(p.dataInizio, 7), YEAR(p.dataInizio), AVG(DATEDIFF((SELECT e.data FROM eventi AS e WHERE e.numProcesso = p.numProcesso AND e.statoFinale = 'DF' AND e.statoIniziale <> 'DF' AND e.fase = 4), p.dataInizio)) FROM processifiniti AS p GROUP BY WEEK(p.dataInizio, 7), YEAR(p.dataInizio) ORDER BY YEAR(p.dataInizio), WEEK(p.dataInizio, 7)")
+    processes = getDataFromDatabase(cursor, "SELECT WEEK(dataInizioProcesso, 7), durata FROM processicondurata")
     avgs = [0] * 53
-    counts = [0] * 53
+    durations = [[] for x in range(53)]
     for p in processes:
-        w = int(p[0] - 1)
-        y = int(p[1])
-        y_avg = y_avgs[years.index(y) - 1]
-        avg = float(p[2]) * tot_avg / y_avg
-        count = counts[w]
-        newAvg = (((avgs[w] * count) + avg) / (count + 1))
-        counts[w] = count + 1
-        avgs[w] = newAvg 
-    return [weeks, avgs]    
+        durations[p[0] - 1].append(float(p[1]))   
+        count = len(durations[p[0] - 1])
+        avg = ((avgs[p[0] - 1] * (count - 1)) + float(p[1])) / count
+        avgs[p[0] - 1] = avg
+    return [durations, avgs]
 
 def displayAvgProcessDurationByMonth(cursor):
     start = tm.time()
-    [months, avgs] = getAvgProcessDurationByMonth(cursor)
-    displayPlot(months, avgs, 8, "Mese inizio processo", "[giorni]", "Durata media processi in base al mese di inizio")
+    [durations, avgs] = getAvgProcessDurationByMonth(cursor)
+    displayPlot(months, avgs, 10, "", "", "")
+    displayBoxPlot(durations, 5, "Mese inizio processo", "[giorni]", "Durata media processi in base al mese di inizio")
     print("--- %s seconds ---" % (tm.time() - start))
 
 def getAvgProcessDurationByMonth(cursor):
-    tot_avg = float(getDataFromDatabase(cursor, "SELECT AVG(DATEDIFF((SELECT e.data FROM eventi AS e WHERE e.numProcesso = p.numProcesso AND e.statoFinale = 'DF' AND e.statoIniziale <> 'DF' AND e.fase = 4), dataInizio)) AS durata FROM processifiniti AS p")[0][0])
-    [years, y_avgs] = getAvgProcessDurationByYear(cursor)
-    processes = getDataFromDatabase(cursor, "SELECT MONTH(p.dataInizio), YEAR(p.dataInizio), AVG(DATEDIFF((SELECT e.data FROM eventi AS e WHERE e.numProcesso = p.numProcesso AND e.statoFinale = 'DF' AND e.statoIniziale <> 'DF' AND e.fase = 4), p.dataInizio)) FROM processifiniti AS p GROUP BY MONTH(p.dataInizio), YEAR(p.dataInizio) ORDER BY YEAR(p.dataInizio), MONTH(p.dataInizio)")
+    processes = getDataFromDatabase(cursor, "SELECT MONTH(dataInizioProcesso), durata FROM processicondurata")
     avgs = [0] * 12
-    counts = [0] * 12
+    durations = [[] for x in range(12)]
     for p in processes:
-        m = int(p[0] - 1)
-        y = int(p[1])
-        y_avg = y_avgs[years.index(y) - 1]
-        avg = float(p[2]) * tot_avg / y_avg
-        count = counts[m]
-        newAvg = (((avgs[m] * count) + avg) / (count + 1))
-        counts[m] = count + 1
-        avgs[m] = newAvg 
-    return [months, avgs] 
+        durations[p[0] - 1].append(float(p[1]))   
+        count = len(durations[p[0] - 1])
+        avg = ((avgs[p[0] - 1] * (count - 1)) + float(p[1])) / count
+        avgs[p[0] - 1] = avg
+    return [durations, avgs]
 
 def displayAvgProcessDurationByYear(cursor):
     start = tm.time()
@@ -288,14 +297,12 @@ def displayAvgProcessDurationByYear(cursor):
     print("--- %s seconds ---" % (tm.time() - start))
 
 def getAvgProcessDurationByYear(cursor):
-    processes = getDataFromDatabase(cursor, "SELECT YEAR(p.dataInizio), AVG(DATEDIFF((SELECT e.data FROM eventi AS e WHERE e.numProcesso = p.numProcesso AND e.statoFinale = 'DF' AND e.statoIniziale <> 'DF' AND e.fase = 4), p.dataInizio)) FROM processifiniti AS p GROUP BY YEAR(p.dataInizio) ORDER BY YEAR(p.dataInizio)")
-    years = []
+    processes = getDataFromDatabase(cursor, "SELECT YEAR(dataInizioProcesso), AVG(durata) FROM processicondurata GROUP BY YEAR(dataInizioProcesso) ORDER BY YEAR(dataInizioProcesso)")
     avgs = []
+    years = []
     for p in processes:
-        y = p[0]
-        avg = float(p[1])
-        years.append(y)
-        avgs.append(avg)
+        years.append(p[0])
+        avgs.append(p[1])
     return [years, avgs] 
 
 def displayAvgProcessDurationByJudge(cursor):
@@ -730,7 +737,15 @@ def startApp():
 
     window.mainloop()
 
+def updateProcessSequence(connection):
+    getProcessSequence(connection)
+    translateProcessSequence(connection)
+
 def getProcessSequence(connection):
+    cursor = connection.cursor(buffered = True)
+    findProcesses = "SELECT numProcesso, statoiniziale, statofinale, durata FROM staticondurata"
+
+def translateProcessSequence(connection):
     cursor = connection.cursor(buffered = True)
     findProcesses = "SELECT numProcesso, sequenzaOriginale FROM processicondurata"
     findTranslation = "SELECT * FROM statinome"
@@ -744,8 +759,8 @@ def getProcessSequence(connection):
             sequence = []
             for s in states:
                 sequence.append(translateState(s, stateTranslation)) 
-            sequence = filterSequence(sequence)     
             sequence = findRestart(sequence, stateTranslation)
+            sequence = filterSequence(sequence)     
             stringSequence = ",".join(str(e) for e in sequence)
             updateProcesses = "UPDATE processicondurata SET sequenzaTradotta = %s WHERE numProcesso = %s"     
             values = (stringSequence, p[0])
@@ -764,28 +779,30 @@ def findPhase(state, states):
             return s[2] 
 
 def filterSequence(sequence):
-    s = sequence[0]
-    newSequence = [s]
-    i = 0
-    while i < len(sequence):
-        if sequence[i] != s:
-            newSequence.append(sequence[i])
-            s = sequence[i]
-        i = i + 1
+    newSequence = []
+    for s in sequence:
+        if not(s in newSequence):
+            newSequence.append(s)
     return newSequence   
 
 def findRestart(sequence, states):
-    newSequence = [sequence[0]]
-    i = 1
+    newSequence = []
+    i = 0
     prevPhase = 0
+    ris = False
+    corr = False
+    pause = False
     while i < len(sequence):
         phase = findPhase(sequence[i], states)
-        if phase != "-":
+        if phase == '5':
+            newSequence.append(sequence[i])  
+            break
+        elif phase != "-":
             if int(phase) < int(prevPhase):
                 newSequence.append('REST')
                 i = i + 1
                 while i < len(sequence):
-                    if findPhase(sequence[i], states) == "-" or int(findPhase(sequence[i], states)) <= int(prevPhase):
+                    if findPhase(sequence[i], states) == "-" or int(findPhase(sequence[i], states)) < int(prevPhase):
                         i = i + 1
                     else:
                         break
@@ -794,27 +811,86 @@ def findRestart(sequence, states):
             else:
                 newSequence.append(sequence[i])  
             prevPhase = phase 
-            if phase == 5:
-                break
         else:
             if sequence[i] == 'REST':
                 newSequence.append('REST')
                 i = i + 1
                 while i < len(sequence):
-                    if findPhase(sequence[i], states) == "-" or int(findPhase(sequence[i], states)) <= int(prevPhase):
+                    if findPhase(sequence[i], states) == "-" or int(findPhase(sequence[i], states)) < int(prevPhase):
                         i = i + 1
                     else:
                         break
                 if i < len(sequence):
-                    newSequence.append(sequence[i])   
+                    newSequence.append(sequence[i])  
             else:    
                 newSequence.append(sequence[i]) 
-        i = i + 1       
+        i = i + 1   
+
     return newSequence                  
+
+def translateStateSequence(connection):
+    cursor = connection.cursor(buffered = True)
+    findProcesses = "SELECT numProcesso, sequenzaOriginale FROM processicondurata"
+    findStateTranslation = "SELECT * FROM statinome"
+    findEventTranslation = "SELECT * FROM eventinome"
+    cursor.execute(findProcesses)
+    processes = cursor.fetchall()
+    cursor.execute(findStateTranslation)
+    stateTranslation = cursor.fetchall()
+    cursor.execute(findEventTranslation)
+    eventTranslation = cursor.fetchall()
+    cursor.execute('DELETE FROM frequenzaeventi')
+    with alive_bar(int(len(processes))) as bar:
+        for p in processes:
+            pId = p[0]
+            states = p[1].split(',')
+            for s in states:
+                sequence = []
+                findEvents = "SELECT codice FROM eventi WHERE numProcesso = " + str(pId) + " AND statofinale = '" + s + "' ORDER BY numEvento"
+                cursor.execute(findEvents)
+                events = cursor.fetchall()
+                for e in events:
+                    sequence.append(translateEvent(e[0], eventTranslation)) 
+                sequence = filterSequence(sequence)
+                stringSequence = ",".join(str(e) for e in sequence)
+                insertSequence = "INSERT INTO sequenzaeventi VALUES (%s, %s, %s, %s)"     
+                values = (pId, translateState(s, stateTranslation), s, stringSequence)
+                cursor.execute(insertSequence, values)
+            bar()
+    connection.commit()  
+
+def filterSequence(sequence):
+    newSequence = [sequence[0]]
+    for s in sequence:
+        if s != newSequence[-1]:
+            newSequence.append(s)
+    return newSequence   
+
+def translateEvent(event, events):
+    for e in events:
+        if e[0] == event:
+            return e[1]
+
+def getCurrentPhase(cursor, numProcesso, id):
+    findEvents = "SELECT id, fase FROM udienze WHERE numProcesso = " + str(numProcesso) + " AND id < " + str(id)
+    cursor.execute(findEvents)
+    events = cursor.fetchall()
+    print(events)
+    i = 1
+    while i < len(events):
+        phase = events[-i][1]
+        print(phase)
+        if phase != '-':
+            exit()
+            return int(phase)
+        else:
+            i = i + 1
+    return 1        
 
 try:
     connection = connectToDatabase()
     cursor = connection.cursor(buffered = True)
+    displayAllProcessEvents(cursor, '2022/06/01', '2023/12/31')
 
 except cnx.Error as e:
         print("ERROR:", e)  
