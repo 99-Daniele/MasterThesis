@@ -19,5 +19,14 @@ def displayEvents(events, t):
     df = pd.DataFrame(
         data={"data": dates, "numProcesso": pIds, "fase": phases})
     fig = px.scatter(df, x="data", y="numProcesso", color = "fase", title=t)
+    fig.update_xaxes(rangeslider_visible=True,
+                     rangeselector=dict(
+                        buttons=list([
+                            dict(count=1, label="1m", step="month", stepmode="backward"),
+                            dict(count=6, label="6m", step="month", stepmode="backward"),
+                            dict(count=1, label="1y", step="year", stepmode="backward"),
+                            dict(step="all")
+                        ])
+    ))
     fig.show()
     return fig
