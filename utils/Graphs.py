@@ -38,6 +38,7 @@ def displayEvents(events, t):
         tickformat="%b\n%Y",
         ticklabelmode="period"
     )
+    
     app = ds.Dash()
     app.layout = ds.html.Div([
         ds.dcc.DatePickerRange(
@@ -62,13 +63,13 @@ def displayEvents(events, t):
         fig = px.scatter(dff, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = ['blue', 'orange', 'red', 'green', 'purple'], labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width=1080)
         fig.update_layout(
             legend=dict(
-                yanchor="top",
-                y=0.99,
-                xanchor="left",
-                x=0.01,
-                bgcolor=None
+                yanchor = "top",
+                y = 0.99,
+                xanchor = "left",
+                x = 0.01,
+                bgcolor = None
             ),
-            yaxis=dict(
+            yaxis = dict(
                 showticklabels = False
             )
         )
@@ -77,6 +78,7 @@ def displayEvents(events, t):
             tickformat="%b\n%Y",
             ticklabelmode="period"
         )
+
         return fig
     
     app.run(debug=True)
