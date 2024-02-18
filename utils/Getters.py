@@ -1,15 +1,15 @@
 from utils.DatabaseConnection import getDataFromDatabase
 
 def getAllEvents(connection):
-    query = "SELECT numProcesso, data, fase FROM eventi WHERE numProcesso IN (SELECT * FROM processifiniti)"
+    query = "SELECT numProcesso, data, fase FROM eventi WHERE numProcesso IN (SELECT * FROM processifiniti) ORDER BY fase"
     return getDataFromDatabase(connection, query)
 
 def getImportantEvents(connection):
-    query = "SELECT numProcesso, data, fase FROM eventiimportanti WHERE numProcesso IN (SELECT * FROM processifiniti)"
+    query = "SELECT numProcesso, data, fase FROM eventiimportanti WHERE numProcesso IN (SELECT * FROM processifiniti) ORDER BY fase"
     return getDataFromDatabase(connection, query)
 
 def getCourtHearingsEvents(connection):
-    query = "SELECT numProcesso, data, fase FROM udienze WHERE numProcesso IN (SELECT * FROM processifiniti)"
+    query = "SELECT numProcesso, data, fase FROM udienze WHERE numProcesso IN (SELECT * FROM processifiniti) ORDER BY fase"
     return getDataFromDatabase(connection, query)
 
 def getAllProcesses(connection):

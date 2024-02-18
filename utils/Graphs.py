@@ -1,5 +1,4 @@
 import plotly.express as px
-import plotly.graph_objects as go
 import numpy as np
 import datetime as dt
 import matplotlib.pyplot as plt
@@ -14,13 +13,31 @@ def getEvents(events):
     for e in events:
             pIds.append(e[0])
             dates.append(e[1])
-            phases.append((e[2]))
+            phases.append(e[2])
     return pd.DataFrame(
-        data={"data": dates, "numProcesso": pIds, "fase": phases})
+        data = {"data": dates, "numProcesso": pIds, "fase": phases})
 
 def displayEvents(events, t):
     df = getEvents(events)
-    fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", title = t)
+    dff = df
+    fig = px.scatter(dff, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = ['blue', 'orange', 'red', 'green', 'purple'], labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width=1080)
+    fig.update_layout(
+        legend=dict(
+            yanchor = "top",
+            y = 0.99,
+            xanchor = "left",
+            x = 0.01,
+            bgcolor = None
+        ),
+        yaxis = dict(
+            showticklabels = False
+        )
+    )
+    fig.update_xaxes(
+        dtick="M1",
+        tickformat="%b\n%Y",
+        ticklabelmode="period"
+    )
     app = ds.Dash()
     app.layout = ds.html.Div([
         ds.dcc.DatePickerRange(
@@ -34,7 +51,7 @@ def displayEvents(events, t):
         ds.dcc.Graph(
              figure = fig, 
              id = 'events-graph'
-        ),
+        )
     ])
 
     @app.callback(
@@ -42,8 +59,25 @@ def displayEvents(events, t):
     [ds.Input('date-ranger', 'start_date'), ds.Input('date-ranger', 'end_date')])
     def update_graph(start_date, end_date):
         dff = df[(df['data'] > start_date) & (df['data'] < end_date)]
-        fig = px.scatter(dff, x = "data", y = "numProcesso", color = "fase", labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t)
+        fig = px.scatter(dff, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = ['blue', 'orange', 'red', 'green', 'purple'], labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width=1080)
+        fig.update_layout(
+            legend=dict(
+                yanchor="top",
+                y=0.99,
+                xanchor="left",
+                x=0.01,
+                bgcolor=None
+            ),
+            yaxis=dict(
+                showticklabels = False
+            )
+        )
+        fig.update_xaxes(
+            dtick="M1",
+            tickformat="%b\n%Y",
+            ticklabelmode="period"
+        )
         return fig
-
+    
     app.run(debug=True)
 
