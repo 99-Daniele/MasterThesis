@@ -5,36 +5,52 @@ import utils.Graphs as gr
 
 def displayAllEvents(connection):
     e = gt.getAllEvents(connection)
-    gr.displayEvents(e, "EVENTI")
+    j = gt.getTop10Judges(connection)
+    s = gt.getTop10Subjects(connection)
+    gr.displayEvents(e, j, s, "EVENTI")
 
 def displayImportantEvents(connection):
     e = gt.getImportantEvents(connection)
-    gr.displayEvents(e, "EVENTI")
+    j = gt.getTop10Judges(connection)
+    s = gt.getTop10Subjects(connection)
+    gr.displayEvents(e, j, s, "EVENTI IMPORTANTI")
 
 def displayCourtHearingEvents(connection):
     e = gt.getCourtHearingsEvents(connection)
-    gr.displayEvents(e, "EVENTI")
+    j = gt.getTop10Judges(connection)
+    s = gt.getTop10Subjects(connection)
+    gr.displayEvents(e, j, s, "UDIENZE")
 
 def displayAllProcesses(connection):
     p = gt.getAllProcesses(connection)
-    gr.displayProcesses(p, "DURATA PROCESSI")
+    j = gt.getTop10Judges(connection)
+    s = gt.getTop10Subjects(connection)
+    gr.displayProcesses(p, j, s, "DURATA MEDIA DI TUTTI I PROCESSI")
 
 def displayFinishedProcesses(connection):
     p = gt.getFinishedProcesses(connection)
-    gr.displayProcesses(p, "DURATA PROCESSI")
+    j = gt.getTop10Judges(connection)
+    s = gt.getTop10Subjects(connection)
+    gr.displayProcesses(p, j, s, "DURATA MEDIA DEI PROCESSI FINITI")
 
 def displayUnfinishedProcesses(connection):
     p = gt.getUnfinishedProcesses(connection)
-    gr.displayProcesses(p, "DURATA PROCESSI")
+    j = gt.getTop10Judges(connection)
+    s = gt.getTop10Subjects(connection)
+    gr.displayProcesses(p, j, s, "DURATA MEDIA DEI PROCESSI NON FINITI")
 
 def displayStoppedProcesses(connection):
     p = gt.getStoppedProcesses(connection)
-    gr.displayProcesses(p, "DURATA PROCESSI")
+    j = gt.getTop10Judges(connection)
+    s = gt.getTop10Subjects(connection)
+    gr.displayProcesses(p, j, s, "DURATA MEDIA DEI PROCESSI STOPPATI")
 
 def displayStuckedProcesses(connection):
-    p = gt.getStuckedProcesses(connection)
-    gr.displayProcesses(p, "DURATA PROCESSI")
+    p = gt.getStuckedProcesses(connection) 
+    j = gt.getTop10Judges(connection)
+    s = gt.getTop10Subjects(connection)
+    gr.displayProcesses(p, j, s, "DURATA MEDIA DEI PROCESSI DERAGLIATI")
 
 if __name__ == '__main__':
     connection = connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayFinishedProcesses(connection)
+    displayAllProcesses(connection)
