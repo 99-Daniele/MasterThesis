@@ -1,15 +1,24 @@
 import plotly.express as px
 import dash as ds
 
+weeks = ['02/01', '08/01', '15/01', '22/01', '29/01', '05/02', '12/02', '19/02', '26/02', '05/03', '12/03', '19/03', '26/03', '02/04', '09/04', '16/04', '23/04', '30/04', '07/05', '14/05', '21/05', '28/05', '04/06', '11/06', '18/06', '25/06', '02/07', '09/07', '16/07', '23/07', '30/07', '06/08', '13/08', '20/08', '27/08', '03/09', '10/09', '17/09', '24/09', '01/10', '08/10', '15/10', '22/10', '29/10', '05/11', '12/11', '19/11', '26/11', '03/12', '10/12', '17/12', '24/12', '31/12']
+months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
+
 def getAvgStdDataframe(df, c):
     match c:
         case "W":
-            df1 = df.groupby(df['data'].dt.to_period("W")).mean()
-            df2 = df.groupby(df['data'].dt.to_period("W")).std()
+            dft = df['data'].map(lambda x: x.week)
+            df1 = df.groupby(dft).mean()
+            df2 = df.groupby(dft).std()
+            df1['data'] = weeks
+            df2['data'] = weeks
             return calcDataframeDifference(df1, df2)
         case "M":
-            df1 = df.groupby(df['data'].map(lambda x: x.month)).mean()
-            df2 = df.groupby(df['data'].map(lambda x: x.month)).std()
+            dft = df['data'].map(lambda x: x.month)
+            df1 = df.groupby(dft).mean()
+            df2 = df.groupby(dft).std()
+            df1['data'] = months
+            df2['data'] = months
             return calcDataframeDifference(df1, df2)
         case "MY":
             df1 = df.groupby(df['data'].dt.to_period("M")).mean()
@@ -29,7 +38,7 @@ def calcDataframeDifference(df1, df2):
 
 def displayEvents(df, t):
     dff = df
-    fig = px.scatter(dff, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = ['blue', 'orange', 'red', 'green', 'purple'], labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width=1080)
+    fig = px.scatter(dff, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = ['blue', 'orange', 'red', 'green', 'purple'], labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
     fig.update_layout(
         legend = dict(
             yanchor = "top",
@@ -48,7 +57,7 @@ def displayEvents(df, t):
                 ])
             ),
             rangeslider = dict(
-                visible = True
+                visible = False
             ),
             type = "date"
         ),
@@ -83,7 +92,7 @@ def displayEvents(df, t):
     [ds.Input('date-ranger', 'start_date'), ds.Input('date-ranger', 'end_date')])
     def update_graph(start_date, end_date):
         dff = df[(df['data'] > start_date) & (df['data'] < end_date)]
-        fig = px.scatter(dff, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = ['blue', 'orange', 'red', 'green', 'purple'], labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width=1080)
+        fig = px.scatter(dff, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = ['blue', 'orange', 'red', 'green', 'purple'], labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
         fig.update_layout(
             legend=dict(
                 yanchor = "top",
@@ -101,10 +110,10 @@ def displayEvents(df, t):
                         dict(step="all")
                     ])
                 ),
-                rangeslider=dict(
-                    visible=True
+                rangeslider = dict(
+                    visible = False
                 ),
-                type="date"
+                type = "date"
             ),
             yaxis = dict(
                 showticklabels = False
@@ -121,7 +130,7 @@ def displayEvents(df, t):
 
 def displayProcesses(df, t):
     dff = getAvgStdDataframe(df, "MY")
-    fig = px.bar(dff[1], x = "data", y = ["durata max", "durata min"], labels = {'value':'Durata del processo [giorni]', 'data':'Data inizio processo'}, barmode = 'overlay',  title = t, width=1080)
+    fig = px.bar(dff[1], x = "data", y = ["durata max", "durata min"], labels = {'value':'Durata del processo [giorni]', 'data':'Data inizio processo'}, barmode = 'overlay',  title = t, width = 1400, height = 600)
     fig.add_traces(
         px.line(dff[0], x = "data", y = "durata", markers = True).update_traces(showlegend = True, name = "durata media", line_color = 'black').data
     )
