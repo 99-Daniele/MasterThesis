@@ -2,15 +2,13 @@ daysOfYear = ['01/01', '02/01', '03/01', '04/01', '05/01', '06/01', '07/01', '08
 weeks = ['02/01', '08/01', '15/01', '22/01', '29/01', '05/02', '12/02', '19/02', '26/02', '05/03', '12/03', '19/03', '26/03', '02/04', '09/04', '16/04', '23/04', '30/04', '07/05', '14/05', '21/05', '28/05', '04/06', '11/06', '18/06', '25/06', '02/07', '09/07', '16/07', '23/07', '30/07', '06/08', '13/08', '20/08', '27/08', '03/09', '10/09', '17/09', '24/09', '01/10', '08/10', '15/10', '22/10', '29/10', '05/11', '12/11', '19/11', '26/11', '03/12', '10/12', '17/12', '24/12', '31/12']
 months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
 daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica']
+colors = ['blue', 'orange', 'red', 'green', 'purple']
+importantEvents = ['ISCRIZIONE', 'ASSEGNAZIONE', 'FISSAZIONE UDIENZA', 'UDIENZA', 'IN DECISIONE', 'PUBBLICAZIONE', 'RINVIO', 'FINE PROCESSO', 'STOP PROCESSO', 'PROCESSO IN PAUSA']
+sectionList = ['01', '02', '03', '04', '05', 'TI', 'V0', 'C0', 'TA', 'AG', 'FE', 'L0']
 
-def getDayOfYear(day):
-    return daysOfYear[day]
-
-def getWeek(week):
-    return weeks[week]
-
-def getMonth(month):
-    return months[month]
-
-def getDayOfWeek(day):
-    return daysOfWeek[day]
+def phaseColorList(df):
+    phases = df['fase'].unique().tolist()
+    c = []
+    for p in phases:
+        c.append(colors[int(p) - 1])
+    return c

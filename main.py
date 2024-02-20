@@ -53,4 +53,4 @@ def displayStuckedProcesses(connection):
 
 if __name__ == '__main__':
     connection = connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayAllProcesses(connection)
+    displayImportantEvents(connection)

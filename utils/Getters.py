@@ -5,11 +5,13 @@ def createEventsDataFrame(events):
     pIds = []
     dates = []
     phases = []
+    tags = []
     for e in events:
             pIds.append(e[0])
             dates.append(e[1])
             phases.append(e[2])
-    return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases})
+            tags.append(e[3])
+    return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "etichetta": tags})
 
 def createProcessesDataFrame(processes):
     durations = []
@@ -26,17 +28,17 @@ def createProcessesDataFrame(processes):
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges, "sezione": sections, "materia": subjects})
 
 def getAllEvents(connection):
-    query = "SELECT numProcesso, data, fase FROM eventi WHERE numProcesso IN (SELECT * FROM processifiniti) ORDER BY fase"
+    query = "SELECT numProcesso, data, fase, etichetta FROM eventi AS e, elencoeventiimportanti AS ei WHERE numProcesso IN (SELECT * FROM processifiniti) AND e.codice = ei.evento ORDER BY fase"
     events = getDataFromDatabase(connection, query)
     return createEventsDataFrame(events)
 
 def getImportantEvents(connection):
-    query = "SELECT numProcesso, data, fase FROM eventiimportanti WHERE numProcesso IN (SELECT * FROM processifiniti) ORDER BY fase"
+    query = "SELECT numProcesso, data, fase, evento FROM eventiimportanti WHERE numProcesso IN (SELECT * FROM processifiniti) ORDER BY fase"
     events = getDataFromDatabase(connection, query)
     return createEventsDataFrame(events)
 
 def getCourtHearingsEvents(connection):
-    query = "SELECT numProcesso, data, fase FROM udienze WHERE numProcesso IN (SELECT * FROM processifiniti) ORDER BY fase"
+    query = "SELECT numProcesso, data, fase, evento FROM udienze WHERE numProcesso IN (SELECT * FROM processifiniti) ORDER BY fase"
     events = getDataFromDatabase(connection, query)
     return createEventsDataFrame(events)
 
