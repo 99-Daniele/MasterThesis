@@ -1,5 +1,6 @@
 import plotly.express as px
 import dash as ds
+import pandas as pd
 
 import utils.Legenda as lg
 
@@ -8,28 +9,28 @@ def getAvgStdDataframe(df, c):
         case "W":
             dft = df[['data', 'durata']].copy()
             dft['data'] = dft['data'].map(lambda x: x.week)
-            df1 = dft.groupby(dft['data']).mean()
-            df2 = dft.groupby(dft['data']).std()
-            df1['data'] = lg.weeks
-            df2['data'] = lg.weeks
+            df1 = dft.groupby(['data'], as_index = False).mean()
+            df2 = dft.groupby(['data'], as_index = False).std()
+            df1['data'] = df1['data'].map(lambda x: lg.weeks[x - 1])
             return calcDataframeDifference(df1, df2)
         case "M":
             dft = df[['data', 'durata']].copy()
             dft['data'] = dft['data'].map(lambda x: x.month)
-            df1 = dft.groupby(dft['data']).mean()
-            df2 = dft.groupby(dft['data']).std()
-            df1['data'] = lg.months
-            df2['data'] = lg.months
+            df1 = dft.groupby(['data'], as_index = False).mean()
+            df2 = dft.groupby(['data'], as_index = False).std()
+            df1['data'] = df1['data'].map(lambda x: lg.months[x - 1])
             return calcDataframeDifference(df1, df2)
         case "MY":
             dft = df[['data', 'durata']].copy()
-            df1 = dft.groupby(dft['data'].dt.to_period("M")).mean()
-            df2 = dft.groupby(dft['data'].dt.to_period("M")).std()
+            dft['mese'] = dft['data'].dt.to_period("M")
+            df1 = dft.groupby(['mese'], as_index = False).mean()
+            df2 = dft.groupby(['mese'], as_index = False).std()
             return calcDataframeDifference(df1, df2)
         case "Y":
             dft = df[['data', 'durata']].copy()
-            df1 = dft.groupby(dft['data'].dt.to_period("Y")).mean()
-            df2 = dft.groupby(dft['data'].dt.to_period("Y")).std()
+            dft['anno'] = dft['data'].dt.to_period("Y")
+            df1 = dft.groupby(['anno'], as_index = False).mean()
+            df2 = dft.groupby(['anno'], as_index = False).std()
             return calcDataframeDifference(df1, df2)
 
 def calcDataframeDifference(df1, df2):
@@ -38,6 +39,14 @@ def calcDataframeDifference(df1, df2):
     df2['durata min'] = df1['durata'] - df2['durata']
     df2['durata min'] = df2['durata min'].apply(lambda x : 0 if x < 0 else x)
     return [df1, df2]
+
+def getTop10Judges(df):
+    judges = df.groupby(['giudice'])['giudice'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
+    return judges
+
+def getTop10Subjects(df):
+    subjects = df.groupby(['materia'])['materia'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
+    return subjects
 
 def displayEvents(df, judges, subjects, t):
     dff = df
@@ -135,7 +144,7 @@ def displayEvents(df, judges, subjects, t):
     
     app.run(debug=True)
 
-def displayProcesses(df, judges, subjects, t):
+def displayProcesses(df, t):
     dft = df
     dff = getAvgStdDataframe(dft, "MY")
     fig = px.bar(dff[1], x = "data", y = ["durata max", "durata min"], labels = {'value':'Durata del processo [giorni]', 'data':'Data inizio processo'}, barmode = 'overlay',  title = t, width = 1400, height = 600)
@@ -180,6 +189,8 @@ def displayProcesses(df, judges, subjects, t):
                 )
             )]
         )
+    judges = getTop10Judges(dft)['giudice']
+    subjects = getTop10Subjects(dft)['materia']
     app = ds.Dash()
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(judges, multi = False, id = 'judge-dropdown', placeholder = 'Seleziona giudice...', style = {'width': 300}),
@@ -217,6 +228,8 @@ def displayProcesses(df, judges, subjects, t):
                     dft = df[(df['giudice'] == ju_drop) & (df['materia'] == su_drop)]
                 else:
                     dft = df[(df['giudice'] == ju_drop) & (df['materia'] == su_drop) & (df['sezione'] == se_drop)]
+        judges = getTop10Judges(dft)['giudice']
+        subjects = getTop10Subjects(dft)['materia']
         dff = getAvgStdDataframe(dft, "MY")
         fig = px.bar(dff[1], x = "data", y = ["durata max", "durata min"], labels = {'value':'Durata del processo [giorni]', 'data':'Data inizio processo'}, barmode = 'overlay',  title = t, width = 1400, height = 600)
         fig.add_traces(
