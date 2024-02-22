@@ -12,22 +12,12 @@ def getAvgStdDataframe(df, c):
             df2 = df1.groupby(['data'], as_index = False).median()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             return [df1, df2]
-            df1 = dft.groupby(['data'], as_index = False).mean()
-            df2 = dft.groupby(['data'], as_index = False).std()
-            df1['data'] = df1['data'].map(lambda x: lg.weeks[x - 1])
-            #df1['data'] = df1['data'].map(lambda x: lg.getWeekDate(x))
-            return calcDataframeDifference(df1, df2)
         case "M":
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: lg.getMonthDate(x.month))
             df2 = df1.groupby(['data'], as_index = False).median()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             return [df1, df2]
-            df1 = dft.groupby(['data'], as_index = False).mean()
-            df2 = dft.groupby(['data'], as_index = False).std()
-            df1['data'] = df1['data'].map(lambda x: lg.months[x - 1])
-            #df1['data'] = df1['data'].map(lambda x: lg.getMonthDate(x))
-            return calcDataframeDifference(df1, df2)
         case "MY":
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].dt.to_period("M")
@@ -35,11 +25,6 @@ def getAvgStdDataframe(df, c):
             df2 = df1.groupby(['data'], as_index = False).median()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             return [df1, df2]
-            df1 = dft.groupby(['mese'], as_index = False).mean()
-            df2 = dft.groupby(['mese'], as_index = False).std()
-            df1['data'] = df1['data'].map(lambda x: lg.getMonthYearDate(x))
-            #df2['tick'] = df1['data']
-            return calcDataframeDifference(df1, df2)
         case "Y":
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].dt.to_period("Y")
@@ -47,18 +32,6 @@ def getAvgStdDataframe(df, c):
             df2 = df1.groupby(['data'], as_index = False).median()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             return [df1, df2]
-            df1 = dft.groupby(['anno'], as_index = False).mean()
-            df2 = dft.groupby(['anno'], as_index = False).std()
-            df1['data'] = df1['data'].map(lambda x: lg.getYearDate(x))
-            #df2['tick'] = df1['data']
-            return calcDataframeDifference(df1, df2)
-
-def getMedianDataframe(df1, df2):
-    df2['data'] = df1['data']
-    df2['durata max'] = df1['durata'] + df2['durata']
-    df2['durata min'] = df1['durata'] - df2['durata']
-    df2['durata min'] = df2['durata min'].apply(lambda x : 0 if x < 0 else x)
-    return [df1, df2]
 
 def getTop10Judges(df):
     judges = df.groupby(['giudice'])['giudice'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
