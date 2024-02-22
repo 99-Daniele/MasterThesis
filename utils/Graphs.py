@@ -12,6 +12,7 @@ def getAvgStdDataframe(df, c):
             df1 = dft.groupby(['data'], as_index = False).mean()
             df2 = dft.groupby(['data'], as_index = False).std()
             df1['data'] = df1['data'].map(lambda x: lg.weeks[x - 1])
+            #df1['data'] = df1['data'].map(lambda x: lg.getWeekDate(x))
             return calcDataframeDifference(df1, df2)
         case "M":
             dft = df[['data', 'durata']].copy()
@@ -19,18 +20,23 @@ def getAvgStdDataframe(df, c):
             df1 = dft.groupby(['data'], as_index = False).mean()
             df2 = dft.groupby(['data'], as_index = False).std()
             df1['data'] = df1['data'].map(lambda x: lg.months[x - 1])
+            #df1['data'] = df1['data'].map(lambda x: lg.getMonthDate(x))
             return calcDataframeDifference(df1, df2)
         case "MY":
             dft = df[['data', 'durata']].copy()
             dft['mese'] = dft['data'].dt.to_period("M")
             df1 = dft.groupby(['mese'], as_index = False).mean()
             df2 = dft.groupby(['mese'], as_index = False).std()
+            df1['data'] = df1['data'].map(lambda x: lg.getMonthYearDate(x))
+            #df2['tick'] = df1['data']
             return calcDataframeDifference(df1, df2)
         case "Y":
             dft = df[['data', 'durata']].copy()
             dft['anno'] = dft['data'].dt.to_period("Y")
             df1 = dft.groupby(['anno'], as_index = False).mean()
             df2 = dft.groupby(['anno'], as_index = False).std()
+            df1['data'] = df1['data'].map(lambda x: lg.getYearDate(x))
+            #df2['tick'] = df1['data']
             return calcDataframeDifference(df1, df2)
 
 def calcDataframeDifference(df1, df2):
@@ -153,42 +159,42 @@ def displayProcesses(df, t):
     )
     fig.update_layout(
         updatemenus = [(
-                dict(
-                    type = 'buttons',
-                    direction = 'right',
-                    showactive = True,     
-                    yanchor = "top",
-                    y = 0.99,
-                    xanchor = "right",
-                    x = 0.99,
-                    buttons = list(
-                        [
-                            dict(
-                                label = 'W',
-                                method = 'update',
-                                args = [{'x' : [getAvgStdDataframe(dft, "W")[1]['data'], getAvgStdDataframe(dft, "W")[0]['data']], 'y' : [getAvgStdDataframe(dft, "W")[1]['durata max'], getAvgStdDataframe(dft, "W")[1]['durata min'], getAvgStdDataframe(dft, "W")[0]['durata']]}]
-                            ),
-                            dict(
-                                label = 'M',
-                                method = 'update',
-                                args = [{'x' : [getAvgStdDataframe(dft, "M")[1]['data'], getAvgStdDataframe(dft, "M")[0]['data']], 'y' : [getAvgStdDataframe(dft, "M")[1]['durata max'], getAvgStdDataframe(dft, "M")[1]['durata min'], getAvgStdDataframe(dft, "M")[0]['durata']]}]
-                            ),
-                            dict(
-                                label = 'MY',
-                                method = 'update',
-                                args = [{'x' : [getAvgStdDataframe(dft, "MY")[1]['data'], getAvgStdDataframe(dft, "MY")[0]['data']], 'y' : [getAvgStdDataframe(dft, "MY")[1]['durata max'], getAvgStdDataframe(dft, "MY")[1]['durata min'], getAvgStdDataframe(dft, "MY")[0]['durata']]}]
-                            ),
-                            dict(
-                                label = 'Y',
-                                method = 'update',
-                                args = [{'x' : [getAvgStdDataframe(dft, "Y")[1]['data'], getAvgStdDataframe(dft, "Y")[0]['data']], 'y' : [getAvgStdDataframe(dft, "Y")[1]['durata max'], getAvgStdDataframe(dft, "Y")[1]['durata min'], getAvgStdDataframe(dft, "Y")[0]['durata']]}]
-                            )
-                        ]
-                    )
-
+            dict(
+                type = 'buttons',
+                direction = 'right',
+                showactive = True,     
+                yanchor = "top",
+                y = 0.99,
+                xanchor = "right",
+                x = 0.99,
+                buttons = list(
+                    [
+                        dict(
+                            label = 'W',
+                            method = 'update',
+                            args = [{'x' : [getAvgStdDataframe(dft, "W")[1]['data'], getAvgStdDataframe(dft, "W")[0]['data']], 'y' : [getAvgStdDataframe(dft, "W")[1]['durata max'], getAvgStdDataframe(dft, "W")[1]['durata min'], getAvgStdDataframe(dft, "W")[0]['durata']]}]
+                        ),
+                        dict(
+                            label = 'M',
+                            method = 'update',
+                            args = [{'x' : [getAvgStdDataframe(dft, "M")[1]['data'], getAvgStdDataframe(dft, "M")[0]['data']], 'y' : [getAvgStdDataframe(dft, "M")[1]['durata max'], getAvgStdDataframe(dft, "M")[1]['durata min'], getAvgStdDataframe(dft, "M")[0]['durata']]}]
+                        ),
+                        dict(
+                            label = 'MY',
+                            method = 'update',
+                            args = [{'x' : [getAvgStdDataframe(dft, "MY")[1]['data'], getAvgStdDataframe(dft, "MY")[0]['data']], 'y' : [getAvgStdDataframe(dft, "MY")[1]['durata max'], getAvgStdDataframe(dft, "MY")[1]['durata min'], getAvgStdDataframe(dft, "MY")[0]['durata']]}]
+                        ),
+                        dict(
+                            label = 'Y',
+                            method = 'update',
+                            args = [{'x' : [getAvgStdDataframe(dft, "Y")[1]['data'], getAvgStdDataframe(dft, "Y")[0]['data']], 'y' : [getAvgStdDataframe(dft, "Y")[1]['durata max'], getAvgStdDataframe(dft, "Y")[1]['durata min'], getAvgStdDataframe(dft, "Y")[0]['durata']]}]
+                        )
+                    ]
                 )
-            )]
-        )
+            )
+        )]
+    )
+    fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
     judges = getTop10Judges(dft)['giudice']
     subjects = getTop10Subjects(dft)['materia']
     app = ds.Dash()
@@ -269,10 +275,10 @@ def displayProcesses(df, t):
                             )
                         ]
                     )
-
                 )
             )]
         )
+        fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
         return fig
 
     app.run(debug=True)
