@@ -7,39 +7,53 @@ import utils.Legenda as lg
 def getAvgStdDataframe(df, c):
     match c:
         case "W":
-            dft = df[['data', 'durata']].copy()
-            dft['data'] = dft['data'].map(lambda x: x.week)
+            df1 = df[['data', 'durata']].copy()
+            df1['data'] = df1['data'].map(lambda x: lg.getWeekDate(x.week))
+            df2 = df1.groupby(['data'], as_index = False).median()
+            df2['conteggio'] = df1.groupby(['data']).size().tolist()
+            return [df1, df2]
             df1 = dft.groupby(['data'], as_index = False).mean()
             df2 = dft.groupby(['data'], as_index = False).std()
             df1['data'] = df1['data'].map(lambda x: lg.weeks[x - 1])
             #df1['data'] = df1['data'].map(lambda x: lg.getWeekDate(x))
             return calcDataframeDifference(df1, df2)
         case "M":
-            dft = df[['data', 'durata']].copy()
-            dft['data'] = dft['data'].map(lambda x: x.month)
+            df1 = df[['data', 'durata']].copy()
+            df1['data'] = df1['data'].map(lambda x: lg.getMonthDate(x.month))
+            df2 = df1.groupby(['data'], as_index = False).median()
+            df2['conteggio'] = df1.groupby(['data']).size().tolist()
+            return [df1, df2]
             df1 = dft.groupby(['data'], as_index = False).mean()
             df2 = dft.groupby(['data'], as_index = False).std()
             df1['data'] = df1['data'].map(lambda x: lg.months[x - 1])
             #df1['data'] = df1['data'].map(lambda x: lg.getMonthDate(x))
             return calcDataframeDifference(df1, df2)
         case "MY":
-            dft = df[['data', 'durata']].copy()
-            dft['mese'] = dft['data'].dt.to_period("M")
+            df1 = df[['data', 'durata']].copy()
+            df1['data'] = df1['data'].dt.to_period("M")
+            df1['data'] = df1['data'].map(lambda x: lg.getMonthYearDate(x))
+            df2 = df1.groupby(['data'], as_index = False).median()
+            df2['conteggio'] = df1.groupby(['data']).size().tolist()
+            return [df1, df2]
             df1 = dft.groupby(['mese'], as_index = False).mean()
             df2 = dft.groupby(['mese'], as_index = False).std()
             df1['data'] = df1['data'].map(lambda x: lg.getMonthYearDate(x))
             #df2['tick'] = df1['data']
             return calcDataframeDifference(df1, df2)
         case "Y":
-            dft = df[['data', 'durata']].copy()
-            dft['anno'] = dft['data'].dt.to_period("Y")
+            df1 = df[['data', 'durata']].copy()
+            df1['data'] = df1['data'].dt.to_period("Y")
+            df1['data'] = df1['data'].map(lambda x: lg.getYearDate(x))
+            df2 = df1.groupby(['data'], as_index = False).median()
+            df2['conteggio'] = df1.groupby(['data']).size().tolist()
+            return [df1, df2]
             df1 = dft.groupby(['anno'], as_index = False).mean()
             df2 = dft.groupby(['anno'], as_index = False).std()
             df1['data'] = df1['data'].map(lambda x: lg.getYearDate(x))
             #df2['tick'] = df1['data']
             return calcDataframeDifference(df1, df2)
 
-def calcDataframeDifference(df1, df2):
+def getMedianDataframe(df1, df2):
     df2['data'] = df1['data']
     df2['durata max'] = df1['durata'] + df2['durata']
     df2['durata min'] = df1['durata'] - df2['durata']
@@ -53,6 +67,30 @@ def getTop10Judges(df):
 def getTop10Subjects(df):
     subjects = df.groupby(['materia'])['materia'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
     return subjects
+
+def updateDataframe(df, ju_drop, su_drop, se_drop):
+    if ju_drop is None:
+        if su_drop is None:
+            if se_drop is None:
+                return df
+            else:
+                return df[df['sezione'] == se_drop]
+        else:
+            if se_drop is None:
+                return df[df['materia'] == su_drop]
+            else:
+                return df[(df['materia'] == su_drop) & (df['sezione'] == se_drop)]
+    else:
+        if su_drop is None:
+            if se_drop is None:
+                return df[df['giudice'] == ju_drop]
+            else:
+                return df[(df['giudice'] == ju_drop) & (df['sezione'] == se_drop)]
+        else:
+            if se_drop is None:
+                return df[(df['giudice'] == ju_drop) & (df['materia'] == su_drop)]
+            else:
+                return df[(df['giudice'] == ju_drop) & (df['materia'] == su_drop) & (df['sezione'] == se_drop)]
 
 def displayEvents(df, judges, subjects, t):
     dff = df
@@ -151,46 +189,33 @@ def displayEvents(df, judges, subjects, t):
     app.run(debug=True)
 
 def displayProcesses(df, t):
-    dft = df
+    dft = df.copy()
     dff = getAvgStdDataframe(dft, "MY")
-    fig = px.bar(dff[1], x = "data", y = ["durata max", "durata min"], labels = {'value':'Durata del processo [giorni]', 'data':'Data inizio processo'}, barmode = 'overlay',  title = t, width = 1400, height = 600)
+    fig = px.box(dff[0], x = "data", y = "durata", labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
     fig.add_traces(
-        px.line(dff[0], x = "data", y = "durata", markers = True).update_traces(showlegend = True, name = "durata media", line_color = 'black').data
+        px.line(dff[1], x = "data", y = "durata", text = "conteggio", markers = True).update_traces(line_color = 'red', textposition = "top center", textfont = dict(color = "black", size = 10)).data
     )
     fig.update_layout(
         updatemenus = [(
-            dict(
-                type = 'buttons',
-                direction = 'right',
-                showactive = True,     
-                yanchor = "top",
-                y = 0.99,
-                xanchor = "right",
-                x = 0.99,
-                buttons = list(
-                    [
-                        dict(
-                            label = 'W',
-                            method = 'update',
-                            args = [{'x' : [getAvgStdDataframe(dft, "W")[1]['data'], getAvgStdDataframe(dft, "W")[0]['data']], 'y' : [getAvgStdDataframe(dft, "W")[1]['durata max'], getAvgStdDataframe(dft, "W")[1]['durata min'], getAvgStdDataframe(dft, "W")[0]['durata']]}]
-                        ),
-                        dict(
-                            label = 'M',
-                            method = 'update',
-                            args = [{'x' : [getAvgStdDataframe(dft, "M")[1]['data'], getAvgStdDataframe(dft, "M")[0]['data']], 'y' : [getAvgStdDataframe(dft, "M")[1]['durata max'], getAvgStdDataframe(dft, "M")[1]['durata min'], getAvgStdDataframe(dft, "M")[0]['durata']]}]
-                        ),
-                        dict(
-                            label = 'MY',
-                            method = 'update',
-                            args = [{'x' : [getAvgStdDataframe(dft, "MY")[1]['data'], getAvgStdDataframe(dft, "MY")[0]['data']], 'y' : [getAvgStdDataframe(dft, "MY")[1]['durata max'], getAvgStdDataframe(dft, "MY")[1]['durata min'], getAvgStdDataframe(dft, "MY")[0]['durata']]}]
-                        ),
-                        dict(
-                            label = 'Y',
-                            method = 'update',
-                            args = [{'x' : [getAvgStdDataframe(dft, "Y")[1]['data'], getAvgStdDataframe(dft, "Y")[0]['data']], 'y' : [getAvgStdDataframe(dft, "Y")[1]['durata max'], getAvgStdDataframe(dft, "Y")[1]['durata min'], getAvgStdDataframe(dft, "Y")[0]['durata']]}]
-                        )
-                    ]
-                )
+            dict(type = 'buttons', direction = 'right', showactive = True, yanchor = "top", y = 0.99, xanchor = "right", x = 0.99,
+                buttons = list([
+                    dict(
+                        label = 'W', method = 'update',
+                        args = [{'x' : [getAvgStdDataframe(dft, "W")[0]['data'], getAvgStdDataframe(dft, "W")[1]['data']], 'y' : [getAvgStdDataframe(dft, "W")[0]['durata'], getAvgStdDataframe(dft, "W")[1]['durata']], 'text': [getAvgStdDataframe(dft, "W")[1]['conteggio']]}]
+                    ),
+                    dict(
+                        label = 'M', method = 'update',
+                        args = [{'x' : [getAvgStdDataframe(dft, "M")[0]['data'], getAvgStdDataframe(dft, "M")[1]['data']], 'y' : [getAvgStdDataframe(dft, "M")[0]['durata'], getAvgStdDataframe(dft, "M")[1]['durata']], 'text': [getAvgStdDataframe(dft, "M")[1]['conteggio']]}]
+                    ),
+                    dict(
+                        label = 'MY', method = 'update',
+                        args = [{'x' : [getAvgStdDataframe(dft, "MY")[0]['data'], getAvgStdDataframe(dft, "MY")[1]['data']], 'y' : [getAvgStdDataframe(dft, "MY")[0]['durata'], getAvgStdDataframe(dft, "MY")[1]['durata']], 'text': [getAvgStdDataframe(dft, "MY")[1]['conteggio']]}]
+                    ),
+                    dict(
+                        label = 'Y', method = 'update',
+                        args = [{'x' : [getAvgStdDataframe(dft, "Y")[0]['data'], getAvgStdDataframe(dft, "Y")[1]['data']], 'y' : [getAvgStdDataframe(dft, "Y")[0]['durata'], getAvgStdDataframe(dft, "Y")[1]['durata']], 'text': [getAvgStdDataframe(dft, "Y")[1]['conteggio']]}]
+                    )
+                ])
             )
         )]
     )
@@ -207,78 +232,44 @@ def displayProcesses(df, t):
              id = 'processes-graph'
         )
     ])
-
     @app.callback(
     ds.Output('processes-graph', 'figure'),
     [ds.Input('judge-dropdown', 'value'), ds.Input('subject-dropdown', 'value'), ds.Input('section-dropdown', 'value')])
     def update_graph(ju_drop, su_drop, se_drop):
-        if ju_drop is None:
-            if su_drop is None:
-                if se_drop is None:
-                    dft = df
-                else:
-                    dft = df[df['sezione'] == se_drop]
-            else:
-                if se_drop is None:
-                    dft = df[df['materia'] == su_drop]
-                else:
-                    dft = df[(df['materia'] == su_drop) & (df['sezione'] == se_drop)]
-        else:
-            if su_drop is None:
-                if se_drop is None:
-                    dft = df[df['giudice'] == ju_drop]
-                else:
-                    dft = df[(df['giudice'] == ju_drop) & (df['sezione'] == se_drop)]
-            else:
-                if se_drop is None:
-                    dft = df[(df['giudice'] == ju_drop) & (df['materia'] == su_drop)]
-                else:
-                    dft = df[(df['giudice'] == ju_drop) & (df['materia'] == su_drop) & (df['sezione'] == se_drop)]
-        judges = getTop10Judges(dft)['giudice']
-        subjects = getTop10Subjects(dft)['materia']
+        dft = df.copy()
+        dft = updateDataframe(df, ju_drop, su_drop, se_drop)
+        #judges = getTop10Judges(dft)['giudice']
+        #subjects = getTop10Subjects(dft)['materia']
         dff = getAvgStdDataframe(dft, "MY")
-        fig = px.bar(dff[1], x = "data", y = ["durata max", "durata min"], labels = {'value':'Durata del processo [giorni]', 'data':'Data inizio processo'}, barmode = 'overlay',  title = t, width = 1400, height = 600)
+        fig = px.box(dff[0], x = "data", y = "durata", labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
         fig.add_traces(
-            px.line(dff[0], x = "data", y = "durata", markers = True).update_traces(showlegend = True, name = "durata media", line_color = 'black').data
+            px.line(dff[1], x = "data", y = "durata", text = "conteggio", markers = True).update_traces(line_color = 'red', textposition = "top center", textfont = dict(color = "black", size = 10)).data
         )
         fig.update_layout(
             updatemenus = [(
-                dict(
-                    type = 'buttons',
-                    direction = 'right',
-                    showactive = True,     
-                    yanchor = "top",
-                    y = 0.99,
-                    xanchor = "right",
-                    x = 0.99,
-                    buttons = list(
-                        [
-                            dict(
-                                label = 'W',
-                                method = 'update',
-                                args = [{'x' : [getAvgStdDataframe(dft, "W")[1]['data'], getAvgStdDataframe(dft, "W")[0]['data']], 'y' : [getAvgStdDataframe(dft, "W")[1]['durata max'], getAvgStdDataframe(dft, "W")[1]['durata min'], getAvgStdDataframe(dft, "W")[0]['durata']]}]
-                            ),
-                            dict(
-                                label = 'M',
-                                method = 'update',
-                                args = [{'x' : [getAvgStdDataframe(dft, "M")[1]['data'], getAvgStdDataframe(dft, "M")[0]['data']], 'y' : [getAvgStdDataframe(dft, "M")[1]['durata max'], getAvgStdDataframe(dft, "M")[1]['durata min'], getAvgStdDataframe(dft, "M")[0]['durata']]}]
-                            ),
-                            dict(
-                                label = 'MY',
-                                method = 'update',
-                                args = [{'x' : [getAvgStdDataframe(dft, "MY")[1]['data'], getAvgStdDataframe(dft, "MY")[0]['data']], 'y' : [getAvgStdDataframe(dft, "MY")[1]['durata max'], getAvgStdDataframe(dft, "MY")[1]['durata min'], getAvgStdDataframe(dft, "MY")[0]['durata']]}]
-                            ),
-                            dict(
-                                label = 'Y',
-                                method = 'update',
-                                args = [{'x' : [getAvgStdDataframe(dft, "Y")[1]['data'], getAvgStdDataframe(dft, "Y")[0]['data']], 'y' : [getAvgStdDataframe(dft, "Y")[1]['durata max'], getAvgStdDataframe(dft, "Y")[1]['durata min'], getAvgStdDataframe(dft, "Y")[0]['durata']]}]
-                            )
-                        ]
-                    )
+                dict(type = 'buttons', direction = 'right', showactive = True, yanchor = "top", y = 0.99, xanchor = "right", x = 0.99,
+                    buttons = list([
+                        dict(
+                            label = 'W', method = 'update',
+                            args = [{'x' : [getAvgStdDataframe(dft, "W")[0]['data'], getAvgStdDataframe(dft, "W")[1]['data']], 'y' : [getAvgStdDataframe(dft, "W")[0]['durata'], getAvgStdDataframe(dft, "W")[1]['durata']], 'text': [getAvgStdDataframe(dft, "W")[1]['conteggio']]}]
+                        ),
+                        dict(
+                            label = 'M', method = 'update',
+                            args = [{'x' : [getAvgStdDataframe(dft, "M")[0]['data'], getAvgStdDataframe(dft, "M")[1]['data']], 'y' : [getAvgStdDataframe(dft, "M")[0]['durata'], getAvgStdDataframe(dft, "M")[1]['durata']], 'text': [getAvgStdDataframe(dft, "M")[1]['conteggio']]}]
+                        ),
+                        dict(
+                            label = 'MY', method = 'update',
+                            args = [{'x' : [getAvgStdDataframe(dft, "MY")[0]['data'], getAvgStdDataframe(dft, "MY")[1]['data']], 'y' : [getAvgStdDataframe(dft, "MY")[0]['durata'], getAvgStdDataframe(dft, "MY")[1]['durata']], 'text': [getAvgStdDataframe(dft, "MY")[1]['conteggio']]}]
+                        ),
+                        dict(
+                            label = 'Y', method = 'update',
+                            args = [{'x' : [getAvgStdDataframe(dft, "Y")[0]['data'], getAvgStdDataframe(dft, "Y")[1]['data']], 'y' : [getAvgStdDataframe(dft, "Y")[0]['durata'], getAvgStdDataframe(dft, "Y")[1]['durata']], 'text': [getAvgStdDataframe(dft, "Y")[1]['conteggio']]}]
+                        )
+                    ])
                 )
             )]
         )
         fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
         return fig
-
+    
     app.run(debug=True)
