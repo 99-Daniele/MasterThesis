@@ -15,6 +15,10 @@ def phaseColorList(df):
         c.append(colors[int(p) - 1])
     return c
 
+def getWeekNumber(date):
+    new_date = pd.Timestamp(day = date.day, month = date.month, year = 2024)
+    return new_date.week
+
 def getWeekDate(week):
     new_date = None
     match week:
