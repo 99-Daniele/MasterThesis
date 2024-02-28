@@ -7,6 +7,7 @@ daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Saba
 colors = ['blue', 'orange', 'red', 'green', 'purple']
 importantEvents = ['ISCRIZIONE', 'ASSEGNAZIONE', 'FISSAZIONE UDIENZA', 'UDIENZA', 'IN DECISIONE', 'PUBBLICAZIONE', 'RINVIO', 'FINE PROCESSO', 'STOP PROCESSO', 'PROCESSO IN PAUSA']
 sectionList = ['01', '02', '03', '04', '05', 'TI', 'V0', 'C0', 'TA', 'AG', 'FE', 'L0']
+processState = ['FINITO', 'NON FINITO', 'IN STALLO', 'STOPPATO']
 
 def phaseColorList(df):
     phases = df['fase'].unique().tolist()
@@ -144,3 +145,14 @@ def getYearDate(date):
     y = date.year
     new_date = pd.Timestamp(day = 1, month = 1, year = y)
     return new_date
+
+def finishedNumber(text):
+    match text:
+        case "FINITO":
+            return 1
+        case "NON FINITO":
+            return 0
+        case "IN STALLO":
+            return -1
+        case "STOPPATO":
+            return 2

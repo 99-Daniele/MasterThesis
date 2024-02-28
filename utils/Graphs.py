@@ -36,6 +36,14 @@ def getAvgStdDataframe(df, type):
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
             return [df1, df2]
 
+
+def getFinishedDataframe(df, finished):
+    dft = df.copy()
+    if finished == None or len(finished) == 0:
+        return dft
+    finished = [(lambda x: lg.finishedNumber(x))(x) for x in finished]
+    return dft[dft['finito'].isin(finished)]
+
 def getYearDataframe(df, years):
     dft = df.copy()
     if years == None or len(years) == 0:
@@ -212,7 +220,8 @@ def displayProcesses(df, t):
     subjects = getTop10Subjects(dft)['materia']
     app = ds.Dash()
     app.layout = ds.html.Div([
-        ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 200}),
+        ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         #ds.dcc.Dropdown(judges, multi = False, searchable = False, id = 'judge-dropdown', placeholder = 'Seleziona giudice...', style = {'width': 400}),
         #ds.dcc.Dropdown(subjects, multi = False, searchable = False, id = 'subject-dropdown', placeholder = 'Seleziona materia...', style = {'width': 400}),
         #ds.dcc.Dropdown(lg.sectionList, multi = False, searchable = False, id = 'section-dropdown', placeholder = 'Seleziona sezione...', style = {'width': 400}),
@@ -223,9 +232,10 @@ def displayProcesses(df, t):
     ])
     @app.callback(
     ds.Output('processes-graph', 'figure'),
-    ds.Input('year-dropdown', 'value'))
-    def update_graph(year):
-        dft = getYearDataframe(df, year)
+    [ds.Input('finished-dropdown', 'value'), ds.Input('year-dropdown', 'value')])
+    def update_graph(finished, year):
+        dft = getFinishedDataframe(df, finished)
+        dft = getYearDataframe(dft, year)
         dff = getAvgStdDataframe(dft, "MY")
         fig = px.box(dff[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
         fig.add_traces(
