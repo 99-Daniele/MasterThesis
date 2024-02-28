@@ -44,7 +44,7 @@ def getYearDataframe(df, years):
 
 def getAllYears(df):
     dft = df['data'].copy()
-    dft = dft.map(lambda x: x.year)
+    dft = dft.map(lambda x: x.year).sort_values()
     years = dft.unique()
     return years
 
@@ -179,7 +179,7 @@ def displayEvents(df, judges, subjects, t):
 def displayProcesses(df, t):
     dft = df.copy()
     dff = getAvgStdDataframe(dft, "MY")
-    fig = px.box(dff[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
+    fig = px.box(dff[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
     fig.add_traces(
         px.line(dff[1], x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
     )
@@ -227,7 +227,7 @@ def displayProcesses(df, t):
     def update_graph(year):
         dft = getYearDataframe(df, year)
         dff = getAvgStdDataframe(dft, "MY")
-        fig = px.box(dff[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
+        fig = px.box(dff[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
         fig.add_traces(
             px.line(dff[1], x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
         )
