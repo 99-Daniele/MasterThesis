@@ -3,52 +3,7 @@ import dash as ds
 import pandas as pd
 
 import utils.Legenda as lg
-
-def getAvgStdDataframe(df, type):
-    match type:
-        case "W":
-            df1 = df[['data', 'durata']].copy()
-            df1['data'] = df1['data'].map(lambda x: lg.getWeekNumber(x))
-            df1 = df1.sort_values(['data'])
-            df2 = df1.groupby(['data'], as_index = False).median()
-            df2['conteggio'] = df1.groupby(['data']).size().tolist()
-            df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
-            df1['data'] = df1['data'].map(lambda x: lg.weeks[x - 1])
-            df2['data'] = df2['data'].map(lambda x: lg.weeks[x - 1])
-            return [df1, df2]
-        case "M":
-            df1 = df[['data', 'durata']].copy()
-            df1['data'] = df1['data'].map(lambda x: x.month)
-            df1 = df1.sort_values(['data'])
-            df2 = df1.groupby(['data'], as_index = False).median()
-            df2['conteggio'] = df1.groupby(['data']).size().tolist()
-            df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
-            df1['data'] = df1['data'].map(lambda x: lg.months[x - 1])
-            df2['data'] = df2['data'].map(lambda x: lg.months[x - 1])
-            return [df1, df2]
-        case "MY":
-            df1 = df[['data', 'durata']].copy()
-            df1['data'] = df1['data'].dt.to_period("M")
-            df1['data'] = df1['data'].map(lambda x: lg.getMonthYearDate(x))
-            df1 = df1.sort_values(['data'])
-            df2 = df1.groupby(['data'], as_index = False).median()
-            df2['conteggio'] = df1.groupby(['data']).size().tolist()
-            df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
-            return [df1, df2]
-
-
-def getFinishedDataframe(df, finished):
-    dft = df.copy()
-    if finished == None or len(finished) == 0:
-        return dft
-    finished = [(lambda x: lg.finishedNumber(x))(x) for x in finished]
-    return dft[dft['finito'].isin(finished)]
-
-def getYearDataframe(df, years):
-    dft = df.copy()
-    if years == None or len(years) == 0:
-        return dft
-    return dft[dft['data'].dt.year.isin(years)]
+import utils.Dataframe as dfm
 
 def getAllYears(df):
     dft = df['data'].copy()
@@ -64,29 +19,6 @@ def getTop10Subjects(df):
     subjects = df.groupby(['materia'])['materia'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
     return subjects
 
-def updateDataframe(df, ju_drop, su_drop, se_drop):
-    if ju_drop is None:
-        if su_drop is None:
-            if se_drop is None:
-                return df
-            else:
-                return df[df['sezione'] == se_drop]
-        else:
-            if se_drop is None:
-                return df[df['materia'] == su_drop]
-            else:
-                return df[(df['materia'] == su_drop) & (df['sezione'] == se_drop)]
-    else:
-        if su_drop is None:
-            if se_drop is None:
-                return df[df['giudice'] == ju_drop]
-            else:
-                return df[(df['giudice'] == ju_drop) & (df['sezione'] == se_drop)]
-        else:
-            if se_drop is None:
-                return df[(df['giudice'] == ju_drop) & (df['materia'] == su_drop)]
-            else:
-                return df[(df['giudice'] == ju_drop) & (df['materia'] == su_drop) & (df['sezione'] == se_drop)]
 
 def displayEvents(df, judges, subjects, t):
     dff = df
@@ -186,7 +118,7 @@ def displayEvents(df, judges, subjects, t):
 
 def displayProcesses(df, t):
     dft = df.copy()
-    dff = getAvgStdDataframe(dft, "MY")
+    dff = dfm.dfm.getAvgStdDataframe(dft, "MY")
     fig = px.box(dff[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
     fig.add_traces(
         px.line(dff[1], x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -200,15 +132,15 @@ def displayProcesses(df, t):
                 buttons = list([
                     dict(
                         label = 'W', method = 'update',
-                        args = [{'x' : [getAvgStdDataframe(dft, "W")[0]['data'], getAvgStdDataframe(dft, "W")[1]['data'], getAvgStdDataframe(dft, "W")[1]['data']], 'y' : [getAvgStdDataframe(dft, "W")[0]['durata'], getAvgStdDataframe(dft, "W")[1]['durata'], getAvgStdDataframe(dft, "W")[1]['quantile']], 'text': [getAvgStdDataframe(dft, "W")[1]['conteggio']]}]
+                        args = [{'x' : [dfm.getAvgStdDataframe(dft, "W")[0]['data'], dfm.getAvgStdDataframe(dft, "W")[1]['data'], dfm.getAvgStdDataframe(dft, "W")[1]['data']], 'y' : [dfm.getAvgStdDataframe(dft, "W")[0]['durata'], dfm.getAvgStdDataframe(dft, "W")[1]['durata'], dfm.getAvgStdDataframe(dft, "W")[1]['quantile']], 'text': [dfm.getAvgStdDataframe(dft, "W")[1]['conteggio']]}]
                     ),
                     dict(
                         label = 'M', method = 'update',
-                        args = [{'x' : [getAvgStdDataframe(dft, "M")[0]['data'], getAvgStdDataframe(dft, "M")[1]['data'], getAvgStdDataframe(dft, "M")[1]['data']], 'y' : [getAvgStdDataframe(dft, "M")[0]['durata'], getAvgStdDataframe(dft, "M")[1]['durata'], getAvgStdDataframe(dft, "M")[1]['quantile']], 'text': [getAvgStdDataframe(dft, "M")[1]['conteggio']]}]
+                        args = [{'x' : [dfm.getAvgStdDataframe(dft, "M")[0]['data'], dfm.getAvgStdDataframe(dft, "M")[1]['data'], dfm.getAvgStdDataframe(dft, "M")[1]['data']], 'y' : [dfm.getAvgStdDataframe(dft, "M")[0]['durata'], dfm.getAvgStdDataframe(dft, "M")[1]['durata'], dfm.getAvgStdDataframe(dft, "M")[1]['quantile']], 'text': [dfm.getAvgStdDataframe(dft, "M")[1]['conteggio']]}]
                     ),
                     dict(
                         label = 'MY', method = 'update',
-                        args = [{'x' : [getAvgStdDataframe(dft, "MY")[0]['data'], getAvgStdDataframe(dft, "MY")[1]['data'], getAvgStdDataframe(dft, "MY")[1]['data']], 'y' : [getAvgStdDataframe(dft, "MY")[0]['durata'], getAvgStdDataframe(dft, "MY")[1]['durata'], getAvgStdDataframe(dft, "MY")[1]['quantile']], 'text': [getAvgStdDataframe(dft, "MY")[1]['conteggio']]}]
+                        args = [{'x' : [dfm.getAvgStdDataframe(dft, "MY")[0]['data'], dfm.getAvgStdDataframe(dft, "MY")[1]['data'], dfm.getAvgStdDataframe(dft, "MY")[1]['data']], 'y' : [dfm.getAvgStdDataframe(dft, "MY")[0]['durata'], dfm.getAvgStdDataframe(dft, "MY")[1]['durata'], dfm.getAvgStdDataframe(dft, "MY")[1]['quantile']], 'text': [dfm.getAvgStdDataframe(dft, "MY")[1]['conteggio']]}]
                     )
                 ])
             )
@@ -234,9 +166,9 @@ def displayProcesses(df, t):
     ds.Output('processes-graph', 'figure'),
     [ds.Input('finished-dropdown', 'value'), ds.Input('year-dropdown', 'value')])
     def update_graph(finished, year):
-        dft = getFinishedDataframe(df, finished)
-        dft = getYearDataframe(dft, year)
-        dff = getAvgStdDataframe(dft, "MY")
+        dft = dfm.getFinishedDataframe(df, finished)
+        dft = dfm.getYearDataframe(dft, year)
+        dff = dfm.getAvgStdDataframe(dft, "MY")
         fig = px.box(dff[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
         fig.add_traces(
             px.line(dff[1], x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -250,15 +182,15 @@ def displayProcesses(df, t):
                     buttons = list([
                         dict(
                         label = 'W', method = 'update',
-                        args = [{'x' : [getAvgStdDataframe(dft, "W")[0]['data'], getAvgStdDataframe(dft, "W")[1]['data'], getAvgStdDataframe(dft, "W")[1]['data']], 'y' : [getAvgStdDataframe(dft, "W")[0]['durata'], getAvgStdDataframe(dft, "W")[1]['durata'], getAvgStdDataframe(dft, "W")[1]['quantile']], 'text': [getAvgStdDataframe(dft, "W")[1]['conteggio']]}]
+                        args = [{'x' : [dfm.getAvgStdDataframe(dft, "W")[0]['data'], dfm.getAvgStdDataframe(dft, "W")[1]['data'], dfm.getAvgStdDataframe(dft, "W")[1]['data']], 'y' : [dfm.getAvgStdDataframe(dft, "W")[0]['durata'], dfm.getAvgStdDataframe(dft, "W")[1]['durata'], dfm.getAvgStdDataframe(dft, "W")[1]['quantile']], 'text': [dfm.getAvgStdDataframe(dft, "W")[1]['conteggio']]}]
                         ),
                         dict(
                             label = 'M', method = 'update',
-                            args = [{'x' : [getAvgStdDataframe(dft, "M")[0]['data'], getAvgStdDataframe(dft, "M")[1]['data'], getAvgStdDataframe(dft, "M")[1]['data']], 'y' : [getAvgStdDataframe(dft, "M")[0]['durata'], getAvgStdDataframe(dft, "M")[1]['durata'], getAvgStdDataframe(dft, "M")[1]['quantile']], 'text': [getAvgStdDataframe(dft, "M")[1]['conteggio']]}]
+                            args = [{'x' : [dfm.getAvgStdDataframe(dft, "M")[0]['data'], dfm.getAvgStdDataframe(dft, "M")[1]['data'], dfm.getAvgStdDataframe(dft, "M")[1]['data']], 'y' : [dfm.getAvgStdDataframe(dft, "M")[0]['durata'], dfm.getAvgStdDataframe(dft, "M")[1]['durata'], dfm.getAvgStdDataframe(dft, "M")[1]['quantile']], 'text': [dfm.getAvgStdDataframe(dft, "M")[1]['conteggio']]}]
                         ),
                         dict(
                             label = 'MY', method = 'update',
-                            args = [{'x' : [getAvgStdDataframe(dft, "MY")[0]['data'], getAvgStdDataframe(dft, "MY")[1]['data'], getAvgStdDataframe(dft, "MY")[1]['data']], 'y' : [getAvgStdDataframe(dft, "MY")[0]['durata'], getAvgStdDataframe(dft, "MY")[1]['durata'], getAvgStdDataframe(dft, "MY")[1]['quantile']], 'text': [getAvgStdDataframe(dft, "MY")[1]['conteggio']]}]
+                            args = [{'x' : [dfm.getAvgStdDataframe(dft, "MY")[0]['data'], dfm.getAvgStdDataframe(dft, "MY")[1]['data'], dfm.getAvgStdDataframe(dft, "MY")[1]['data']], 'y' : [dfm.getAvgStdDataframe(dft, "MY")[0]['durata'], dfm.getAvgStdDataframe(dft, "MY")[1]['durata'], dfm.getAvgStdDataframe(dft, "MY")[1]['quantile']], 'text': [dfm.getAvgStdDataframe(dft, "MY")[1]['conteggio']]}]
                         )
                     ])
                 )
