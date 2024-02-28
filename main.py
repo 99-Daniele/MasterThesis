@@ -24,26 +24,8 @@ def displayCourtHearingEvents(connection):
 
 def displayAllProcesses(connection):
     p = gt.getAllProcesses(connection)
-    j = gt.getTop10Judges(connection)
-    s = gt.getTop10Subjects(connection)
-    gr.displayProcesses(p, j, s, "DURATA MEDIA DI TUTTI I PROCESSI")
-
-def displayFinishedProcesses(connection):
-    p = gt.getFinishedProcesses(connection)
-    gr.displayProcesses(p, "DURATA MEDIA DEI PROCESSI FINITI")
-
-def displayUnfinishedProcesses(connection):
-    p = gt.getUnfinishedProcesses(connection)
-    gr.displayProcesses(p, "DURATA MEDIA DEI PROCESSI NON FINITI")
-
-def displayStoppedProcesses(connection):
-    p = gt.getStoppedProcesses(connection)
-    gr.displayProcesses(p, "DURATA MEDIA DEI PROCESSI STOPPATI")
-
-def displayStuckedProcesses(connection):
-    p = gt.getStuckedProcesses(connection) 
-    gr.displayProcesses(p, "DURATA MEDIA DEI PROCESSI DERAGLIATI")
+    gr.displayProcesses(p, "DURATA MEDIA DI TUTTI I PROCESSI")
 
 if __name__ == '__main__':
     connection = connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayFinishedProcesses(connection)
+    displayAllProcesses(connection)

@@ -9,6 +9,7 @@ def getAvgStdDataframe(df, type):
         case "W":
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: lg.getWeekNumber(x))
+            df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).median()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
@@ -18,6 +19,7 @@ def getAvgStdDataframe(df, type):
         case "M":
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: x.month)
+            df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).median()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
@@ -28,6 +30,7 @@ def getAvgStdDataframe(df, type):
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].dt.to_period("M")
             df1['data'] = df1['data'].map(lambda x: lg.getMonthYearDate(x))
+            df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).median()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']

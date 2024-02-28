@@ -19,13 +19,17 @@ def createProcessesDataFrame(processes):
     judges = []
     sections = []
     subjects = []
+    finished = []
+    changes = []
     for p in processes:
         dates.append(p[0])
         durations.append(p[1])
         judges.append(p[2])
-        sections.append(p[3])
-        subjects.append(p[4])
-    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges, "sezione": sections, "materia": subjects})
+        subjects.append(p[3])
+        sections.append(p[4])
+        finished.append(p[5])
+        changes.append(p[6])
+    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes})
 
 def getAllEvents(connection):
     query = "SELECT numProcesso, data, fase, etichetta FROM eventi AS e, elencoeventiimportanti AS ei WHERE numProcesso IN (SELECT * FROM processifiniti) AND e.codice = ei.evento ORDER BY fase"
@@ -43,22 +47,6 @@ def getCourtHearingsEvents(connection):
     return createEventsDataFrame(events)
 
 def getAllProcesses(connection):
-    query = "SELECT dataInizioProcesso, durata, giudice, sezione, materia FROM processicondurata AS pd, processi AS p WHERE pd.numProcesso = p.numProcesso"
+    query = "SELECT * FROM durataprocessiinfo ORDER BY numProcesso, dataInizioProcesso"
     processes = getDataFromDatabase(connection, query)
     return createProcessesDataFrame(processes)
-
-def getTop10Judges(connection):
-    query = "SELECT * FROM top10giudici"
-    judges = getDataFromDatabase(connection, query)
-    j = []
-    for judge in judges:
-            j.append(judge[0])
-    return j
-
-def getTop10Subjects(connection):
-    query = "SELECT * FROM top10materie"
-    subjects = getDataFromDatabase(connection, query)
-    s = []
-    for subject in subjects:
-            s.append(subject[0])
-    return s
