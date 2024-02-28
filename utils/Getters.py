@@ -47,26 +47,6 @@ def getAllProcesses(connection):
     processes = getDataFromDatabase(connection, query)
     return createProcessesDataFrame(processes)
 
-def getFinishedProcesses(connection):
-    query = "SELECT dataInizioProcesso, durata, giudice, sezione, materia FROM processicondurata AS pd, processi AS p WHERE pd.numProcesso = p.numProcesso AND processofinito = 1"
-    processes = getDataFromDatabase(connection, query)
-    return createProcessesDataFrame(processes)
-
-def getUnfinishedProcesses(connection):
-    query = "SELECT dataInizioProcesso, durata, giudice, sezione, materia FROM processicondurata AS pd, processi AS p WHERE pd.numProcesso = p.numProcesso AND processofinito = 0"
-    processes = getDataFromDatabase(connection, query)
-    return createProcessesDataFrame(processes)
-
-def getStoppedProcesses(connection):
-    query = "SELECT dataInizioProcesso, durata, giudice, sezione, materia FROM processicondurata AS pd, processi AS p WHERE pd.numProcesso = p.numProcesso AND processofinito = 2"
-    processes = getDataFromDatabase(connection, query)
-    return createProcessesDataFrame(processes)
-
-def getStuckedProcesses(connection):
-    query = "SELECT dataInizioProcesso, durata, giudice, sezione, materia FROM processicondurata AS pd, processi AS p WHERE pd.numProcesso = p.numProcesso AND processofinito = -1"
-    processes = getDataFromDatabase(connection, query)
-    return createProcessesDataFrame(processes)
-
 def getTop10Judges(connection):
     query = "SELECT * FROM top10giudici"
     judges = getDataFromDatabase(connection, query)

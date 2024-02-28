@@ -2,7 +2,7 @@ from utils.DatabaseConnection import connectToDatabase
 
 import utils.Getters as gt
 import utils.Graphs as gr
-import webbrowser
+import utils.DatabaseConnection as dbc
 
 def displayAllEvents(connection):
     e = gt.getAllEvents(connection)
