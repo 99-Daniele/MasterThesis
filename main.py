@@ -22,10 +22,22 @@ def displayCourtHearingEvents(connection):
     s = gt.getTop10Subjects(connection)
     gr.displayEvents(e, j, s, "UDIENZE")
 
-def displayAllProcesses(connection):
-    p = gt.getAllProcesses(connection)
-    gr.displayProcesses(p, "DURATA MEDIA DI TUTTI I PROCESSI")
+def displayProcessesDuration(connection):
+    processes = gt.getProcessesDuration(connection)
+    gr.displayProcesses(processes, "DURATA MEDIA PROCESSI")
+
+def displayStatesDuration(connection):
+    states = gt.getStatesDuration(connection)
+    gr.displayProcesses(states, "DURATA MEDIA STATI DEL PROCESSO")
+
+def displayPhasesDuration(connection):
+    phases = gt.getPhasesDuration(connection)
+    gr.displayProcesses(phases, "DURATA MEDIA FASI DEL PROCESSO")
+
+def displayEventsDuration(connection):
+    events = gt.getEventsDuration(connection)
+    gr.displayProcesses(events, "DURATA MEDIA EVENTI DEL PROCESSO")
 
 if __name__ == '__main__':
     connection = connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayAllProcesses(connection)
+    displayProcessesDuration(connection)

@@ -49,7 +49,7 @@ def updateProcessSequence(connection):
     query = "SELECT * FROM statinome"
     translation = getDataFromDatabase(connection, query)
     processes = translateProcessSequence(processesSequence, translation)
-    updateTable(connection, 'tribunali2020.processitipo', processes)
+    updateTable(connection, 'processitipo', processes)
 
 def isProcessAlreadyPresent(processes, processId):
     for p in processes:

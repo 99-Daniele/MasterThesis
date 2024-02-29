@@ -16,7 +16,22 @@ def getCourtHearingsEvents(connection):
     events = getDataFromDatabase(connection, query)
     return df.createEventsDataFrame(events)
 
-def getAllProcesses(connection):
+def getProcessesDuration(connection):
     query = "SELECT * FROM durataprocessiinfo ORDER BY numProcesso, dataInizioProcesso"
+    processes = getDataFromDatabase(connection, query)
+    return df.createProcessesDataFrame(processes)
+
+def getStatesDuration(connection):
+    query = "SELECT * FROM duratastatiinfo ORDER BY numProcesso, dataInizioProcesso"
+    processes = getDataFromDatabase(connection, query)
+    return df.createProcessesDataFrame(processes)
+
+def getPhasesDuration(connection):
+    query = "SELECT * FROM duratafasiinfo ORDER BY numProcesso, dataInizioProcesso"
+    processes = getDataFromDatabase(connection, query)
+    return df.createProcessesDataFrame(processes)
+
+def getEventsDuration(connection):
+    query = "SELECT * FROM durataeventiinfo ORDER BY numProcesso, dataInizioProcesso"
     processes = getDataFromDatabase(connection, query)
     return df.createProcessesDataFrame(processes)

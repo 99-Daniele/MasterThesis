@@ -98,3 +98,17 @@ def updateDataframe(df, ju_drop, su_drop, se_drop):
                 return df[(df['giudice'] == ju_drop) & (df['materia'] == su_drop)]
             else:
                 return df[(df['giudice'] == ju_drop) & (df['materia'] == su_drop) & (df['sezione'] == se_drop)]
+            
+def getAllYears(df):
+    dft = df['data'].copy()
+    dft = dft.map(lambda x: x.year).sort_values()
+    years = dft.unique()
+    return years
+
+def getTop10Judges(df):
+    judges = df.groupby(['giudice'])['giudice'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
+    return judges
+
+def getTop10Subjects(df):
+    subjects = df.groupby(['materia'])['materia'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
+    return subjects

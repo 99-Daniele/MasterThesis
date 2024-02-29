@@ -5,21 +5,6 @@ import pandas as pd
 import utils.Legenda as lg
 import utils.Dataframe as dfm
 
-def getAllYears(df):
-    dft = df['data'].copy()
-    dft = dft.map(lambda x: x.year).sort_values()
-    years = dft.unique()
-    return years
-
-def getTop10Judges(df):
-    judges = df.groupby(['giudice'])['giudice'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
-    return judges
-
-def getTop10Subjects(df):
-    subjects = df.groupby(['materia'])['materia'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
-    return subjects
-
-
 def displayEvents(df, judges, subjects, t):
     dff = df
     fig = px.scatter(dff, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = lg.phaseColorList(dff), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
@@ -116,7 +101,7 @@ def displayEvents(df, judges, subjects, t):
     
     app.run(debug=True)
 
-def displayProcesses(df, t):
+def displayProcessDuration(df, t):
     dft = df.copy()
     dff = dfm.dfm.getAvgStdDataframe(dft, "MY")
     fig = px.box(dff[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
@@ -147,9 +132,9 @@ def displayProcesses(df, t):
         ]
     )
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
-    years = getAllYears(df)
-    judges = getTop10Judges(dft)['giudice']
-    subjects = getTop10Subjects(dft)['materia']
+    years = dfm.getAllYears(df)
+    judges = dfm.getTop10Judges(dft)['giudice']
+    subjects = dfm.getTop10Subjects(dft)['materia']
     app = ds.Dash()
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
