@@ -38,4 +38,4 @@ def displayEventsDuration(connection):
 
 if __name__ == '__main__':
     connection = dbc.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayProcessesDuration(connection)
+    displayStatesDuration(connection)

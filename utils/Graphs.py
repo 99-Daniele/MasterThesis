@@ -117,7 +117,6 @@ def displayProcessesDuration(df, t):
          ds.Input('change-dropdown', 'value')]
     )
     def update_output(finished, year, change):
-        print(change)
         df_temp = dfm.getFinishedDataFrame(df, finished)
         df_temp = dfm.getYearDataFrame(df_temp, year)
         df_temp = dfm.getChangeJudgeDataFrame(df_temp, change)
@@ -160,20 +159,23 @@ def displayStatesDuration(df, t):
     app = ds.Dash()
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
-        ds.dcc.Dropdown(states, multi = True, searchable = False, id = 'states-dropdown', placeholder = 'Seleziona stato...', style = {'width': 400}),
+        ds.dcc.Dropdown(states, multi = True, searchable = False, id = 'state-dropdown', placeholder = 'Seleziona stato...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
+        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
         ds.dcc.Graph(id = 'processes-graph')
     ])
     @app.callback(
         ds.Output('processes-graph', 'figure'),
-        [ds.Input('finished-dropdown', 'value'), 
-         ds.Input('states-dropdown', 'value'), 
-         ds.Input('year-dropdown', 'value')]
+        [ds.Input('finished-dropdown', 'value'),
+         ds.Input('state-dropdown', 'value'), 
+         ds.Input('year-dropdown', 'value'),
+         ds.Input('change-dropdown', 'value')]
     )
-    def update_output(finished, state, year):
+    def update_output(finished, state, year, change):
         df_temp = dfm.getFinishedDataFrame(df, finished)
-        df_temp = dfm.getStatesDataFrame(df, state)
+        df_temp = dfm.getStatesDataFrame(df_temp, state)
         df_temp = dfm.getYearDataFrame(df_temp, year)
+        df_temp = dfm.getChangeJudgeDataFrame(df_temp, change)
         df_data = dfm.getAvgStdDataFrame(df_temp, "MY")
         fig = px.box(df_data[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
         fig.add_traces(
@@ -213,17 +215,20 @@ def displayPhasesDuration(df, t):
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
-        ds.dcc.Graph(
-             id = 'processes-graph'
-        )
+        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
+        ds.dcc.Graph(id = 'processes-graph')
     ])
     @app.callback(
         ds.Output('processes-graph', 'figure'),
         [ds.Input('finished-dropdown', 'value'), 
-         ds.Input('year-dropdown', 'value')])
-    def update_output(finished, year):
+         ds.Input('year-dropdown', 'value'),
+         ds.Input('change-dropdown', 'value')]
+    )
+    def update_output(finished, year, change):
+        print(change)
         df_temp = dfm.getFinishedDataFrame(df, finished)
         df_temp = dfm.getYearDataFrame(df_temp, year)
+        df_temp = dfm.getChangeJudgeDataFrame(df_temp, change)
         df_data = dfm.getAvgStdDataFrame(df_temp, "MY")
         fig = px.box(df_data[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
         fig.add_traces(
@@ -263,17 +268,20 @@ def displayEventsDuration(df, t):
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
-        ds.dcc.Graph(
-             id = 'processes-graph'
-        )
+        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
+        ds.dcc.Graph(id = 'processes-graph')
     ])
     @app.callback(
         ds.Output('processes-graph', 'figure'),
         [ds.Input('finished-dropdown', 'value'), 
-         ds.Input('year-dropdown', 'value')])
-    def update_output(finished, year):
+         ds.Input('year-dropdown', 'value'),
+         ds.Input('change-dropdown', 'value')]
+    )
+    def update_output(finished, year, change):
+        print(change)
         df_temp = dfm.getFinishedDataFrame(df, finished)
         df_temp = dfm.getYearDataFrame(df_temp, year)
+        df_temp = dfm.getChangeJudgeDataFrame(df_temp, change)
         df_data = dfm.getAvgStdDataFrame(df_temp, "MY")
         fig = px.box(df_data[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
         fig.add_traces(
@@ -306,4 +314,3 @@ def displayEventsDuration(df, t):
         return fig
     
     app.run(debug = True)
-

@@ -105,7 +105,7 @@ def getYearDataFrame(df, years):
 
 def getChangeJudgeDataFrame(df, change):
     df_temp = df.copy()
-    if change == None or len(change) == 0:
+    if change == None:
         return df
     if change == "SI":
         change = 1

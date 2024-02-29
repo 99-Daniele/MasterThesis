@@ -22,16 +22,16 @@ def getProcessesDuration(connection):
     return df.createProcessesDurationDataFrame(processes)
 
 def getStatesDuration(connection):
-    query = "SELECT * FROM duratastatiinfo ORDER BY numProcesso, dataInizioProcesso"
+    query = "SELECT * FROM duratastatiinfo ORDER BY numProcesso, dataInizioStato"
     processes = getDataFromDatabase(connection, query)
     return df.createStatesDurationsDataFrame(processes)
 
 def getPhasesDuration(connection):
-    query = "SELECT * FROM duratafasiinfo ORDER BY numProcesso, dataInizioProcesso"
+    query = "SELECT * FROM duratafasiinfo ORDER BY numProcesso, dataInizioFase"
     processes = getDataFromDatabase(connection, query)
     return df.createProcessesDataFrame(processes)
 
 def getEventsDuration(connection):
-    query = "SELECT * FROM durataeventiinfo ORDER BY numProcesso, dataInizioProcesso"
+    query = "SELECT * FROM durataeventiinfo ORDER BY numProcesso, dataInizio"
     processes = getDataFromDatabase(connection, query)
     return df.createProcessesDataFrame(processes)
