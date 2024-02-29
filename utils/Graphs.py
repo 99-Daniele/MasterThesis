@@ -101,22 +101,26 @@ def displayEvents(df, judges, subjects, t):
     
     app.run(debug=True)
 
-def displayProcessDuration(df, t):
+def displayProcessesDuration(df, t):
     years = dfm.getAllYears(df)
     app = ds.Dash()
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
+        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
         ds.dcc.Graph(id = 'processes-graph')
     ])
     @app.callback(
         ds.Output('processes-graph', 'figure'),
         [ds.Input('finished-dropdown', 'value'), 
-         ds.Input('year-dropdown', 'value')]
+         ds.Input('year-dropdown', 'value'),
+         ds.Input('change-dropdown', 'value')]
     )
-    def update_output(finished, year):
+    def update_output(finished, year, change):
+        print(change)
         df_temp = dfm.getFinishedDataFrame(df, finished)
         df_temp = dfm.getYearDataFrame(df_temp, year)
+        df_temp = dfm.getChangeJudgeDataFrame(df_temp, change)
         df_data = dfm.getAvgStdDataFrame(df_temp, "MY")
         fig = px.box(df_data[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
         fig.add_traces(
@@ -203,7 +207,7 @@ def displayStatesDuration(df, t):
     
     app.run(debug = True)
 
-def displayProcessDuration(df, t):
+def displayPhasesDuration(df, t):
     years = dfm.getAllYears(df)
     app = ds.Dash()
     app.layout = ds.html.Div([
@@ -253,7 +257,7 @@ def displayProcessDuration(df, t):
     
     app.run(debug = True)
 
-def displayProcessDuration(df, t):
+def displayEventsDuration(df, t):
     years = dfm.getAllYears(df)
     app = ds.Dash()
     app.layout = ds.html.Div([

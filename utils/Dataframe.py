@@ -13,7 +13,7 @@ def createEventsDataFrame(events):
             tags.append(e[3])
     return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "etichetta": tags})
 
-def createProcessesDurationDataframe(processes):
+def createProcessesDurationDataFrame(processes):
     durations = []
     dates = []
     judges = []
@@ -51,7 +51,7 @@ def createStatesDurationsDataFrame(processes):
         tags.append(p[8])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "etichetta": tags})
 
-def getAvgStdDataframe(df, type):
+def getAvgStdDataFrame(df, type):
     df_temp = df.copy()
     match type:
         case "W":
@@ -84,26 +84,36 @@ def getAvgStdDataframe(df, type):
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
             return [df1, df2]
 
-def getFinishedDataframe(df, finished):
+def getFinishedDataFrame(df, finished):
     df_temp = df.copy()
     if finished == None or len(finished) == 0:
         return df
     finished = [(lambda x: lg.finishedNumber(x))(x) for x in finished]
     return df_temp[df_temp['finito'].isin(finished)]
 
-def getStatesDataframe(df, states):
+def getStatesDataFrame(df, states):
     df_temp = df.copy()
     if states == None or len(states) == 0:
         return df
     return df_temp[df_temp['etichetta'].isin(states)]
 
-def getYearDataframe(df, years):
+def getYearDataFrame(df, years):
     df_temp = df.copy()
     if years == None or len(years) == 0:
         return df
     return df_temp[df_temp['data'].dt.year.isin(years)]
 
-def updateDataframe(df, judges, subjects, sections):
+def getChangeJudgeDataFrame(df, change):
+    df_temp = df.copy()
+    if change == None or len(change) == 0:
+        return df
+    if change == "SI":
+        change = 1
+    else:
+        change = 0
+    return df_temp[df_temp['cambio'] == change]
+
+def updateDataFrame(df, judges, subjects, sections):
     df_temp = df.copy()
     if judges is None:
         if subjects is None:

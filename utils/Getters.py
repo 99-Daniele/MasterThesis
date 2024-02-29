@@ -19,7 +19,7 @@ def getCourtHearingsEvents(connection):
 def getProcessesDuration(connection):
     query = "SELECT * FROM durataprocessiinfo ORDER BY numProcesso, dataInizioProcesso"
     processes = getDataFromDatabase(connection, query)
-    return df.createProcessesDurationDataframe(processes)
+    return df.createProcessesDurationDataFrame(processes)
 
 def getStatesDuration(connection):
     query = "SELECT * FROM duratastatiinfo ORDER BY numProcesso, dataInizioProcesso"

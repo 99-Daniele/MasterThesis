@@ -22,7 +22,7 @@ def displayCourtHearingEvents(connection):
 
 def displayProcessesDuration(connection):
     processes = gt.getProcessesDuration(connection)
-    gr.displayProcessDuration(processes, "DURATA MEDIA PROCESSI")
+    gr.displayProcessesDuration(processes, "DURATA MEDIA PROCESSI")
 
 def displayStatesDuration(connection):
     states = gt.getStatesDuration(connection)
