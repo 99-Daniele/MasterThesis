@@ -1,4 +1,5 @@
 import pandas as pd
+import utils.Legenda as lg
 
 def createEventsDataFrame(events):
     pIds = []
@@ -12,7 +13,7 @@ def createEventsDataFrame(events):
             tags.append(e[3])
     return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "etichetta": tags})
 
-def createProcessesDataFrame(processes):
+def createProcessesDurationDataframe(processes):
     durations = []
     dates = []
     judges = []
@@ -30,10 +31,31 @@ def createProcessesDataFrame(processes):
         changes.append(p[6])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes})
 
+def createStatesDurationsDataFrame(processes):
+    durations = []
+    dates = []
+    judges = []
+    sections = []
+    subjects = []
+    finished = []
+    changes = []
+    tags = []
+    for p in processes:
+        dates.append(p[0])
+        durations.append(p[1])
+        judges.append(p[2])
+        subjects.append(p[3])
+        sections.append(p[4])
+        finished.append(p[5])
+        changes.append(p[6])
+        tags.append(p[8])
+    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "etichetta": tags})
+
 def getAvgStdDataframe(df, type):
+    df_temp = df.copy()
     match type:
         case "W":
-            df1 = df[['data', 'durata']].copy()
+            df1 = df_temp[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: lg.getWeekNumber(x))
             df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).median()
@@ -43,7 +65,7 @@ def getAvgStdDataframe(df, type):
             df2['data'] = df2['data'].map(lambda x: lg.weeks[x - 1])
             return [df1, df2]
         case "M":
-            df1 = df[['data', 'durata']].copy()
+            df1 = df_temp[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: x.month)
             df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).median()
@@ -53,7 +75,7 @@ def getAvgStdDataframe(df, type):
             df2['data'] = df2['data'].map(lambda x: lg.months[x - 1])
             return [df1, df2]
         case "MY":
-            df1 = df[['data', 'durata']].copy()
+            df1 = df_temp[['data', 'durata']].copy()
             df1['data'] = df1['data'].dt.to_period("M")
             df1['data'] = df1['data'].map(lambda x: lg.getMonthYearDate(x))
             df1 = df1.sort_values(['data'])
@@ -63,52 +85,66 @@ def getAvgStdDataframe(df, type):
             return [df1, df2]
 
 def getFinishedDataframe(df, finished):
-    dft = df.copy()
+    df_temp = df.copy()
     if finished == None or len(finished) == 0:
-        return dft
+        return df
     finished = [(lambda x: lg.finishedNumber(x))(x) for x in finished]
-    return dft[dft['finito'].isin(finished)]
+    return df_temp[df_temp['finito'].isin(finished)]
+
+def getStatesDataframe(df, states):
+    df_temp = df.copy()
+    if states == None or len(states) == 0:
+        return df
+    return df_temp[df_temp['etichetta'].isin(states)]
 
 def getYearDataframe(df, years):
-    dft = df.copy()
+    df_temp = df.copy()
     if years == None or len(years) == 0:
-        return dft
-    return dft[dft['data'].dt.year.isin(years)]
+        return df
+    return df_temp[df_temp['data'].dt.year.isin(years)]
 
-def updateDataframe(df, ju_drop, su_drop, se_drop):
-    if ju_drop is None:
-        if su_drop is None:
-            if se_drop is None:
+def updateDataframe(df, judges, subjects, sections):
+    df_temp = df.copy()
+    if judges is None:
+        if subjects is None:
+            if sections is None:
                 return df
             else:
-                return df[df['sezione'] == se_drop]
+                return df_temp[df_temp['sezione'] == sections]
         else:
-            if se_drop is None:
-                return df[df['materia'] == su_drop]
+            if sections is None:
+                return df_temp[df_temp['materia'] == subjects]
             else:
-                return df[(df['materia'] == su_drop) & (df['sezione'] == se_drop)]
+                return df_temp[(df_temp['materia'] == subjects) & (df_temp['sezione'] == sections)]
     else:
-        if su_drop is None:
-            if se_drop is None:
-                return df[df['giudice'] == ju_drop]
+        if subjects is None:
+            if sections is None:
+                return df_temp[df_temp['giudice'] == judges]
             else:
-                return df[(df['giudice'] == ju_drop) & (df['sezione'] == se_drop)]
+                return df_temp[(df_temp['giudice'] == judges) & (df_temp['sezione'] == sections)]
         else:
-            if se_drop is None:
-                return df[(df['giudice'] == ju_drop) & (df['materia'] == su_drop)]
+            if sections is None:
+                return df_temp[(df_temp['giudice'] == judges) & (df_temp['materia'] == subjects)]
             else:
-                return df[(df['giudice'] == ju_drop) & (df['materia'] == su_drop) & (df['sezione'] == se_drop)]
+                return df_temp[(df_temp['giudice'] == judges) & (df_temp['materia'] == subjects) & (df['sezione'] == sections)]
             
 def getAllYears(df):
-    dft = df['data'].copy()
-    dft = dft.map(lambda x: x.year).sort_values()
-    years = dft.unique()
+    df_temp = df['data'].copy()
+    df_temp = df_temp.map(lambda x: x.year).sort_values()
+    years = df_temp.unique()
     return years
 
+def getAllStates(df):
+    df_temp = df['etichetta'].copy()
+    states = df_temp.unique()
+    return states
+
 def getTop10Judges(df):
-    judges = df.groupby(['giudice'])['giudice'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
+    df_temp = df.copy()
+    judges = df_temp.groupby(['giudice'])['giudice'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
     return judges
 
 def getTop10Subjects(df):
-    subjects = df.groupby(['materia'])['materia'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
+    df_temp = df.copy()
+    subjects = df_temp.groupby(['materia'])['materia'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
     return subjects

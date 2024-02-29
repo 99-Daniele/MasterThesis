@@ -1,5 +1,5 @@
 from utils.DatabaseConnection import getDataFromDatabase
-import utils.Dataframe as df
+import utils.DataFrame as df
 
 def getAllEvents(connection):
     query = "SELECT numProcesso, data, fase, etichetta FROM eventi AS e, elencoeventiimportanti AS ei WHERE numProcesso IN (SELECT * FROM processifiniti) AND e.codice = ei.evento ORDER BY fase"
@@ -19,12 +19,12 @@ def getCourtHearingsEvents(connection):
 def getProcessesDuration(connection):
     query = "SELECT * FROM durataprocessiinfo ORDER BY numProcesso, dataInizioProcesso"
     processes = getDataFromDatabase(connection, query)
-    return df.createProcessesDataFrame(processes)
+    return df.createProcessesDurationDataframe(processes)
 
 def getStatesDuration(connection):
     query = "SELECT * FROM duratastatiinfo ORDER BY numProcesso, dataInizioProcesso"
     processes = getDataFromDatabase(connection, query)
-    return df.createProcessesDataFrame(processes)
+    return df.createStatesDurationsDataFrame(processes)
 
 def getPhasesDuration(connection):
     query = "SELECT * FROM duratafasiinfo ORDER BY numProcesso, dataInizioProcesso"

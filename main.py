@@ -1,5 +1,3 @@
-from utils.DatabaseConnection import connectToDatabase
-
 import utils.Getters as gt
 import utils.Graphs as gr
 import utils.DatabaseConnection as dbc
@@ -24,11 +22,11 @@ def displayCourtHearingEvents(connection):
 
 def displayProcessesDuration(connection):
     processes = gt.getProcessesDuration(connection)
-    gr.displayProcesses(processes, "DURATA MEDIA PROCESSI")
+    gr.displayProcessDuration(processes, "DURATA MEDIA PROCESSI")
 
 def displayStatesDuration(connection):
     states = gt.getStatesDuration(connection)
-    gr.displayProcesses(states, "DURATA MEDIA STATI DEL PROCESSO")
+    gr.displayStatesDuration(states, "DURATA MEDIA STATI DEL PROCESSO")
 
 def displayPhasesDuration(connection):
     phases = gt.getPhasesDuration(connection)
@@ -39,5 +37,5 @@ def displayEventsDuration(connection):
     gr.displayProcesses(events, "DURATA MEDIA EVENTI DEL PROCESSO")
 
 if __name__ == '__main__':
-    connection = connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
+    connection = dbc.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
     displayProcessesDuration(connection)
