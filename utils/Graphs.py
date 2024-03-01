@@ -5,6 +5,16 @@ import pandas as pd
 import utils.Legenda as lg
 import utils.DataFrame as dfm
 
+def updateProcessesDuration(df, finished, year, change):
+    df_temp = df
+    if not (finished == None or len(finished) == 0):
+        df_temp = dfm.getFinishedDataFrame(df, finished)
+    if not (year == None or len(year) == 0):
+        df_temp = dfm.getYearDataFrame(df_temp, year)
+    if not (change == None or len(change) == 0):
+        df_temp = dfm.getChangeJudgeDataFrame(df_temp, change)
+    return df_temp
+
 def displayEvents(df, judges, subjects, t):
     df_data = df
     fig = px.scatter(df_data, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = lg.phaseColorList(df_data), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
@@ -104,11 +114,16 @@ def displayEvents(df, judges, subjects, t):
 def displayProcessesDuration(df, t):
     years = dfm.getAllYears(df)
     app = ds.Dash()
+    df_data = dfm.getAvgStdDataFrame(df, "MY")
+    fig = px.box(df_data[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
+    fig.add_traces(
+        px.line(df_data[1], x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
+    )
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
-        ds.dcc.Graph(id = 'processes-graph')
+        ds.dcc.Graph(id = 'processes-graph', figure = fig)
     ])
     @app.callback(
         ds.Output('processes-graph', 'figure'),
@@ -117,9 +132,7 @@ def displayProcessesDuration(df, t):
          ds.Input('change-dropdown', 'value')]
     )
     def update_output(finished, year, change):
-        df_temp = dfm.getFinishedDataFrame(df, finished)
-        df_temp = dfm.getYearDataFrame(df_temp, year)
-        df_temp = dfm.getChangeJudgeDataFrame(df_temp, change)
+        df_temp = updateProcessesDuration(df, finished, year, change)
         df_data = dfm.getAvgStdDataFrame(df_temp, "MY")
         fig = px.box(df_data[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
         fig.add_traces(
@@ -156,13 +169,18 @@ def displayProcessesDuration(df, t):
 def displayStatesDuration(df, t):
     years = dfm.getAllYears(df)
     states = dfm.getAllStates(df)
+    df_data = dfm.getAvgStdDataFrame(df, "MY")
+    fig = px.box(df_data[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
+    fig.add_traces(
+        px.line(df_data[1], x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
+    )
     app = ds.Dash()
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(states, multi = True, searchable = False, id = 'state-dropdown', placeholder = 'Seleziona stato...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
-        ds.dcc.Graph(id = 'processes-graph')
+        ds.dcc.Graph(id = 'processes-graph', figure = fig)
     ])
     @app.callback(
         ds.Output('processes-graph', 'figure'),
