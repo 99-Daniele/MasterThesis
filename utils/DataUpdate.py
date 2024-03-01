@@ -20,7 +20,7 @@ def refreshData(connection):
     dbc.updateTable(connection, 'processitipo', processSequence)
 
 def getEventsType(connection):
-    updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato ORDER BY data"
+    updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato ORDER BY numEvento"
     eventsType = dbc.getDataFromDatabase(connection, updateQuery)
     return eventsType
 
@@ -72,15 +72,22 @@ def calcEventsDuration(processEvents):
     for p in processEvents.keys():
         i = 0
         events = processEvents.get(p)
-        while i < len(events) - 1:
-            if events[i][0] > events[i + 1][0]:
-                eventsDuration.update({events[i][0]: (events[i][0], 0, events[i][5], events[i][5])})
-            else:
-                eventsDuration.update({events[i][0]: (events[i][0], (events[i + 1][5] - events[i][5]).days, events[i][5], events[i + 1][5])})
+        while i < len(events):
+            e = events[i]
+            nextEvent = getNextEvent(e, events[i + 1:]) 
+            eventsDuration.update({e[0]: (e[0], (nextEvent[5] - e[5]).days, e[5], nextEvent[5])})
             i = i + 1
-        eventsDuration.update({events[i][0]: (events[i][0], 0, events[i][5], events[i][5])})
     return eventsDuration
 
+def getNextEvent(event, events):
+    i = 0
+    while i < len(events) and ((events[i][5] - event[5]).days < 0 or (events[i][5] - event[5]).days > 365):
+        i = i +  1
+    if i == len(events):
+        return event
+    else:
+        return events[i]
+    
 def calcPhasesDuration(processEvents, eventDuration):
     phasesDuration = []
     for p in processEvents.keys():
