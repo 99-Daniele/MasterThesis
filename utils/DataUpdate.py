@@ -1,25 +1,34 @@
 import utils.DatabaseConnection as dbc
 
-from alive_progress import alive_bar
 from operator import itemgetter
 
 def refreshData(connection):
-    events = updateEventsType(connection)
+    events = getEventsType(connection)
+    eventsFiltered = filterEvents(events)
+    dbc.updateTable(connection, 'eventitipo', eventsFiltered)
     processEvents = groupEventsByProcess(events)
     processPhaseEvents = groupEventsByProcessPhase(processEvents)
     processStateEvents = groupEventsByProcessState(processEvents)
     eventsDuration = calcEventsDuration(processEvents)
+    dbc.updateTable(connection, 'durataeventi', list(eventsDuration.values()))
     phasesDuration = calcPhasesDuration(processPhaseEvents, eventsDuration)
+    dbc.updateTable(connection, 'duratafasi', phasesDuration)
     statesDuration = calcStatesDuration(processStateEvents, eventsDuration)
+    dbc.updateTable(connection, 'duratastati', statesDuration)
     [processDuration, processSequence] = calcProcessesInfo(processEvents)
+    dbc.updateTable(connection, 'durataprocessi', processDuration)
+    dbc.updateTable(connection, 'processitipo', processSequence)
 
-def updateEventsType(connection):
-    #updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato ORDER BY data"
-    updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato AND( numProcesso = 109848 OR numProcesso = 109850 OR numProcesso = 109855 OR numProcesso = 109959) ORDER BY data"
+def getEventsType(connection):
+    updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato ORDER BY data"
     eventsType = dbc.getDataFromDatabase(connection, updateQuery)
-    eventsTypeFiltered = [e[0:4] for e in eventsType]
-    #dbc.updateTable(connection, "eventitipo", eventsTypeFiltered)
     return eventsType
+
+def filterEvents(events):
+    eventsFiltered = []
+    for e in events:
+        eventsFiltered.append((e[0], e[1], e[6], e[3]))
+    return eventsFiltered
 
 def groupEventsByProcess(events):
     processes = {}
@@ -28,7 +37,7 @@ def groupEventsByProcess(events):
         if p == None:
             processes.update({e[4]: [e]})
         else:
-           p.append(e)
+            p.append(e)
     return processes
 
 def groupEventsByProcessPhase(processEvents):
@@ -114,7 +123,7 @@ def getProcessInfo(events):
     return [startDate, endDate, processType, originalSequence, translatedSequence, finalSequence]
 
 def getSequences(e, endDate, processType, find, phase, originalSequence, translatedSequence, finalSequence):
-    if not e[3].isdigit() and finalSequence[-1] != e[6] and not find:
+    if not e[3].isdigit() and (len(finalSequence) == 0 or finalSequence[-1] != e[6] and not find):
         finalSequence.append(e[6])
     if e[3].isdigit() and not find:
         if int(e[3]) != 0:
@@ -133,11 +142,14 @@ def getSequences(e, endDate, processType, find, phase, originalSequence, transla
             else:
                 processType = 2
             find = True
-    originalSequence.append(e[2])
-    translatedSequence.append(e[6])
+    if len(originalSequence) == 0:
+        originalSequence.append(e[2])
+        translatedSequence.append(e[6])
+    elif e[2] != originalSequence[-1]:
+        originalSequence.append(e[2])
+        translatedSequence.append(e[6])
     return [endDate, processType, find, phase]
 
 def fromListToString(list):
     string = ",".join(str(l) for l in list)
     return string
-

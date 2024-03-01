@@ -28,9 +28,10 @@ def dropTable(connection, table):
 def updateTable(connection, table, tuples):
     clearTable(connection, table)
     with alive_bar(int(len(tuples))) as bar:
+        length = len(tuples[0])
+        filler = createFiller(length)
         for t in tuples:
-            t = du.translateTuple(t)
-            insertIntoDatabase(connection, table, t)
+            insertIntoDatabase(connection, table, filler, t)
             bar()
     connection.commit()  
 
@@ -40,9 +41,15 @@ def clearTable(connection, table):
     cursor.execute(query)
     connection.commit()  
 
-def insertIntoDatabase(connection, table, process):
-    query = "INSERT INTO {} VALUES (%s, %s, %s, %s, %s)".format(table)
-    values = (process[0], process[1], process[2], process[3], process[4])
+def insertIntoDatabase(connection, table, filler, values):
+    query = ("INSERT INTO {} VALUES" + filler).format(table)
     cursor = connection.cursor(buffered = True)
-    cursor.execute(query, values) 
+    cursor.execute(query, values)
+
+def createFiller(length):
+    filler = "("
+    for i in range(length - 1):
+        filler = filler + "%s, "
+    filler = filler + "%s)"
+    return filler
 
