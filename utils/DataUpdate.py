@@ -5,19 +5,19 @@ from operator import itemgetter
 def refreshData(connection):
     events = getEventsType(connection)
     eventsFiltered = filterEvents(events)
-    dbc.updateTable(connection, 'eventitipo', eventsFiltered)
+    #dbc.updateTable(connection, 'eventitipo', eventsFiltered)
     processEvents = groupEventsByProcess(events)
     processPhaseEvents = groupEventsByProcessPhase(processEvents)
     processStateEvents = groupEventsByProcessState(processEvents)
     eventsDuration = calcEventsDuration(processEvents)
-    dbc.updateTable(connection, 'durataeventi', list(eventsDuration.values()))
+    #dbc.updateTable(connection, 'durataeventi', list(eventsDuration.values()))
     phasesDuration = calcPhasesDuration(processPhaseEvents, eventsDuration)
-    dbc.updateTable(connection, 'duratafasi', phasesDuration)
+    #dbc.updateTable(connection, 'duratafasi', phasesDuration)
     statesDuration = calcStatesDuration(processStateEvents, eventsDuration)
-    dbc.updateTable(connection, 'duratastati', statesDuration)
+    #dbc.updateTable(connection, 'duratastati', statesDuration)
     [processDuration, processSequence] = calcProcessesInfo(processEvents)
     dbc.updateTable(connection, 'durataprocessi', processDuration)
-    dbc.updateTable(connection, 'processitipo', processSequence)
+    #dbc.updateTable(connection, 'processitipo', processSequence)
 
 def getEventsType(connection):
     updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato ORDER BY numEvento"
@@ -62,7 +62,7 @@ def addIDEvent(p, ID):
         if p[i][ID] != flag:
             process.append([p[i][ID], [p[i]]])
             flag = p[i][ID]
-        else:
+        elif process[-1][1][-1][5] < p[i][5]:
             process[-1][1].append(p[i])
         i = i + 1
     return process
