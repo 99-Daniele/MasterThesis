@@ -1,6 +1,7 @@
 import utils.Getters as gt
 import utils.Graphs as gr
 import utils.DatabaseConnection as dbc
+import utils.DataUpdate as du
 
 def displayAllEvents(connection):
     e = gt.getAllEvents(connection)
@@ -38,4 +39,5 @@ def displayEventsDuration(connection):
 
 if __name__ == '__main__':
     connection = dbc.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayStatesDuration(connection)
+    #displayStatesDuration(connection)
+    du.refreshData(connection)
