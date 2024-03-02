@@ -114,10 +114,13 @@ def displayEvents(df, judges, subjects, t):
 def displayProcessesDuration(df, t):
     years = dfm.getAllYears(df)
     app = ds.Dash()
-    df_data = dfm.getAvgStdDataFrame(df, "MY")
-    fig = px.box(df_data[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
+    [allData, avgData] = dfm.getAvgStdDataFrameByDate(df, "MY")
+    fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points = False)
     fig.add_traces(
-        px.line(df_data[1], x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
+        px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
+    )
+    fig.add_traces(
+        px.line(avgData, x = "data", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
     )
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
@@ -133,13 +136,13 @@ def displayProcessesDuration(df, t):
     )
     def update_output(finished, year, change):
         df_temp = updateProcessesDuration(df, finished, year, change)
-        df_data = dfm.getAvgStdDataFrame(df_temp, "MY")
-        fig = px.box(df_data[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
+        [allData, avgData] = dfm.getAvgStdDataFrameByDate(df_temp, "MY")
+        fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
         fig.add_traces(
-            px.line(df_data[1], x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
+            px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
         )
         fig.add_traces(
-            px.line(df_data[1], x = "data", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
+            px.line(avgData, x = "data", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
         )
         fig.update_layout(
             updatemenus = [
@@ -169,10 +172,14 @@ def displayProcessesDuration(df, t):
 def displayStatesDuration(df, t):
     years = dfm.getAllYears(df)
     states = dfm.getAllStates(df)
-    df_data = dfm.getAvgStdDataFrame(df, "MY")
-    fig = px.box(df_data[0], x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points=False)
+    [allData, avgData] = dfm.getAvgStdDataFrameByState(df)
+    fig = px.box(allData, x = "etichetta", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata stati del processo [giorni]', 'etichetta':'Stati del processo'}, title = t, width = 1400, height = 600, points = False)
+    fig.update_traces(showwhiskers = False) 
     fig.add_traces(
-        px.line(df_data[1], x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
+        px.line(avgData, x = "etichetta", y = "durata", markers = True).update_traces(line_color = 'red').data
+    )
+    fig.add_traces(
+        px.line(avgData, x = "etichetta", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
     )
     app = ds.Dash()
     app.layout = ds.html.Div([
@@ -182,7 +189,7 @@ def displayStatesDuration(df, t):
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
         ds.dcc.Graph(id = 'processes-graph', figure = fig)
     ])
-    @app.callback(
+    '''@app.callback(
         ds.Output('processes-graph', 'figure'),
         [ds.Input('finished-dropdown', 'value'),
          ds.Input('state-dropdown', 'value'), 
@@ -223,7 +230,7 @@ def displayStatesDuration(df, t):
             ]
         )
         fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
-        return fig
+        return fig'''
     
     app.run(debug = True)
 
@@ -243,7 +250,6 @@ def displayPhasesDuration(df, t):
          ds.Input('change-dropdown', 'value')]
     )
     def update_output(finished, year, change):
-        print(change)
         df_temp = dfm.getFinishedDataFrame(df, finished)
         df_temp = dfm.getYearDataFrame(df_temp, year)
         df_temp = dfm.getChangeJudgeDataFrame(df_temp, change)
@@ -296,7 +302,6 @@ def displayEventsDuration(df, t):
          ds.Input('change-dropdown', 'value')]
     )
     def update_output(finished, year, change):
-        print(change)
         df_temp = dfm.getFinishedDataFrame(df, finished)
         df_temp = dfm.getYearDataFrame(df_temp, year)
         df_temp = dfm.getChangeJudgeDataFrame(df_temp, change)

@@ -60,6 +60,8 @@ def addIDEvent(p, ID):
         if p[i][ID] != flag:
             process.append([p[i][ID], [p[i]]])
             flag = p[i][ID]
+            if p[i][3]:
+                return process
         elif process[-1][1][-1][5] < p[i][5]:
             process[-1][1].append(p[i])
         i = i + 1
@@ -72,14 +74,19 @@ def calcEventsDuration(processEvents):
         events = processEvents.get(p)
         while i < len(events):
             e = events[i]
-            nextEvent = getNextEvent(e, events[i + 1:]) 
+            if i == 0:
+                nextEvent = getNextEvent(e, events[i + 1:], e[5]) 
+            else:
+                nextEvent = getNextEvent(e, events[i + 1:], events[i - 1][5])
             eventsDuration.update({e[0]: (e[0], (nextEvent[5] - e[5]).days, e[5], nextEvent[5])})
             i = i + 1
     return eventsDuration
 
-def getNextEvent(event, events):
+def getNextEvent(event, events, prevDate):
+    if event[3] == '5':
+        return event
     i = 0
-    while i < len(events) and ((events[i][5] - event[5]).days < 0 or (events[i][5] - event[5]).days > 365):
+    while i < len(events) and ((events[i][5] - event[5]).days < 0 or (event[5] < prevDate and (events[i][5] - event[5]).days > 365)):
         i = i +  1
     if i == len(events):
         return event

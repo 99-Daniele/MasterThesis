@@ -40,6 +40,7 @@ def createStatesDurationsDataFrame(processes):
     finished = []
     changes = []
     tags = []
+    phases = []
     for p in processes:
         dates.append(p[0])
         durations.append(p[1])
@@ -49,13 +50,13 @@ def createStatesDurationsDataFrame(processes):
         finished.append(p[5])
         changes.append(p[6])
         tags.append(p[8])
-    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "etichetta": tags})
+        phases.append(p[10])
+    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "etichetta": tags, "fase": phases})
 
-def getAvgStdDataFrame(df, type):
-    df_temp = df.copy()
+def getAvgStdDataFrameByDate(df, type):
     match type:
         case "W":
-            df1 = df_temp[['data', 'durata']].copy()
+            df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: lg.getWeekNumber(x))
             df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).median()
@@ -65,7 +66,7 @@ def getAvgStdDataFrame(df, type):
             df2['data'] = df2['data'].map(lambda x: lg.weeks[x - 1])
             return [df1, df2]
         case "M":
-            df1 = df_temp[['data', 'durata']].copy()
+            df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: x.month)
             df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).median()
@@ -75,7 +76,7 @@ def getAvgStdDataFrame(df, type):
             df2['data'] = df2['data'].map(lambda x: lg.months[x - 1])
             return [df1, df2]
         case "MY":
-            df1 = df_temp[['data', 'durata']].copy()
+            df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].dt.to_period("M")
             df1['data'] = df1['data'].map(lambda x: lg.getMonthYearDate(x))
             df1 = df1.sort_values(['data'])
@@ -83,6 +84,15 @@ def getAvgStdDataFrame(df, type):
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
             return [df1, df2]
+        
+def getAvgStdDataFrameByState(df):
+    df1 = df[['etichetta', 'durata', 'fase']].copy()
+    df2 = df1.groupby(['etichetta', 'fase'], as_index = False).median()
+    df2['conteggio'] = df1.groupby(['etichetta', 'fase']).size().tolist()
+    df2['quantile'] = df1.groupby(['etichetta', 'fase'], as_index = False).quantile(0.75)['durata']
+    df1 = df1.sort_values(['fase', 'etichetta']).reset_index(drop = True)
+    df2 = df2.sort_values(['fase', 'etichetta']).reset_index(drop = True)
+    return [df1, df2]
 
 def getFinishedDataFrame(df, finished):
     df_temp = df.copy()
