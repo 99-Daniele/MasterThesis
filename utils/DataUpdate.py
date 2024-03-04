@@ -60,7 +60,7 @@ def addIDEvent(p, ID):
         if p[i][ID] != flag:
             process.append([p[i][ID], [p[i]]])
             flag = p[i][ID]
-            if p[i][3]:
+            if p[i][3] == 5:
                 return process
         elif process[-1][1][-1][5] < p[i][5]:
             process[-1][1].append(p[i])
