@@ -44,4 +44,4 @@ def displayEventsDuration(connection):
 
 if __name__ == '__main__':
     connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayEventsDuration(connection)
+    displayImportantEvents(connection)

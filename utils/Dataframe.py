@@ -92,8 +92,8 @@ def createEventsDurationsDataFrame(processes):
         sections.append(p[4])
         finished.append(p[5])
         changes.append(p[6])
-        events.append(p[8])
-        phases.append(p[10])
+        events.append(p[9])
+        phases.append(p[11])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "evento": events, "fase": phases})
 
 def getAvgStdDataFrameByDate(df, type):

@@ -33,6 +33,6 @@ def getPhasesDuration(connection):
     return df.createPhasesDurationsDataFrame(processes)
 
 def getEventsDuration(connection):
-    query = "SELECT * FROM durataeventiinfo ORDER BY numProcesso, dataInizio"
+    query = "SELECT * FROM durataeventiinfo WHERE evento IN (SELECT evento FROM durataeventiinfo GROUP BY evento HAVING COUNT(*) > 50) ORDER BY numProcesso, dataInizio"
     processes = connect.getDataFromDatabase(connection, query)
     return df.createEventsDurationsDataFrame(processes)
