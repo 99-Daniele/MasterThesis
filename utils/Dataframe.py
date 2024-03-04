@@ -1,5 +1,6 @@
 import pandas as pd
-import utils.Legenda as lg
+
+import utils.Legenda as legenda
 
 def createEventsDataFrame(events):
     pIds = []
@@ -99,13 +100,13 @@ def getAvgStdDataFrameByDate(df, type):
     match type:
         case "W":
             df1 = df[['data', 'durata']].copy()
-            df1['data'] = df1['data'].map(lambda x: lg.getWeekNumber(x))
+            df1['data'] = df1['data'].map(lambda x: legenda.getWeekNumber(x))
             df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).median()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
-            df1['data'] = df1['data'].map(lambda x: lg.weeks[x - 1])
-            df2['data'] = df2['data'].map(lambda x: lg.weeks[x - 1])
+            df1['data'] = df1['data'].map(lambda x: legenda.weeks[x - 1])
+            df2['data'] = df2['data'].map(lambda x: legenda.weeks[x - 1])
             return [df1, df2]
         case "M":
             df1 = df[['data', 'durata']].copy()
@@ -114,13 +115,13 @@ def getAvgStdDataFrameByDate(df, type):
             df2 = df1.groupby(['data'], as_index = False).median()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
-            df1['data'] = df1['data'].map(lambda x: lg.months[x - 1])
-            df2['data'] = df2['data'].map(lambda x: lg.months[x - 1])
+            df1['data'] = df1['data'].map(lambda x: legenda.months[x - 1])
+            df2['data'] = df2['data'].map(lambda x: legenda.months[x - 1])
             return [df1, df2]
         case "MY":
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].dt.to_period("M")
-            df1['data'] = df1['data'].map(lambda x: lg.getMonthYearDate(x))
+            df1['data'] = df1['data'].map(lambda x: legenda.getMonthYearDate(x))
             df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).median()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
@@ -158,7 +159,7 @@ def getFinishedDataFrame(df, finished):
     df_temp = df.copy()
     if finished == None or len(finished) == 0:
         return df
-    finished = [(lambda x: lg.finishedNumber(x))(x) for x in finished]
+    finished = [(lambda x: legenda.finishedNumber(x))(x) for x in finished]
     return df_temp[df_temp['finito'].isin(finished)]
 
 def getYearDataFrame(df, years):

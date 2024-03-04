@@ -1,7 +1,4 @@
 import mysql.connector as cnx
-
-import utils.DataUpdate as du
-
 from alive_progress import alive_bar
 
 def connectToDatabase(h, usr, psw, db):

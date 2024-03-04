@@ -1,25 +1,25 @@
-import utils.DatabaseConnection as dbc
+import utils.DatabaseConnection as connect
 
 def refreshData(connection):
     events = getEventsType(connection)
     eventsFiltered = filterEvents(events)
-    dbc.updateTable(connection, 'eventitipo', eventsFiltered)
+    connect.updateTable(connection, 'eventitipo', eventsFiltered)
     processEvents = groupEventsByProcess(events)
     processPhaseEvents = groupEventsByProcessPhase(processEvents)
     processStateEvents = groupEventsByProcessState(processEvents)
     eventsDuration = calcEventsDuration(processEvents)
-    dbc.updateTable(connection, 'durataeventi', list(eventsDuration.values()))
+    connect.updateTable(connection, 'durataeventi', list(eventsDuration.values()))
     phasesDuration = calcPhasesDuration(processPhaseEvents, eventsDuration)
-    dbc.updateTable(connection, 'duratafasi', phasesDuration)
+    connect.updateTable(connection, 'duratafasi', phasesDuration)
     statesDuration = calcStatesDuration(processStateEvents, eventsDuration)
-    dbc.updateTable(connection, 'duratastati', statesDuration)
+    connect.updateTable(connection, 'duratastati', statesDuration)
     [processDuration, processSequence] = calcProcessesInfo(processEvents)
-    dbc.updateTable(connection, 'durataprocessi', processDuration)
-    dbc.updateTable(connection, 'processitipo', processSequence)
+    connect.updateTable(connection, 'durataprocessi', processDuration)
+    connect.updateTable(connection, 'processitipo', processSequence)
 
 def getEventsType(connection):
     updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato ORDER BY numEvento"
-    eventsType = dbc.getDataFromDatabase(connection, updateQuery)
+    eventsType = connect.getDataFromDatabase(connection, updateQuery)
     return eventsType
 
 def filterEvents(events):

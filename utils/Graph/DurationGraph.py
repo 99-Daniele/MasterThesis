@@ -1,141 +1,44 @@
 import plotly.express as px
 import dash as ds
-import pandas as pd
 
-import utils.Legenda as lg
-import utils.DataFrame as dfm
+import utils.Legenda as legenda
+import utils.DataFrame as frame
 
 def updateFinishYearChangeDuration(df, finished, year, change):
     df_temp = df
     if not (finished == None or len(finished) == 0):
-        df_temp = dfm.getFinishedDataFrame(df_temp, finished)
+        df_temp = frame.getFinishedDataFrame(df_temp, finished)
     if not (year == None or len(year) == 0):
-        df_temp = dfm.getYearDataFrame(df_temp, year)
+        df_temp = frame.getYearDataFrame(df_temp, year)
     if not (change == None or len(change) == 0):
-        df_temp = dfm.getChangeJudgeDataFrame(df_temp, change)
+        df_temp = frame.getChangeJudgeDataFrame(df_temp, change)
     return df_temp
 
 def updateStatesDuration(df, state, finished, year, change):
     df_temp = df
     if not state == None:
-        df_temp = dfm.getStateDataFrame(df_temp, state)
+        df_temp = frame.getStateDataFrame(df_temp, state)
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
 def updatePhasesDuration(df, phase, finished, year, change):
     df_temp = df
     if not phase == None:
-        df_temp = dfm.getPhaseDataFrame(df_temp, phase)
+        df_temp = frame.getPhaseDataFrame(df_temp, phase)
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
 def updateEventsDuration(df, event, finished, year, change):
     df_temp = df
     if not event == None:
-        df_temp = dfm.getEventDataFrame(df_temp, event)
+        df_temp = frame.getEventDataFrame(df_temp, event)
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
-def displayEvents(df, judges, subjects, t):
-    df_data = df
-    fig = px.scatter(df_data, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = lg.phaseColorList(df_data), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
-    fig.update_layout(
-        legend = dict(
-            yanchor = "top",
-            y = 0.99,
-            xanchor = "left",
-            x = 0.01,
-            bgcolor = None
-        ),
-        xaxis = dict(
-            rangeselector = dict(
-                buttons = list([
-                    dict(count = 3, label = "3m", step = "month", stepmode = "backward"),
-                    dict(count = 6, label = "6m", step = "month", stepmode = "backward"),
-                    dict(count = 1, label = "1y", step = "year", stepmode = "backward"),
-                    dict(step="all")
-                ])
-            ),
-            rangeslider = dict(
-                visible = True
-            ),
-            type = "date"
-        ),
-        yaxis = dict(
-            showticklabels = False
-        )
-    )
-    fig.update_xaxes(
-        dtick = "M1",
-        tickformat = "%b\n%Y",
-        ticklabelmode = "period"
-    )
-    
-    app = ds.Dash()
-    app.layout = ds.html.Div([
-        ds.dcc.DatePickerRange(
-            id = 'date-ranger',
-            start_date = df['data'].min().date(),
-            end_date = df['data'].max().date(),
-            min_date_allowed = df['data'].min().date(),
-            max_date_allowed = df['data'].max().date(),
-            display_format = 'DD MM YYYY'
-        ),
-        ds.dcc.Dropdown(lg.importantEvents, multi = True, id = 'tag-dropdown', placeholder = 'Seleziona tipo di evento...', style = {'width': 300}),
-        ds.dcc.Graph(
-             figure = fig, 
-             id = 'events-graph'
-        )
-    ])
-
-    @app.callback(
-    ds.Output('events-graph', 'figure'),
-    [ds.Input('date-ranger', 'start_date'), ds.Input('date-ranger', 'end_date'), ds.Input('tag-dropdown', 'value')])
-    def update_graph(start_date, end_date, t_value):
-        if t_value is None:
-            df_data = df[(df['data'] > start_date) & (df['data'] < end_date)]
-        else:
-            df_data = df[(df['data'] > start_date) & (df['data'] < end_date) & (df['etichetta'].isin(t_value))]
-        fig = px.scatter(df_data, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = lg.phaseColorList(df_data), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
-        fig.update_layout(
-            legend=dict(
-                yanchor = "top",
-                y = 0.99,
-                xanchor = "left",
-                x = 0.01,
-                bgcolor = None
-            ),
-            xaxis=dict(
-                rangeselector=dict(
-                    buttons=list([
-                        dict(count = 3, label = "3m", step = "month", stepmode = "backward"),
-                        dict(count = 6, label = "6m", step = "month", stepmode = "backward"),
-                        dict(count = 1, label = "1y", step = "year", stepmode = "backward"),
-                        dict(step="all")
-                    ])
-                ),
-                rangeslider = dict(
-                    visible = True
-                ),
-                type = "date"
-            ),
-            yaxis = dict(
-                showticklabels = False
-            )
-        )
-        fig.update_xaxes(
-            dtick="M1",
-            tickformat="%b\n%Y",
-            ticklabelmode="period"
-        )
-        return fig
-    
-    app.run(debug=True)
-
 def displayProcessesDuration(df, t):
-    years = dfm.getAllYears(df)
+    years = frame.getAllYears(df)
     app = ds.Dash()
-    [allData, avgData] = dfm.getAvgStdDataFrameByDate(df, "MY")
+    [allData, avgData] = frame.getAvgStdDataFrameByDate(df, "MY")
     fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points  = False)
     fig.add_traces(
         px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -144,7 +47,7 @@ def displayProcessesDuration(df, t):
         px.line(avgData, x = "data", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
     )
     app.layout = ds.html.Div([
-        ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
         ds.dcc.Graph(id = 'processes-graph', figure = fig)
@@ -157,7 +60,7 @@ def displayProcessesDuration(df, t):
     )
     def update_output(finished, year, change):
         df_temp = updateFinishYearChangeDuration(df, finished, year, change)
-        [allData, avgData] = dfm.getAvgStdDataFrameByDate(df_temp, "MY")
+        [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
         fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points = False)
         fig.add_traces(
             px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -171,15 +74,15 @@ def displayProcessesDuration(df, t):
                     buttons = list([
                         dict(
                             label = 'W', method = 'update',
-                            args = [{'x' : [dfm.getAvgStdDataFrameByDate(df_temp, "W")[0]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['data']], 'y' : [dfm.getAvgStdDataFrameByDate(df_temp, "W")[0]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['quantile']], 'text': [dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['conteggio']]}]
+                            args = [{'x' : [frame.getAvgStdDataFrameByDate(df_temp, "W")[0]['data'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['data'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['data']], 'y' : [frame.getAvgStdDataFrameByDate(df_temp, "W")[0]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['quantile']], 'text': [frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['conteggio']]}]
                         ),
                         dict(
                             label = 'M', method = 'update',
-                            args = [{'x' : [dfm.getAvgStdDataFrameByDate(df_temp, "M")[0]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['data']], 'y' : [dfm.getAvgStdDataFrameByDate(df_temp, "M")[0]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['quantile']], 'text': [dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['conteggio']]}]
+                            args = [{'x' : [frame.getAvgStdDataFrameByDate(df_temp, "M")[0]['data'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['data'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['data']], 'y' : [frame.getAvgStdDataFrameByDate(df_temp, "M")[0]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['quantile']], 'text': [frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['conteggio']]}]
                         ),
                         dict(
                             label = 'MY', method = 'update',
-                            args = [{'x' : [dfm.getAvgStdDataFrameByDate(df_temp, "MY")[0]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data']], 'y' : [dfm.getAvgStdDataFrameByDate(df_temp, "MY")[0]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['quantile']], 'text': [dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['conteggio']]}]
+                            args = [{'x' : [frame.getAvgStdDataFrameByDate(df_temp, "MY")[0]['data'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data']], 'y' : [frame.getAvgStdDataFrameByDate(df_temp, "MY")[0]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['quantile']], 'text': [frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['conteggio']]}]
                         )
                     ])
                 )
@@ -191,9 +94,9 @@ def displayProcessesDuration(df, t):
     app.run(debug = True)
 
 def displayStatesDuration(df, t):
-    years = dfm.getAllYears(df)
-    states = dfm.getAllStates(df)
-    [allData, avgData] = dfm.getAvgStdDataFrameByState(df)
+    years = frame.getAllYears(df)
+    states = frame.getAllStates(df)
+    [allData, avgData] = frame.getAvgStdDataFrameByState(df)
     fig = px.box(allData, x = "etichetta", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata stati del processo [giorni]', 'etichetta':'Stati del processo'}, title = t, width = 1400, height = 600, points  = False)
     fig.add_traces(
         px.line(avgData, x = "etichetta", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -203,7 +106,7 @@ def displayStatesDuration(df, t):
     )
     app = ds.Dash()
     app.layout = ds.html.Div([
-        ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(states, multi = False, searchable = False, id = 'state-dropdown', placeholder = 'Seleziona stato...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
@@ -219,7 +122,7 @@ def displayStatesDuration(df, t):
     def update_output(finished, state, year, change):
         df_temp = updateStatesDuration(df, state, finished, year, change)
         if state == None:
-            [allData, avgData] = dfm.getAvgStdDataFrameByState(df_temp)
+            [allData, avgData] = frame.getAvgStdDataFrameByState(df_temp)
             fig = px.box(allData, x = "etichetta", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata stati del processo [giorni]', 'etichetta':'Stati del processo'}, title = t, width = 1400, height = 600, points  = False)
             fig.add_traces(
                 px.line(avgData, x = "etichetta", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -230,7 +133,7 @@ def displayStatesDuration(df, t):
             fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
             return fig
         else:
-            [allData, avgData] = dfm.getAvgStdDataFrameByDate(df_temp, "MY")
+            [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
             fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = "DURATA MEDIA STATO: " + state, width = 1400, height = 600, points  = False)
             fig.add_traces(
                 px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -244,15 +147,15 @@ def displayStatesDuration(df, t):
                         buttons = list([
                             dict(
                                 label = 'W', method = 'update',
-                                args = [{'x' : [dfm.getAvgStdDataFrameByDate(df_temp, "W")[0]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['data']], 'y' : [dfm.getAvgStdDataFrameByDate(df_temp, "W")[0]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['quantile']], 'text': [dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['conteggio']]}]
+                                args = [{'x' : [frame.getAvgStdDataFrameByDate(df_temp, "W")[0]['data'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['data'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['data']], 'y' : [frame.getAvgStdDataFrameByDate(df_temp, "W")[0]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['quantile']], 'text': [frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['conteggio']]}]
                             ),
                             dict(
                                 label = 'M', method = 'update',
-                                args = [{'x' : [dfm.getAvgStdDataFrameByDate(df_temp, "M")[0]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['data']], 'y' : [dfm.getAvgStdDataFrameByDate(df_temp, "M")[0]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['quantile']], 'text': [dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['conteggio']]}]
+                                args = [{'x' : [frame.getAvgStdDataFrameByDate(df_temp, "M")[0]['data'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['data'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['data']], 'y' : [frame.getAvgStdDataFrameByDate(df_temp, "M")[0]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['quantile']], 'text': [frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['conteggio']]}]
                             ),
                             dict(
                                 label = 'MY', method = 'update',
-                                args = [{'x' : [dfm.getAvgStdDataFrameByDate(df_temp, "MY")[0]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data']], 'y' : [dfm.getAvgStdDataFrameByDate(df_temp, "MY")[0]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['quantile']], 'text': [dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['conteggio']]}]
+                                args = [{'x' : [frame.getAvgStdDataFrameByDate(df_temp, "MY")[0]['data'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data']], 'y' : [frame.getAvgStdDataFrameByDate(df_temp, "MY")[0]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['quantile']], 'text': [frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['conteggio']]}]
                             )
                         ])
                     )
@@ -264,9 +167,9 @@ def displayStatesDuration(df, t):
     app.run(debug = True)
 
 def displayPhasesDuration(df, t):
-    years = dfm.getAllYears(df)
-    phases = dfm.getAllPhases(df)
-    [allData, avgData] = dfm.getAvgStdDataFrameByPhase(df)
+    years = frame.getAllYears(df)
+    phases = frame.getAllPhases(df)
+    [allData, avgData] = frame.getAvgStdDataFrameByPhase(df)
     fig = px.box(allData, x = "fase", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, title = t, width = 1400, height = 600, points  = False)
     fig.add_traces(
         px.line(avgData, x = "fase", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -276,7 +179,7 @@ def displayPhasesDuration(df, t):
     )
     app = ds.Dash()
     app.layout = ds.html.Div([
-        ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(phases, multi = False, searchable = False, id = 'phase-dropdown', placeholder = 'Seleziona fase...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
@@ -292,7 +195,7 @@ def displayPhasesDuration(df, t):
     def update_output(finished, phase, year, change):
         df_temp = updatePhasesDuration(df, phase, finished, year, change)
         if phase == None:
-            [allData, avgData] = dfm.getAvgStdDataFrameByPhase(df_temp)
+            [allData, avgData] = frame.getAvgStdDataFrameByPhase(df_temp)
             fig = px.box(allData, x = "fase", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, title = t, width = 1400, height = 600, points  = False)
             fig.add_traces(
                 px.line(avgData, x = "fase", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -303,7 +206,7 @@ def displayPhasesDuration(df, t):
             fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
             return fig
         else:
-            [allData, avgData] = dfm.getAvgStdDataFrameByDate(df_temp, "MY")
+            [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
             fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = "DURATA MEDIA FASE " + phase, width = 1400, height = 600, points  = False)
             fig.add_traces(
                 px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -317,15 +220,15 @@ def displayPhasesDuration(df, t):
                         buttons = list([
                             dict(
                                 label = 'W', method = 'update',
-                                args = [{'x' : [dfm.getAvgStdDataFrameByDate(df_temp, "W")[0]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['data']], 'y' : [dfm.getAvgStdDataFrameByDate(df_temp, "W")[0]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['quantile']], 'text': [dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['conteggio']]}]
+                                args = [{'x' : [frame.getAvgStdDataFrameByDate(df_temp, "W")[0]['data'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['data'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['data']], 'y' : [frame.getAvgStdDataFrameByDate(df_temp, "W")[0]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['quantile']], 'text': [frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['conteggio']]}]
                             ),
                             dict(
                                 label = 'M', method = 'update',
-                                args = [{'x' : [dfm.getAvgStdDataFrameByDate(df_temp, "M")[0]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['data']], 'y' : [dfm.getAvgStdDataFrameByDate(df_temp, "M")[0]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['quantile']], 'text': [dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['conteggio']]}]
+                                args = [{'x' : [frame.getAvgStdDataFrameByDate(df_temp, "M")[0]['data'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['data'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['data']], 'y' : [frame.getAvgStdDataFrameByDate(df_temp, "M")[0]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['quantile']], 'text': [frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['conteggio']]}]
                             ),
                             dict(
                                 label = 'MY', method = 'update',
-                                args = [{'x' : [dfm.getAvgStdDataFrameByDate(df_temp, "MY")[0]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data']], 'y' : [dfm.getAvgStdDataFrameByDate(df_temp, "MY")[0]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['quantile']], 'text': [dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['conteggio']]}]
+                                args = [{'x' : [frame.getAvgStdDataFrameByDate(df_temp, "MY")[0]['data'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data']], 'y' : [frame.getAvgStdDataFrameByDate(df_temp, "MY")[0]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['quantile']], 'text': [frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['conteggio']]}]
                             )
                         ])
                     )
@@ -337,9 +240,9 @@ def displayPhasesDuration(df, t):
     app.run(debug = True)
 
 def displayEventsDuration(df, t):
-    years = dfm.getAllYears(df)
-    events = dfm.getAllEvents(df)
-    [allData, avgData] = dfm.getAvgStdDataFrameByEvent(df)
+    years = frame.getAllYears(df)
+    events = frame.getAllEvents(df)
+    [allData, avgData] = frame.getAvgStdDataFrameByEvent(df)
     fig = px.box(allData, x = "evento", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata eventi del processo [giorni]', 'evento':'Eventi del processo'}, title = t, width = 1400, height = 600, points  = False)
     fig.add_traces(
         px.line(avgData, x = "evento", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -349,7 +252,7 @@ def displayEventsDuration(df, t):
     )
     app = ds.Dash()
     app.layout = ds.html.Div([
-        ds.dcc.Dropdown(lg.processState, value = [lg.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'event-dropdown', placeholder = 'Seleziona evento...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
@@ -365,7 +268,7 @@ def displayEventsDuration(df, t):
     def update_output(finished, event, year, change):
         df_temp = updateEventsDuration(df, event, finished, year, change)
         if event == None:
-            [allData, avgData] = dfm.getAvgStdDataFrameByEvent(df_temp)
+            [allData, avgData] = frame.getAvgStdDataFrameByEvent(df_temp)
             fig = px.box(allData, x = "evento", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata eventi del processo [giorni]', 'evento':'Eventi del processo'}, title = t, width = 1400, height = 600, points  = False)
             fig.add_traces(
                 px.line(avgData, x = "evento", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -376,7 +279,7 @@ def displayEventsDuration(df, t):
             fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
             return fig
         else:
-            [allData, avgData] = dfm.getAvgStdDataFrameByDate(df_temp, "MY")
+            [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
             fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = "DURATA MEDIA EVENTO: " + event, width = 1400, height = 600, points  = False)
             fig.add_traces(
                 px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -390,15 +293,15 @@ def displayEventsDuration(df, t):
                         buttons = list([
                             dict(
                                 label = 'W', method = 'update',
-                                args = [{'x' : [dfm.getAvgStdDataFrameByDate(df_temp, "W")[0]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['data']], 'y' : [dfm.getAvgStdDataFrameByDate(df_temp, "W")[0]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['quantile']], 'text': [dfm.getAvgStdDataFrameByDate(df_temp, "W")[1]['conteggio']]}]
+                                args = [{'x' : [frame.getAvgStdDataFrameByDate(df_temp, "W")[0]['data'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['data'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['data']], 'y' : [frame.getAvgStdDataFrameByDate(df_temp, "W")[0]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['quantile']], 'text': [frame.getAvgStdDataFrameByDate(df_temp, "W")[1]['conteggio']]}]
                             ),
                             dict(
                                 label = 'M', method = 'update',
-                                args = [{'x' : [dfm.getAvgStdDataFrameByDate(df_temp, "M")[0]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['data']], 'y' : [dfm.getAvgStdDataFrameByDate(df_temp, "M")[0]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['quantile']], 'text': [dfm.getAvgStdDataFrameByDate(df_temp, "M")[1]['conteggio']]}]
+                                args = [{'x' : [frame.getAvgStdDataFrameByDate(df_temp, "M")[0]['data'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['data'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['data']], 'y' : [frame.getAvgStdDataFrameByDate(df_temp, "M")[0]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['quantile']], 'text': [frame.getAvgStdDataFrameByDate(df_temp, "M")[1]['conteggio']]}]
                             ),
                             dict(
                                 label = 'MY', method = 'update',
-                                args = [{'x' : [dfm.getAvgStdDataFrameByDate(df_temp, "MY")[0]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data']], 'y' : [dfm.getAvgStdDataFrameByDate(df_temp, "MY")[0]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['durata'], dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['quantile']], 'text': [dfm.getAvgStdDataFrameByDate(df_temp, "MY")[1]['conteggio']]}]
+                                args = [{'x' : [frame.getAvgStdDataFrameByDate(df_temp, "MY")[0]['data'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['data']], 'y' : [frame.getAvgStdDataFrameByDate(df_temp, "MY")[0]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['durata'], frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['quantile']], 'text': [frame.getAvgStdDataFrameByDate(df_temp, "MY")[1]['conteggio']]}]
                             )
                         ])
                     )
