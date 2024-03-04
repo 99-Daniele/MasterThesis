@@ -73,6 +73,28 @@ def createPhasesDurationsDataFrame(processes):
         phases.append(p[8])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "fase": phases})
 
+def createEventsDurationsDataFrame(processes):
+    durations = []
+    dates = []
+    judges = []
+    sections = []
+    subjects = []
+    finished = []
+    changes = []
+    events = []
+    phases = []
+    for p in processes:
+        dates.append(p[0])
+        durations.append(p[1])
+        judges.append(p[2])
+        subjects.append(p[3])
+        sections.append(p[4])
+        finished.append(p[5])
+        changes.append(p[6])
+        events.append(p[8])
+        phases.append(p[10])
+    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "evento": events, "fase": phases})
+
 def getAvgStdDataFrameByDate(df, type):
     match type:
         case "W":
@@ -123,6 +145,15 @@ def getAvgStdDataFrameByPhase(df):
     df2 = df2.sort_values(['fase']).reset_index(drop = True)
     return [df1, df2]
 
+def getAvgStdDataFrameByEvent(df):
+    df1 = df[['evento', 'durata']].copy()
+    df2 = df1.groupby(['evento'], as_index = False).median()
+    df2['conteggio'] = df1.groupby(['evento']).size().tolist()
+    df2['quantile'] = df1.groupby(['evento'], as_index = False).quantile(0.75)['durata']
+    df1 = df1.sort_values(['evento']).reset_index(drop = True)
+    df2 = df2.sort_values(['evento']).reset_index(drop = True)
+    return [df1, df2]
+
 def getFinishedDataFrame(df, finished):
     df_temp = df.copy()
     if finished == None or len(finished) == 0:
@@ -158,6 +189,12 @@ def getPhaseDataFrame(df, phase):
         return df
     return df_temp[df_temp['fase'] == phase]
 
+def getEventDataFrame(df, event):
+    df_temp = df.copy()
+    if event == None:
+        return df
+    return df_temp[df_temp['evento'] == event]
+
 def getAllYears(df):
     df_temp = df['data'].copy()
     df_temp = df_temp.map(lambda x: x.year).sort_values()
@@ -173,6 +210,11 @@ def getAllPhases(df):
     df_temp = df['fase'].copy()
     phases = df_temp.unique()
     return phases
+
+def getAllEvents(df):
+    df_temp = df['evento'].copy()
+    events = df_temp.unique()
+    return events
 
 def getTop10Judges(df):
     df_temp = df.copy()

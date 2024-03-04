@@ -35,8 +35,8 @@ def displayPhasesDuration(connection):
 
 def displayEventsDuration(connection):
     events = gt.getEventsDuration(connection)
-    gr.displayProcesses(events, "DURATA MEDIA EVENTI DEL PROCESSO")
+    gr.displayEventsDuration(events, "DURATA MEDIA EVENTI DEL PROCESSO")
 
 if __name__ == '__main__':
     connection = dbc.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayPhasesDuration(connection)
+    displayEventsDuration(connection)

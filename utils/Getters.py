@@ -34,4 +34,4 @@ def getPhasesDuration(connection):
 def getEventsDuration(connection):
     query = "SELECT * FROM durataeventiinfo ORDER BY numProcesso, dataInizio"
     processes = getDataFromDatabase(connection, query)
-    return df.createProcessesDataFrame(processes)
+    return df.createEventsDurationsDataFrame(processes)
