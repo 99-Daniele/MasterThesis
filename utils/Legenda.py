@@ -6,7 +6,6 @@ months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio'
 daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica']
 colors = ['blue', 'orange', 'red', 'green', 'purple']
 importantEvents = ['ISCRIZIONE', 'ASSEGNAZIONE', 'FISSAZIONE UDIENZA', 'UDIENZA', 'IN DECISIONE', 'PUBBLICAZIONE', 'RINVIO', 'FINE PROCESSO', 'STOP PROCESSO', 'PROCESSO IN PAUSA']
-sectionList = ['01', '02', '03', '04', '05', 'TI', 'V0', 'C0', 'TA', 'AG', 'FE', 'L0']
 processState = ['FINITO', 'NON FINITO', 'IN STALLO', 'STOPPATO']
 
 def phaseColorList(df):

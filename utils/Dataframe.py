@@ -115,7 +115,7 @@ def getAvgStdDataFrameByState(df):
     return [df1, df2]
 
 def getAvgStdDataFrameByPhase(df):
-    df1 = df[['fase', 'durata']]
+    df1 = df[['fase', 'durata']].copy()
     df2 = df1.groupby(['fase'], as_index = False).median()
     df2['conteggio'] = df1.groupby(['fase']).size().tolist()
     df2['quantile'] = df1.groupby(['fase'], as_index = False).quantile(0.75)['durata']
@@ -129,12 +129,6 @@ def getFinishedDataFrame(df, finished):
         return df
     finished = [(lambda x: lg.finishedNumber(x))(x) for x in finished]
     return df_temp[df_temp['finito'].isin(finished)]
-
-def getStateDataFrame(df, state):
-    df_temp = df.copy()
-    if state == None:
-        return df
-    return df_temp[df_temp['etichetta'] == state]
 
 def getYearDataFrame(df, years):
     df_temp = df.copy()
@@ -151,7 +145,19 @@ def getChangeJudgeDataFrame(df, change):
     else:
         change = 0
     return df_temp[df_temp['cambio'] == change]
-           
+
+def getStateDataFrame(df, state):
+    df_temp = df.copy()
+    if state == None:
+        return df
+    return df_temp[df_temp['etichetta'] == state]
+
+def getPhaseDataFrame(df, phase):
+    df_temp = df.copy()
+    if phase == None:
+        return df
+    return df_temp[df_temp['fase'] == phase]
+
 def getAllYears(df):
     df_temp = df['data'].copy()
     df_temp = df_temp.map(lambda x: x.year).sort_values()
@@ -162,6 +168,11 @@ def getAllStates(df):
     df_temp = df['etichetta'].copy()
     states = df_temp.unique()
     return states
+
+def getAllPhases(df):
+    df_temp = df['fase'].copy()
+    phases = df_temp.unique()
+    return phases
 
 def getTop10Judges(df):
     df_temp = df.copy()
