@@ -53,6 +53,26 @@ def createStatesDurationsDataFrame(processes):
         phases.append(p[10])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "etichetta": tags, "fase": phases})
 
+def createPhasesDurationsDataFrame(processes):
+    durations = []
+    dates = []
+    judges = []
+    sections = []
+    subjects = []
+    finished = []
+    changes = []
+    phases = []
+    for p in processes:
+        dates.append(p[0])
+        durations.append(p[1])
+        judges.append(p[2])
+        subjects.append(p[3])
+        sections.append(p[4])
+        finished.append(p[5])
+        changes.append(p[6])
+        phases.append(p[8])
+    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "fase": phases})
+
 def getAvgStdDataFrameByDate(df, type):
     match type:
         case "W":
@@ -94,6 +114,15 @@ def getAvgStdDataFrameByState(df):
     df2 = df2.sort_values(['fase', 'etichetta']).reset_index(drop = True)
     return [df1, df2]
 
+def getAvgStdDataFrameByPhase(df):
+    df1 = df[['fase', 'durata']]
+    df2 = df1.groupby(['fase'], as_index = False).median()
+    df2['conteggio'] = df1.groupby(['fase']).size().tolist()
+    df2['quantile'] = df1.groupby(['fase'], as_index = False).quantile(0.75)['durata']
+    df1 = df1.sort_values(['fase']).reset_index(drop = True)
+    df2 = df2.sort_values(['fase']).reset_index(drop = True)
+    return [df1, df2]
+
 def getFinishedDataFrame(df, finished):
     df_temp = df.copy()
     if finished == None or len(finished) == 0:
@@ -101,11 +130,11 @@ def getFinishedDataFrame(df, finished):
     finished = [(lambda x: lg.finishedNumber(x))(x) for x in finished]
     return df_temp[df_temp['finito'].isin(finished)]
 
-def getStatesDataFrame(df, states):
+def getStateDataFrame(df, state):
     df_temp = df.copy()
-    if states == None or len(states) == 0:
+    if state == None:
         return df
-    return df_temp[df_temp['etichetta'].isin(states)]
+    return df_temp[df_temp['etichetta'] == state]
 
 def getYearDataFrame(df, years):
     df_temp = df.copy()
@@ -122,32 +151,7 @@ def getChangeJudgeDataFrame(df, change):
     else:
         change = 0
     return df_temp[df_temp['cambio'] == change]
-
-def updateDataFrame(df, judges, subjects, sections):
-    df_temp = df.copy()
-    if judges is None:
-        if subjects is None:
-            if sections is None:
-                return df
-            else:
-                return df_temp[df_temp['sezione'] == sections]
-        else:
-            if sections is None:
-                return df_temp[df_temp['materia'] == subjects]
-            else:
-                return df_temp[(df_temp['materia'] == subjects) & (df_temp['sezione'] == sections)]
-    else:
-        if subjects is None:
-            if sections is None:
-                return df_temp[df_temp['giudice'] == judges]
-            else:
-                return df_temp[(df_temp['giudice'] == judges) & (df_temp['sezione'] == sections)]
-        else:
-            if sections is None:
-                return df_temp[(df_temp['giudice'] == judges) & (df_temp['materia'] == subjects)]
-            else:
-                return df_temp[(df_temp['giudice'] == judges) & (df_temp['materia'] == subjects) & (df['sezione'] == sections)]
-            
+           
 def getAllYears(df):
     df_temp = df['data'].copy()
     df_temp = df_temp.map(lambda x: x.year).sort_values()
@@ -165,6 +169,6 @@ def getTop10Judges(df):
     return judges
 
 def getTop10Subjects(df):
-    df_temp = df.copy()
+    df_temp = df
     subjects = df_temp.groupby(['materia'])['materia'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
     return subjects
