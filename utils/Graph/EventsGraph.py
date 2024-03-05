@@ -1,10 +1,12 @@
 import dash as ds
 import plotly.express as px
 
-def displayEvents(df, judges, subjects, t):
+import utils.Legenda as legenda
+
+def displayEvents(df, t):
     df_data = df
-    fig = px.scatter(df_data, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = lg.phaseColorList(df_data), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
-    fig.update_layout(
+    fig = px.scatter(df_data, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = legenda.phaseColorList(df_data), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
+    '''fig.update_layout(
         legend = dict(
             yanchor = "top",
             y = 0.99,
@@ -34,7 +36,7 @@ def displayEvents(df, judges, subjects, t):
         dtick = "M1",
         tickformat = "%b\n%Y",
         ticklabelmode = "period"
-    )
+    )'''
     
     app = ds.Dash()
     app.layout = ds.html.Div([
@@ -46,14 +48,14 @@ def displayEvents(df, judges, subjects, t):
             max_date_allowed = df['data'].max().date(),
             display_format = 'DD MM YYYY'
         ),
-        ds.dcc.Dropdown(lg.importantEvents, multi = True, id = 'tag-dropdown', placeholder = 'Seleziona tipo di evento...', style = {'width': 300}),
+        #ds.dcc.Dropdown(lg.importantEvents, multi = True, id = 'tag-dropdown', placeholder = 'Seleziona tipo di evento...', style = {'width': 300}),
         ds.dcc.Graph(
              figure = fig, 
              id = 'events-graph'
         )
     ])
 
-    @app.callback(
+    '''@app.callback(
     ds.Output('events-graph', 'figure'),
     [ds.Input('date-ranger', 'start_date'), ds.Input('date-ranger', 'end_date'), ds.Input('tag-dropdown', 'value')])
     def update_graph(start_date, end_date, t_value):
@@ -93,6 +95,6 @@ def displayEvents(df, judges, subjects, t):
             tickformat="%b\n%Y",
             ticklabelmode="period"
         )
-        return fig
+        return fig'''
     
     app.run(debug = True)

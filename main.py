@@ -10,21 +10,7 @@ def refreshData(connection):
 
 def displayAllEvents(connection):
     e = getter.getAllEvents(connection)
-    j = getter.getTop10Judges(connection)
-    s = getter.getTop10Subjects(connection)
-    event.displayEvents(e, j, s, "EVENTI")
-
-def displayImportantEvents(connection):
-    e = getter.getImportantEvents(connection)
-    j = getter.getTop10Judges(connection)
-    s = getter.getTop10Subjects(connection)
-    event.displayEvents(e, j, s, "EVENTI IMPORTANTI")
-
-def displayCourtHearingEvents(connection):
-    e = getter.getCourtHearingsEvents(connection)
-    j = getter.getTop10Judges(connection)
-    s = getter.getTop10Subjects(connection)
-    event.displayEvents(e, j, s, "UDIENZE")
+    event.displayEvents(e, "EVENTI DEI PROCESSI")
 
 def displayProcessesDuration(connection):
     processes = getter.getProcessesDuration(connection)
@@ -44,4 +30,4 @@ def displayEventsDuration(connection):
 
 if __name__ == '__main__':
     connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayImportantEvents(connection)
+    displayAllEvents(connection)

@@ -7,12 +7,18 @@ def createEventsDataFrame(events):
     dates = []
     phases = []
     tags = []
+    eIds = []
+    finishedEventProcesses = []
     for e in events:
-            pIds.append(e[0])
-            dates.append(e[1])
-            phases.append(e[2])
-            tags.append(e[3])
-    return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "etichetta": tags})
+            if e[2] != '5' or e[0] not in finishedEventProcesses:
+                pIds.append(e[0])
+                dates.append(e[1])
+                phases.append(e[2])
+                tags.append(e[3])
+                eIds.append(e[4])
+                if e[2] == '5':
+                    finishedEventProcesses.append(e[0])
+    return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "etichetta": tags, "numEvento": eIds})
 
 def createProcessesDurationDataFrame(processes):
     durations = []

@@ -1,19 +1,10 @@
 import utils.DataFrame as df
+import time as tm
 
 import utils.DatabaseConnection as connect
 
 def getAllEvents(connection):
-    query = "SELECT numProcesso, data, fase, etichetta FROM eventi AS e, elencoeventiimportanti AS ei WHERE numProcesso IN (SELECT * FROM processifiniti) AND e.codice = ei.evento ORDER BY fase"
-    events = connect.getDataFromDatabase(connection, query)
-    return df.createEventsDataFrame(events)
-
-def getImportantEvents(connection):
-    query = "SELECT numProcesso, data, fase, evento FROM eventiimportanti WHERE numProcesso IN (SELECT * FROM processifiniti) ORDER BY fase"
-    events = connect.getDataFromDatabase(connection, query)
-    return df.createEventsDataFrame(events)
-
-def getCourtHearingsEvents(connection):
-    query = "SELECT numProcesso, data, fase, evento FROM udienze WHERE numProcesso IN (SELECT * FROM processifiniti) ORDER BY fase"
+    query = "SELECT * FROM eventiinfo ORDER BY fase"
     events = connect.getDataFromDatabase(connection, query)
     return df.createEventsDataFrame(events)
 
