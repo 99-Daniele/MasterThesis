@@ -11,8 +11,7 @@ def refreshData(connection):
 def displayEvents(connection):
     events = getter.getAllEvents(connection)
     importantEventsType = getter.getImportantEventsType(connection)
-    courtHearingEventsType = getter.getCourtHearingEventsType(connection)
-    event.displayEvents(events, importantEventsType, courtHearingEventsType, "EVENTI DEI PROCESSI")
+    event.displayEvents(events, importantEventsType, "EVENTI DEI PROCESSI")
 
 def displayProcessesDuration(connection):
     processes = getter.getProcessesDuration(connection)

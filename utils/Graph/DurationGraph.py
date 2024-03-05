@@ -5,6 +5,7 @@ import utils.Legenda as legenda
 import utils.DataFrame as frame
 
 def updateFinishYearChangeDuration(df, finished, year, change):
+    df_temp = df
     if not (finished == None or len(finished) == 0):
         df_temp = frame.getFinishedDataFrame(df_temp, finished)
     if not (year == None or len(year) == 0):
@@ -14,28 +15,26 @@ def updateFinishYearChangeDuration(df, finished, year, change):
     return df_temp
 
 def updateProcessesDuration(df, sequence, finished, year, change):
-    df_temp = updateFinishYearChangeDuration(df, finished, year, change)
     if not sequence == None:
-        df_temp = frame.getSequenceDataFrame(df_temp, sequence)
+        df_temp = frame.getSequenceDataFrame(df, sequence)
+    df_temp = updateFinishYearChangeDuration(df, finished, year, change)
     return df_temp
 
 def updateStatesDuration(df, state, finished, year, change):
-    df_temp = updateFinishYearChangeDuration(df, finished, year, change)
     if not state == None:
-        df_temp = frame.getStateDataFrame(df_temp, state)
+        df_temp = frame.getStateDataFrame(df, state)
+    df_temp = updateFinishYearChangeDuration(df, finished, year, change)
     return df_temp
 
 def updatePhasesDuration(df, phase, finished, year, change):
-    df_temp = df
     if not phase == None:
-        df_temp = frame.getPhaseDataFrame(df_temp, phase)
+        df_temp = frame.getPhaseDataFrame(df, phase)
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
 def updateEventsDuration(df, event, finished, year, change):
-    df_temp = df
     if not event == None:
-        df_temp = frame.getEventDataFrame(df_temp, event)
+        df_temp = frame.getEventDataFrame(df, event)
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 

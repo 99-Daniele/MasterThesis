@@ -104,6 +104,17 @@ def createEventsDurationsDataFrame(processes):
         phases.append(p[11])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "evento": events, "fase": phases})
 
+def getEventType(df, type, importantEventsType, courtHearingEventsType):
+    match type:
+        case "ALL":
+            return df
+        case "IMP":
+            df = df[df['evento'].isin(importantEventsType)]
+            return df
+        case "CH":
+            df = df[df['evento'].isin(courtHearingEventsType)]
+            return df
+
 def getAvgStdDataFrameByDate(df, type):
     match type:
         case "W":
