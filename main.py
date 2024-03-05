@@ -8,9 +8,11 @@ import utils.DataUpdate as update
 def refreshData(connection):
     update.refreshData(connection)
 
-def displayAllEvents(connection):
-    e = getter.getAllEvents(connection)
-    event.displayEvents(e, "EVENTI DEI PROCESSI")
+def displayEvents(connection):
+    events = getter.getAllEvents(connection)
+    importantEventsType = getter.getImportantEventsType(connection)
+    courtHearingEventsType = getter.getCourtHearingEventsType(connection)
+    event.displayEvents(events, importantEventsType, courtHearingEventsType, "EVENTI DEI PROCESSI")
 
 def displayProcessesDuration(connection):
     processes = getter.getProcessesDuration(connection)
@@ -30,4 +32,4 @@ def displayEventsDuration(connection):
 
 if __name__ == '__main__':
     connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayProcessesDuration(connection)
+    displayEvents(connection)

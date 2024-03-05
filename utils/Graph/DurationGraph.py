@@ -5,7 +5,6 @@ import utils.Legenda as legenda
 import utils.DataFrame as frame
 
 def updateFinishYearChangeDuration(df, finished, year, change):
-    df_temp = df
     if not (finished == None or len(finished) == 0):
         df_temp = frame.getFinishedDataFrame(df_temp, finished)
     if not (year == None or len(year) == 0):
@@ -15,17 +14,15 @@ def updateFinishYearChangeDuration(df, finished, year, change):
     return df_temp
 
 def updateProcessesDuration(df, sequence, finished, year, change):
-    df_temp = df
+    df_temp = updateFinishYearChangeDuration(df, finished, year, change)
     if not sequence == None:
         df_temp = frame.getSequenceDataFrame(df_temp, sequence)
-    df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
 def updateStatesDuration(df, state, finished, year, change):
-    df_temp = df
+    df_temp = updateFinishYearChangeDuration(df, finished, year, change)
     if not state == None:
         df_temp = frame.getStateDataFrame(df_temp, state)
-    df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
 def updatePhasesDuration(df, phase, finished, year, change):
@@ -45,9 +42,8 @@ def updateEventsDuration(df, event, finished, year, change):
 def displayProcessesDuration(df, t):
     years = frame.getAllYears(df)
     sequences = frame.getAllSequences(df)
-    df_temp = df.copy()
     app = ds.Dash()
-    [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
+    [allData, avgData] = frame.getAvgStdDataFrameByDate(df, "MY")
     fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points  = False)
     fig.update_layout(hovermode = False)
     fig.add_traces(
@@ -71,7 +67,8 @@ def displayProcessesDuration(df, t):
          ds.Input('change-dropdown', 'value')]
     )
     def update_output(finished, year, sequence, change):
-        df_temp = updateProcessesDuration(df, sequence, finished, year, change)
+        df_temp = df.copy()
+        df_temp = updateProcessesDuration(df_temp, sequence, finished, year, change)
         sequences = frame.getAllSequences(df_temp)
         [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
         fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points = False, hover_data = {"data": False, "durata": False})
@@ -135,7 +132,8 @@ def displayStatesDuration(df, t):
          ds.Input('change-dropdown', 'value')]
     )
     def update_output(finished, state, year, change):
-        df_temp = updateStatesDuration(df, state, finished, year, change)
+        df_temp = df.copy()
+        df_temp = updateStatesDuration(df_temp, state, finished, year, change)
         if state == None:
             [allData, avgData] = frame.getAvgStdDataFrameByState(df_temp)
             fig = px.box(allData, x = "etichetta", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata stati del processo [giorni]', 'etichetta':'Stati del processo'}, title = t, width = 1400, height = 600, points  = False)
@@ -210,7 +208,8 @@ def displayPhasesDuration(df, t):
          ds.Input('change-dropdown', 'value')]
     )
     def update_output(finished, phase, year, change):
-        df_temp = updatePhasesDuration(df, phase, finished, year, change)
+        df_temp = df.copy()
+        df_temp = updatePhasesDuration(df_temp, phase, finished, year, change)
         if phase == None:
             [allData, avgData] = frame.getAvgStdDataFrameByPhase(df_temp)
             fig = px.box(allData, x = "fase", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, title = t, width = 1400, height = 600, points  = False)
@@ -285,7 +284,8 @@ def displayEventsDuration(df, t):
          ds.Input('change-dropdown', 'value')]
     )
     def update_output(finished, event, year, change):
-        df_temp = updateEventsDuration(df, event, finished, year, change)
+        df_temp = df.copy()
+        df_temp = updateEventsDuration(df_temp, event, finished, year, change)
         if event == None:
             [allData, avgData] = frame.getAvgStdDataFrameByEvent(df_temp)
             fig = px.box(allData, x = "evento", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata eventi del processo [giorni]', 'evento':'Eventi del processo'}, title = t, width = 1400, height = 600, points  = False, hover_data = [])

@@ -1,5 +1,4 @@
 import utils.DataFrame as df
-import time as tm
 
 import utils.DatabaseConnection as connect
 
@@ -7,6 +6,16 @@ def getAllEvents(connection):
     query = "SELECT * FROM eventiinfo ORDER BY fase"
     events = connect.getDataFromDatabase(connection, query)
     return df.createEventsDataFrame(events)
+
+def getImportantEventsType(connection):
+    query = "SELECT DISTINCT etichetta FROM elencoeventiimportanti"
+    importantEventsType = connect.getDataFromDatabase(connection, query)
+    importantEventsType = [e[0] for e in importantEventsType]
+    return importantEventsType
+
+def getCourtHearingEventsType(connection):
+    query = "SELECT DISTINCT etichetta FROM elencoeventiudienze"
+    return connect.getDataFromDatabase(connection, query)
 
 def getProcessesDuration(connection):
     query = "SELECT * FROM durataprocessiinfo ORDER BY numProcesso, dataInizioProcesso"

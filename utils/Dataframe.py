@@ -18,7 +18,7 @@ def createEventsDataFrame(events):
                 eIds.append(e[4])
                 if e[2] == '5':
                     finishedEventProcesses.append(e[0])
-    return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "etichetta": tags, "numEvento": eIds})
+    return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "evento": tags, "numEvento": eIds})
 
 def createProcessesDurationDataFrame(processes):
     durations = []
@@ -164,80 +164,86 @@ def getAvgStdDataFrameByEvent(df):
     return [df1, df2]
 
 def getFinishedDataFrame(df, finished):
-    df_temp = df.copy()
     if finished == None or len(finished) == 0:
         return df
     finished = [(lambda x: legenda.finishedNumber(x))(x) for x in finished]
-    return df_temp[df_temp['finito'].isin(finished)]
+    return df[df['finito'].isin(finished)]
 
 def getYearDataFrame(df, years):
-    df_temp = df.copy()
     if years == None or len(years) == 0:
         return df
-    return df_temp[df_temp['data'].dt.year.isin(years)]
+    return df[df['data'].dt.year.isin(years)]
 
 def getSequenceDataFrame(df, sequence):
-    df_temp = df.copy()
+    df_temp = df
     if sequence == None:
         return df
     return df_temp[df_temp['sequenza'] == sequence]
 
 def getChangeJudgeDataFrame(df, change):
-    df_temp = df.copy()
     if change == None:
         return df
     if change == "SI":
         change = 1
     else:
         change = 0
-    return df_temp[df_temp['cambio'] == change]
+    return df[df['cambio'] == change]
 
 def getStateDataFrame(df, state):
-    df_temp = df.copy()
     if state == None:
         return df
-    return df_temp[df_temp['etichetta'] == state]
+    return df[df['etichetta'] == state]
 
 def getPhaseDataFrame(df, phase):
-    df_temp = df.copy()
     if phase == None:
         return df
-    return df_temp[df_temp['fase'] == phase]
+    return df[df['fase'] == phase]
 
 def getEventDataFrame(df, event):
-    df_temp = df.copy()
     if event == None:
         return df
-    return df_temp[df_temp['evento'] == event]
+    return df[df['evento'] == event]
+
+def getEventsDataFrame(df, events):
+    if (events == None or len(events) == 0):
+        return df
+    return df[df['evento'].isin(events)]
+
+def getDateDataFrame(df, startDate, endDate):
+    if startDate == None or endDate == None:
+        return df
+    d = df[df['data'] >= startDate]
+    d = d[d['data'] <= endDate]
+    return d
 
 def getAllYears(df):
-    df_temp = df['data'].copy()
+    df_temp = df['data']
     df_temp = df_temp.map(lambda x: x.year).sort_values()
     years = df_temp.unique()
     return years
 
 def getAllStates(df):
-    df_temp = df['etichetta'].copy()
+    df_temp = df['etichetta']
     states = df_temp.unique()
     return states
 
 def getAllSequences(df):
-    df_temp = df.copy()
+    df_temp = df
     sequences = df_temp.groupby(['sequenza'])['sequenza'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)['sequenza']
     return sequences
 
 def getAllPhases(df):
-    df_temp = df['fase'].copy()
+    df_temp = df['fase']
     phases = df_temp.unique()
     return phases
 
 def getAllEvents(df):
-    df_temp = df['evento'].copy()
+    df_temp = df['evento']
     events = df_temp.unique()
     return events
 
 def getTop10Judges(df):
-    df_temp = df.copy()
+    df_temp = df
     judges = df_temp.groupby(['giudice'])['giudice'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
     return judges
 
