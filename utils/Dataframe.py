@@ -28,6 +28,7 @@ def createProcessesDurationDataFrame(processes):
     subjects = []
     finished = []
     changes = []
+    sequences = []
     for p in processes:
         dates.append(p[0])
         durations.append(p[1])
@@ -36,7 +37,8 @@ def createProcessesDurationDataFrame(processes):
         sections.append(p[4])
         finished.append(p[5])
         changes.append(p[6])
-    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes})
+        sequences.append(p[8])
+    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "sequenza": sequences})
 
 def createStatesDurationsDataFrame(processes):
     durations = []
@@ -174,6 +176,12 @@ def getYearDataFrame(df, years):
         return df
     return df_temp[df_temp['data'].dt.year.isin(years)]
 
+def getSequenceDataFrame(df, sequence):
+    df_temp = df.copy()
+    if sequence == None:
+        return df
+    return df_temp[df_temp['sequenza'] == sequence]
+
 def getChangeJudgeDataFrame(df, change):
     df_temp = df.copy()
     if change == None:
@@ -212,6 +220,11 @@ def getAllStates(df):
     df_temp = df['etichetta'].copy()
     states = df_temp.unique()
     return states
+
+def getAllSequences(df):
+    df_temp = df.copy()
+    sequences = df_temp.groupby(['sequenza'])['sequenza'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)['sequenza']
+    return sequences
 
 def getAllPhases(df):
     df_temp = df['fase'].copy()

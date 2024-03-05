@@ -14,6 +14,13 @@ def updateFinishYearChangeDuration(df, finished, year, change):
         df_temp = frame.getChangeJudgeDataFrame(df_temp, change)
     return df_temp
 
+def updateProcessesDuration(df, sequence, finished, year, change):
+    df_temp = df
+    if not sequence == None:
+        df_temp = frame.getSequenceDataFrame(df_temp, sequence)
+    df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
+    return df_temp
+
 def updateStatesDuration(df, state, finished, year, change):
     df_temp = df
     if not state == None:
@@ -37,8 +44,10 @@ def updateEventsDuration(df, event, finished, year, change):
 
 def displayProcessesDuration(df, t):
     years = frame.getAllYears(df)
+    sequences = frame.getAllSequences(df)
+    df_temp = df.copy()
     app = ds.Dash()
-    [allData, avgData] = frame.getAvgStdDataFrameByDate(df, "MY")
+    [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
     fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points  = False)
     fig.update_layout(hovermode = False)
     fig.add_traces(
@@ -50,17 +59,20 @@ def displayProcessesDuration(df, t):
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
+        ds.dcc.Dropdown(sequences, multi = False, searchable = False, id = 'sequence-dropdown', placeholder = 'Selezione sequenza...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
         ds.dcc.Graph(id = 'processes-graph', figure = fig)
     ])
     @app.callback(
-        ds.Output('processes-graph', 'figure'),
+        [ds.Output('processes-graph', 'figure'), ds.Output('sequence-dropdown', 'options')],
         [ds.Input('finished-dropdown', 'value'), 
          ds.Input('year-dropdown', 'value'),
+         ds.Input('sequence-dropdown', 'value'),
          ds.Input('change-dropdown', 'value')]
     )
-    def update_output(finished, year, change):
-        df_temp = updateFinishYearChangeDuration(df, finished, year, change)
+    def update_output(finished, year, sequence, change):
+        df_temp = updateProcessesDuration(df, sequence, finished, year, change)
+        sequences = frame.getAllSequences(df_temp)
         [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
         fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points = False, hover_data = {"data": False, "durata": False})
         fig.update_layout(hovermode = False)
@@ -91,7 +103,7 @@ def displayProcessesDuration(df, t):
             ]
         )
         fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
-        return fig
+        return fig, sequences
     
     app.run(debug = True)
 

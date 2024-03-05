@@ -6,21 +6,21 @@ import utils.Legenda as legenda
 def displayEvents(df, t):
     df_data = df
     fig = px.scatter(df_data, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = legenda.phaseColorList(df_data), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600)
-    '''fig.update_layout(
+    fig.update_layout(
         legend = dict(
             yanchor = "top",
             y = 0.99,
-            xanchor = "left",
-            x = 0.01,
+            xanchor = "right",
+            x = 1.09,
             bgcolor = None
         ),
         xaxis = dict(
             rangeselector = dict(
                 buttons = list([
-                    dict(count = 3, label = "3m", step = "month", stepmode = "backward"),
-                    dict(count = 6, label = "6m", step = "month", stepmode = "backward"),
                     dict(count = 1, label = "1y", step = "year", stepmode = "backward"),
-                    dict(step="all")
+                    dict(count = 18, label = "1y6m", step = "month", stepmode = "backward"),
+                    dict(count = 2, label = "2y", step = "year", stepmode = "backward"),
+                    dict(step = "all")
                 ])
             ),
             rangeslider = dict(
@@ -36,7 +36,7 @@ def displayEvents(df, t):
         dtick = "M1",
         tickformat = "%b\n%Y",
         ticklabelmode = "period"
-    )'''
+    )
     
     app = ds.Dash()
     app.layout = ds.html.Div([

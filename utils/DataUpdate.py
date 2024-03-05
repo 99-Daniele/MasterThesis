@@ -18,7 +18,7 @@ def refreshData(connection):
     connect.updateTable(connection, 'processitipo', processSequence)
 
 def getEventsType(connection):
-    updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato ORDER BY numEvento"
+    updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta, s.abbreviazione FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato ORDER BY numEvento"
     eventsType = connect.getDataFromDatabase(connection, updateQuery)
     return eventsType
 
@@ -136,20 +136,20 @@ def getProcessInfo(events):
 
 def getSequences(e, endDate, processType, find, phase, originalSequence, translatedSequence, finalSequence):
     if not e[3].isdigit() and (len(finalSequence) == 0 or finalSequence[-1] != e[6] and not find):
-        finalSequence.append(e[6])
+        finalSequence.append(e[7])
     if e[3].isdigit() and not find:
         if int(e[3]) != 0:
             processType = 0
         if int(e[3]) < phase and "RESTART" not in finalSequence:
             finalSequence.append("RESTART")
-        if int(e[3]) == phase and e[6] not in finalSequence:
-            finalSequence.append(e[6])
+        if int(e[3]) == phase and e[7] not in finalSequence:
+            finalSequence.append(e[7])
         if int(e[3]) > phase:
-            finalSequence.append(e[6])
+            finalSequence.append(e[7])
             phase = int(e[3])
         if int(e[3]) == 5:
             endDate = e[5]
-            if e[6] == "FINE":
+            if e[7] == "FINE":
                 processType = 1
             else:
                 processType = 2
