@@ -12,8 +12,8 @@ def updateEvents(df, startDate, endDate, events):
         df = frame.getEventsDataFrame(df, events)
     return df
 
-def displayEvents(df, importantEventsType, title):
-    fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", color_discrete_sequence = legenda.phaseColorList(df), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = title, width = 1400, height = 600)
+def displayEvents(df, importantEventsType):
+    fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", color_discrete_sequence = legenda.phaseColorList(df), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = "EVENTI DEI PROCESSI", width = 1400, height = 600)
     app = ds.Dash()
     app.layout = ds.html.Div([
         ds.dcc.DatePickerRange(
@@ -34,7 +34,7 @@ def displayEvents(df, importantEventsType, title):
     def update_graph(startDate, endDate, event):
         df_data = df.copy()
         df_data = updateEvents(df_data, startDate, endDate, event)
-        fig = px.scatter(df_data, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = legenda.phaseColorList(df_data), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = title, width = 1400, height = 600)
+        fig = px.scatter(df_data, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = legenda.phaseColorList(df_data), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = "EVENTI DEI PROCESSI", width = 1400, height = 600)
         fig.update_layout(
             legend = dict(
                 yanchor = "top",

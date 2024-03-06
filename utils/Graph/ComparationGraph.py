@@ -11,9 +11,9 @@ def getPosition(name, df, type):
     pos = df.index.get_loc(df[df[type] == name].index[0])
     return pos
 
-def displayComparationByMonthYear(df, title):
+def displayComparationByMonthYear(df):
     [sectionData, allData, countData] = frame.getAvgDataFrameBySection(df, "MY")
-    fig = px.line(sectionData, x = "data", y = "durata", color = "sezione", markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, title = title, width = 1400, height = 600)
+    fig = px.line(sectionData, x = "data", y = "durata", color = "sezione", markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, title = "CONFRONTO DURATA MEDIA PROCESSI IN BASE AL MESE DELL'ANNO DI INZIO PROCESSO", width = 1400, height = 600)
     fig.update_traces(visible = "legendonly", selector = (lambda t: not getPosition(t.name, countData, 'sezione') == 0))
     fig.for_each_trace(
         lambda t: t.update(

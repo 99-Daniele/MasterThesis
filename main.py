@@ -11,36 +11,36 @@ def refreshData(connection):
 def displayEvents(connection):
     events = getter.getAllEvents(connection)
     importantEventsType = getter.getImportantEventsType(connection)
-    event.displayEvents(events, importantEventsType, "EVENTI DEI PROCESSI")
+    event.displayEvents(events, importantEventsType)
 
 def displayProcessesDuration(connection):
     processes = getter.getProcessesDuration(connection)
-    duration.displayProcessesDuration(processes, "DURATA MEDIA PROCESSI")
+    duration.displayProcessesDuration(processes)
 
 def displayStatesDuration(connection):
     states = getter.getStatesDuration(connection)
-    duration.displayStatesDuration(states, "DURATA MEDIA STATI DEL PROCESSO")
+    duration.displayStatesDuration(states)
 
 def displayPhasesDuration(connection):
     phases = getter.getPhasesDuration(connection)
-    duration.displayPhasesDuration(phases, "DURATA MEDIA FASI DEL PROCESSO")
+    duration.displayPhasesDuration(phases)
 
 def displayEventsDuration(connection):
     events = getter.getEventsDuration(connection)
-    duration.displayEventsDuration(events, "DURATA MEDIA EVENTI DEL PROCESSO")
+    duration.displayEventsDuration(events)
 
 def displayComparationByWeek(connection):
     processes = getter.getProcessesDuration(connection)
-    comparation.displayComparationByMonthYear(processes, "CONFRONTO DURATA MEDIA PROCESSI IN BASE AL MESE DI INIZIO")
+    comparation.displayComparationByWeek(processes)
 
 def displayComparationByMonth(connection):
     processes = getter.getProcessesDuration(connection)
-    comparation.displayComparationByMonthYear(processes, "CONFRONTO DURATA MEDIA PROCESSI IN BASE ALLA SETTIMANA DI INIZIO")
+    comparation.displayComparationByMonth(processes)
 
 def displayComparationByMonthYear(connection):
     processes = getter.getProcessesDuration(connection)
-    comparation.displayComparationByMonthYear(processes, "CONFRONTO DURATA MEDIA PROCESSI IN BASE AL MESE DELL'ANNO DI INZIO")
+    comparation.displayComparationByMonthYear(processes)
 
 if __name__ == '__main__':
     connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayComparationByMonthYear(connection)
+    displayProcessesDuration(connection)
