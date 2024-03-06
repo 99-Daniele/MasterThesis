@@ -1,8 +1,8 @@
-import plotly.express as px
 import dash as ds
+import plotly.express as px
 
-import utils.Legenda as legenda
 import utils.DataFrame as frame
+import utils.Legenda as legenda
 
 def updateFinishYearChangeDuration(df, finished, year, change):
     df_temp = df

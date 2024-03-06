@@ -1,9 +1,9 @@
 import dash as ds
 import plotly.express as px
 
-import utils.Legenda as legenda
-import utils.Getters as getter
 import utils.DataFrame as frame
+import utils.Getters as getter
+import utils.Legenda as legenda
 
 def updateEvents(df, startDate, endDate, events):
     if not (startDate == None or endDate == None):
