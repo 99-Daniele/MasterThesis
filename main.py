@@ -29,10 +29,18 @@ def displayEventsDuration(connection):
     events = getter.getEventsDuration(connection)
     duration.displayEventsDuration(events, "DURATA MEDIA EVENTI DEL PROCESSO")
 
-def displayProcessComparation(connection):
+def displayComparationByWeek(connection):
     processes = getter.getProcessesDuration(connection)
-    duration.displayProcessesDuration(processes, "DURATA MEDIA PROCESSI")
+    comparation.displayComparationByMonthYear(processes, "CONFRONTO DURATA MEDIA PROCESSI IN BASE AL MESE DI INIZIO")
+
+def displayComparationByMonth(connection):
+    processes = getter.getProcessesDuration(connection)
+    comparation.displayComparationByMonthYear(processes, "CONFRONTO DURATA MEDIA PROCESSI IN BASE ALLA SETTIMANA DI INIZIO")
+
+def displayComparationByMonthYear(connection):
+    processes = getter.getProcessesDuration(connection)
+    comparation.displayComparationByMonthYear(processes, "CONFRONTO DURATA MEDIA PROCESSI IN BASE AL MESE DELL'ANNO DI INZIO")
 
 if __name__ == '__main__':
     connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayEvents(connection)
+    displayComparationByMonthYear(connection)

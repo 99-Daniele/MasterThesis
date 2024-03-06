@@ -174,6 +174,43 @@ def getAvgStdDataFrameByEvent(df):
     df2 = df2.sort_values(['evento']).reset_index(drop = True)
     return [df1, df2]
 
+def getAvgDataFrameBySection(df, type):
+    df3 = df.groupby(['sezione'], as_index = False).size()
+    df3 = df3.sort_values(['size'], ascending = False).reset_index(drop = True)
+    order_dict = df3.set_index('sezione')['size'].to_dict()
+    match type:
+        case "W":
+            df_temp = df[['data', 'durata', 'sezione']].copy()
+            df_temp['data'] = df_temp['data'].map(lambda x: legenda.getWeekNumber(x))
+            df1 = df_temp.groupby(['data', 'sezione'], as_index = False).mean()
+            df1['sort_column'] = df1['sezione'].map(order_dict)
+            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
+            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
+            df1['data'] = df1['data'].map(lambda x: legenda.weeks[x - 1])
+            df2 = df2.sort_values(['data']).reset_index(drop = True)
+            df2['data'] = df2['data'].map(lambda x: legenda.weeks[x - 1])
+            return [df1, df2, df3]
+        case "M":
+            df_temp = df[['data', 'durata', 'sezione']].copy()
+            df_temp['data'] = df_temp['data'].map(lambda x: x.month)
+            df1 = df_temp.groupby(['data', 'sezione'], as_index = False).mean()
+            df1['sort_column'] = df1['sezione'].map(order_dict)
+            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
+            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
+            df1['data'] = df1['data'].map(lambda x: legenda.months[x - 1])
+            df2 = df2.sort_values(['data']).reset_index(drop = True)
+            df2['data'] = df2['data'].map(lambda x: legenda.months[x - 1])
+            return [df1, df2, df3]
+        case "MY":
+            df_temp = df[['data', 'durata', 'sezione']].copy()
+            df_temp['data'] = df_temp['data'].map(lambda x: legenda.getMonthYearDate(x))
+            df1 = df_temp.groupby(['data', 'sezione'], as_index = False).mean()
+            df1['sort_column'] = df1['sezione'].map(order_dict)
+            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
+            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
+            df2 = df2.sort_values(['data']).reset_index(drop = True)
+            return [df1, df2, df3]
+
 def getFinishedDataFrame(df, finished):
     if finished == None or len(finished) == 0:
         return df

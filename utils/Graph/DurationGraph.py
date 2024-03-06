@@ -38,12 +38,13 @@ def updateEventsDuration(df, event, finished, year, change):
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
-def displayProcessesDuration(df, t):
-    years = frame.getAllYears(df)
-    sequences = frame.getAllSequences(df)
+def displayProcessesDuration(df, title):
+    df_temp = df.copy()
+    years = frame.getAllYears(df_temp)
+    sequences = frame.getAllSequences(df_temp)
     app = ds.Dash()
-    [allData, avgData] = frame.getAvgStdDataFrameByDate(df, "MY")
-    fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points  = False)
+    [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
+    fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = title, width = 1400, height = 600, points  = False)
     fig.update_layout(hovermode = False)
     fig.add_traces(
         px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -70,7 +71,7 @@ def displayProcessesDuration(df, t):
         df_temp = updateProcessesDuration(df_temp, sequence, finished, year, change)
         sequences = frame.getAllSequences(df_temp)
         [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
-        fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = t, width = 1400, height = 600, points = False, hover_data = {"data": False, "durata": False})
+        fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = title, width = 1400, height = 600, points = False)
         fig.update_layout(hovermode = False)
         fig.add_traces(
             px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -103,11 +104,12 @@ def displayProcessesDuration(df, t):
     
     app.run(debug = True)
 
-def displayStatesDuration(df, t):
-    years = frame.getAllYears(df)
-    states = frame.getAllStates(df)
-    [allData, avgData] = frame.getAvgStdDataFrameByState(df)
-    fig = px.box(allData, x = "etichetta", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata stati del processo [giorni]', 'etichetta':'Stati del processo'}, title = t, width = 1400, height = 600, points  = False)
+def displayStatesDuration(df, title):
+    df_temp = df.copy()
+    years = frame.getAllYears(df_temp)
+    states = frame.getAllStates(df_temp)
+    [allData, avgData] = frame.getAvgStdDataFrameByState(df_temp)
+    fig = px.box(allData, x = "etichetta", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata stati del processo [giorni]', 'etichetta':'Stati del processo'}, title = title, width = 1400, height = 600, points  = False)
     fig.update_layout(hovermode = False)
     fig.add_traces(
         px.line(avgData, x = "etichetta", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -135,7 +137,7 @@ def displayStatesDuration(df, t):
         df_temp = updateStatesDuration(df_temp, state, finished, year, change)
         if state == None:
             [allData, avgData] = frame.getAvgStdDataFrameByState(df_temp)
-            fig = px.box(allData, x = "etichetta", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata stati del processo [giorni]', 'etichetta':'Stati del processo'}, title = t, width = 1400, height = 600, points  = False)
+            fig = px.box(allData, x = "etichetta", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata stati del processo [giorni]', 'etichetta':'Stati del processo'}, title = title, width = 1400, height = 600, points  = False)
             fig.update_layout(hovermode = False)
             fig.add_traces(
                 px.line(avgData, x = "etichetta", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -179,11 +181,12 @@ def displayStatesDuration(df, t):
     
     app.run(debug = True)
 
-def displayPhasesDuration(df, t):
-    years = frame.getAllYears(df)
-    phases = frame.getAllPhases(df)
-    [allData, avgData] = frame.getAvgStdDataFrameByPhase(df)
-    fig = px.box(allData, x = "fase", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, title = t, width = 1400, height = 600, points  = False)
+def displayPhasesDuration(df, title):
+    df_temp = df.copy()
+    years = frame.getAllYears(df_temp)
+    phases = frame.getAllPhases(df_temp)
+    [allData, avgData] = frame.getAvgStdDataFrameByPhase(df_temp)
+    fig = px.box(allData, x = "fase", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, title = title, width = 1400, height = 600, points  = False)
     fig.update_layout(hovermode = False)
     fig.add_traces(
         px.line(avgData, x = "fase", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -211,7 +214,7 @@ def displayPhasesDuration(df, t):
         df_temp = updatePhasesDuration(df_temp, phase, finished, year, change)
         if phase == None:
             [allData, avgData] = frame.getAvgStdDataFrameByPhase(df_temp)
-            fig = px.box(allData, x = "fase", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, title = t, width = 1400, height = 600, points  = False)
+            fig = px.box(allData, x = "fase", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, title = title, width = 1400, height = 600, points  = False)
             fig.update_layout(hovermode = False)
             fig.add_traces(
                 px.line(avgData, x = "fase", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -255,11 +258,12 @@ def displayPhasesDuration(df, t):
     
     app.run(debug = True)
 
-def displayEventsDuration(df, t):
-    years = frame.getAllYears(df)
-    events = frame.getAllEvents(df)
-    [allData, avgData] = frame.getAvgStdDataFrameByEvent(df)
-    fig = px.box(allData, x = "evento", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata eventi del processo [giorni]', 'evento':'Eventi del processo'}, title = t, width = 1400, height = 600, points  = False, hover_data = [])
+def displayEventsDuration(df, title):
+    df_temp = df.copy()
+    years = frame.getAllYears(df_temp)
+    events = frame.getAllEvents(df_temp)
+    [allData, avgData] = frame.getAvgStdDataFrameByEvent(df_temp)
+    fig = px.box(allData, x = "evento", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata eventi del processo [giorni]', 'evento':'Eventi del processo'}, title = title, width = 1400, height = 600, points  = False)
     fig.update_layout(hovermode = False)
     fig.add_traces(
         px.line(avgData, x = "evento", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -287,7 +291,7 @@ def displayEventsDuration(df, t):
         df_temp = updateEventsDuration(df_temp, event, finished, year, change)
         if event == None:
             [allData, avgData] = frame.getAvgStdDataFrameByEvent(df_temp)
-            fig = px.box(allData, x = "evento", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata eventi del processo [giorni]', 'evento':'Eventi del processo'}, title = t, width = 1400, height = 600, points  = False, hover_data = [])
+            fig = px.box(allData, x = "evento", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata eventi del processo [giorni]', 'evento':'Eventi del processo'}, title = title, width = 1400, height = 600, points  = False)
             fig.update_layout(hovermode = False)
             fig.add_traces(
                 px.line(avgData, x = "evento", y = "durata", markers = True).update_traces(line_color = 'red').data
