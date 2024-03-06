@@ -29,6 +29,7 @@ def createProcessesDurationDataFrame(processes):
     finished = []
     changes = []
     sequences = []
+    phases = []
     for p in processes:
         dates.append(p[0])
         durations.append(p[1])
@@ -38,7 +39,8 @@ def createProcessesDurationDataFrame(processes):
         finished.append(p[5])
         changes.append(p[6])
         sequences.append(p[8])
-    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "sequenza": sequences})
+        phases.append(p[9])
+    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "sequenza": sequences, "fasi": phases})
 
 def createStatesDurationsDataFrame(processes):
     durations = []
@@ -268,6 +270,12 @@ def getSequenceDataFrame(df, sequence):
         return df
     return df_temp[df_temp['sequenza'] == sequence]
 
+def getPhaseSequenceDataFrame(df, phase):
+    df_temp = df
+    if phase == None:
+        return df
+    return df_temp[df_temp['fasi'] == phase]
+
 def getChangeJudgeDataFrame(df, change):
     if change == None:
         return df
@@ -319,6 +327,11 @@ def getAllSequences(df):
     df_temp = df
     sequences = df_temp.groupby(['sequenza'])['sequenza'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)['sequenza']
     return sequences
+
+def getAllPhaseSequences(df):
+    df_temp = df
+    phaseSequences = df_temp.groupby(['fasi'])['fasi'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)['fasi']
+    return phaseSequences
 
 def getAllPhases(df):
     df_temp = df['fase']

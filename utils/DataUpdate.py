@@ -3,22 +3,27 @@ import utils.DatabaseConnection as connect
 def refreshData(connection):
     events = getEventsType(connection)
     eventsFiltered = filterEvents(events)
-    connect.updateTable(connection, 'eventitipo', eventsFiltered)
     processEvents = groupEventsByProcess(events)
     processPhaseEvents = groupEventsByProcessPhase(processEvents)
     processStateEvents = groupEventsByProcessState(processEvents)
     eventsDuration = calcEventsDuration(processEvents)
-    connect.updateTable(connection, 'durataeventi', list(eventsDuration.values()))
     phasesDuration = calcPhasesDuration(processPhaseEvents, eventsDuration)
-    connect.updateTable(connection, 'duratafasi', phasesDuration)
     statesDuration = calcStatesDuration(processStateEvents, eventsDuration)
-    connect.updateTable(connection, 'duratastati', statesDuration)
     [processDuration, processSequence] = calcProcessesInfo(processEvents)
+    connect.updateTable(connection, 'eventitipo', eventsFiltered)
+    connect.updateTable(connection, 'durataeventi', list(eventsDuration.values()))
+    connect.updateTable(connection, 'duratafasi', phasesDuration)
+    connect.updateTable(connection, 'duratastati', statesDuration)
     connect.updateTable(connection, 'durataprocessi', processDuration)
     connect.updateTable(connection, 'processitipo', processSequence)
 
 def getEventsType(connection):
     updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta, s.abbreviazione FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato ORDER BY numEvento"
+    eventsType = connect.getDataFromDatabase(connection, updateQuery)
+    return eventsType
+
+def getTestEventsType(connection):
+    updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta, s.abbreviazione FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato AND (numProcesso = 109848 OR numProcesso = 109855 OR numProcesso = 109850 OR numProcesso = 109959) ORDER BY numEvento"
     eventsType = connect.getDataFromDatabase(connection, updateQuery)
     return eventsType
 
@@ -116,9 +121,9 @@ def calcProcessesInfo(processEvents):
     processDuration = []
     processSequence = []
     for p in processEvents.keys():
-        [startDate, endDate, processType, originalSequence, translatedSequence, finalSequence] = getProcessInfo(processEvents.get(p))
+        [startDate, endDate, processType, originalSequence, translatedSequence, finalSequence, phaseSequence] = getProcessInfo(processEvents.get(p))
         processDuration.append((p, (endDate - startDate).days, startDate, endDate))
-        processSequence.append((p, processType, fromListToString(originalSequence), fromListToString(translatedSequence), fromListToString(finalSequence)))
+        processSequence.append((p, processType, fromListToString(originalSequence), fromListToString(translatedSequence), fromListToString(finalSequence), fromListToString(phaseSequence)))
     return [processDuration, processSequence]
 
 def getProcessInfo(events):
@@ -130,11 +135,14 @@ def getProcessInfo(events):
     originalSequence = []
     translatedSequence = []
     finalSequence = []
+    phaseSequence = []
     for e in events:
-        [endDate, processType, find, phase] = getSequences(e, endDate, processType, find, phase, originalSequence, translatedSequence, finalSequence)
-    return [startDate, endDate, processType, originalSequence, translatedSequence, finalSequence]
+        [endDate, processType, find, phase] = getSequences(e, endDate, processType, find, phase, originalSequence, translatedSequence, finalSequence, phaseSequence)
+        if processType == -1:
+            phaseSequence = [0]
+    return [startDate, endDate, processType, originalSequence, translatedSequence, finalSequence, phaseSequence]
 
-def getSequences(e, endDate, processType, find, phase, originalSequence, translatedSequence, finalSequence):
+def getSequences(e, endDate, processType, find, phase, originalSequence, translatedSequence, finalSequence, phaseSequence):
     if not e[3].isdigit() and (len(finalSequence) == 0 or finalSequence[-1] != e[6] and not find):
         finalSequence.append(e[7])
     if e[3].isdigit() and not find:
@@ -146,6 +154,7 @@ def getSequences(e, endDate, processType, find, phase, originalSequence, transla
             finalSequence.append(e[7])
         if int(e[3]) > phase:
             finalSequence.append(e[7])
+            phaseSequence.append(int(e[3]))
             phase = int(e[3])
         if int(e[3]) == 5:
             endDate = e[5]

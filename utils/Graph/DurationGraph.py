@@ -14,10 +14,12 @@ def updateFinishYearChangeDuration(df, finished, year, change):
         df_temp = frame.getChangeJudgeDataFrame(df_temp, change)
     return df_temp
 
-def updateProcessesDuration(df, sequence, finished, year, change):
+def updateProcessesDuration(df, sequence, phase, finished, year, change):
     df_temp = df
     if not sequence == None:
         df_temp = frame.getSequenceDataFrame(df_temp, sequence)
+    if not phase == None:
+        df_temp = frame.getPhaseSequenceDataFrame(df_temp, phase)
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
@@ -46,6 +48,7 @@ def displayProcessesDuration(df):
     df_temp = df.copy()
     years = frame.getAllYears(df_temp)
     sequences = frame.getAllSequences(df_temp)
+    phases = frame.getAllPhaseSequences(df_temp)
     app = ds.Dash()
     [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
     fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = "DURATA MEDIA PROCESSI", width = 1400, height = 600, points  = False)
@@ -57,23 +60,28 @@ def displayProcessesDuration(df):
         px.line(avgData, x = "data", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
     )
     app.layout = ds.html.Div([
-        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
-        ds.dcc.Dropdown(sequences, multi = False, searchable = False, id = 'sequence-dropdown', placeholder = 'Selezione sequenza...', style = {'width': 400}),
+        ds.dcc.Dropdown(sequences, multi = False, searchable = False, id = 'sequence-dropdown', placeholder = 'Seleziona sequenza...', style = {'width': 400}),
+        ds.dcc.Dropdown(phases, multi = False, searchable = False, id = 'phase-dropdown', placeholder = 'Seleziona fasi...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
         ds.dcc.Graph(id = 'processes-graph', figure = fig)
     ])
     @app.callback(
-        [ds.Output('processes-graph', 'figure'), ds.Output('sequence-dropdown', 'options')],
+        [ds.Output('processes-graph', 'figure'), 
+         ds.Output('sequence-dropdown', 'options'), 
+         ds.Output('phase-dropdown', 'options')],
         [ds.Input('finished-dropdown', 'value'), 
          ds.Input('year-dropdown', 'value'),
          ds.Input('sequence-dropdown', 'value'),
+         ds.Input('phase-dropdown', 'value'),
          ds.Input('change-dropdown', 'value')]
     )
-    def update_output(finished, year, sequence, change):
+    def update_output(finished, year, sequence, phase, change):
         df_temp = df.copy()
-        df_temp = updateProcessesDuration(df_temp, sequence, finished, year, change)
+        df_temp = updateProcessesDuration(df_temp, sequence, phase, finished, year, change)
         sequences = frame.getAllSequences(df_temp)
+        phases = frame.getAllPhaseSequences(df_temp)
         [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
         fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = "DURATA MEDIA PROCESSI",  width = 1400, height = 600, points = False)
         fig.update_layout(hovermode = False)
@@ -104,7 +112,7 @@ def displayProcessesDuration(df):
             ]
         )
         fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
-        return fig, sequences
+        return fig, sequences, phases
     
     app.run(debug = True)
 

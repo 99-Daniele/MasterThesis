@@ -43,4 +43,4 @@ def displayComparationByMonthYear(connection):
 
 if __name__ == '__main__':
     connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayComparationByMonthYear(connection)
+    displayProcessesDuration(connection)
