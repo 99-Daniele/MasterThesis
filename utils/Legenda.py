@@ -5,7 +5,7 @@ weeks = ['02/01', '08/01', '15/01', '22/01', '29/01', '05/02', '12/02', '19/02',
 months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
 daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica']
 colors = ['grey', 'blue', 'orange', 'red', 'green', 'purple']
-processState = ['FINITO', 'NON FINITO', 'IN STALLO', 'STOPPATO']
+processState = ['NON FINITO', 'FINITO', 'STOPPATO', 'IN STALLO']
 
 def phaseColorList(df):
     phases = df['fase'].unique().tolist()
