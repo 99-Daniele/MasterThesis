@@ -214,44 +214,6 @@ def getAvgDataFrameByType(df, datetype, type):
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
             df2 = df2.sort_values(['data']).reset_index(drop = True)
             return [df1, df2, df3]
-        
-def getAvgDataFrameBySubject(df, type):
-    df3 = df.groupby(['materia'], as_index = False).size()
-    df3 = df3.sort_values(['size'], ascending = False).reset_index(drop = True)
-    df3 = df3.head(15)
-    order_dict = df3.set_index('materia')['size'].to_dict()
-    order_list = df3['materia'].tolist()
-    df_temp = df[['data', 'durata', 'materia']].copy()
-    df_temp = df_temp[df_temp['materia'].isin(order_list)]
-    match type:
-        case "W":
-            df_temp['data'] = df_temp['data'].map(lambda x: legenda.getWeekNumber(x))
-            df1 = df_temp.groupby(['data', 'materia'], as_index = False).mean()
-            df1['sort_column'] = df1['materia'].map(order_dict)
-            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
-            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df1['data'] = df1['data'].map(lambda x: legenda.weeks[x - 1])
-            df2 = df2.sort_values(['data']).reset_index(drop = True)
-            df2['data'] = df2['data'].map(lambda x: legenda.weeks[x - 1])
-            return [df1, df2, df3]
-        case "M":
-            df_temp['data'] = df_temp['data'].map(lambda x: x.month)
-            df1 = df_temp.groupby(['data', 'materia'], as_index = False).mean()
-            df1['sort_column'] = df1['materia'].map(order_dict)
-            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
-            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df1['data'] = df1['data'].map(lambda x: legenda.months[x - 1])
-            df2 = df2.sort_values(['data']).reset_index(drop = True)
-            df2['data'] = df2['data'].map(lambda x: legenda.months[x - 1])
-            return [df1, df2, df3]
-        case "MY":
-            df_temp['data'] = df_temp['data'].map(lambda x: legenda.getMonthYearDate(x))
-            df1 = df_temp.groupby(['data', 'materia'], as_index = False).mean()
-            df1['sort_column'] = df1['materia'].map(order_dict)
-            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
-            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df2 = df2.sort_values(['data']).reset_index(drop = True)
-            return [df1, df2, df3]
 
 def getFinishedDataFrame(df, finished):
     if finished == None or len(finished) == 0:
