@@ -180,7 +180,7 @@ def getAvgDataFrameByType(df, datetype, type):
     df3 = df.groupby([type], as_index = False).size()
     df3 = df3.sort_values(['size'], ascending = False).reset_index(drop = True)
     df3.drop(df3[df3[type] == 'null'].index, inplace = True)
-    df3 = df3.head(50)
+    df3 = df3.head(20)
     order_dict = df3.set_index(type)['size'].to_dict()
     order_list = df3[type].tolist()
     df_temp = df[['data', 'durata', type]].copy()
@@ -285,16 +285,6 @@ def getAllStates(df):
     states = df_temp.unique()
     return states
 
-def getAllSequences(df):
-    df_temp = df
-    sequences = df_temp.groupby(['sequenza'])['sequenza'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)['sequenza']
-    return sequences
-
-def getAllPhaseSequences(df):
-    df_temp = df
-    phaseSequences = df_temp.groupby(['fasi'])['fasi'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)['fasi']
-    return phaseSequences
-
 def getAllPhases(df):
     df_temp = df['fase']
     phases = df_temp.unique()
@@ -305,12 +295,27 @@ def getAllEvents(df):
     events = df_temp.unique()
     return events
 
-def getTop10Judges(df):
+def getTop20Judges(df):
     df_temp = df
-    judges = df_temp.groupby(['giudice'])['giudice'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
+    judges = df_temp.groupby(['giudice'])['giudice'].size().sort_values(ascending = False).reset_index(name = 'count').head(20)['giudice']
     return judges
 
-def getTop10Subjects(df):
+def getTop20Subjects(df):
     df_temp = df
-    subjects = df_temp.groupby(['materia'])['materia'].size().sort_values(ascending = False).reset_index(name = 'count').head(10)
+    subjects = df_temp.groupby(['materia'])['materia'].size().sort_values(ascending = False).reset_index(name = 'count').head(20)['materia']
     return subjects
+
+def getTop20Sections(df):
+    df_temp = df
+    subjects = df_temp.groupby(['sezione'])['sezione'].size().sort_values(ascending = False).reset_index(name = 'count').head(20)['sezione']
+    return subjects
+
+def getTop20Sequences(df):
+    df_temp = df
+    sequences = df_temp.groupby(['sequenza'])['sequenza'].size().sort_values(ascending = False).reset_index(name = 'count').head(20)['sequenza']
+    return sequences
+
+def getTop20PhaseSequences(df):
+    df_temp = df
+    phaseSequences = df_temp.groupby(['fasi'])['fasi'].size().sort_values(ascending = False).reset_index(name = 'count').head(20)['fasi']
+    return phaseSequences

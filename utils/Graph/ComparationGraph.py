@@ -27,24 +27,65 @@ def getPosition(name, df, type):
     pos = df.index.get_loc(df[df[type] == name].index[0])
     return pos
 
+def hideChosen(choice):
+    sectionStyle = {'width': 200, 'display': 'inline-block'}
+    subjectStyle = {'width': 200, 'display': 'inline-block'}
+    judgeStyle = {'width': 200, 'display': 'inline-block'}
+    finishedStyle = {'width': 200, 'display': 'inline-block'}
+    changeStyle = {'width': 200, 'display': 'inline-block'}
+    sequenceStyle = {'width': 200, 'display': 'inline-block'}
+    phaseSequenceStyle = {'width': 200, 'display': 'inline-block'}
+    match choice:
+        case 'sezione':
+            sectionStyle = {'width': 200, 'display': 'none'}
+        case 'materia':
+            subjectStyle = {'width': 200, 'display': 'none'}
+        case 'giudice':
+            judgeStyle = {'width': 200, 'display': 'none'}
+        case 'finito':
+            finishedStyle = {'width': 200, 'display': 'none'}
+        case 'cambio':
+            changeStyle = {'width': 200, 'display': 'none'}
+        case 'sequenza':
+            sequenceStyle = {'width': 200, 'display': 'none'}
+        case 'fasi':
+            phaseSequenceStyle = {'width': 200, 'display': 'none'}
+    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle]
+
 def displayComparationByMonthYear(df):
     df_temp = df.copy()
+    sections = frame.getTop20Sections(df_temp)
+    subjects = frame.getTop20Subjects(df_temp)
+    judges = frame.getTop20Judges(df_temp)
+    sequences = frame.getTop20Sequences(df_temp)
+    phaseSequences = frame.getTop20PhaseSequences(df_temp)
     [typeData, allData, countData] = frame.getAvgDataFrameByType(df_temp, "MY", 'sezione')
     fig = px.line(typeData, x = "data", y = "durata", color = "sezione", markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, title = "CONFRONTO DURATA MEDIA PROCESSI IN BASE AL MESE DELL'ANNO DI INZIO PROCESSO", width = 1400, height = 600)
     app = ds.Dash()
     app.layout = ds.html.Div([
-        #ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
-        #ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'event-dropdown', placeholder = 'Seleziona evento...', style = {'width': 400}),
-        #ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
-        #ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
         ds.dcc.RadioItems(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = 'sezione', id = "choice-radioitem", inline = True),
-        ds.dcc.Graph(id = 'events-graph', figure = fig)
+        ds.dcc.Dropdown(sections, multi = True, searchable = False, id = 'section-dropdown', placeholder = 'SEZIONE', style = {'width': 200, 'display' : 'inline-block'}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = False, id = 'subject-dropdown', placeholder = 'MATERIA', style = {'width': 200, 'display' : 'inline-block'}),
+        ds.dcc.Dropdown(judges, multi = True, searchable = False, id = 'judge-dropdown', placeholder = 'GIUDICE', style = {'width': 200, 'display' : 'inline-block'}),
+        ds.dcc.Dropdown(legenda.processState, value = legenda.processState[1], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'PROCESSO', style = {'width': 200, 'display' : 'inline-block'}),
+        ds.dcc.Dropdown(['NO', 'SI'], multi = True, searchable = False, id = 'change-dropdown', placeholder = 'CAMBIO', style = {'width': 200, 'display' : 'inline-block'}),
+        ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown', placeholder = 'SEQUENZA', style = {'width': 200, 'display' : 'inline-block'}),
+        ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown', placeholder = 'FASI', style = {'width': 200, 'display' : 'inline-block'}),
+        ds.dcc.Graph(id = 'comparation-graph', figure = fig)
     ])
     @app.callback(
-        ds.Output('events-graph', 'figure'),
+        [ds.Output('comparation-graph', 'figure'),
+         ds.Output('section-dropdown', 'style'),
+         ds.Output('subject-dropdown', 'style'),
+         ds.Output('judge-dropdown', 'style'),
+         ds.Output('finished-dropdown', 'style'),
+         ds.Output('change-dropdown', 'style'),
+         ds.Output('sequence-dropdown', 'style'),
+         ds.Output('phaseSequence-dropdown', 'style')],
         [ds.Input('choice-radioitem', 'value')]
     )
     def update_output(choice):
+        [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle] = hideChosen(choice)
         df_temp = df.copy()
         [typeData, allData, countData] = frame.getAvgDataFrameByType(df_temp, "MY", choice)
         fig = px.line(typeData, x = "data", y = "durata", color = choice, markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, title = "CONFRONTO DURATA MEDIA PROCESSI IN BASE AL MESE DELL'ANNO DI INZIO PROCESSO", width = 1400, height = 600)
@@ -59,6 +100,6 @@ def displayComparationByMonthYear(df):
         )
         fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
         fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
-        return fig
+        return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle
     
     app.run(debug = True)

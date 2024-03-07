@@ -47,8 +47,8 @@ def updateEventsDuration(df, event, finished, year, change):
 def displayProcessesDuration(df):
     df_temp = df.copy()
     years = frame.getAllYears(df_temp)
-    sequences = frame.getAllSequences(df_temp)
-    phases = frame.getAllPhaseSequences(df_temp)
+    sequences = frame.getTop20Sequences(df_temp)
+    phases = frame.getTop20PhaseSequences(df_temp)
     app = ds.Dash()
     [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
     fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = "DURATA MEDIA PROCESSI", width = 1400, height = 600, points  = False)
@@ -80,8 +80,8 @@ def displayProcessesDuration(df):
     def update_output(finished, year, sequence, phase, change):
         df_temp = df.copy()
         df_temp = updateProcessesDuration(df_temp, sequence, phase, finished, year, change)
-        sequences = frame.getAllSequences(df_temp)
-        phases = frame.getAllPhaseSequences(df_temp)
+        sequences = frame.getTop20Sequences(df_temp)
+        phases = frame.getTop20PhaseSequences(df_temp)
         [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
         fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = "DURATA MEDIA PROCESSI",  width = 1400, height = 600, points = False)
         fig.update_layout(hovermode = False)
