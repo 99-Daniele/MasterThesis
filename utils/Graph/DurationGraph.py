@@ -14,12 +14,12 @@ def updateFinishYearChangeDuration(df, finished, year, change):
         df_temp = frame.getChangeJudgeDataFrame(df_temp, change)
     return df_temp
 
-def updateProcessesDuration(df, sequence, phase, finished, year, change):
+def updateProcessesDuration(df, sequences, phases, finished, year, change):
     df_temp = df
-    if not sequence == None:
-        df_temp = frame.getSequenceDataFrame(df_temp, sequence)
-    if not phase == None:
-        df_temp = frame.getPhaseSequenceDataFrame(df_temp, phase)
+    if not (sequences == None or len(sequences) == 0):
+        df_temp = frame.getSequencesDataFrame(df_temp, sequences)
+    if not (phases == None or len(phases) == 0):
+        df_temp = frame.getPhaseSequencesDataFrame(df_temp, phases)
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
@@ -62,8 +62,8 @@ def displayProcessesDuration(df):
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
-        ds.dcc.Dropdown(sequences, multi = False, searchable = False, id = 'sequence-dropdown', placeholder = 'Seleziona sequenza...', style = {'width': 400}),
-        ds.dcc.Dropdown(phases, multi = False, searchable = False, id = 'phase-dropdown', placeholder = 'Seleziona fasi...', style = {'width': 400}),
+        ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown', placeholder = 'Seleziona sequenza...', style = {'width': 400}),
+        ds.dcc.Dropdown(phases, multi = True, searchable = False, id = 'phase-dropdown', placeholder = 'Seleziona fasi...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
         ds.dcc.Graph(id = 'processes-graph', figure = fig)
     ])
@@ -131,7 +131,7 @@ def displayStatesDuration(df):
     )
     app = ds.Dash()
     app.layout = ds.html.Div([
-        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(states, multi = False, searchable = False, id = 'state-dropdown', placeholder = 'Seleziona stato...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
@@ -208,7 +208,7 @@ def displayPhasesDuration(df):
     )
     app = ds.Dash()
     app.layout = ds.html.Div([
-        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(phases, multi = False, searchable = False, id = 'phase-dropdown', placeholder = 'Seleziona fase...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
@@ -238,7 +238,7 @@ def displayPhasesDuration(df):
             return fig
         else:
             [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
-            fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = "DURATA MEDIA FASE " + phase + " IN BASE AL MESE DELL'ANNO DI INIZIO PROCESSO", width = 1400, height = 600, points  = False)
+            fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, title = "DURATA MEDIA FASE <b>" + phase, width = 1400, height = 600, points  = False)
             fig.add_traces(
                 px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
             )
@@ -285,7 +285,7 @@ def displayEventsDuration(df):
     )
     app = ds.Dash()
     app.layout = ds.html.Div([
-        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[0]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'event-dropdown', placeholder = 'Seleziona evento...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),

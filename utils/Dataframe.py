@@ -215,28 +215,26 @@ def getAvgDataFrameByType(df, datetype, type):
             df2 = df2.sort_values(['data']).reset_index(drop = True)
             return [df1, df2, df3]
 
+def getSectionsdDataFrame(df, sections):
+    if sections == None or len(sections) == 0:
+        return df
+    return df[df['sezione'].isin(sections)]
+
+def getSubjectsdDataFrame(df, subjects):
+    if subjects == None or len(subjects) == 0:
+        return df
+    return df[df['materia'].isin(subjects)]
+
+def getJudgesdDataFrame(df, judges):
+    if judges == None or len(judges) == 0:
+        return df
+    return df[df['materia'].isin(judges)]
+
 def getFinishedDataFrame(df, finished):
     if finished == None or len(finished) == 0:
         return df
     finished = [(lambda x: legenda.finishedNumber(x))(x) for x in finished]
     return df[df['finito'].isin(finished)]
-
-def getYearDataFrame(df, years):
-    if years == None or len(years) == 0:
-        return df
-    return df[df['data'].dt.year.isin(years)]
-
-def getSequenceDataFrame(df, sequence):
-    df_temp = df
-    if sequence == None:
-        return df
-    return df_temp[df_temp['sequenza'] == sequence]
-
-def getPhaseSequenceDataFrame(df, phase):
-    df_temp = df
-    if phase == None:
-        return df
-    return df_temp[df_temp['fasi'] == phase]
 
 def getChangeJudgeDataFrame(df, change):
     if change == None:
@@ -246,6 +244,23 @@ def getChangeJudgeDataFrame(df, change):
     else:
         change = 0
     return df[df['cambio'] == change]
+
+def getSequencesDataFrame(df, sequences):
+    df_temp = df
+    if not (sequences == None or len(sequences) == 0):
+        return df
+    return df_temp[df_temp['sequenza'].isin(sequences)]
+
+def getPhaseSequencesDataFrame(df, phases):
+    df_temp = df
+    if not (phases == None or len(phases) == 0):
+        return df
+    return df_temp[df_temp['fasi'].isin(phases)]
+
+def getYearDataFrame(df, years):
+    if years == None or len(years) == 0:
+        return df
+    return df[df['data'].dt.year.isin(years)]
 
 def getStateDataFrame(df, state):
     if state == None:
