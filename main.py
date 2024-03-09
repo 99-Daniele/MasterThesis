@@ -8,10 +8,20 @@ import utils.Graph.EventsGraph as event
 def refreshData(connection):
     update.refreshData(connection)
 
-def displayEvents(connection):
+def displayAllEvents(connection):
     events = getter.getAllEvents(connection)
     importantEventsType = getter.getImportantEventsType(connection)
     event.displayEvents(events, importantEventsType)
+
+def displayImportantEvents(connection):
+    importantEvents = getter.getImportantEvents(connection)
+    importantEventsType = getter.getImportantEventsType(connection)
+    event.displayEvents(importantEvents, importantEventsType)
+
+def displayCourtHearingEvents(connection):
+    courtHearingEvents = getter.getCourtHearingEvents(connection)
+    courtHearingEventsType = getter.getCourtHearingEventsType(connection)
+    event.displayEvents(courtHearingEvents, courtHearingEventsType)
 
 def displayProcessesDuration(connection):
     processes = getter.getProcessesDuration(connection)
@@ -28,6 +38,10 @@ def displayPhasesDuration(connection):
 def displayEventsDuration(connection):
     events = getter.getEventsDuration(connection)
     duration.displayEventsDuration(events)
+    
+def displayCourtHearingsDuration(connection):
+    courtHearings = getter.getCourtHearingsDuration(connection)
+    duration.displayCourtHearingsDuration(courtHearings)
 
 def displayComparationByWeek(connection):
     processes = getter.getProcessesDuration(connection)
@@ -43,4 +57,4 @@ def displayComparationByMonthYear(connection):
 
 if __name__ == '__main__':
     connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayComparationByMonth(connection)
+    displayComparationByWeek(connection)

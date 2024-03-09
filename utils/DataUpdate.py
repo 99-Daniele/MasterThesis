@@ -1,31 +1,27 @@
 import utils.DatabaseConnection as connect
+import utils.Getters as getter
 
 def refreshData(connection):
-    events = getEventsType(connection)
+    events = getter.getEventsType(connection)
+    courtHearingsEventsType = getter.getCourtHearingEventsType(connection)
     eventsFiltered = filterEvents(events)
     processEvents = groupEventsByProcess(events)
     processPhaseEvents = groupEventsByProcessPhase(processEvents)
     processStateEvents = groupEventsByProcessState(processEvents)
+    processCourtHearingEvents = groupCourtHearingByProcess(events, courtHearingsEventsType)
     eventsDuration = calcEventsDuration(processEvents)
     phasesDuration = calcPhasesDuration(processPhaseEvents, eventsDuration)
     statesDuration = calcStatesDuration(processStateEvents, eventsDuration)
+    courtHearingsDuration = calcCourtHearingsDuration(processCourtHearingEvents)
     [processDuration, processSequence] = calcProcessesInfo(processEvents)
+    exit()
     connect.updateTable(connection, 'eventitipo', eventsFiltered)
     connect.updateTable(connection, 'durataeventi', list(eventsDuration.values()))
     connect.updateTable(connection, 'duratafasi', phasesDuration)
     connect.updateTable(connection, 'duratastati', statesDuration)
     connect.updateTable(connection, 'durataprocessi', processDuration)
+    connect.updateTable(connection, 'durataudienze', courtHearingsDuration)
     connect.updateTable(connection, 'processitipo', processSequence)
-
-def getEventsType(connection):
-    updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta, s.abbreviazione FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato ORDER BY numEvento"
-    eventsType = connect.getDataFromDatabase(connection, updateQuery)
-    return eventsType
-
-def getTestEventsType(connection):
-    updateQuery = "SELECT numEvento, en.etichetta, s.stato, s.fase, e.numProcesso, e.data, s.etichetta, s.abbreviazione FROM eventi AS e, eventinome AS en, statinome AS s WHERE e.codice = en.codice AND e.statofinale = s.stato AND (numProcesso = 109848 OR numProcesso = 109855 OR numProcesso = 109850 OR numProcesso = 109959) ORDER BY numEvento"
-    eventsType = connect.getDataFromDatabase(connection, updateQuery)
-    return eventsType
 
 def filterEvents(events):
     eventsFiltered = []
@@ -56,6 +52,17 @@ def groupEventsByProcessState(processEvents):
         process = addIDEvent(processEvents.get(p), 2)
         processStateEvents.update({p: process})
     return processStateEvents
+
+def groupCourtHearingByProcess(events, courtHearingsType):
+    processes = {}
+    for e in events:
+        if e[1] in courtHearingsType:
+            p = processes.get(e[4])
+            if p == None:
+                processes.update({e[4]: [e]})
+            else:
+                p.append(e)
+    return processes
 
 def addIDEvent(p, ID):
     flag = p[0][ID]
@@ -116,6 +123,15 @@ def calcStatesDuration(processEvents, eventDuration):
             tag = process[1][0][6]
             statesDuration.append((p, tag, process[0], (endDate - startDate).days, startDate, endDate))
     return statesDuration
+
+def calcCourtHearingsDuration(processEvents):
+    courtHearingDuration = []
+    for p in processEvents.keys():
+        events = processEvents.get(p)
+        startDate = events[0][5]
+        endDate = events[-1][5]
+        courtHearingDuration.append((p, (endDate - startDate).days, startDate, endDate))
+    return courtHearingDuration
 
 def calcProcessesInfo(processEvents):
     processDuration = []

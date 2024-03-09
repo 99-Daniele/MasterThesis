@@ -106,6 +106,24 @@ def createEventsDurationsDataFrame(processes):
         phases.append(p[11])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "evento": events, "fase": phases})
 
+def createCourtHearingsDurationDataFrame(processes):
+    durations = []
+    dates = []
+    judges = []
+    sections = []
+    subjects = []
+    finished = []
+    changes = []
+    for p in processes:
+        dates.append(p[0])
+        durations.append(p[1])
+        judges.append(p[2])
+        subjects.append(p[3])
+        sections.append(p[4])
+        finished.append(p[5])
+        changes.append(p[6])
+    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes})
+
 def getEventType(df, type, importantEventsType, courtHearingEventsType):
     match type:
         case "ALL":

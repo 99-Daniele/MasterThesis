@@ -81,14 +81,14 @@ def displayComparation(df, dateType, title):
     fig = px.line(typeData, x = "data", y = "durata", color = "sezione", markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, title = title, width = 1400, height = 600)
     app = ds.Dash()
     app.layout = ds.html.Div([
+        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown', placeholder = 'SEZIONE', style = {'width': 400}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown', placeholder = 'MATERIA', style = {'width': 400}),
+        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown', placeholder = 'GIUDICE', style = {'width': 400}),
+        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'CAMBIO', style = {'width': 400}),
+        ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown', placeholder = 'SEQUENZA', style = {'width': 400}),
+        ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown', placeholder = 'FASI', style = {'width': 400}),
         ds.dcc.RadioItems(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = 'sezione', id = "choice-radioitem", inline = True),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown', placeholder = 'SEZIONE', style = {'width': 200, 'display' : 'inline-block', 'margin-right' : 40}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown', placeholder = 'MATERIA', style = {'width': 200, 'display' : 'inline-block'}),
-        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown', placeholder = 'GIUDICE', style = {'width': 200, 'display' : 'inline-block'}),
-        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'PROCESSO', style = {'width': 200, 'display' : 'inline-block'}),
-        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'CAMBIO', style = {'width': 200, 'display' : 'inline-block'}),
-        ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown', placeholder = 'SEQUENZA', style = {'width': 200, 'display' : 'inline-block'}),
-        ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown', placeholder = 'FASI', style = {'width': 200, 'display' : 'inline-block'}),
         ds.dcc.Graph(id = 'comparation-graph', figure = fig)
     ])
     @app.callback(
@@ -105,16 +105,16 @@ def displayComparation(df, dateType, title):
          ds.Output('judge-dropdown', 'options'),
          ds.Output('sequence-dropdown', 'options'),
          ds.Output('phaseSequence-dropdown', 'options')],
-        [ds.Input('choice-radioitem', 'value'),
-         ds.Input('section-dropdown', 'value'),
+        [ds.Input('section-dropdown', 'value'),
          ds.Input('subject-dropdown', 'value'),
          ds.Input('judge-dropdown', 'value'),
          ds.Input('finished-dropdown', 'value'),
          ds.Input('change-dropdown', 'value'),
          ds.Input('sequence-dropdown', 'value'),
-         ds.Input('phaseSequence-dropdown', 'value')]
+         ds.Input('phaseSequence-dropdown', 'value'),
+         ds.Input('choice-radioitem', 'value')]
     )
-    def update_output(choice, sections, subjects, judges, finished, changes, sequences, phaseSequences):
+    def update_output(sections, subjects, judges, finished, changes, sequences, phaseSequences, choice):
         [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle] = hideChosen(choice)
         df_temp = df.copy()
         df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, changes, sequences, phaseSequences)
