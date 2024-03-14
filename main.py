@@ -5,6 +5,10 @@ import utils.Graph.ComparationGraph as comparation
 import utils.Graph.DurationGraph as duration
 import utils.Graph.EventsGraph as event
 
+import dash as ds
+import dash_bootstrap_components as dbc
+from dash import html
+
 def refreshData(connection):
     update.refreshData(connection)
 
@@ -55,6 +59,22 @@ def displayComparationByMonthYear(connection):
     processes = getter.getProcessesDuration(connection)
     comparation.displayComparation(processes, "MY", "CONFRONTO DURATA MEDIA PROCESSI IN BASE AL MESE DELL'ANNO DI INIZIO PROCESSO")
 
+def getConnection():
+    return connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
+
+def startApp():
+    app = ds.Dash(__name__, use_pages = True)
+
+    app.layout = html.Div([
+        html.H1('Multi-page app with Dash Pages'),
+        html.Div([
+            html.Div(
+                ds.dcc.Link(f"{page['name']} - {page['path']}", href = page["relative_path"])
+            ) for page in ds.page_registry.values()
+        ]),
+        ds.page_container
+    ])
+    app.run(debug = True)
+
 if __name__ == '__main__':
-    connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
-    displayComparationByWeek(connection)
+    startApp()

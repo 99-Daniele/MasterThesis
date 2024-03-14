@@ -14,7 +14,6 @@ def refreshData(connection):
     statesDuration = calcStatesDuration(processStateEvents, eventsDuration)
     courtHearingsDuration = calcCourtHearingsDuration(processCourtHearingEvents)
     [processDuration, processSequence] = calcProcessesInfo(processEvents)
-    exit()
     connect.updateTable(connection, 'eventitipo', eventsFiltered)
     connect.updateTable(connection, 'durataeventi', list(eventsDuration.values()))
     connect.updateTable(connection, 'duratafasi', phasesDuration)
