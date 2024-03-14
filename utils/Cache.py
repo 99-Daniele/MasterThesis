@@ -1,4 +1,3 @@
-import main
 import utils.DatabaseConnection as connect
 
 from bson import json_util
@@ -26,6 +25,6 @@ def getCacheData(func):
 
 @getCacheData
 def getData(id, query):
-    connection = main.getConnection()
+    connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
     data = connect.getDataFromDatabase(connection, query)
     return data
