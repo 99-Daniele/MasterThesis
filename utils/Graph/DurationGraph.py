@@ -51,7 +51,7 @@ def displayProcessesDuration(df):
     phases = frame.getTop20PhaseSequences(df)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
-    app = ds.Dash()
+    app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
@@ -116,7 +116,7 @@ def displayStatesDuration(df):
     states = frame.getAllStates(df)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
-    app = ds.Dash()
+    app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(states, multi = False, searchable = False, id = 'state-dropdown', placeholder = 'Seleziona stato...', style = {'width': 400}),
@@ -187,7 +187,7 @@ def displayPhasesDuration(df):
     phases = frame.getAllPhases(df)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
-    app = ds.Dash()
+    app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(phases, multi = False, searchable = False, id = 'phase-dropdown', placeholder = 'Seleziona fase...', style = {'width': 400}),
@@ -258,7 +258,7 @@ def displayEventsDuration(df):
     events = frame.getAllEvents(df)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
-    app = ds.Dash()
+    app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'event-dropdown', placeholder = 'Seleziona evento...', style = {'width': 400}),
@@ -328,7 +328,7 @@ def displayCourtHearingsDuration(df):
     years = frame.getAllYears(df)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
-    app = ds.Dash()
+    app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),

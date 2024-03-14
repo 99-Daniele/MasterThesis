@@ -40,12 +40,12 @@ def displayProcessesDuration():
     processes = getter.getProcessesDuration()
     duration.displayProcessesDuration(processes)
 
-def displayStatesDuration(connection):
-    states = getter.getStatesDuration(connection)
+def displayStatesDuration():
+    states = getter.getStatesDuration()
     duration.displayStatesDuration(states)
 
-def displayPhasesDuration(connection):
-    phases = getter.getPhasesDuration(connection)
+def displayPhasesDuration():
+    phases = getter.getPhasesDuration()
     duration.displayPhasesDuration(phases)
 
 def displayEventsDuration(connection):
@@ -69,7 +69,7 @@ def displayComparationByMonthYear(connection):
     comparation.displayComparation(processes, "MY", "CONFRONTO DURATA MEDIA PROCESSI IN BASE AL MESE DELL'ANNO DI INIZIO PROCESSO")
 
 def startApp():
-    app = ds.Dash(__name__, suppress_callback_exceptions=True)
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = html.Div([
         ds.dcc.Location(id='url', refresh=False),
         html.Div(id = 'page-content')
@@ -100,4 +100,4 @@ def startApp():
     app.run(debug = True)
 
 if __name__ == '__main__':
-    startApp()
+    displayPhasesDuration()

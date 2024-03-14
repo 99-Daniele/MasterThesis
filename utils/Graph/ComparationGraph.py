@@ -79,7 +79,7 @@ def displayComparation(df, dateType, title):
     phaseSequences = frame.getTop20PhaseSequences(df_temp)
     [typeData, allData, countData] = frame.getAvgDataFrameByType(df_temp, dateType, 'sezione')
     fig = px.line(typeData, x = "data", y = "durata", color = "sezione", markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, title = title, width = 1400, height = 600)
-    app = ds.Dash()
+    app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown', placeholder = 'MATERIA', style = {'width': 400}),

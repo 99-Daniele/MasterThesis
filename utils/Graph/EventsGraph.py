@@ -14,7 +14,7 @@ def updateEvents(df, startDate, endDate, events):
 
 def displayEvents(df, importantEventsType):
     fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", color_discrete_sequence = legenda.phaseColorList(df), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, title = "EVENTI DEI PROCESSI", width = 1400, height = 600)
-    app = ds.Dash()
+    app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.dcc.DatePickerRange(
             id = 'event-dateranger',
