@@ -1,3 +1,4 @@
+import utils.DatabaseConnection as connect
 import utils.DataUpdate as update
 import utils.Getters as getter
 import utils.Graph.ComparationGraph as comparation
@@ -16,24 +17,24 @@ import pages.DurationGraph.StateDuration as stateDurationPage
 
 import dash as ds
 import dash_bootstrap_components as dbc
-from dash import html
 
-def refreshData(connection):
+def refreshData():
+    connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
     update.refreshData(connection)
 
-def displayAllEvents(connection):
-    events = getter.getAllEvents(connection)
-    importantEventsType = getter.getImportantEventsType(connection)
+def displayAllEvents():
+    events = getter.getAllEvents()
+    importantEventsType = getter.getImportantEventsType()
     event.displayEvents(events, importantEventsType)
 
-def displayImportantEvents(connection):
-    importantEvents = getter.getImportantEvents(connection)
-    importantEventsType = getter.getImportantEventsType(connection)
+def displayImportantEvents():
+    importantEvents = getter.getImportantEvents()
+    importantEventsType = getter.getImportantEventsType()
     event.displayEvents(importantEvents, importantEventsType)
 
-def displayCourtHearingEvents(connection):
-    courtHearingEvents = getter.getCourtHearingEvents(connection)
-    courtHearingEventsType = getter.getCourtHearingEventsType(connection)
+def displayCourtHearingEvents():
+    courtHearingEvents = getter.getCourtHearingEvents()
+    courtHearingEventsType = getter.getCourtHearingEventsType()
     event.displayEvents(courtHearingEvents, courtHearingEventsType)
 
 def displayProcessesDuration():
@@ -48,31 +49,31 @@ def displayPhasesDuration():
     phases = getter.getPhasesDuration()
     duration.displayPhasesDuration(phases)
 
-def displayEventsDuration(connection):
-    events = getter.getEventsDuration(connection)
+def displayEventsDuration():
+    events = getter.getEventsDuration()
     duration.displayEventsDuration(events)
     
-def displayCourtHearingsDuration(connection):
-    courtHearings = getter.getCourtHearingsDuration(connection)
+def displayCourtHearingsDuration():
+    courtHearings = getter.getCourtHearingsDuration()
     duration.displayCourtHearingsDuration(courtHearings)
 
-def displayComparationByWeek(connection):
-    processes = getter.getProcessesDuration(connection)
+def displayComparationByWeek():
+    processes = getter.getProcessesDuration()
     comparation.displayComparation(processes, "W", "CONFRONTO DURATA MEDIA PROCESSI IN BASE ALLA SETTIMANA DI INIZIO PROCESSO")
 
-def displayComparationByMonth(connection):
-    processes = getter.getProcessesDuration(connection)
+def displayComparationByMonth():
+    processes = getter.getProcessesDuration()
     comparation.displayComparation(processes, "M", "CONFRONTO DURATA MEDIA PROCESSI IN BASE AL MESE DI INIZIO PROCESSO")
 
-def displayComparationByMonthYear(connection):
-    processes = getter.getProcessesDuration(connection)
+def displayComparationByMonthYear():
+    processes = getter.getProcessesDuration()
     comparation.displayComparation(processes, "MY", "CONFRONTO DURATA MEDIA PROCESSI IN BASE AL MESE DELL'ANNO DI INIZIO PROCESSO")
 
 def startApp():
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
-    app.layout = html.Div([
+    app.layout = ds.html.Div([
         ds.dcc.Location(id='url', refresh=False),
-        html.Div(id = 'page-content')
+        ds.html.Div(id = 'page-content')
     ])
     @app.callback(
             ds.Output('page-content', 'children'),
@@ -80,24 +81,27 @@ def startApp():
     def display_page(pathname):
         match pathname:
             case '/comparationgraph':
-                return comparationPage.layout
+                return comparationPage.pageLayout()
             case '/durationgraph':
-                return durationPage.layout
+                return durationPage.pageLayout()
             case '/eventpage':
-                return eventPage.layout
+                return eventPage.pageLayout()
             case '/durationgraph/courthearingduration':
-                return courtHearingDurationPage.layout
+                return courtHearingDurationPage.pageLayout()
             case '/durationgraph/eventduration':
-                return eventDurationPage.layout
+                return eventDurationPage.pageLayout()
             case '/durationgraph/phaseduration':
-                return phaseDurationPage.layout
+                return phaseDurationPage.pageLayout()
             case '/durationgraph/processduration':
-                return processDurationPage.layout
+                return processDurationPage.pageLayout()
             case '/durationgraph/stateduration':
-                return stateDurationPage.layout
+                return stateDurationPage.pageLayout()
             case _:
-                return homePage.layout
+                return homePage.pageLayout()
     app.run(debug = True)
 
-if __name__ == '__main__':
+def main():
     displayPhasesDuration()
+
+if __name__ == '__main__':
+    main()

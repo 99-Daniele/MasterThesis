@@ -735,7 +735,7 @@ def startApp():
     subject_duration_btn = tk.Button(window, text = "Materie del processo", command = lambda: displayAvgProcessDurationBySection(cursor))   
     subject_duration_btn.grid(row = 4, column = 0, padx = 60, pady = 20)                                     
 
-    window.mainloop()
+    #window.mainloop()
 
 def updateProcessSequence(connection):
     getProcessSequence(connection)
