@@ -1,3 +1,6 @@
+import dash as ds
+import dash_bootstrap_components as dbc
+
 import utils.DatabaseConnection as connect
 import utils.DataUpdate as update
 import utils.Getters as getter
@@ -14,9 +17,6 @@ import pages.DurationGraph.EventDuration as eventDurationPage
 import pages.DurationGraph.PhaseDuration as phaseDurationPage
 import pages.DurationGraph.ProcessDuration as processDurationPage
 import pages.DurationGraph.StateDuration as stateDurationPage
-
-import dash as ds
-import dash_bootstrap_components as dbc
 
 def refreshData():
     connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')

@@ -1,5 +1,5 @@
-import plotly.express as px
 import dash as ds
+import plotly.express as px
 
 import utils.DataFrame as frame
 import utils.Legenda as legenda

@@ -1,7 +1,7 @@
-import utils.DatabaseConnection as connect
-
 from bson import json_util
 import json
+
+import utils.DatabaseConnection as connect
 
 def getCacheData(func):
     try:

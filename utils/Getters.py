@@ -1,7 +1,6 @@
 import utils.DatabaseConnection as connect
 import utils.DataFrame as frame
 import utils.Cache as cache
-import time as tm
 
 def getAllEvents():
     query = "SELECT * FROM eventiinfo ORDER BY fase"
