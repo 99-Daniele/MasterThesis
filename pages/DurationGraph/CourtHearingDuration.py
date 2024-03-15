@@ -8,6 +8,7 @@ import utils.Graph.DurationGraph as duration
 import utils.Legenda as legenda
 
 df = getter.getCourtHearingsDuration()
+
 def pageLayout():
     years = frame.getAllYears(df)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
@@ -30,5 +31,6 @@ def pageLayout():
         ds.Input('year-dropdown-chd', 'value'),
         ds.Input('change-dropdown-chd', 'value')]
 )
+
 def update_output(finished, year, change):
     return duration.durationCourtHearingUpdate(df, finished, year, change)

@@ -8,6 +8,7 @@ import utils.Graph.DurationGraph as duration
 import utils.Legenda as legenda
 
 df = getter.getStatesDuration()
+
 def pageLayout():
     years = frame.getAllYears(df)
     states = frame.getAllStates(df)
@@ -33,5 +34,6 @@ def pageLayout():
         ds.Input('year-dropdown-sd', 'value'),
         ds.Input('change-dropdown-sd', 'value')]
 )
+
 def update_output(finished, state, year, change):
     return duration.durationStateUpdate(df, finished, state, year, change)

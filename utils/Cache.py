@@ -22,7 +22,6 @@ def getCacheData(func):
             return result
     return wrapper
 
-
 @getCacheData
 def getData(id, query):
     connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')

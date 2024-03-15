@@ -100,7 +100,7 @@ def startApp():
     app.run_server(debug = True)
 
 def main():
-    startApp()
+    displayStatesDuration()
 
 if __name__ == '__main__':
     main()

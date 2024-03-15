@@ -8,6 +8,7 @@ import utils.Graph.DurationGraph as duration
 import utils.Legenda as legenda
 
 df = getter.getPhasesDuration()
+
 def pageLayout():
     years = frame.getAllYears(df)
     phases = frame.getAllPhases(df)
@@ -33,5 +34,6 @@ def pageLayout():
         ds.Input('year-dropdown-phd', 'value'),
         ds.Input('change-dropdown-phd', 'value')]
 )
+
 def update_output(finished, phase, year, change):
     return duration.durationPhaseUpdate(df, finished, phase, year, change)
