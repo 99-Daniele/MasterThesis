@@ -141,7 +141,7 @@ def getAvgStdDataFrameByDate(df, type):
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: legenda.getWeekNumber(x))
             df1 = df1.sort_values(['data'])
-            df2 = df1.groupby(['data'], as_index = False).median()
+            df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
             df1['data'] = df1['data'].map(lambda x: legenda.weeks[x - 1])
@@ -151,7 +151,7 @@ def getAvgStdDataFrameByDate(df, type):
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: x.month)
             df1 = df1.sort_values(['data'])
-            df2 = df1.groupby(['data'], as_index = False).median()
+            df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
             df1['data'] = df1['data'].map(lambda x: legenda.months[x - 1])
@@ -162,14 +162,14 @@ def getAvgStdDataFrameByDate(df, type):
             df1['data'] = df1['data'].dt.to_period("M")
             df1['data'] = df1['data'].map(lambda x: legenda.getMonthYearDate(x))
             df1 = df1.sort_values(['data'])
-            df2 = df1.groupby(['data'], as_index = False).median()
+            df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
             return [df1, df2]
         
 def getAvgStdDataFrameByState(df):
     df1 = df[['etichetta', 'durata', 'fase']].copy()
-    df2 = df1.groupby(['etichetta', 'fase'], as_index = False).median()
+    df2 = df1.groupby(['etichetta', 'fase'], as_index = False).mean()
     df2['conteggio'] = df1.groupby(['etichetta', 'fase']).size().tolist()
     df2['quantile'] = df1.groupby(['etichetta', 'fase'], as_index = False).quantile(0.75)['durata']
     df1 = df1.sort_values(['fase', 'etichetta']).reset_index(drop = True)
@@ -178,7 +178,7 @@ def getAvgStdDataFrameByState(df):
 
 def getAvgStdDataFrameByPhase(df):
     df1 = df[['fase', 'durata']].copy()
-    df2 = df1.groupby(['fase'], as_index = False).median()
+    df2 = df1.groupby(['fase'], as_index = False).mean()
     df2['conteggio'] = df1.groupby(['fase']).size().tolist()
     df2['quantile'] = df1.groupby(['fase'], as_index = False).quantile(0.75)['durata']
     df1 = df1.sort_values(['fase']).reset_index(drop = True)
@@ -187,7 +187,7 @@ def getAvgStdDataFrameByPhase(df):
 
 def getAvgStdDataFrameByEvent(df):
     df1 = df[['evento', 'durata']].copy()
-    df2 = df1.groupby(['evento'], as_index = False).median()
+    df2 = df1.groupby(['evento'], as_index = False).mean()
     df2['conteggio'] = df1.groupby(['evento']).size().tolist()
     df2['quantile'] = df1.groupby(['evento'], as_index = False).quantile(0.75)['durata']
     df1 = df1.sort_values(['evento']).reset_index(drop = True)
