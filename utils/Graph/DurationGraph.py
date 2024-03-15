@@ -53,6 +53,7 @@ def displayProcessesDuration(df):
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
+        ds.html.H2('DURATA MEDIA PROCESSI'),
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown', placeholder = 'Seleziona sequenza...', style = {'width': 400}),
@@ -70,7 +71,7 @@ def displayProcessesDuration(df):
          ds.Input('phase-dropdown', 'value'),
          ds.Input('change-dropdown', 'value')]
     )
-    def update_output(finished, year, sequence, phase, change):
+    def updateOutput(finished, year, sequence, phase, change):
         return durationProcessUpdate(df, finished, year, sequence, phase, change)
     app.run_server(debug = True)
 
@@ -118,6 +119,7 @@ def displayStatesDuration(df):
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
+        ds.html.H2('DURATA MEDIA STATI'),
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(states, multi = False, searchable = False, id = 'state-dropdown', placeholder = 'Seleziona stato...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
@@ -131,7 +133,7 @@ def displayStatesDuration(df):
          ds.Input('year-dropdown', 'value'),
          ds.Input('change-dropdown', 'value')]
     )
-    def update_output(finished, state, year, change):
+    def updateOutput(finished, state, year, change):
         return durationStateUpdate(df, finished, state, year, change)
     app.run_server(debug = True)
 
@@ -189,6 +191,7 @@ def displayPhasesDuration(df):
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
+        ds.html.H2('DURATA MEDIA FASI'),
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(phases, multi = False, searchable = False, id = 'phase-dropdown', placeholder = 'Seleziona fase...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
@@ -202,7 +205,7 @@ def displayPhasesDuration(df):
          ds.Input('year-dropdown', 'value'),
          ds.Input('change-dropdown', 'value')]
     )
-    def update_output(finished, phase, year, change):
+    def updateOutput(finished, phase, year, change):
         return durationPhaseUpdate(df, finished, phase, year, change)
     app.run_server(debug = True)
 
@@ -260,6 +263,7 @@ def displayEventsDuration(df):
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
+        ds.html.H2('DURATA MEDIA EVENTI'),
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'event-dropdown', placeholder = 'Seleziona evento...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
@@ -273,7 +277,7 @@ def displayEventsDuration(df):
          ds.Input('year-dropdown', 'value'),
          ds.Input('change-dropdown', 'value')]
     )
-    def update_output(finished, event, year, change):
+    def updateOutput(finished, event, year, change):
         return durationEventUpdate(df, finished, event, year, change)
     app.run_server(debug = True)
 
@@ -330,6 +334,7 @@ def displayCourtHearingsDuration(df):
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
+        ds.html.H2('DURATA MEDIA UDIENZE'),
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
@@ -341,16 +346,15 @@ def displayCourtHearingsDuration(df):
          ds.Input('year-dropdown', 'value'),
          ds.Input('change-dropdown', 'value')]
     )
-    def update_output(finished, year, change):
+    def updateOutput(finished, year, change):
         return durationCourtHearingUpdate(df, finished, year, change)
-    
     app.run_server(debug = True)
 
 def durationCourtHearingUpdate(df, finished, year, change):
     df_temp = df.copy()
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
-    fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata dell udienza [giorni]', 'data':'Data inizio udienza'}, width = 1400, height = 600, points = False)
+    fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':"Durata dell' udienza [giorni]", 'data':'Data inizio udienza'}, width = 1400, height = 600, points = False)
     fig.update_layout(hovermode = False)
     fig.add_traces(
         px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data

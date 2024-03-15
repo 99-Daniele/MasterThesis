@@ -18,7 +18,7 @@ def pageLayout():
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
         ds.dcc.Link('Grafici durata', href='/durationgraph'),
-        ds.html.H1('DURATA MEDIA EVENTI DEL PROCESSO'),
+        ds.html.H2('DURATA MEDIA EVENTI DEL PROCESSO'),
         ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown-ed', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'event-dropdown-ed', placeholder = 'Seleziona evento...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown-ed', placeholder = 'Seleziona anno...', style = {'width': 400}),
@@ -35,5 +35,5 @@ def pageLayout():
         ds.Input('change-dropdown-ed', 'value')]
 )
 
-def update_output(finished, event, year, change):
+def updateOutput(finished, event, year, change):
     return duration.durationEventUpdate(df, finished, event, year, change)

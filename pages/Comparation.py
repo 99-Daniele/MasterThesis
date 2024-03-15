@@ -3,7 +3,7 @@ import dash as ds
 def pageLayout():
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),
-        ds.html.H1('Grafici confronto'),
+        ds.html.H2('Grafici confronto'),
         ds.dcc.Link('Confronto per settimana', href='/comparationgraph/weekcomparation'),
         ds.html.Br(),
         ds.dcc.Link('Confronto per mese', href='/comparationgraph/monthcomparation'),
