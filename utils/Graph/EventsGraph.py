@@ -72,4 +72,4 @@ def displayEvents(df, importantEventsType):
         )   
         return fig
     
-    app.run(debug = True)
+    app.run_server(debug = True)

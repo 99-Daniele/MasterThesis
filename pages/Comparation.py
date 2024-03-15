@@ -10,3 +10,4 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Confronto per mese dell anno', href='/comparationgraph/monthyearcomparation')
     ])
+    return layout

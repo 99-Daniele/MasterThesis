@@ -14,3 +14,4 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Durata eventi', href='/durationgraph/eventduration')
     ])
+    return layout

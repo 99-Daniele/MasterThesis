@@ -138,4 +138,4 @@ def displayComparation(df, dateType, title):
         fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
         return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, sequences, phaseSequences
     
-    app.run(debug = True)
+    app.run_server(debug = True)

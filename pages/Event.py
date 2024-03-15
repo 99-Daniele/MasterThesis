@@ -10,3 +10,4 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Udienze', href='/eventgraph/courthearings')
     ])
+    return layout

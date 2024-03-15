@@ -9,3 +9,4 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici confronto', href='/comparationgraph')
     ])
+    return layout

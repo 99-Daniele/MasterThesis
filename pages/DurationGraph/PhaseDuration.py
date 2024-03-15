@@ -7,8 +7,8 @@ import utils.Getters as getter
 import utils.Graph.DurationGraph as duration
 import utils.Legenda as legenda
 
+df = getter.getPhasesDuration()
 def pageLayout():
-    df = getter.getPhasesDuration()
     years = frame.getAllYears(df)
     phases = frame.getAllPhases(df)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
@@ -18,18 +18,20 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici durata', href='/durationgraph'),
         ds.html.H1('DURATA MEDIA FASI DEL PROCESSO'),
-        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
-        ds.dcc.Dropdown(phases, multi = False, searchable = False, id = 'phase-dropdown', placeholder = 'Seleziona fase...', style = {'width': 400}),
-        ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
-        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
+        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown-phd', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(phases, multi = False, searchable = False, id = 'phase-dropdown-phd', placeholder = 'Seleziona fase...', style = {'width': 400}),
+        ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown-phd', placeholder = 'Seleziona anno...', style = {'width': 400}),
+        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-phd', placeholder = 'Cambio giudice', style = {'width': 400}),
         ds.dcc.Graph(id = 'phase-graph', figure = fig)
     ])
-    @ds.callback(
-        ds.Output('phase-graph', 'figure'),
-        [ds.Input('finished-dropdown', 'value'),
-            ds.Input('phase-dropdown', 'value'), 
-            ds.Input('year-dropdown', 'value'),
-            ds.Input('change-dropdown', 'value')]
-    )
-    def update_output(finished, phase, year, change):
-        return duration.durationPhaseUpdate(df, finished, phase, year, change)
+    return layout
+
+@ds.callback(
+    ds.Output('phase-graph', 'figure'),
+    [ds.Input('finished-dropdown-phd', 'value'),
+        ds.Input('phase-dropdown-phd', 'value'), 
+        ds.Input('year-dropdown-phd', 'value'),
+        ds.Input('change-dropdown-phd', 'value')]
+)
+def update_output(finished, phase, year, change):
+    return duration.durationPhaseUpdate(df, finished, phase, year, change)

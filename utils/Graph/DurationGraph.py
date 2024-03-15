@@ -72,7 +72,7 @@ def displayProcessesDuration(df):
     )
     def update_output(finished, year, sequence, phase, change):
         return durationProcessUpdate(df, finished, year, sequence, phase, change)
-    app.run(debug = True)
+    app.run_server(debug = True)
 
 def durationProcessUpdate(df, finished, year, sequence, phase, change):
     df_temp = df.copy()
@@ -133,7 +133,7 @@ def displayStatesDuration(df):
     )
     def update_output(finished, state, year, change):
         return durationStateUpdate(df, finished, state, year, change)
-    app.run(debug = True)
+    app.run_server(debug = True)
 
 def durationStateUpdate(df, finished, state, year, change):
     df_temp = df.copy()
@@ -204,7 +204,7 @@ def displayPhasesDuration(df):
     )
     def update_output(finished, phase, year, change):
         return durationPhaseUpdate(df, finished, phase, year, change)
-    app.run(debug = True)
+    app.run_server(debug = True)
 
 def durationPhaseUpdate(df, finished, phase, year, change):
     df_temp = df.copy()
@@ -275,7 +275,7 @@ def displayEventsDuration(df):
     )
     def update_output(finished, event, year, change):
         return durationEventUpdate(df, finished, event, year, change)
-    app.run(debug = True)
+    app.run_server(debug = True)
 
 def durationEventUpdate(df, finished, event, year, change):
     df_temp = df.copy()
@@ -344,7 +344,7 @@ def displayCourtHearingsDuration(df):
     def update_output(finished, year, change):
         return durationCourtHearingUpdate(df, finished, year, change)
     
-    app.run(debug = True)
+    app.run_server(debug = True)
 
 def durationCourtHearingUpdate(df, finished, year, change):
     df_temp = df.copy()

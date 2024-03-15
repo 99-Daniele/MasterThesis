@@ -1,5 +1,4 @@
 import dash as ds
-import dash_bootstrap_components as dbc
 
 import utils.DatabaseConnection as connect
 import utils.DataUpdate as update
@@ -75,7 +74,7 @@ def startApp():
         ds.dcc.Location(id='url', refresh=False),
         ds.html.Div(id = 'page-content')
     ])
-    @app.callback(
+    @ds.callback(
             ds.Output('page-content', 'children'),
             ds.Input('url', 'pathname'))
     def display_page(pathname):
@@ -98,10 +97,10 @@ def startApp():
                 return stateDurationPage.pageLayout()
             case _:
                 return homePage.pageLayout()
-    app.run(debug = True)
+    app.run_server(debug = True)
 
 def main():
-    displayPhasesDuration()
+    startApp()
 
 if __name__ == '__main__':
     main()
