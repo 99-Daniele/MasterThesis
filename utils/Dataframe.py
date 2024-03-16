@@ -265,13 +265,13 @@ def getChangeJudgeDataFrame(df, change):
 
 def getSequencesDataFrame(df, sequences):
     df_temp = df
-    if not (sequences == None or len(sequences) == 0):
+    if (sequences == None or len(sequences) == 0):
         return df
     return df_temp[df_temp['sequenza'].isin(sequences)]
 
 def getPhaseSequencesDataFrame(df, phases):
     df_temp = df
-    if not (phases == None or len(phases) == 0):
+    if (phases == None or len(phases) == 0):
         return df
     return df_temp[df_temp['fasi'].isin(phases)]
 

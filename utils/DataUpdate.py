@@ -2,8 +2,8 @@ import utils.DatabaseConnection as connect
 import utils.Getters as getter
 
 def refreshData(connection):
-    events = getter.getEventsType(connection)
-    courtHearingsEventsType = getter.getCourtHearingEventsType(connection)
+    events = getter.getEventsType()
+    courtHearingsEventsType = getter.getCourtHearingEventsType()
     eventsFiltered = filterEvents(events)
     processEvents = groupEventsByProcess(events)
     processPhaseEvents = groupEventsByProcessPhase(processEvents)
@@ -12,6 +12,7 @@ def refreshData(connection):
     eventsDuration = calcEventsDuration(processEvents)
     phasesDuration = calcPhasesDuration(processPhaseEvents, eventsDuration)
     statesDuration = calcStatesDuration(processStateEvents, eventsDuration)
+    processCourtHearingEvents
     courtHearingsDuration = calcCourtHearingsDuration(processCourtHearingEvents)
     [processDuration, processSequence] = calcProcessesInfo(processEvents)
     connect.updateTable(connection, 'eventitipo', eventsFiltered)
@@ -103,7 +104,16 @@ def getNextEvent(event, events, prevDate):
         return event
     else:
         return events[i]
-    
+
+def getLastEvent(events):
+    startDate = events[0][5]
+    i = -1
+    endDate = events[i][5]
+    while endDate < startDate:
+        i = i - 1
+        endDate = events[i][5]
+    return endDate
+
 def calcPhasesDuration(processEvents, eventDuration):
     phasesDuration = []
     for p in processEvents.keys():
@@ -128,7 +138,7 @@ def calcCourtHearingsDuration(processEvents):
     for p in processEvents.keys():
         events = processEvents.get(p)
         startDate = events[0][5]
-        endDate = events[-1][5]
+        endDate = getLastEvent(events)
         courtHearingDuration.append((p, (endDate - startDate).days, startDate, endDate))
     return courtHearingDuration
 
