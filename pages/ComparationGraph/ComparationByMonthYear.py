@@ -25,7 +25,7 @@ def pageLayout():
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-my', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-my', placeholder = 'MATERIA', style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-my', placeholder = 'GIUDICE', style = {'width': 400}),
-        ds.dcc.Dropdown(utilities.processState, value = [Utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown-my', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.processState, value = [utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown-my', placeholder = 'PROCESSO', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-my', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-my', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-my', placeholder = 'FASI', style = {'width': 400}),

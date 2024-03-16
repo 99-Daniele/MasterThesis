@@ -18,7 +18,7 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici durata', href='/durationgraph'),
         ds.html.H2('DURATA MEDIA UDIENZE'),
-        ds.dcc.Dropdown(utilities.processState, value = [Utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown-chd', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.processState, value = [utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown-chd', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown-chd', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-chd', placeholder = 'Cambio giudice', style = {'width': 400}),
         ds.dcc.Graph(id = 'courthearing-graph', figure = fig)

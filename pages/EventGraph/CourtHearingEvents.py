@@ -10,7 +10,7 @@ df = getter.getCourtHearingEvents()
 
 def pageLayout():
     courtHearingEvents = getter.getCourtHearingEvents()
-    fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", color_discrete_sequence = Utilities.phaseColorList(df), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 600)
+    fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", color_discrete_sequence = utilities.phaseColorList(df), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 600)
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
