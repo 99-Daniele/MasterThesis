@@ -28,7 +28,7 @@ def getPosition(name, df, type):
     pos = df.index.get_loc(df[df[type] == name].index[0])
     return pos
 
-def hideChosen(choice):
+def hideChosen(choice, sections, subjects, judges, finished, changes, sequences, phaseSequences):
     sectionStyle = {'width': 400}
     subjectStyle = {'width': 400}
     judgeStyle = {'width': 400}
@@ -39,23 +39,30 @@ def hideChosen(choice):
     match choice:
         case 'sezione':
             sectionStyle = {'width': 200, 'display': 'none'}
+            sections = None
         case 'materia':
             subjectStyle = {'width': 200, 'display': 'none'}
+            subjects = None
         case 'giudice':
             judgeStyle = {'width': 200, 'display': 'none'}
+            judges = None
         case 'finito':
             finishedStyle = {'width': 200, 'display': 'none'}
+            finished = None
         case 'cambio':
             changeStyle = {'width': 200, 'display': 'none'}
+            changes = None
         case 'sequenza':
             sequenceStyle = {'width': 200, 'display': 'none'}
+            sequences = None
         case 'fasi':
             phaseSequenceStyle = {'width': 200, 'display': 'none'}
-    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle]
+            phaseSequences = None
+    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences]
 
 def updateProcessData(df, sections, subjects, judges, finished, change, sequences, phaseSequences):
     df_temp = df
-    if not (sections == None or len(sequences) == 0):
+    if not (sections == None or len(sections) == 0):
         df_temp = frame.getSectionsdDataFrame(df_temp, sections)
     if not (subjects == None or len(subjects) == 0):
         df_temp = frame.getSubjectsdDataFrame(df_temp, subjects)
@@ -120,7 +127,7 @@ def displayComparation(df, dateType):
     app.run_server(debug = True)
 
 def comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choice):
-    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle] = hideChosen(choice)
+    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences] = hideChosen(choice, sections, subjects, judges, finished, changes, sequences, phaseSequences)
     df_temp = df.copy()
     df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, changes, sequences, phaseSequences)
     sections = frame.getTop20Sections(df_temp)
