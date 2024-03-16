@@ -5,7 +5,7 @@ import plotly.express as px
 import utils.DataFrame as frame
 import utils.Getters as getter
 import utils.Graph.ComparationGraph as comparation
-import utils.Legenda as legenda
+import utils.Utilities as utilities
 
 df = getter.getProcessesDuration()
 
@@ -25,7 +25,7 @@ def pageLayout():
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-m', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-m', placeholder = 'MATERIA', style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-m', placeholder = 'GIUDICE', style = {'width': 400}),
-        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown-m', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.processState, value = [Utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown-m', placeholder = 'PROCESSO', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-m', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-m', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-m', placeholder = 'FASI', style = {'width': 400}),

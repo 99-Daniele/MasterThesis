@@ -2,7 +2,7 @@ import dash as ds
 import plotly.express as px
 
 import utils.DataFrame as frame
-import utils.Legenda as legenda
+import utils.Utilities as utilities
 
 def updateEvents(df, startDate, endDate, events):
     if not (startDate == None or endDate == None):
@@ -12,7 +12,7 @@ def updateEvents(df, startDate, endDate, events):
     return df
 
 def displayEvents(df, importantEventsType):
-    fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", color_discrete_sequence = legenda.phaseColorList(df), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 600)
+    fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", color_discrete_sequence = Utilities.phaseColorList(df), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 600)
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.H2('EVENTI DEL PROCESSO'),
@@ -40,7 +40,7 @@ def displayEvents(df, importantEventsType):
 def eventUpdate(df, startDate, endDate, event):
     df_temp = df.copy()
     df_temp = updateEvents(df_temp, startDate, endDate, event)
-    fig = px.scatter(df_temp, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = legenda.phaseColorList(df_temp), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 600)
+    fig = px.scatter(df_temp, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = Utilities.phaseColorList(df_temp), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 600)
     fig.update_layout(
         legend = dict(
             yanchor = "top",

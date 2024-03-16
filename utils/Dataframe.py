@@ -1,6 +1,6 @@
 import pandas as pd
 
-import utils.Legenda as legenda
+import utils.Utilities as utilities
 
 def createEventsDataFrame(events):
     pIds = []
@@ -139,13 +139,13 @@ def getAvgStdDataFrameByDate(df, type):
     match type:
         case "W":
             df1 = df[['data', 'durata']].copy()
-            df1['data'] = df1['data'].map(lambda x: legenda.getWeekNumber(x))
+            df1['data'] = df1['data'].map(lambda x: Utilities.getWeekNumber(x))
             df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
-            df1['data'] = df1['data'].map(lambda x: legenda.weeks[x - 1])
-            df2['data'] = df2['data'].map(lambda x: legenda.weeks[x - 1])
+            df1['data'] = df1['data'].map(lambda x: Utilities.weeks[x - 1])
+            df2['data'] = df2['data'].map(lambda x: Utilities.weeks[x - 1])
             return [df1, df2]
         case "M":
             df1 = df[['data', 'durata']].copy()
@@ -154,13 +154,13 @@ def getAvgStdDataFrameByDate(df, type):
             df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
-            df1['data'] = df1['data'].map(lambda x: legenda.months[x - 1])
-            df2['data'] = df2['data'].map(lambda x: legenda.months[x - 1])
+            df1['data'] = df1['data'].map(lambda x: Utilities.months[x - 1])
+            df2['data'] = df2['data'].map(lambda x: Utilities.months[x - 1])
             return [df1, df2]
         case "MY":
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].dt.to_period("M")
-            df1['data'] = df1['data'].map(lambda x: legenda.getMonthYearDate(x))
+            df1['data'] = df1['data'].map(lambda x: Utilities.getMonthYearDate(x))
             df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
@@ -205,14 +205,14 @@ def getAvgDataFrameByType(df, datetype, type):
     df_temp = df_temp[df_temp[type].isin(order_list)]
     match datetype:
         case "W":
-            df_temp['data'] = df_temp['data'].map(lambda x: legenda.getWeekNumber(x))
+            df_temp['data'] = df_temp['data'].map(lambda x: Utilities.getWeekNumber(x))
             df1 = df_temp.groupby(['data', type], as_index = False).mean()
             df1['sort_column'] = df1[type].map(order_dict)
             df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df1['data'] = df1['data'].map(lambda x: legenda.weeks[x - 1])
+            df1['data'] = df1['data'].map(lambda x: Utilities.weeks[x - 1])
             df2 = df2.sort_values(['data']).reset_index(drop = True)
-            df2['data'] = df2['data'].map(lambda x: legenda.weeks[x - 1])
+            df2['data'] = df2['data'].map(lambda x: Utilities.weeks[x - 1])
             return [df1, df2, df3]
         case "M":
             df_temp['data'] = df_temp['data'].map(lambda x: x.month)
@@ -220,12 +220,12 @@ def getAvgDataFrameByType(df, datetype, type):
             df1['sort_column'] = df1[type].map(order_dict)
             df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df1['data'] = df1['data'].map(lambda x: legenda.months[x - 1])
+            df1['data'] = df1['data'].map(lambda x: Utilities.months[x - 1])
             df2 = df2.sort_values(['data']).reset_index(drop = True)
-            df2['data'] = df2['data'].map(lambda x: legenda.months[x - 1])
+            df2['data'] = df2['data'].map(lambda x: Utilities.months[x - 1])
             return [df1, df2, df3]
         case "MY":
-            df_temp['data'] = df_temp['data'].map(lambda x: legenda.getMonthYearDate(x))
+            df_temp['data'] = df_temp['data'].map(lambda x: Utilities.getMonthYearDate(x))
             df1 = df_temp.groupby(['data', type], as_index = False).mean()
             df1['sort_column'] = df1[type].map(order_dict)
             df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
@@ -251,7 +251,7 @@ def getJudgesdDataFrame(df, judges):
 def getFinishedDataFrame(df, finished):
     if finished == None or len(finished) == 0:
         return df
-    finished = [(lambda x: legenda.finishedNumber(x))(x) for x in finished]
+    finished = [(lambda x: Utilities.finishedNumber(x))(x) for x in finished]
     return df[df['finito'].isin(finished)]
 
 def getChangeJudgeDataFrame(df, change):

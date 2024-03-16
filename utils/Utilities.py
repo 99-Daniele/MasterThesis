@@ -6,6 +6,7 @@ months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio'
 daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica']
 colors = ['grey', 'blue', 'orange', 'red', 'green', 'purple']
 processState = ['NON FINITO', 'FINITO', 'STOPPATO', 'IN STALLO']
+dataBaseInfo = ['localhost', 'root', 'Ropswot_@222', 'tribunali2020']
 
 def phaseColorList(df):
     phases = df['fase'].unique().tolist()

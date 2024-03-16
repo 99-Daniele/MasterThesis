@@ -4,13 +4,13 @@ import plotly.express as px
 
 import utils.Getters as getter
 import utils.Graph.EventsGraph as event
-import utils.Legenda as legenda
+import utils.Utilities as utilities
 
 df = getter.getImportantEvents()
 
 def pageLayout():
     importantEventsType = getter.getImportantEventsType()
-    fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", color_discrete_sequence = legenda.phaseColorList(df), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 600)
+    fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", color_discrete_sequence = Utilities.phaseColorList(df), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 600)
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),

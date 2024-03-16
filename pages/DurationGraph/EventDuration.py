@@ -5,7 +5,7 @@ import plotly.express as px
 import utils.DataFrame as frame
 import utils.Getters as getter
 import utils.Graph.DurationGraph as duration
-import utils.Legenda as legenda
+import utils.Utilities as utilities
 
 df = getter.getEventsDuration()
 
@@ -19,7 +19,7 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici durata', href='/durationgraph'),
         ds.html.H2('DURATA MEDIA EVENTI DEL PROCESSO'),
-        ds.dcc.Dropdown(legenda.processState, value = [legenda.processState[1]], multi = True, searchable = False, id = 'finished-dropdown-ed', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.processState, value = [Utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown-ed', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'event-dropdown-ed', placeholder = 'Seleziona evento...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown-ed', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-ed', placeholder = 'Cambio giudice', style = {'width': 400}),

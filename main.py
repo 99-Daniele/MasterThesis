@@ -6,6 +6,7 @@ import utils.Getters as getter
 import utils.Graph.ComparationGraph as comparation
 import utils.Graph.DurationGraph as duration
 import utils.Graph.EventsGraph as event
+import utils.Utilities as utilities
 
 import pages.Home as homePage
 import pages.Comparation as comparationPage
@@ -25,7 +26,8 @@ import pages.EventGraph.CourtHearingEvents as courtHearingEventsPage
 import pages.EventGraph.ImportantEvents as importantEventsPage
 
 def refreshData():
-    connection = connect.connectToDatabase('localhost', 'root', 'Ropswot_@222', 'tribunali2020')
+    database = utilities.dataBaseInfo
+    connection = connect.connectToDatabase(database[0], database[1], database[2], database[3])
     update.refreshData(connection)
 
 def displayAllEvents():
