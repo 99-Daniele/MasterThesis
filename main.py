@@ -93,7 +93,7 @@ def startApp():
                 return comparationPage.pageLayout()
             case '/durationgraph':
                 return durationPage.pageLayout()
-            case '/eventpage':
+            case '/eventgraph':
                 return eventPage.pageLayout()
             case '/comparationgraph/weekcomparation':
                 return comparationWeekPage.pageLayout()
@@ -113,7 +113,7 @@ def startApp():
                 return stateDurationPage.pageLayout()
             case '/eventgraph/allevents':
                 return allEventsPage.pageLayout()
-            case 'eventgraph/courthearings':
+            case '/eventgraph/courthearings':
                 return courtHearingEventsPage.pageLayout()
             case '/eventgraph/importantevents':
                 return importantEventsPage.pageLayout()
