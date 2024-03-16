@@ -26,8 +26,8 @@ import pages.EventGraph.CourtHearingEvents as courtHearingEventsPage
 import pages.EventGraph.ImportantEvents as importantEventsPage
 
 def refreshData():
-    database = utilities.dataBaseInfo
-    connection = connect.connectToDatabase(database[0], database[1], database[2], database[3])
+    databaseInfo = utilities.dataBaseInfo
+    connection = connect.connectToDatabase(databaseInfo[0], databaseInfo[1], databaseInfo[2], databaseInfo[3])
     update.refreshData(connection)
 
 def displayAllEvents():

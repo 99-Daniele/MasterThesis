@@ -25,7 +25,7 @@ def getCacheData(func):
 
 @getCacheData
 def getData(id, query):
-    database = utilities.dataBaseInfo
-    connection = connect.connectToDatabase(database[0], database[1], database[2], database[3])
+    databaseInfo = utilities.dataBaseInfo
+    connection = connect.connectToDatabase(databaseInfo[0], databaseInfo[1], databaseInfo[2], databaseInfo[3])
     data = connect.getDataFromDatabase(connection, query)
     return data
