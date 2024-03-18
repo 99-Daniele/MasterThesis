@@ -12,7 +12,6 @@ def refreshData(connection):
     eventsDuration = calcEventsDuration(processEvents)
     phasesDuration = calcPhasesDuration(processPhaseEvents, eventsDuration)
     statesDuration = calcStatesDuration(processStateEvents, eventsDuration)
-    processCourtHearingEvents
     courtHearingsDuration = calcCourtHearingsDuration(processCourtHearingEvents)
     [processDuration, processSequence] = calcProcessesInfo(processEvents)
     connect.updateTable(connection, 'eventitipo', eventsFiltered)
@@ -66,16 +65,18 @@ def groupCourtHearingByProcess(events, courtHearingsType):
 
 def addIDEvent(p, ID):
     flag = p[0][ID]
-    process = [[flag, [p[0]]]]
+    order = 2
+    process = [[flag, 1, [p[0]]]]
     i = 1
     while i < len(p):
         if p[i][ID] != flag:
-            process.append([p[i][ID], [p[i]]])
+            process.append([p[i][ID], order, [p[i]]])
             flag = p[i][ID]
+            order = order + 1
             if p[i][3] == 5:
                 return process
-        elif process[-1][1][-1][5] < p[i][5]:
-            process[-1][1].append(p[i])
+        elif process[-1][2][-1][5] < p[i][5]:
+            process[-1][2].append(p[i])
         i = i + 1
     return process
 
@@ -118,19 +119,19 @@ def calcPhasesDuration(processEvents, eventDuration):
     phasesDuration = []
     for p in processEvents.keys():
         for process in processEvents.get(p):
-            startDate = eventDuration.get(process[1][0][0])[2]
-            endDate = eventDuration.get(process[1][-1][0])[3]
-            phasesDuration.append((p, process[0], (endDate - startDate).days, startDate, endDate))
+            startDate = eventDuration.get(process[2][0][0])[2]
+            endDate = eventDuration.get(process[2][-1][0])[3]
+            phasesDuration.append((p, process[0], process[1], (endDate - startDate).days, startDate, endDate))
     return phasesDuration
 
 def calcStatesDuration(processEvents, eventDuration):
     statesDuration = []
     for p in processEvents.keys():
         for process in processEvents.get(p):
-            startDate = eventDuration.get(process[1][0][0])[2]
-            endDate = eventDuration.get(process[1][-1][0])[3]
-            tag = process[1][0][6]
-            statesDuration.append((p, tag, process[0], (endDate - startDate).days, startDate, endDate))
+            startDate = eventDuration.get(process[2][0][0])[2]
+            endDate = eventDuration.get(process[2][-1][0])[3]
+            tag = process[2][0][6]
+            statesDuration.append((p, tag, process[0], process[1], (endDate - startDate).days, startDate, endDate))
     return statesDuration
 
 def calcCourtHearingsDuration(processEvents):
