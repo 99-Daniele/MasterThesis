@@ -194,12 +194,30 @@ def getAvgStdDataFrameByEvent(df):
     df2 = df2.sort_values(['evento']).reset_index(drop = True)
     return [df1, df2]
 
+def keepOnlyImportant(df):
+    df_temp = df.copy()
+    totCount = df_temp['conteggio'].sum()
+    threshold = totCount * 0.85
+    df_temp = df_temp.sort_values(['conteggio'], ascending = False)
+    i = 0
+    sum = 0
+    while (i < 20 or sum < threshold) and i < len(list(df_temp['conteggio'].items())):
+        sum = sum + list(df_temp['conteggio'].items())[i][1]
+        i = i + 1
+    while i < len(list(df_temp['conteggio'].items())):
+        index = list(df_temp['conteggio'].items())[i][0]
+        df = df.drop(index)
+        i = i + 1
+    df.reset_index(drop = True)
+    return df
+
 def getAvgDataFrameByType(df, datetype, type, order):
     df3 = df.groupby([type], as_index = False).size()
     df3 = df.groupby([type]) \
        .agg({'giudice':'size', 'durata':'mean'}) \
        .rename(columns = {'giudice':'conteggio','durata':'media'}) \
        .reset_index()
+    df3 = keepOnlyImportant(df3)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
     df3.drop(df3[df3[type] == 'null'].index, inplace = True)
     order_dict = df3.set_index(type)[order].to_dict()
