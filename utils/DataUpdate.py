@@ -169,7 +169,7 @@ def getProcessInfo(events):
     return [startDate, endDate, processType, originalSequence, translatedSequence, finalSequence, phaseSequence]
 
 def getSequences(e, endDate, processType, find, phase, originalSequence, translatedSequence, finalSequence, phaseSequence):
-    if not e[3].isdigit() and (len(finalSequence) == 0 or finalSequence[-1] != e[6] and not find):
+    if not e[3].isdigit() and (len(finalSequence) == 0 or finalSequence[-1] != e[7] and not find):
         finalSequence.append(e[7])
     if e[3].isdigit() and not find:
         if int(e[3]) != 0:
