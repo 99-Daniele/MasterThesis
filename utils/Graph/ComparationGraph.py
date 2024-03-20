@@ -5,23 +5,32 @@ import plotly.express as px
 import utils.DataFrame as frame
 import utils.Utilities as utilities
 
-def addCountToName(name, df, type):
+def addTextToName(name, df, type, order):
     if type == 'finito':
-        count = df[df[type] == int(name)]['size'].item()
+        text = df[df[type] == int(name)][order].item()
         name = utilities.processState[int(name)]
     elif type == 'cambio':
-        count = df[df[type] == int(name)]['size'].item()
+        text = df[df[type] == int(name)][order].item()
         if int(name) == 0:
             name = "NO"
         else:
             name = "SI"
     else:
-        count = df[df[type] == name]['size'].item()
-    newName = name + " (" + str(count) + ")"
+        text = df[df[type] == name][order].item()
+    if order == 'media':
+        text = round(text, 1)
+    newName = name + " (" + str(text) + ")"
     return newName
 
-def addMaxCountToName(df):
-    newName = "TUTTI (" + str(df['size'].sum()) + ")"
+def addTotCountToName(df):
+    totCount = df['conteggio'].sum()
+    newName = "TUTTI (" + str(totCount) + ")"
+    return newName
+
+def addAvgToName(df):
+    totCount = df['conteggio'].sum()
+    avg = round((df['media'] * df['conteggio']).sum() / totCount, 1)
+    newName = "TUTTI (" + str(avg) + ")"
     return newName
 
 def getPosition(name, df, type):
@@ -79,11 +88,11 @@ def updateProcessData(df, sections, subjects, judges, finished, change, sequence
     return df_temp
 
 def displayComparation(df, dateType):
-    sections = frame.getTop20Sections(df)
-    subjects = frame.getTop20Subjects(df)
-    judges = frame.getTop20Judges(df)
-    sequences = frame.getTop20Sequences(df)
-    phaseSequences = frame.getTop20PhaseSequences(df)
+    sections = frame.getSections(df)
+    subjects = frame.getSubjects(df)
+    judges = frame.getJudges(df)
+    sequences = frame.getSequences(df)
+    phaseSequences = frame.getPhaseSequences(df)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
@@ -96,7 +105,8 @@ def displayComparation(df, dateType):
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown', placeholder = 'FASI', style = {'width': 400}),
-        ds.dcc.RadioItems(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = 'sezione', id = "choice-radioitem", inline = True),
+        ds.dcc.RadioItems(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = 'sezione', id = "choice-radioitem", inline = True, style = {'display':'inline'}),
+        ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem", inline = True, style = {'padding-left':'85%'}),
         ds.dcc.Graph(id = 'comparation-graph', figure = fig)
     ])
     @app.callback(
@@ -120,32 +130,38 @@ def displayComparation(df, dateType):
          ds.Input('change-dropdown', 'value'),
          ds.Input('sequence-dropdown', 'value'),
          ds.Input('phaseSequence-dropdown', 'value'),
-         ds.Input('choice-radioitem', 'value')]
+         ds.Input('choice-radioitem', 'value'),
+         ds.Input('order-radioitem', 'value')]
     )
-    def updateOutput(sections, subjects, judges, finished, changes, sequences, phaseSequences, choice):
-        return comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choice)
+    def updateOutput(sections, subjects, judges, finished, changes, sequences, phaseSequences, choice, order):
+        return comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choice, order)
     app.run_server(debug = True)
 
-def comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choice):
+def comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choice, order):
     [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences] = hideChosen(choice, sections, subjects, judges, finished, changes, sequences, phaseSequences)
     df_temp = df.copy()
     df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, changes, sequences, phaseSequences)
-    sections = frame.getTop20Sections(df_temp)
-    subjects = frame.getTop20Subjects(df_temp)
-    judges = frame.getTop20Judges(df_temp)
-    sequences = frame.getTop20Sequences(df_temp)
-    phaseSequences = frame.getTop20PhaseSequences(df_temp)
-    [typeData, allData, countData] = frame.getAvgDataFrameByType(df_temp, dateType, choice)
+    sections = frame.getSections(df_temp)
+    subjects = frame.getSubjects(df_temp)
+    judges = frame.getJudges(df_temp)
+    sequences = frame.getSequences(df_temp)
+    phaseSequences = frame.getPhaseSequences(df_temp)
+    [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_temp, dateType, choice, order)
     fig = px.line(typeData, x = "data", y = "durata", color = choice, markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600)
     fig.update_traces(visible = "legendonly", selector = (lambda t: t))
     fig.for_each_trace(
         lambda t: t.update(
-            name = addCountToName(t.name, countData, choice)
+            name = addTextToName(t.name, infoData, choice, order)
         )
     )
-    fig.add_traces(
-        px.line(allData, x = "data", y = "durata").update_traces(showlegend = True, name = addMaxCountToName(countData), line_color = 'rgb(0, 0, 0)', line = {'width': 3}).data
-    )
+    if order == 'conteggio':
+        fig.add_traces(
+            px.line(allData, x = "data", y = "durata").update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3}).data
+        )
+    else:
+        fig.add_traces(
+            px.line(allData, x = "data", y = "durata").update_traces(showlegend = True, name = addAvgToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3}).data
+        )
     fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
     return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, sequences, phaseSequences

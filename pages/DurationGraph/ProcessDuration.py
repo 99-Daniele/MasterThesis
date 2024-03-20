@@ -11,8 +11,8 @@ df = getter.getProcessesDuration()
 
 def pageLayout():
     years = frame.getAllYears(df)
-    sequences = frame.getTop20Sequences(df)
-    phases = frame.getTop20PhaseSequences(df)
+    sequences = frame.getSequences(df)
+    phases = frame.getPhaseSequences(df)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([

@@ -10,11 +10,11 @@ import utils.Utilities as utilities
 df = getter.getProcessesDuration()
 
 def pageLayout():
-    sections = frame.getTop20Sections(df)
-    subjects = frame.getTop20Subjects(df)
-    judges = frame.getTop20Judges(df)
-    sequences = frame.getTop20Sequences(df)
-    phaseSequences = frame.getTop20PhaseSequences(df)
+    sections = frame.getSections(df)
+    subjects = frame.getSubjects(df)
+    judges = frame.getJudges(df)
+    sequences = frame.getSequences(df)
+    phaseSequences = frame.getPhaseSequences(df)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([
@@ -29,7 +29,9 @@ def pageLayout():
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-m', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-m', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-m', placeholder = 'FASI', style = {'width': 400}),
-        ds.dcc.RadioItems(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = 'sezione', id = "choice-radioitem-m", inline = True),
+        ds.dcc.RadioItems(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = 'sezione', id = "choice-radioitem-m", inline = True, style = {'display':'inline'}),
+        ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-m", inline = True, style = {'padding-left':'85%'}),
+
         ds.dcc.Graph(id = 'comparation-graph-m', figure = fig)
     ])
     return layout
@@ -55,8 +57,9 @@ def pageLayout():
         ds.Input('change-dropdown-m', 'value'),
         ds.Input('sequence-dropdown-m', 'value'),
         ds.Input('phaseSequence-dropdown-m', 'value'),
-        ds.Input('choice-radioitem-m', 'value')]
+        ds.Input('choice-radioitem-m', 'value'),
+        ds.Input('order-radioitem-m', 'value')]
 )
 
-def updateOutput(sections, subjects, judges, finished, changes, sequences, phaseSequences, choice):
-    return comparation.comparationUpdate(df, "M", sections, subjects, judges, finished, changes, sequences, phaseSequences, choice)
+def updateOutput(sections, subjects, judges, finished, changes, sequences, phaseSequences, choice, order):
+    return comparation.comparationUpdate(df, "M", sections, subjects, judges, finished, changes, sequences, phaseSequences, choice, order)

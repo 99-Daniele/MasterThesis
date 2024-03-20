@@ -47,8 +47,8 @@ def updateEventsDuration(df, event, finished, year, change):
 
 def displayProcessesDuration(df):
     years = frame.getAllYears(df)
-    sequences = frame.getTop20Sequences(df)
-    phases = frame.getTop20PhaseSequences(df)
+    sequences = frame.getSequences(df)
+    phases = frame.getPhaseSequences(df)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
@@ -78,8 +78,8 @@ def displayProcessesDuration(df):
 def durationProcessUpdate(df, finished, year, sequence, phase, change):
     df_temp = df.copy()
     df_temp = updateProcessesDuration(df_temp, sequence, phase, finished, year, change)
-    sequences = frame.getTop20Sequences(df_temp)
-    phases = frame.getTop20PhaseSequences(df_temp)
+    sequences = frame.getSequences(df_temp)
+    phases = frame.getPhaseSequences(df_temp)
     [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
     fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600, points = False)
     fig.add_traces(
