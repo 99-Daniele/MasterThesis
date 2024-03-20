@@ -5,32 +5,24 @@ import plotly.express as px
 import utils.DataFrame as frame
 import utils.Utilities as utilities
 
-def addTextToName(name, df, type, order):
+def addCountToName(name, df, type):
     if type == 'finito':
-        text = df[df[type] == int(name)][order].item()
+        count = df[df[type] == int(name)]['conteggio'].item()
         name = utilities.processState[int(name)]
     elif type == 'cambio':
-        text = df[df[type] == int(name)][order].item()
+        count = df[df[type] == int(name)]['conteggio'].item()
         if int(name) == 0:
             name = "NO"
         else:
             name = "SI"
     else:
-        text = df[df[type] == name][order].item()
-    if order == 'media':
-        text = round(text, 1)
-    newName = name + " (" + str(text) + ")"
+        count = df[df[type] == name]['conteggio'].item()
+    newName = name + " (" + str(count) + ")"
     return newName
 
 def addTotCountToName(df):
     totCount = df['conteggio'].sum()
     newName = "TUTTI (" + str(totCount) + ")"
-    return newName
-
-def addAvgToName(df):
-    totCount = df['conteggio'].sum()
-    avg = round((df['media'] * df['conteggio']).sum() / totCount, 1)
-    newName = "TUTTI (" + str(avg) + ")"
     return newName
 
 def getPosition(name, df, type):
@@ -147,21 +139,24 @@ def comparationUpdate(df, dateType, sections, subjects, judges, finished, change
     sequences = frame.getSequences(df_temp)
     phaseSequences = frame.getPhaseSequences(df_temp)
     [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_temp, dateType, choice, order)
-    fig = px.line(typeData, x = "data", y = "durata", color = choice, markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600)
+    fig = px.line(allData, x = "data", y = "durata").update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+    fig.add_traces(
+        px.line(typeData, x = "data", y = "durata", color = choice, markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600).data
+    )
+    fig.for_each_trace(
+        lambda t: t.update(name = addCountToName(t.name, infoData, choice)) if t.name != addTotCountToName(infoData) else False
+    )
+    fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
+    '''fig = px.line(typeData, x = "data", y = "durata", color = choice, markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600)
     fig.update_traces(visible = "legendonly", selector = (lambda t: t))
     fig.for_each_trace(
         lambda t: t.update(
-            name = addTextToName(t.name, infoData, choice, order)
+            name = addCountToName(t.name, infoData, choice)
         )
     )
-    if order == 'conteggio':
-        fig.add_traces(
-            px.line(allData, x = "data", y = "durata").update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3}).data
-        )
-    else:
-        fig.add_traces(
-            px.line(allData, x = "data", y = "durata").update_traces(showlegend = True, name = addAvgToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3}).data
-        )
+    fig.add_traces(
+        px.line(allData, x = "data", y = "durata").update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3}).data
+    )'''
     fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
     return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, sequences, phaseSequences
