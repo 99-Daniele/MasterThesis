@@ -147,16 +147,6 @@ def comparationUpdate(df, dateType, sections, subjects, judges, finished, change
         lambda t: t.update(name = addCountToName(t.name, infoData, choice)) if t.name != addTotCountToName(infoData) else False
     )
     fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
-    '''fig = px.line(typeData, x = "data", y = "durata", color = choice, markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600)
-    fig.update_traces(visible = "legendonly", selector = (lambda t: t))
-    fig.for_each_trace(
-        lambda t: t.update(
-            name = addCountToName(t.name, infoData, choice)
-        )
-    )
-    fig.add_traces(
-        px.line(allData, x = "data", y = "durata").update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3}).data
-    )'''
     fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
     return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, sequences, phaseSequences
