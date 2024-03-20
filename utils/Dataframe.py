@@ -194,10 +194,10 @@ def getAvgStdDataFrameByEvent(df):
     df2 = df2.sort_values(['evento']).reset_index(drop = True)
     return [df1, df2]
 
-def keepOnlyImportant(df):
+def keepOnlyImportant(df, perc):
     df_temp = df.copy()
     totCount = df_temp['conteggio'].sum()
-    threshold = totCount * 0.85
+    threshold = totCount * perc
     df_temp = df_temp.sort_values(['conteggio'], ascending = False)
     i = 0
     sum = 0
@@ -217,7 +217,7 @@ def getAvgDataFrameByType(df, datetype, type, order):
        .agg({'giudice':'size', 'durata':'mean'}) \
        .rename(columns = {'giudice':'conteggio','durata':'media'}) \
        .reset_index()
-    df3 = keepOnlyImportant(df3)
+    df3 = keepOnlyImportant(df3, 0.85)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
     df3.drop(df3[df3[type] == 'null'].index, inplace = True)
     order_dict = df3.set_index(type)[order].to_dict()
