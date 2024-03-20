@@ -1,4 +1,7 @@
 def refreshData():
+    import os
+    os.remove("cache.json")
+
     import utils.DatabaseConnection as connect
     import utils.DataUpdate as update
     import utils.Utilities as utilities
@@ -139,4 +142,4 @@ def startApp():
     app.run_server(debug = True)
 
 if __name__ == '__main__':
-    displayComparationByMonthYear()
+    startApp()
