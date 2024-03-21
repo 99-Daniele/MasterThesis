@@ -264,10 +264,10 @@ def getSubjectsdDataFrame(df, subjects):
         return df
     return df[df['materia'].isin(subjects)]
 
-def getJudgesdDataFrame(df, judges):
+def getJudgesDataFrame(df, judges):
     if judges == None or len(judges) == 0:
         return df
-    return df[df['materia'].isin(judges)]
+    return df[df['giudice'].isin(judges)]
 
 def getFinishedDataFrame(df, finished):
     if finished == None or len(finished) == 0:

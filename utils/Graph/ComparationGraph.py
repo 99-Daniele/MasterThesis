@@ -68,7 +68,7 @@ def updateProcessData(df, sections, subjects, judges, finished, change, sequence
     if not (subjects == None or len(subjects) == 0):
         df_temp = frame.getSubjectsdDataFrame(df_temp, subjects)
     if not (judges == None or len(judges) == 0):
-        df_temp = frame.getJudgesdDataFrame(df_temp, judges)
+        df_temp = frame.getJudgesDataFrame(df_temp, judges)
     if not (finished == None or len(finished) == 0):
         df_temp = frame.getFinishedDataFrame(df_temp, finished)
     if not (change == None):
@@ -131,14 +131,27 @@ def displayComparation(df, dateType):
 
 def comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choice, order):
     [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences] = hideChosen(choice, sections, subjects, judges, finished, changes, sequences, phaseSequences)
+    df_data = df.copy()
+    df_data = updateProcessData(df_data, sections, subjects, judges, finished, changes, sequences, phaseSequences)
     df_temp = df.copy()
-    df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, changes, sequences, phaseSequences)
+    if ds.ctx.triggered_id != None and 'section-dropdown' in ds.ctx.triggered_id:
+        df_temp = updateProcessData(df_temp, None, subjects, judges, finished, changes, sequences, phaseSequences)
+    elif ds.ctx.triggered_id != None and 'subject-dropdown' in ds.ctx.triggered_id:
+        df_temp = updateProcessData(df_temp, sections, None, judges, finished, changes, sequences, phaseSequences)
+    elif ds.ctx.triggered_id != None and 'judge-dropdown' in ds.ctx.triggered_id:
+        df_temp = updateProcessData(df_temp, sections, subjects, None, finished, changes, sequences, phaseSequences)
+    elif ds.ctx.triggered_id != None and 'sequence-dropdown' in ds.ctx.triggered_id:
+        df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, changes, None, phaseSequences)
+    elif ds.ctx.triggered_id != None and 'phaseSequence-dropdown' in ds.ctx.triggered_id:
+        df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, changes, sequences, None)
+    else:
+        df_temp = df_data
     sections = frame.getSections(df_temp)
     subjects = frame.getSubjects(df_temp)
     judges = frame.getJudges(df_temp)
     sequences = frame.getSequences(df_temp)
     phaseSequences = frame.getPhaseSequences(df_temp)
-    [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_temp, dateType, choice, order)
+    [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, dateType, choice, order)
     fig = px.line(allData, x = "data", y = "durata").update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
     fig.add_traces(
         px.line(typeData, x = "data", y = "durata", color = choice, markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600).data
