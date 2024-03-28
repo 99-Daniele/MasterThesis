@@ -150,5 +150,5 @@ if __name__ == '__main__':
     import utils.FileOperation as f
     databaseInfo = ut.dataBaseInfo
     connection = dbc.connectToDatabase(databaseInfo[0], databaseInfo[1], databaseInfo[2], databaseInfo[3])
-    d = f.getDataFromJsonFile('dataBaseCredentials copy.json')
+    d = f.getDataFromJsonFile('databaseCredentials.json')
     print(d['host'])
