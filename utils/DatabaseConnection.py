@@ -16,32 +16,94 @@ def getDataFromDatabase(connection, query):
     cursor.execute(query)
     return cursor.fetchall()
 
-def dropTable(connection, table):
-    query = "DROP TABLE IF EXISTS " + table
+def executeQuery(connection, query):
     cursor = connection.cursor(buffered = True)
     cursor.execute(query)
     connection.commit()  
 
+def executeQueryWithValues(connection, query, values):
+    cursor = connection.cursor(buffered = True)
+    cursor.execute(query, values)
+    connection.commit()  
+
+def doesATableExist(connection, table):
+    query = "SELECT COUNT(*) > 0 FROM information_schema.tables WHERE table_name = '" + table + "' AND table_type = 'BASE TABLE' LIMIT 1"
+    r = getDataFromDatabase(connection, query)
+    return r[0][0] == 1
+
+def doesAViewExist(connection, table):
+    query = "SELECT COUNT(*) > 0 FROM information_schema.tables WHERE table_name = '" + table + "' AND table_type = 'VIEW' LIMIT 1"
+    r = getDataFromDatabase(connection, query)
+    return r[0][0] == 1
+
+def createTable(connection, tableName, columnNames, columnTypes, primaryKeys, notNullables): 
+    if doesATableExist(connection, tableName):
+        dropTable(connection, tableName)
+    query = "CREATE TABLE " + tableName + "("
+    i = 0
+    while i < len(columnNames):
+        query = query + columnNames[i] + " " + columnTypes[i]
+        if i in notNullables:
+            query = query + " NOT NULL"
+        query = query + ", "
+        i = i + 1
+    query = query + "PRIMARY KEY ("
+    j = 0
+    while j < len(primaryKeys):
+        key = primaryKeys[j]
+        query = query + columnNames[key]
+        if j < len(primaryKeys) - 1:
+            query = query + ", "
+        j = j + 1
+    query = query + "));"
+    executeQuery(connection, query)
+
+def createStrangeTable(connection, table, query):
+    if doesATableExist(connection, table):
+        dropTable(connection, table)
+    executeQuery(connection, query)
+
+def createView(connection, view, query):
+    if doesAViewExist(connection, view):
+        dropTable(connection, view)
+    executeQuery(connection, query)
+    return
+
+def dropTable(connection, table):
+    if not doesATableExist(connection, table):
+        raise Exception("\nYou can't drop this table since it doesn't exist!!")
+    query = "DROP TABLE " + table
+    executeQuery(connection, query)
+
+def dropView(connection, view):
+    if not doesAViewExist(connection, view):
+        raise Exception("\nYou can't drop this view since it doesn't exist!!")
+    query = "DROP VIEW " + view
+    executeQuery(connection, query)
+
 def updateTable(connection, table, tuples):
+    if not doesATableExist(connection, table):
+        raise Exception("\nYou can't update this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
     clearTable(connection, table)
+    insertIntoDatabase(connection, table, tuples)
+    connection.commit()
+
+def clearTable(connection, table):
+    if not doesATableExist(connection, table):
+        raise Exception("\nYou can't clear this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
+    query = "DELETE FROM {}".format(table)
+    executeQuery(connection, query)
+
+def insertIntoDatabase(connection, table, tuples):
+    if not doesATableExist(connection, table):
+        raise Exception("\nYou can't insert into this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
     with alive_bar(int(len(tuples))) as bar:
         length = len(tuples[0])
         filler = createFiller(length)
         for t in tuples:
-            insertIntoDatabase(connection, table, filler, t)
+            query = ("INSERT INTO {} VALUES" + filler).format(table)
+            executeQueryWithValues(connection, query, t)
             bar()
-    connection.commit()  
-
-def clearTable(connection, table):
-    query = "DELETE FROM {}".format(table)
-    cursor = connection.cursor(buffered = True)
-    cursor.execute(query)
-    connection.commit()  
-
-def insertIntoDatabase(connection, table, filler, values):
-    query = ("INSERT INTO {} VALUES" + filler).format(table)
-    cursor = connection.cursor(buffered = True)
-    cursor.execute(query, values)
 
 def createFiller(length):
     filler = "("

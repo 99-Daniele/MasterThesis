@@ -1,9 +1,11 @@
 import utils.DatabaseConnection as connect
+import utils.FileOperation as file
 import utils.Getters as getter
+import utils.Utilities as utilities
 
 def refreshData(connection):
-    events = getter.getEventsType()
-    courtHearingsEventsType = getter.getCourtHearingEventsType()
+    events = getter.getEvents()
+    courtHearingsEventsType = utilities.courtHearingsEvents
     eventsFiltered = filterEvents(events)
     processEvents = groupEventsByProcess(events)
     processPhaseEvents = groupEventsByProcessPhase(processEvents)
@@ -200,3 +202,41 @@ def getSequences(e, endDate, processType, find, phase, originalSequence, transla
 def fromListToString(list):
     string = ",".join(str(l) for l in list)
     return string
+
+def verifyDatabase(connection):
+    if not connect.doesATableExist(connection, "eventi"):
+        raise "\nEvents table is not present or is called differently than 'eventi'. Please change name or add such table because it's fundamental for the analysis"
+    if not connect.doesATableExist(connection, "processi"):
+        raise "\Processes table is not present or is called differently than 'processi'. Please change name or add such table because it's fundamental for the analysis"
+    if not connect.doesATableExist(connection, "eventinome"):
+        connect.createTable(connection, 'eventinome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
+        eventsName = file.getDataFromFile('eventsName.txt')
+        connect.insertIntoDatabase(connection, 'eventinome', eventsName)
+    if not connect.doesATableExist(connection, "materienome"):
+        connect.createTable(connection, 'materienome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
+        subjectsName = file.getDataFromFile('subjectsName.txt')
+        connect.insertIntoDatabase(connection, 'materienome', subjectsName)
+    if not connect.doesATableExist(connection, "statinome"):
+        connect.createTable(connection, 'statinome', ['stato', 'etichetta', 'abbreviazione', 'fase'], ['VARCHAR(5)', 'TEXT', 'VARCHAR(10)', 'VARCHAR(5)'], [0], [])
+        statesName = file.getDataFromFile('statesName.txt')
+        connect.insertIntoDatabase(connection, 'statinome', statesName)
+    if not connect.doesATableExist(connection, "eventitipo"):
+        connect.createTable(connection, 'eventitipo', ['numEvento', 'evento', 'stato', 'fase'], ['BIGINT', 'TEXT', 'TEXT', 'VARCHAR(5)'], [0], [])
+    if not connect.doesATableExist(connection, "durataeventi"):
+        connect.createTable(connection, 'durataeventi', ['numEvento', 'durata', 'dataInizio', 'dataFine'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME'], [0], [])
+    if not connect.doesATableExist(connection, "duratafasi"):
+        connect.createTable(connection, 'duratafasi', ['numProcesso', 'fase', 'ordine', 'durata', 'dataInizioFase', 'dataFineFase'], ['BIGINT', 'VARCHAR(5)', 'INT', 'INT', 'DATETIME', 'DATETIME'], [0, 2], [])
+    if not connect.doesATableExist(connection, "duratastati"):
+        connect.createTable(connection, 'duratastati', ['numProcesso', 'etichetta', 'stato', 'ordine', 'durata', 'dataInizioStato', 'dataFineStato'], ['BIGINT', 'TEXT', 'VARCHAR(10)', 'INT', 'INT', 'DATETIME', 'DATETIME'], [0, 3], [])
+    if not connect.doesATableExist(connection, "durataprocessi"):
+        connect.createTable(connection, 'durataprocessi', ['numProcesso', 'durata', 'dataInizioProcesso', 'dataFineProcesso'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME'], [0], [])
+    if not connect.doesATableExist(connection, "durataudienze"):
+        connect.createTable(connection, 'durataudienze', ['numProcesso', 'durata', 'dataInizioUdienza', 'dataFineUdienza'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME'], [0], [])
+    if not connect.doesATableExist(connection, "processitipo"):
+        connect.createTable(connection, 'processitipo', ['numProcesso', 'processofinito', 'sequenzaStati', 'sequenzaTradotta', 'sequenzaCorta', 'sequenzaFasi'], ['BIGINT', 'INT', 'TEXT', 'TEXT','TEXT','TEXT'], [0], [])
+    if not connect.doesAViewExist(connection, "aliasgiudice"):
+        query = "CREATE VIEW aliasgiudice AS SELECT giudice, CONCAT('giudice ', ROW_NUMBER() OVER ()) AS alias FROM (SELECT DISTINCT giudice FROM eventi WHERE giudice <> 'null' ORDER BY giudice) AS g"
+        connect.createView(connection, 'aliasgiudice', query)
+    if not connect.doesAViewExist(connection, "processicambiogiudice"):
+        query = "CREATE VIEW processiCambioGiudice AS SELECT numProcesso, (CASE WHEN numProcesso IN (SELECT pc.numProcesso FROM ((SELECT numProcesso FROM eventi AS e WHERE (giudice <> 'null') GROUP BY numProcesso HAVING (COUNT(DISTINCT giudice) > 1)) AS e, processi AS pc) WHERE (e.numProcesso = pc.numProcesso)) THEN 1 ELSE 0 END) AS cambioGiudice FROM processi"
+        connect.createView(connection, 'processiCambioGiudice', query)

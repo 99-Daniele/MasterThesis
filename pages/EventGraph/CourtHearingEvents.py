@@ -9,7 +9,7 @@ import utils.Utilities as utilities
 df = getter.getCourtHearingEvents()
 
 def pageLayout():
-    courtHearingEvents = getter.getCourtHearingEventsType()
+    courtHearingsEventsType = utilities.courtHearingsEvents()
     fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", color_discrete_sequence = utilities.phaseColorList(df), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 600)
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),
@@ -25,7 +25,7 @@ def pageLayout():
             display_format = 'DD MM YYYY',
             style = {'width': 300}
         ),
-        ds.dcc.Dropdown(courtHearingEvents, multi = True, id = 'event-dropdown-che', placeholder = 'Seleziona tipo di evento...', style = {'width': 300}),
+        ds.dcc.Dropdown(courtHearingsEventsType, multi = True, id = 'event-dropdown-che', placeholder = 'Seleziona tipo di evento...', style = {'width': 300}),
         ds.dcc.Graph(figure = fig, id = 'events-graph-che')
     ])
     return layout

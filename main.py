@@ -1,10 +1,9 @@
 def refreshData():
-    import os
-    os.remove("cache.json")
-
     import utils.DatabaseConnection as connect
     import utils.DataUpdate as update
+    import utils.FileOperation as file
     import utils.Utilities as utilities
+    file.removeFile('cache.json')
     databaseInfo = utilities.dataBaseInfo
     connection = connect.connectToDatabase(databaseInfo[0], databaseInfo[1], databaseInfo[2], databaseInfo[3])
     update.refreshData(connection)
@@ -12,23 +11,26 @@ def refreshData():
 def displayAllEvents():
     import utils.Getters as getter
     import utils.Graph.EventsGraph as event
+    import utils.Utilities as utilities
     events = getter.getAllEvents()
-    importantEventsType = getter.getImportantEventsType()
+    importantEventsType = utilities.importantEvents()
     event.displayEvents(events, importantEventsType)
 
 def displayImportantEvents():
     import utils.Getters as getter
     import utils.Graph.EventsGraph as event
+    import utils.Utilities as utilities
     importantEvents = getter.getImportantEvents()
-    importantEventsType = getter.getImportantEventsType()
+    importantEventsType = utilities.importantEvents()
     event.displayEvents(importantEvents, importantEventsType)
 
 def displayCourtHearingEvents():
     import utils.Getters as getter
     import utils.Graph.EventsGraph as event
+    import utils.Utilities as utilities
     courtHearingEvents = getter.getCourtHearingEvents()
-    courtHearingEventsType = getter.getCourtHearingEventsType()
-    event.displayEvents(courtHearingEvents, courtHearingEventsType)
+    courtHearingsEventsType = utilities.courtHearingsEvents()
+    event.displayEvents(courtHearingEvents, courtHearingsEventsType)
 
 def displayProcessesDuration():
     import utils.Getters as getter
@@ -142,4 +144,11 @@ def startApp():
     app.run_server(debug = True)
 
 if __name__ == '__main__':
-    startApp()
+    #refreshData()
+    import utils.DatabaseConnection as dbc
+    import utils.Utilities as ut
+    import utils.FileOperation as f
+    databaseInfo = ut.dataBaseInfo
+    connection = dbc.connectToDatabase(databaseInfo[0], databaseInfo[1], databaseInfo[2], databaseInfo[3])
+    d = f.getDataFromJsonFile('dataBaseCredentials copy.json')
+    print(d['host'])

@@ -1,15 +1,9 @@
-from bson import json_util
-import json
-
 import utils.DatabaseConnection as connect
+import utils.FileOperation as file
 import utils.Utilities as utilities
 
 def getCacheData(func):
-    try:
-        jsonCache = json.load(open('cache.json', 'r'))
-        cache = json.loads(jsonCache, object_hook = json_util.object_hook)
-    except (IOError, ValueError):
-        cache = {}
+    cache = file.getDataFromJsonFileWithTranslation('cache.json')
 
     def wrapper(*args):
         id = args[0]
@@ -18,8 +12,7 @@ def getCacheData(func):
         else:
             result = func(*args)
             cache.update({id: result})
-            jsonCache = json.dumps(cache, default = json_util.default) 
-            json.dump(jsonCache, open('cache.json', 'w'))
+            file.writeOnJsonFile('cache.json', cache)
             return result
     return wrapper
 

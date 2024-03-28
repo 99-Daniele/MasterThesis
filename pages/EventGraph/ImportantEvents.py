@@ -9,7 +9,7 @@ import utils.Utilities as utilities
 df = getter.getImportantEvents()
 
 def pageLayout():
-    importantEventsType = getter.getImportantEventsType()
+    importantEventsType = utilities.importantEvents()
     fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", color_discrete_sequence = utilities.phaseColorList(df), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 600)
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),
