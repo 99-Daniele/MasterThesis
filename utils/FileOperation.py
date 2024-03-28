@@ -6,6 +6,16 @@ def removeFile(filename):
     if os.path.isfile(filename):
         os.remove(filename)
 
+def getDataFromTextFile(filename):
+    file = open(filename, 'r')
+    data = []
+    for line in file.read().splitlines():
+        if line[-1] == ',':
+            line = line[0:-1]
+        d = eval(line)
+        data.append(d)
+    return data
+
 def getDataFromJsonFile(filename):
     return json.load(open(filename, 'r'))
 
