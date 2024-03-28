@@ -6,7 +6,6 @@ months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio'
 daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica']
 colors = ['grey', 'blue', 'orange', 'red', 'green', 'purple']
 processState = ['NON FINITO', 'FINITO', 'STOPPATO', 'IN STALLO']
-dataBaseInfo = ['localhost', 'root', 'Ropswot_@222', 'tribunali2020']
 importantEvents = ("FISSAZIONE UDIENZA", "DEPOSITO", "PROCESSO IN PAUSA", "IN DECISIONE", "PUBBLICAZIONE", "FINE PROCESSO", "STOP PROCESSO", "UDIENZA", "RINVIO", "RINVIO COMPARIZIONE PARTI", "ASSEGNAZIONE", "DESIGNAZIONE GIUDICE", "DESIGNAZIONE COLLEGIO", "PRECISAZIONE CONCLUSIONI", "ISCRIZIONE", "RINVIO D'UFFICIO", "RINVIO PRECISAZIONE CONCLUSIONI")
 courtHearingsEvents = ("FISSAZIONE UDIENZA", "IN DECISIONE", "PUBBLICAZIONE", "UDIENZA", "RINVIO", "RINVIO COMPARIZIONE PARTI", "PRECISAZIONE CONCLUSIONI", "RINVIO D'UFFICIO", "RINVIO PRECISAZIONE CONCLUSIONI")
 

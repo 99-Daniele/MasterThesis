@@ -3,10 +3,8 @@ import json
 import os
  
 def removeFile(filename):
-    try:
+    if os.path.isfile(filename):
         os.remove(filename)
-    except:
-        pass
 
 def getDataFromJsonFile(filename):
     return json.load(open(filename, 'r'))
@@ -19,6 +17,9 @@ def getDataFromJsonFileWithTranslation(filename):
         return {}
         
 def writeOnJsonFile(filename, data):
+    json.dump(data, open(filename, 'w'))
+        
+def writeOnJsonFileWithTranslation(filename, data):
     jsonData = json.dumps(data, default = json_util.default)
     json.dump(jsonData, open(filename, 'w'))
    

@@ -12,13 +12,12 @@ def getCacheData(func):
         else:
             result = func(*args)
             cache.update({id: result})
-            file.writeOnJsonFile('cache.json', cache)
+            file.writeOnJsonFileWithTranslation('cache.json', cache)
             return result
     return wrapper
 
 @getCacheData
 def getData(id, query):
-    databaseInfo = utilities.dataBaseInfo
-    connection = connect.connectToDatabase(databaseInfo[0], databaseInfo[1], databaseInfo[2], databaseInfo[3])
+    connection = connect.getDatabaseConnection()
     data = connect.getDataFromDatabase(connection, query)
     return data

@@ -1,5 +1,30 @@
-import mysql.connector as cnx
 from alive_progress import alive_bar
+import mysql.connector as cnx
+import os
+
+import utils.FileOperation as file
+
+def getDatabaseConnection():
+    if os.path.isfile('databaseCredentials.json'):
+        credentials = file.getDataFromJsonFile('databaseCredentials.json')
+        host = credentials['host']
+        user = credentials['user']
+        password = credentials['password']
+        database = credentials['database']
+        return connectToDatabase(host, user, password, database)
+    else:
+        while True:
+            host = input("Insert host: ")
+            user = input("Insert user: ")
+            password = input("Insert password: ")
+            database = input("Insert database name: ")
+            try:
+                connection = connectToDatabase(host, user, password, database)
+                credentials = {'host': host, 'user': user, 'password': password, 'database': database}
+                file.writeOnJsonFile('databaseCredentials.json', credentials)
+                return connection
+            except:
+                print("\nWrong credentials!! Please give right credentials")
 
 def connectToDatabase(h, usr, psw, db):
     connection = cnx.connect(

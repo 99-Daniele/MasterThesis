@@ -4,8 +4,7 @@ def refreshData():
     import utils.FileOperation as file
     import utils.Utilities as utilities
     file.removeFile('cache.json')
-    databaseInfo = utilities.dataBaseInfo
-    connection = connect.connectToDatabase(databaseInfo[0], databaseInfo[1], databaseInfo[2], databaseInfo[3])
+    connection = connect.getDatabaseConnection()
     update.refreshData(connection)
 
 def displayAllEvents():
@@ -146,9 +145,4 @@ def startApp():
 if __name__ == '__main__':
     #refreshData()
     import utils.DatabaseConnection as dbc
-    import utils.Utilities as ut
-    import utils.FileOperation as f
-    databaseInfo = ut.dataBaseInfo
-    connection = dbc.connectToDatabase(databaseInfo[0], databaseInfo[1], databaseInfo[2], databaseInfo[3])
-    d = f.getDataFromJsonFile('databaseCredentials.json')
-    print(d['host'])
+    connection = dbc.getDatabaseConnection()
