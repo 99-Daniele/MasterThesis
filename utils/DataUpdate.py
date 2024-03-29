@@ -4,6 +4,7 @@ import utils.Getters as getter
 import utils.Utilities as utilities
 
 def refreshData(connection):
+    verifyDatabase(connection)
     events = getter.getEvents()
     courtHearingsEventsType = utilities.courtHearingsEvents
     eventsFiltered = filterEvents(events)
@@ -206,8 +207,12 @@ def fromListToString(list):
 def verifyDatabase(connection):
     if not connect.doesATableExist(connection, "eventi"):
         raise "\nEvents table is not present or is called differently than 'eventi'. Please change name or add such table because it's fundamental for the analysis"
+    if not connect.doesATableHaveColumns(connection, "eventi", ['numEvento', 'numProcesso', 'codice', 'giudice', 'data', 'statoiniziale', 'statofinale']):
+        raise "\nEvents table does not have all requested columns. The requested columns are: 'numEvento', 'numProcesso', 'codice', 'giudice', 'data', 'statoiniziale', 'statofinale'"
     if not connect.doesATableExist(connection, "processi"):
         raise "\Processes table is not present or is called differently than 'processi'. Please change name or add such table because it's fundamental for the analysis"
+    if not connect.doesATableHaveColumns(connection, "processi", ['numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione']):
+        raise "\Processes table does not have all requested columns. The requested columns are: 'numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'"
     if not connect.doesATableExist(connection, "eventinome"):
         connect.createTable(connection, 'eventinome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
         eventsName = file.getDataFromTextFile('eventsName.txt')

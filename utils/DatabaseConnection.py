@@ -56,6 +56,14 @@ def doesATableExist(connection, table):
     r = getDataFromDatabase(connection, query)
     return r[0][0] == 1
 
+def doesATableHaveColumns(connection, table, columns):
+    for column in columns:
+        query = "SELECT COUNT(*) > 0 FROM information_schema.columns WHERE table_name = '" + table + "' AND column_name = '" + column + "'"
+        r = getDataFromDatabase(connection, query)
+        if r[0][0] == 0:
+            return False
+    return True
+
 def doesAViewExist(connection, table):
     query = "SELECT COUNT(*) > 0 FROM information_schema.tables WHERE table_name = '" + table + "' AND table_type = 'VIEW' LIMIT 1"
     r = getDataFromDatabase(connection, query)

@@ -1,26 +1,28 @@
 import utils.Cache as cache
 import utils.DatabaseConnection as connect
 import utils.DataFrame as frame
-import utils.Utilities as utilities
+import utils.FileOperation as file
 
 def getAllEvents():
     query = "SELECT e.numProcesso AS numProcesso, e.data AS dataEvento, et.fase AS fase, et.evento AS tipoevento, e.numEvento AS numEvento, e.codice AS codiceEvento, et.stato AS tipostato, e.statofinale AS codiceStato, a.alias AS giudice, mn.etichetta AS materiaProcesso, p.sezione AS sezioneProcesso, pt.processofinito AS processofinito, (CASE WHEN ((SELECT pcg.numProcesso FROM processicambiogiudice AS pcg WHERE (pcg.numProcesso = p.numProcesso)) IS NOT NULL) THEN 1 ELSE 0 END) AS cambiogiudice FROM eventitipo AS et, eventi AS e, durataprocessi AS d, aliasgiudice AS a, processi AS p, processitipo AS pt, materienome AS mn WHERE ((e.numEvento = et.numEvento) AND (e.numProcesso = d.numProcesso) AND (a.giudice = p.giudice) AND (p.numProcesso = d.numProcesso) AND (pt.numProcesso = p.numProcesso) AND (p.materia = mn.codice)) ORDER BY et.fase"
-    events = cache.getData('eventi', query)
+    events = cache.getData('tuttieventi', query)
     return frame.createEventsDataFrame(events)
 
 def getImportantEvents():
-    query = "SELECT e.numProcesso AS numProcesso, e.data AS dataEvento, et.fase AS fase, et.evento AS tipoevento, e.numEvento AS numEvento, e.codice AS codiceEvento, et.stato AS tipostato, e.statofinale AS codiceStato, a.alias AS giudice, mn.etichetta AS materiaProcesso, p.sezione AS sezioneProcesso, pt.processofinito AS processofinito, (CASE WHEN ((SELECT pcg.numProcesso FROM processicambiogiudice AS pcg WHERE (pcg.numProcesso = p.numProcesso)) IS NOT NULL) THEN 1 ELSE 0 END) AS cambiogiudice FROM eventitipo AS et, eventi AS e, durataprocessi AS d, aliasgiudice AS a, processi AS p, processitipo AS pt, materienome AS mn WHERE ((e.numEvento = et.numEvento) AND (e.numProcesso = d.numProcesso) AND (a.giudice = p.giudice) AND (p.numProcesso = d.numProcesso) AND (pt.numProcesso = p.numProcesso) AND (p.materia = mn.codice) AND (et.evento IN (" + str(utilities.importantEvents) + "))) ORDER BY et.fase"
+    importantEvents = str(tuple(file.getDataFromTextFile('importantEvents.txt')))
+    query = "SELECT e.numProcesso AS numProcesso, e.data AS dataEvento, et.fase AS fase, et.evento AS tipoevento, e.numEvento AS numEvento, e.codice AS codiceEvento, et.stato AS tipostato, e.statofinale AS codiceStato, a.alias AS giudice, mn.etichetta AS materiaProcesso, p.sezione AS sezioneProcesso, pt.processofinito AS processofinito, (CASE WHEN ((SELECT pcg.numProcesso FROM processicambiogiudice AS pcg WHERE (pcg.numProcesso = p.numProcesso)) IS NOT NULL) THEN 1 ELSE 0 END) AS cambiogiudice FROM eventitipo AS et, eventi AS e, durataprocessi AS d, aliasgiudice AS a, processi AS p, processitipo AS pt, materienome AS mn WHERE ((e.numEvento = et.numEvento) AND (e.numProcesso = d.numProcesso) AND (a.giudice = p.giudice) AND (p.numProcesso = d.numProcesso) AND (pt.numProcesso = p.numProcesso) AND (p.materia = mn.codice) AND (et.evento IN " + importantEvents + ")) ORDER BY et.fase"
     events = cache.getData('eventiimportanti', query)
     return frame.createEventsDataFrame(events)
 
 def getCourtHearingEvents():
-    query = "SELECT e.numProcesso AS numProcesso, e.data AS dataEvento, et.fase AS fase, et.evento AS tipoevento, e.numEvento AS numEvento, e.codice AS codiceEvento, et.stato AS tipostato, e.statofinale AS codiceStato, a.alias AS giudice, mn.etichetta AS materiaProcesso, p.sezione AS sezioneProcesso, pt.processofinito AS processofinito, (CASE WHEN ((SELECT pcg.numProcesso FROM processicambiogiudice AS pcg WHERE (pcg.numProcesso = p.numProcesso)) IS NOT NULL) THEN 1 ELSE 0 END) AS cambiogiudice FROM eventitipo AS et, eventi AS e, durataprocessi AS d, aliasgiudice AS a, processi AS p, processitipo AS pt, materienome AS mn WHERE ((e.numEvento = et.numEvento) AND (e.numProcesso = d.numProcesso) AND (a.giudice = p.giudice) AND (p.numProcesso = d.numProcesso) AND (pt.numProcesso = p.numProcesso) AND (p.materia = mn.codice) AND (et.evento IN (" + str(utilities.courtHearingsEvents) + "))) ORDER BY et.fase"
+    courtHearingsEvents = str(tuple(file.getDataFromTextFile('courtHearingsEvents.txt')))
+    query = "SELECT e.numProcesso AS numProcesso, e.data AS dataEvento, et.fase AS fase, et.evento AS tipoevento, e.numEvento AS numEvento, e.codice AS codiceEvento, et.stato AS tipostato, e.statofinale AS codiceStato, a.alias AS giudice, mn.etichetta AS materiaProcesso, p.sezione AS sezioneProcesso, pt.processofinito AS processofinito, (CASE WHEN ((SELECT pcg.numProcesso FROM processicambiogiudice AS pcg WHERE (pcg.numProcesso = p.numProcesso)) IS NOT NULL) THEN 1 ELSE 0 END) AS cambiogiudice FROM eventitipo AS et, eventi AS e, durataprocessi AS d, aliasgiudice AS a, processi AS p, processitipo AS pt, materienome AS mn WHERE ((e.numEvento = et.numEvento) AND (e.numProcesso = d.numProcesso) AND (a.giudice = p.giudice) AND (p.numProcesso = d.numProcesso) AND (pt.numProcesso = p.numProcesso) AND (p.materia = mn.codice) AND (et.evento IN " + courtHearingsEvents + ")) ORDER BY et.fase"
     events = cache.getData('eventiudienze', query)
     return frame.createEventsDataFrame(events)
 
 def getEvents():
     query = "SELECT e.numEvento AS numEvento, en.etichetta AS tipoEvento, s.stato AS codiceStato, s.fase AS faseStato, e.numProcesso AS numProcesso, e.data AS dataEvento, s.etichetta AS tipoStato, s.abbreviazione AS statoAbbr FROM eventi AS e, eventinome AS en, statinome AS s WHERE ((e.codice = en.codice) AND (e.statofinale = s.stato)) ORDER BY e.numEvento"
-    eventsType = cache.getData('tipoeventi', query)
+    eventsType = cache.getData('eventi', query)
     return eventsType
 
 def getTestEvents():
@@ -52,3 +54,14 @@ def getCourtHearingsDuration():
     query = "SELECT d.dataInizioUdienza AS dataInizioUdienza, d.durata AS durataUdienza, a.alias AS giudiceProcesso, mn.etichetta AS materiaProcesso, p.sezione AS sezioneProcesso, pt.processofinito AS processoFinito, pcg.cambioGiudice AS cambioGiudice, p.numProcesso AS numProcesso FROM durataudienze AS d, processi AS p, processitipo AS pt, aliasgiudice AS a, materienome AS mn, processicambiogiudice AS pcg WHERE ((p.numProcesso = d.numProcesso) AND (pt.numProcesso = p.numProcesso) AND (a.giudice = p.giudice) AND (mn.codice = p.materia) AND (p.numProcesso = pcg.numProcesso)) ORDER BY p.numProcesso, d.dataInizioUdienza"
     courtHearings = cache.getData('durataudienze', query)
     return frame.createCourtHearingsDurationDataFrame(courtHearings)
+
+def runAllGetters():
+    getAllEvents()
+    getImportantEvents()
+    getCourtHearingEvents()
+    getEvents()
+    getProcessesDuration()
+    getStatesDuration()
+    getPhasesDuration()
+    getEventsDuration()
+    getCourtHearingsDuration()

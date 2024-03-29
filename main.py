@@ -2,10 +2,11 @@ def refreshData():
     import utils.DatabaseConnection as connect
     import utils.DataUpdate as update
     import utils.FileOperation as file
-    import utils.Utilities as utilities
+    import utils.Getters as getter
     file.removeFile('cache.json')
     connection = connect.getDatabaseConnection()
     update.refreshData(connection)
+    getter.runAllGetters()
 
 def displayAllEvents():
     import utils.Getters as getter
@@ -143,4 +144,4 @@ def startApp():
     app.run_server(debug = True)
 
 if __name__ == '__main__':
-    refreshData()
+    startApp()

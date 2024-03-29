@@ -1,6 +1,6 @@
 import utils.DatabaseConnection as connect
 import utils.FileOperation as file
-import utils.Utilities as utilities
+import utils.Getters as getter
 
 def getCacheData(func):
     cache = file.getDataFromJsonFileWithTranslation('cache.json')

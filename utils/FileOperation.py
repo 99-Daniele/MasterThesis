@@ -25,7 +25,15 @@ def getDataFromJsonFileWithTranslation(filename):
         return json.loads(jsonCache, object_hook = json_util.object_hook)
     except (IOError, ValueError):
         return {}
-        
+
+def writeOnTextFile(filename, data):
+    f = open(filename, 'w')
+    f.write(data)
+
+def appendOnTextFile(filename, data):
+    f = open(filename, 'a')
+    f.write(data)
+
 def writeOnJsonFile(filename, data):
     json.dump(data, open(filename, 'w'))
         
