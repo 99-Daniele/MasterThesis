@@ -215,15 +215,15 @@ def verifyDatabase(connection):
         raise "\Processes table does not have all requested columns. The requested columns are: 'numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'"
     if not connect.doesATableExist(connection, "eventinome"):
         connect.createTable(connection, 'eventinome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
-        eventsName = file.getDataFromTextFile('eventsName.txt')
+        eventsName = file.getDataFromTextFile('utils/Preferences/eventsName.txt')
         connect.insertIntoDatabase(connection, 'eventinome', eventsName)
     if not connect.doesATableExist(connection, "materienome"):
         connect.createTable(connection, 'materienome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
-        subjectsName = file.getDataFromTextFile('subjectsName.txt')
+        subjectsName = file.getDataFromTextFile('utils/Preferences/subjectsName.txt')
         connect.insertIntoDatabase(connection, 'materienome', subjectsName)
     if not connect.doesATableExist(connection, "statinome"):
         connect.createTable(connection, 'statinome', ['stato', 'etichetta', 'abbreviazione', 'fase'], ['VARCHAR(5)', 'TEXT', 'VARCHAR(10)', 'VARCHAR(5)'], [0], [])
-        statesName = file.getDataFromTextFile('statesName.txt')
+        statesName = file.getDataFromTextFile('utils/Preferences/statesName.txt')
         connect.insertIntoDatabase(connection, 'statinome', statesName)
     if not connect.doesATableExist(connection, "eventitipo"):
         connect.createTable(connection, 'eventitipo', ['numEvento', 'evento', 'stato', 'fase'], ['BIGINT', 'TEXT', 'TEXT', 'VARCHAR(5)'], [0], [])

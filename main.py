@@ -3,7 +3,7 @@ def refreshData():
     import utils.DataUpdate as update
     import utils.FileOperation as file
     import utils.Getters as getter
-    file.removeFile('cache.json')
+    file.removeFile('utils/cache.json')
     connection = connect.getDatabaseConnection()
     update.refreshData(connection)
     getter.runAllGetters()

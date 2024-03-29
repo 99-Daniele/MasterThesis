@@ -5,8 +5,8 @@ import os
 import utils.FileOperation as file
 
 def getDatabaseConnection():
-    if os.path.isfile('databaseCredentials.json'):
-        credentials = file.getDataFromJsonFile('databaseCredentials.json')
+    if os.path.isfile('utils/databaseCredentials.json'):
+        credentials = file.getDataFromJsonFile('utils/databaseCredentials.json')
         host = credentials['host']
         user = credentials['user']
         password = credentials['password']
@@ -21,7 +21,7 @@ def getDatabaseConnection():
             try:
                 connection = connectToDatabase(host, user, password, database)
                 credentials = {'host': host, 'user': user, 'password': password, 'database': database}
-                file.writeOnJsonFile('databaseCredentials.json', credentials)
+                file.writeOnJsonFile('utils/databaseCredentials.json', credentials)
                 return connection
             except:
                 print("\nWrong credentials!! Please give right credentials")

@@ -3,7 +3,7 @@ import utils.FileOperation as file
 import utils.Getters as getter
 
 def getCacheData(func):
-    cache = file.getDataFromJsonFileWithTranslation('cache.json')
+    cache = file.getDataFromJsonFileWithTranslation('utils/cache.json')
 
     def wrapper(*args):
         id = args[0]
@@ -12,7 +12,7 @@ def getCacheData(func):
         else:
             result = func(*args)
             cache.update({id: result})
-            file.writeOnJsonFileWithTranslation('cache.json', cache)
+            file.writeOnJsonFileWithTranslation('utils/cache.json', cache)
             return result
     return wrapper
 
