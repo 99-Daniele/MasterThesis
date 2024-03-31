@@ -30,8 +30,11 @@ def createEventsDataFrame(events):
             judges.append(e[8])
             subjects.append(e[9])
             sections.append(e[10])
-            finished.append(e[11])
-            changes.append(e[12])
+            finished.append(utilities.processState[e[11]])
+            if e[12] == 1:
+                changes.append("SI")
+            else:
+                changes.append("NO")
             if e[2] == '5':
                 finishedEventProcesses.append(e[0])
     return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "evento": tagEvents, "numEvento": eIds})
@@ -53,8 +56,11 @@ def createProcessesDurationDataFrame(processes):
         judges.append(p[2])
         subjects.append(p[3])
         sections.append(p[4])
-        finished.append(p[5])
-        changes.append(p[6])
+        finished.append(utilities.processState[p[5]])
+        if p[6] == 1:
+            changes.append("SI")
+        else:
+            changes.append("NO")
         pIds.append(p[7])
         sequences.append(p[8])
         phases.append(p[9])
@@ -78,8 +84,11 @@ def createStatesDurationsDataFrame(processes):
         judges.append(p[2])
         subjects.append(p[3])
         sections.append(p[4])
-        finished.append(p[5])
-        changes.append(p[6])
+        finished.append(utilities.processState[p[5]])
+        if p[6] == 1:
+            changes.append("SI")
+        else:
+            changes.append("NO")
         pIds.append(p[7])
         tags.append(p[8])
         states.append(p[9])
@@ -103,8 +112,11 @@ def createPhasesDurationsDataFrame(processes):
         judges.append(p[2])
         subjects.append(p[3])
         sections.append(p[4])
-        finished.append(p[5])
-        changes.append(p[6])
+        finished.append(utilities.processState[p[5]])
+        if p[6] == 1:
+            changes.append("SI")
+        else:
+            changes.append("NO")
         pIds.append(p[7])
         phases.append(p[8])
         orders.append(p [9])
@@ -129,8 +141,11 @@ def createEventsDurationsDataFrame(processes):
         judges.append(p[2])
         subjects.append(p[3])
         sections.append(p[4])
-        finished.append(p[5])
-        changes.append(p[6])
+        finished.append(utilities.processState[p[5]])
+        if p[6] == 1:
+            changes.append("SI")
+        else:
+            changes.append("NO")
         eIds.append(p[7])
         pIds.append(p[8])
         tagEvents.append(p[9])
@@ -153,8 +168,11 @@ def createCourtHearingsDurationDataFrame(processes):
         judges.append(p[2])
         subjects.append(p[3])
         sections.append(p[4])
-        finished.append(p[5])
-        changes.append(p[6])
+        finished.append(utilities.processState[p[5]])
+        if p[6] == 1:
+            changes.append("SI")
+        else:
+            changes.append("NO")
         pIds.append(p[7])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes})
 
@@ -245,24 +263,35 @@ def keepOnlyImportant(df, perc):
     df.reset_index(drop = True)
     return df
 
-def getAvgDataFrameByType(df, datetype, type, order):
-    df3 = df.groupby([type], as_index = False).size()
-    df3 = df.groupby([type]) \
+def getAvgDataFrameByType(df, datetype, types, order):
+    df4 = df.groupby(types) \
        .agg({'giudice':'size', 'durata':'mean'}) \
        .rename(columns = {'giudice':'conteggio','durata':'media'}) \
        .reset_index()
+    for t in types: 
+        df4.drop(df4[df4[t] == 'null'].index, inplace = True)
+    df3 = df4[[types[0], 'conteggio', 'media']].copy()
+    df3 = df3.rename(columns = {types[0]:'filtro'})
+    i = 1
+    while i < len(types):
+        df3['filtro'] = df3['filtro'] + " - " + df4[types[i]]
+        i = i + 1
     df3 = keepOnlyImportant(df3, 0.85)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
-    df3.drop(df3[df3[type] == 'null'].index, inplace = True)
-    order_dict = df3.set_index(type)[order].to_dict()
-    order_list = df3[type].tolist()
-    df_temp = df[['data', 'durata', type]].copy()
-    df_temp = df_temp[df_temp[type].isin(order_list)]
+    order_dict = df3.set_index('filtro')[order].to_dict()
+    order_list = df3['filtro'].tolist()
+    df_temp = df[['data', 'durata', types[0]]].copy()
+    df_temp = df_temp.rename(columns = {types[0]:'filtro'})
+    i = 1
+    while i < len(types):
+        df_temp['filtro'] = df_temp['filtro'] + " - " + df[types[i]]
+        i = i + 1
+    df_temp = df_temp[df_temp['filtro'].isin(order_list)]
     match datetype:
         case "W":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getWeekNumber(x))
-            df1 = df_temp.groupby(['data', type], as_index = False).mean()
-            df1['sort_column'] = df1[type].map(order_dict)
+            df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
+            df1['sort_column'] = df1['filtro'].map(order_dict)
             df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
             df1['data'] = df1['data'].map(lambda x: utilities.weeks[x - 1])
@@ -271,8 +300,8 @@ def getAvgDataFrameByType(df, datetype, type, order):
             return [df1, df2, df3]
         case "M":
             df_temp['data'] = df_temp['data'].map(lambda x: x.month)
-            df1 = df_temp.groupby(['data', type], as_index = False).mean()
-            df1['sort_column'] = df1[type].map(order_dict)
+            df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
+            df1['sort_column'] = df1['filtro'].map(order_dict)
             df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
             df1['data'] = df1['data'].map(lambda x: utilities.months[x - 1])
@@ -281,54 +310,17 @@ def getAvgDataFrameByType(df, datetype, type, order):
             return [df1, df2, df3]
         case "MY":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getMonthYearDate(x))
-            df1 = df_temp.groupby(['data', type], as_index = False).mean()
-            df1['sort_column'] = df1[type].map(order_dict)
+            df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
+            df1['sort_column'] = df1['filtro'].map(order_dict)
             df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
             df2 = df2.sort_values(['data']).reset_index(drop = True)
             return [df1, df2, df3]
-
-def getSectionsdDataFrame(df, sections):
-    if sections == None or len(sections) == 0:
+        
+def getTypesDataFrame(df, type, types):
+    if types == None or len(types) == 0:
         return df
-    return df[df['sezione'].isin(sections)]
-
-def getSubjectsdDataFrame(df, subjects):
-    if subjects == None or len(subjects) == 0:
-        return df
-    return df[df['materia'].isin(subjects)]
-
-def getJudgesDataFrame(df, judges):
-    if judges == None or len(judges) == 0:
-        return df
-    return df[df['giudice'].isin(judges)]
-
-def getFinishedDataFrame(df, finished):
-    if finished == None or len(finished) == 0:
-        return df
-    finished = [(lambda x: utilities.finishedNumber(x))(x) for x in finished]
-    return df[df['finito'].isin(finished)]
-
-def getChangeJudgeDataFrame(df, change):
-    if change == None:
-        return df
-    if change == "SI":
-        change = 1
-    else:
-        change = 0
-    return df[df['cambio'] == change]
-
-def getSequencesDataFrame(df, sequences):
-    df_temp = df
-    if (sequences == None or len(sequences) == 0):
-        return df
-    return df_temp[df_temp['sequenza'].isin(sequences)]
-
-def getPhaseSequencesDataFrame(df, phases):
-    df_temp = df
-    if (phases == None or len(phases) == 0):
-        return df
-    return df_temp[df_temp['fasi'].isin(phases)]
+    return df[df[type].isin(types)]
 
 def getYearDataFrame(df, years):
     if years == None or len(years) == 0:
