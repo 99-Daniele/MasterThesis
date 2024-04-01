@@ -5,18 +5,18 @@ import plotly.express as px
 import utils.Dataframe as frame
 import utils.Utilities as utilities
 
-def addCountToName(name, df, type):
-    if type == 'finito':
+def addCountToName(name, df, choices):
+    if choices == 'finito':
         count = df[df[type] == int(name)]['conteggio'].item()
         name = utilities.processState[int(name)]
-    elif type == 'cambio':
+    elif choices == 'cambio':
         count = df[df[type] == int(name)]['conteggio'].item()
         if int(name) == 0:
             name = "NO"
         else:
             name = "SI"
     else:
-        count = df[df[type] == name]['conteggio'].item()
+        count = df[df['filtro'] == name]['conteggio'].item()
     newName = name + " (" + str(count) + ")"
     return newName
 
@@ -29,7 +29,7 @@ def getPosition(name, df, type):
     pos = df.index.get_loc(df[df[type] == name].index[0])
     return pos
 
-def hideChosen(choice, sections, subjects, judges, finished, changes, sequences, phaseSequences):
+def hideChosen(choices, sections, subjects, judges, finished, changes, sequences, phaseSequences):
     sectionStyle = {'width': 400}
     subjectStyle = {'width': 400}
     judgeStyle = {'width': 400}
@@ -37,46 +37,38 @@ def hideChosen(choice, sections, subjects, judges, finished, changes, sequences,
     changeStyle = {'width': 400}
     sequenceStyle = {'width': 400}
     phaseSequenceStyle = {'width': 400}
-    match choice:
-        case 'sezione':
-            sectionStyle = {'width': 200, 'display': 'none'}
-            sections = None
-        case 'materia':
-            subjectStyle = {'width': 200, 'display': 'none'}
-            subjects = None
-        case 'giudice':
-            judgeStyle = {'width': 200, 'display': 'none'}
-            judges = None
-        case 'finito':
-            finishedStyle = {'width': 200, 'display': 'none'}
-            finished = None
-        case 'cambio':
-            changeStyle = {'width': 200, 'display': 'none'}
-            changes = None
-        case 'sequenza':
-            sequenceStyle = {'width': 200, 'display': 'none'}
-            sequences = None
-        case 'fasi':
-            phaseSequenceStyle = {'width': 200, 'display': 'none'}
-            phaseSequences = None
+    if 'sezione' in choices:
+        sectionStyle = {'width': 200, 'display': 'none'}
+        sections = None
+    if 'materia' in choices:
+        subjectStyle = {'width': 200, 'display': 'none'}
+        subjects = None
+    if 'giudice' in choices:
+        judgeStyle = {'width': 200, 'display': 'none'}
+        judges = None
+    if 'finito' in choices:
+        finishedStyle = {'width': 200, 'display': 'none'}
+        finished = None
+    if 'cambio' in choices:
+        changeStyle = {'width': 200, 'display': 'none'}
+        changes = None
+    if 'sequenza' in choices:
+        sequenceStyle = {'width': 200, 'display': 'none'}
+        sequences = None
+    if 'fasi' in choices:
+        phaseSequenceStyle = {'width': 200, 'display': 'none'}
+        phaseSequences = None
     return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences]
 
 def updateProcessData(df, sections, subjects, judges, finished, change, sequences, phaseSequences):
     df_temp = df
-    if not (sections == None or len(sections) == 0):
-        df_temp = frame.getSectionsdDataFrame(df_temp, sections)
-    if not (subjects == None or len(subjects) == 0):
-        df_temp = frame.getSubjectsdDataFrame(df_temp, subjects)
-    if not (judges == None or len(judges) == 0):
-        df_temp = frame.getJudgesDataFrame(df_temp, judges)
-    if not (finished == None or len(finished) == 0):
-        df_temp = frame.getFinishedDataFrame(df_temp, finished)
-    if not (change == None):
-        df_temp = frame.getChangeJudgeDataFrame(df_temp, change)
-    if not (sequences == None or len(sequences) == 0):
-        df_temp = frame.getSequencesDataFrame(df_temp, sequences)
-    if not (phaseSequences == None or len(phaseSequences) == 0):
-        df_temp = frame.getPhaseSequencesDataFrame(df_temp, phaseSequences)
+    df_temp = frame.getTypesDataFrame(df_temp, 'sezione', sections)
+    df_temp = frame.getTypesDataFrame(df_temp, 'materia', subjects)
+    df_temp = frame.getTypesDataFrame(df_temp, 'giudice', judges)
+    df_temp = frame.getTypesDataFrame(df_temp, 'finito', finished)
+    df_temp = frame.getTypesDataFrame(df_temp, 'cambio', change)
+    df_temp = frame.getTypesDataFrame(df_temp, 'sequenza', sequences)
+    df_temp = frame.getTypesDataFrame(df_temp, 'fasi', phaseSequences)
     return df_temp
 
 def displayComparation(df, dateType):
@@ -97,7 +89,8 @@ def displayComparation(df, dateType):
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown', placeholder = 'FASI', style = {'width': 400}),
-        ds.dcc.RadioItems(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = 'sezione', id = "choice-radioitem", inline = True, style = {'display':'inline'}),
+        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist", inline = True, style = {'display':'inline'}),
+        ds.dcc.Store(data = ['sezione'], id = "choice-store"),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem", inline = True, style = {'padding-left':'85%'}),
         ds.dcc.Graph(id = 'comparation-graph', figure = fig)
     ])
@@ -114,7 +107,9 @@ def displayComparation(df, dateType):
          ds.Output('subject-dropdown', 'options'),
          ds.Output('judge-dropdown', 'options'),
          ds.Output('sequence-dropdown', 'options'),
-         ds.Output('phaseSequence-dropdown', 'options')],
+         ds.Output('phaseSequence-dropdown', 'options'),
+         ds.Output('choice-checklist', 'value'),
+         ds.Output('choice-store', 'data')],
         [ds.Input('section-dropdown', 'value'),
          ds.Input('subject-dropdown', 'value'),
          ds.Input('judge-dropdown', 'value'),
@@ -122,15 +117,20 @@ def displayComparation(df, dateType):
          ds.Input('change-dropdown', 'value'),
          ds.Input('sequence-dropdown', 'value'),
          ds.Input('phaseSequence-dropdown', 'value'),
-         ds.Input('choice-radioitem', 'value'),
+         ds.Input('choice-checklist', 'value'),
+         ds.Input('choice-store', 'data'),
          ds.Input('order-radioitem', 'value')]
     )
-    def updateOutput(sections, subjects, judges, finished, changes, sequences, phaseSequences, choice, order):
-        return comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choice, order)
+    def updateOutput(sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
+        return comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order)
     app.run_server(debug = True)
 
-def comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choice, order):
-    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences] = hideChosen(choice, sections, subjects, judges, finished, changes, sequences, phaseSequences)
+def comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
+    if len(choices) < 1:
+        choices = [choiceStore]
+    elif len(choices) == 1:
+        choiceStore = choices[0]
+    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences] = hideChosen(choices, sections, subjects, judges, finished, changes, sequences, phaseSequences)
     df_data = df.copy()
     df_data = updateProcessData(df_data, sections, subjects, judges, finished, changes, sequences, phaseSequences)
     df_temp = df.copy()
@@ -151,15 +151,15 @@ def comparationUpdate(df, dateType, sections, subjects, judges, finished, change
     judges = frame.getJudges(df_temp)
     sequences = frame.getSequences(df_temp)
     phaseSequences = frame.getPhaseSequences(df_temp)
-    [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, dateType, choice, order)
+    [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, dateType, choices, order)
     fig = px.line(allData, x = "data", y = "durata").update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
     fig.add_traces(
-        px.line(typeData, x = "data", y = "durata", color = choice, markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600).data
+        px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600).data
     )
     fig.for_each_trace(
-        lambda t: t.update(name = addCountToName(t.name, infoData, choice)) if t.name != addTotCountToName(infoData) else False
+        lambda t: t.update(name = addCountToName(t.name, infoData, choices)) if t.name != addTotCountToName(infoData) else False
     )
     fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
     fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
-    return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, sequences, phaseSequences
+    return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, sequences, phaseSequences, choices, choiceStore

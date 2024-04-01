@@ -146,14 +146,3 @@ def getYearDate(date):
     y = date.year
     new_date = pd.Timestamp(day = 1, month = 1, year = y)
     return new_date
-
-def finishedNumber(text):
-    match text:
-        case "FINITO":
-            return 1
-        case "NON FINITO":
-            return 0
-        case "IN STALLO":
-            return -1
-        case "STOPPATO":
-            return 2
