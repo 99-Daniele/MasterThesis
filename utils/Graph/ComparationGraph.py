@@ -2,7 +2,7 @@ import dash as ds
 import pandas as pd
 import plotly.express as px
 
-import utils.DataFrame as frame
+import utils.Dataframe as frame
 import utils.Utilities as utilities
 
 def addCountToName(name, df, type):

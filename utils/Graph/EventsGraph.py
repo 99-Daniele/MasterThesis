@@ -1,7 +1,7 @@
 import dash as ds
 import plotly.express as px
 
-import utils.DataFrame as frame
+import utils.Dataframe as frame
 import utils.Utilities as utilities
 
 def updateEvents(df, startDate, endDate, events):

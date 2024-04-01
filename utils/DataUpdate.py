@@ -6,7 +6,7 @@ import utils.Utilities as utilities
 def refreshData(connection):
     verifyDatabase(connection)
     events = getter.getEvents()
-    courtHearingsEventsType = utilities.courtHearingsEvents
+    courtHearingsEventsType = str(tuple(file.getDataFromTextFile('utils/Preferences/courtHearingsEvents.txt')))
     eventsFiltered = filterEvents(events)
     processEvents = groupEventsByProcess(events)
     processPhaseEvents = groupEventsByProcessPhase(processEvents)
