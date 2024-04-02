@@ -13,7 +13,7 @@ def displayEvents():
     import utils.Graph.EventsGraph as event
     import utils.FileOperation as file
     importantEvents = getter.getImportantEvents()
-    importantEventsType = file.getDataFromTextFile('importantEvents.txt')
+    importantEventsType = file.getDataFromTextFile('utils\Preferences\importantEvents.txt')
     event.displayEvents(importantEvents, importantEventsType)
     
 def displayDuration():
