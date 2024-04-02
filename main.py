@@ -8,73 +8,21 @@ def refreshData():
     update.refreshData(connection)
     getter.runAllGetters()
 
-def displayAllEvents():
+def displayEvents():
     import utils.Getters as getter
     import utils.Graph.EventsGraph as event
-    import utils.Utilities as utilities
-    events = getter.getAllEvents()
-    importantEventsType = utilities.importantEvents()
-    event.displayEvents(events, importantEventsType)
-
-def displayImportantEvents():
-    import utils.Getters as getter
-    import utils.Graph.EventsGraph as event
-    import utils.Utilities as utilities
+    import utils.FileOperation as file
     importantEvents = getter.getImportantEvents()
-    importantEventsType = utilities.importantEvents()
+    importantEventsType = file.getDataFromTextFile('importantEvents.txt')
     event.displayEvents(importantEvents, importantEventsType)
-
-def displayCourtHearingEvents():
-    import utils.Getters as getter
-    import utils.Graph.EventsGraph as event
-    import utils.Utilities as utilities
-    courtHearingEvents = getter.getCourtHearingEvents()
-    courtHearingsEventsType = utilities.courtHearingsEvents()
-    event.displayEvents(courtHearingEvents, courtHearingsEventsType)
-
-def displayProcessesDuration():
+    
+def displayDuration():
     import utils.Getters as getter
     import utils.Graph.DurationGraph as duration
     processes = getter.getProcessesDuration()
     duration.displayProcessesDuration(processes)
 
-def displayStatesDuration():
-    import utils.Getters as getter
-    import utils.Graph.DurationGraph as duration
-    states = getter.getStatesDuration()
-    duration.displayStatesDuration(states)
-
-def displayPhasesDuration():
-    import utils.Getters as getter
-    import utils.Graph.DurationGraph as duration
-    phases = getter.getPhasesDuration()
-    duration.displayPhasesDuration(phases)
-
-def displayEventsDuration():
-    import utils.Getters as getter
-    import utils.Graph.DurationGraph as duration
-    events = getter.getEventsDuration()
-    duration.displayEventsDuration(events)
-    
-def displayCourtHearingsDuration():
-    import utils.Getters as getter
-    import utils.Graph.DurationGraph as duration
-    courtHearings = getter.getCourtHearingsDuration()
-    duration.displayCourtHearingsDuration(courtHearings)
-
-def displayComparationByWeek():
-    import utils.Getters as getter
-    import utils.Graph.ComparationGraph as comparation
-    processes = getter.getProcessesDuration()
-    comparation.displayComparation(processes, "W")
-
-def displayComparationByMonth():
-    import utils.Getters as getter
-    import utils.Graph.ComparationGraph as comparation
-    processes = getter.getProcessesDuration()
-    comparation.displayComparation(processes, "M")
-
-def displayComparationByMonthYear():
+def displayComparation():
     import utils.Getters as getter
     import utils.Graph.ComparationGraph as comparation
     processes = getter.getProcessesDuration()
@@ -144,4 +92,4 @@ def startApp():
     app.run_server(debug = True)
 
 if __name__ == '__main__':
-    displayComparationByMonth()
+    displayComparation()
