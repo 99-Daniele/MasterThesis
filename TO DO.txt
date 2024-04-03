@@ -1,0 +1,8 @@
+- confronto finito e non finito
+- durata fasi finite sia per processi finiti e non finiti
+- grafico eventi migliore (tipo quello precedente studente)
+- disponibile per accesso esterno --> descrizione nel readme
+- tradurre nomi tabelle (vediamo...)
+- rimpicciolire legenda
+
+- screenshot cose significative e powerpoint
