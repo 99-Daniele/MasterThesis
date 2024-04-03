@@ -17,6 +17,8 @@ def addCountToName(name, df, choices):
             name = "SI"
     else:
         count = df[df['filtro'] == name]['conteggio'].item()
+    if len(name) >= 30:
+        name = name[:27] + "..."
     newName = name + " (" + str(count) + ")"
     return newName
 

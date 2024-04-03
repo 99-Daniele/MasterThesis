@@ -29,7 +29,8 @@ def pageLayout():
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-w', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-w', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-w', placeholder = 'FASI', style = {'width': 400}),
-        ds.dcc.RadioItems(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = 'sezione', id = "choice-radioitem-w", inline = True, style = {'display':'inline'}),
+        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist-w", inline = True, style = {'display':'inline'}),
+        ds.dcc.Store(data = ['sezione'], id = "choice-store-w"),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-w", inline = True, style = {'padding-left':'85%'}),
         ds.dcc.Graph(id = 'comparation-graph-w', figure = fig)
     ])
@@ -48,7 +49,9 @@ def pageLayout():
         ds.Output('subject-dropdown-w', 'options'),
         ds.Output('judge-dropdown-w', 'options'),
         ds.Output('sequence-dropdown-w', 'options'),
-        ds.Output('phaseSequence-dropdown-w', 'options')],
+        ds.Output('phaseSequence-dropdown-w', 'options'),
+        ds.Output('choice-checklist-w', 'value'),
+        ds.Output('choice-store-w', 'data')],
     [ds.Input('section-dropdown-w', 'value'),
         ds.Input('subject-dropdown-w', 'value'),
         ds.Input('judge-dropdown-w', 'value'),
@@ -56,9 +59,10 @@ def pageLayout():
         ds.Input('change-dropdown-w', 'value'),
         ds.Input('sequence-dropdown-w', 'value'),
         ds.Input('phaseSequence-dropdown-w', 'value'),
-        ds.Input('choice-radioitem-w', 'value'),
+        ds.Input('choice-checklist-w', 'value'),
+        ds.Input('choice-store-w', 'data'),
         ds.Input('order-radioitem-w', 'value')]
 )
 
-def updateOutput(sections, subjects, judges, finished, changes, sequences, phaseSequences, choice, order):
-    return comparation.comparationUpdate(df, "W", sections, subjects, judges, finished, changes, sequences, phaseSequences, choice, order)
+def updateOutput(sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
+        return comparation.comparationUpdate(df, "W", sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order)
