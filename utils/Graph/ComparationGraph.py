@@ -17,8 +17,6 @@ def addCountToName(name, df, choices):
             name = "SI"
     else:
         count = df[df['filtro'] == name]['conteggio'].item()
-    if len(name) >= 30:
-        name = name[:27] + "..."
     newName = name + " (" + str(count) + ")"
     return newName
 
@@ -93,7 +91,7 @@ def displayComparation(df, dateType):
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown', placeholder = 'FASI', style = {'width': 400}),
         ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist", inline = True, style = {'display':'inline'}),
         ds.dcc.Store(data = ['sezione'], id = "choice-store"),
-        ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem", inline = True, style = {'padding-left':'85%'}),
+        ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem", inline = True, style = {'paddingLeft':'85%'}),
         ds.dcc.Graph(id = 'comparation-graph', figure = fig)
     ])
     @app.callback(
@@ -154,13 +152,14 @@ def comparationUpdate(df, dateType, sections, subjects, judges, finished, change
     sequences = frame.getSequences(df_temp)
     phaseSequences = frame.getPhaseSequences(df_temp)
     [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, dateType, choices, order)
-    fig = px.line(allData, x = "data", y = "durata").update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+    fig = px.line(allData, x = "data", y = "durata", height = 800).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
     fig.add_traces(
         px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600).data
     )
     fig.for_each_trace(
         lambda t: t.update(name = addCountToName(t.name, infoData, choices)) if t.name != addTotCountToName(infoData) else False
     )
+    fig.update_layout(legend = dict(yanchor = "bottom", y = -1.5, xanchor = "left", x = 0))
     fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
     fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')

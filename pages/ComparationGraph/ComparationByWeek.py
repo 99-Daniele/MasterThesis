@@ -31,7 +31,7 @@ def pageLayout():
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-w', placeholder = 'FASI', style = {'width': 400}),
         ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist-w", inline = True, style = {'display':'inline'}),
         ds.dcc.Store(data = ['sezione'], id = "choice-store-w"),
-        ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-w", inline = True, style = {'padding-left':'85%'}),
+        ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-w", inline = True, style = {'paddingLeft':'85%'}),
         ds.dcc.Graph(id = 'comparation-graph-w', figure = fig)
     ])
     return layout
