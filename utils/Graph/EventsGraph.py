@@ -40,7 +40,7 @@ def displayEvents(df, importantEventsType):
 def eventUpdate(df, startDate, endDate, event):
     df_temp = df.copy()
     df_temp = updateEvents(df_temp, startDate, endDate, event)
-    fig = px.scatter(df_temp, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = utilities.phaseColorList(df_temp), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 600)
+    fig = px.scatter(df_temp, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = utilities.phaseColorList(df_temp), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, height = 700)
     fig.update_layout(
         legend = dict(
             yanchor = "top",

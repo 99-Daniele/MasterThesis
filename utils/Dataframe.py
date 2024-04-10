@@ -337,8 +337,8 @@ def getYearDataFrame(df, years):
 def getDateDataFrame(df, startDate, endDate):
     if startDate == None or endDate == None:
         return df
-    d = df[df['data'] >= startDate]
-    d = d[d['data'] <= endDate]
+    d = df[df['dataInizioProcesso'] >= startDate]
+    d = d[d['dataInizioProcesso'] <= endDate]
     return d
 
 def getAllYears(df):
