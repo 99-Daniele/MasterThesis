@@ -72,11 +72,11 @@ def updateProcessData(df, sections, subjects, judges, finished, change, sequence
     return df_temp
 
 def displayComparation(df, dateType):
-    sections = frame.getSections(df)
-    subjects = frame.getSubjects(df)
-    judges = frame.getJudges(df)
-    sequences = frame.getSequences(df)
-    phaseSequences = frame.getPhaseSequences(df)
+    sections = frame.getGroupBy(df, 'sezione')
+    subjects = frame.getGroupBy(df, 'materia')
+    judges = frame.getGroupBy(df, 'giudice')
+    subjects = frame.getGroupBy(df, 'sequenza')
+    phaseSequences = frame.getGroupBy(df, 'fasi')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
@@ -146,11 +146,11 @@ def comparationUpdate(df, dateType, sections, subjects, judges, finished, change
         df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, changes, sequences, None)
     else:
         df_temp = df_data
-    sections = frame.getSections(df_temp)
-    subjects = frame.getSubjects(df_temp)
-    judges = frame.getJudges(df_temp)
-    sequences = frame.getSequences(df_temp)
-    phaseSequences = frame.getPhaseSequences(df_temp)
+    sections = frame.getGroupBy(df_temp, 'sezione')
+    subjects = frame.getGroupBy(df_temp, 'materia')
+    judges = frame.getGroupBy(df_temp, 'giudice')
+    subjects = frame.getGroupBy(df_temp, 'sequenza')
+    phaseSequences = frame.getGroupBy(df_temp, 'fasi')
     [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, dateType, choices, order)
     fig = px.line(allData, x = "data", y = "durata", height = 800).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
     fig.add_traces(

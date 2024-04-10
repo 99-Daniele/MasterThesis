@@ -11,7 +11,7 @@ df = getter.getPhasesDuration()
 
 def pageLayout():
     years = frame.getAllYears(df)
-    phases = frame.getAllPhases(df)
+    phases = frame.getUniques(df, 'fase')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([

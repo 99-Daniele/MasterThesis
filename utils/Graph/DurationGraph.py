@@ -27,21 +27,21 @@ def updateProcessesDuration(df, sequences, phases, finished, year, change):
 def updateStatesDuration(df, state, finished, year, change):
     df_temp = df
     if not state == None:
-        df_temp = frame.getStateDataFrame(df_temp, state)
+        df_temp = frame.getTypeDataFrame(df_temp, 'etichetta', state)
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
 def updatePhasesDuration(df, phase, finished, year, change):
     df_temp = df
     if not phase == None:
-        df_temp = frame.getPhaseDataFrame(df_temp, phase)
+        df_temp = frame.getTypeDataFrame(df_temp, 'fase', phase)
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
 def updateEventsDuration(df, event, finished, year, change):
     df_temp = df
     if not event == None:
-        df_temp = frame.getEventDataFrame(df_temp, event)
+        df_temp = frame.getTypeDataFrame(df_temp, 'evento', event)
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
@@ -113,7 +113,7 @@ def durationProcessUpdate(df, finished, year, sequence, phase, change):
 
 def displayStatesDuration(df):
     years = frame.getAllYears(df)
-    states = frame.getAllStates(df)
+    states = frame.getUniques(df, 'etichetta')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
@@ -184,7 +184,7 @@ def durationStateUpdate(df, finished, state, year, change):
 
 def displayPhasesDuration(df):
     years = frame.getAllYears(df)
-    phases = frame.getAllPhases(df)
+    phases = frame.getUniques(df, 'fase')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
@@ -255,7 +255,7 @@ def durationPhaseUpdate(df, finished, phase, year, change):
 
 def displayEventsDuration(df):
     years = frame.getAllYears(df)
-    events = frame.getAllEvents(df)
+    events = frame.getUniques(df, 'evento')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)

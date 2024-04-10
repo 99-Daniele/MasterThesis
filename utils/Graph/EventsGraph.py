@@ -8,7 +8,7 @@ def updateEvents(df, startDate, endDate, events):
     if not (startDate == None or endDate == None):
         df = frame.getDateDataFrame(df, startDate, endDate)
     if not (events == None or len(events) == 0):
-        df = frame.getEventsDataFrame(df, events)
+        df = frame.getTypesDataFrame(df, 'evento', events)
     return df
 
 def displayEvents(df, importantEventsType):

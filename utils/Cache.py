@@ -1,23 +1,21 @@
 import utils.DatabaseConnection as connect
 import utils.FileOperation as file
-import utils.Getters as getter
 
-def getCacheData(func):
-    cache = file.getDataFromJsonFileWithTranslation('utils/cache.json')
-
-    def wrapper(*args):
-        id = args[0]
-        if id in cache.keys():
-            return cache.get(id)
-        else:
-            result = func(*args)
-            cache.update({id: result})
-            file.writeOnJsonFileWithTranslation('utils/cache.json', cache)
-            return result
-    return wrapper
-
-@getCacheData
-def getData(id, query):
+def updateCache(id, cache, query):
+    cacheData = getData(id, query)
+    cacheData = [tuple(x) for x in cacheData]
     connection = connect.getDatabaseConnection()
-    data = connect.getDataFromDatabase(connection, query)
-    return data
+    databaseData = connect.getDataFromDatabase(connection, query)
+    if set(cacheData) != set(databaseData):
+        cache.update({id: databaseData})
+        file.writeOnJsonFileWithTranslation('utils/cache.json', cache)
+
+def getData(id, query):
+    cache = file.getDataFromJsonFileWithTranslation('utils/cache.json')
+    if id in cache.keys():
+        return cache.get(id)
+    else:
+        connection = connect.getDatabaseConnection()
+        data = connect.getDataFromDatabase(connection, query)
+        updateCache(id, data, cache)
+        return data

@@ -3,10 +3,9 @@ def refreshData():
     import utils.DataUpdate as update
     import utils.FileOperation as file
     import utils.Getters as getter
-    file.removeFile('utils/cache.json')
     connection = connect.getDatabaseConnection()
     update.refreshData(connection)
-    getter.runAllGetters()
+    getter.updateCache()
 
 def displayEvents():
     import utils.Getters as getter
@@ -92,4 +91,4 @@ def startApp():
     app.run_server(debug = True)
 
 if __name__ == '__main__':
-    displayComparation()
+    refreshData()

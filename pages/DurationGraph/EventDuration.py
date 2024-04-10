@@ -11,7 +11,7 @@ df = getter.getEventsDuration()
 
 def pageLayout():
     years = frame.getAllYears(df)
-    events = frame.getAllEvents(df)
+    events = frame.getUniques(df, 'evento')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([

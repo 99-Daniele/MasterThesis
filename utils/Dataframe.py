@@ -16,6 +16,7 @@ def createEventsDataFrame(events):
     sections = []
     finished = []
     changes = []
+    startProcessDates = []
     finishedEventProcesses = []
     for e in events:
         if e[2] != '5' or e[0] not in finishedEventProcesses:
@@ -35,9 +36,10 @@ def createEventsDataFrame(events):
                 changes.append("SI")
             else:
                 changes.append("NO")
+            startProcessDates.append(e[13])
             if e[2] == '5':
                 finishedEventProcesses.append(e[0])
-    return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "evento": tagEvents, "numEvento": eIds})
+    return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "evento": tagEvents, "numEvento": eIds, "dataInizioProcesso": startProcessDates})
 
 def createProcessesDurationDataFrame(processes):
     dates = []
@@ -317,35 +319,20 @@ def getAvgDataFrameByType(df, datetype, types, order):
             df2 = df2.sort_values(['data']).reset_index(drop = True)
             return [df1, df2, df3]
         
-def getTypesDataFrame(df, type, types):
+def getTypesDataFrame(df, tag, types):
     if types == None or len(types) == 0:
         return df
-    return df[df[type].isin(types)]
+    return df[df[tag].isin(types)]
+
+def getTypeDataFrame(df, tag, type):
+    if type == None:
+        return df
+    return df[df[tag] == type]
 
 def getYearDataFrame(df, years):
     if years == None or len(years) == 0:
         return df
     return df[df['data'].dt.year.isin(years)]
-
-def getStateDataFrame(df, state):
-    if state == None:
-        return df
-    return df[df['etichetta'] == state]
-
-def getPhaseDataFrame(df, phase):
-    if phase == None:
-        return df
-    return df[df['fase'] == phase]
-
-def getEventDataFrame(df, event):
-    if event == None:
-        return df
-    return df[df['evento'] == event]
-
-def getEventsDataFrame(df, events):
-    if (events == None or len(events) == 0):
-        return df
-    return df[df['evento'].isin(events)]
 
 def getDateDataFrame(df, startDate, endDate):
     if startDate == None or endDate == None:
@@ -360,43 +347,12 @@ def getAllYears(df):
     years = df_temp.unique()
     return years
 
-def getAllStates(df):
-    df_temp = df['etichetta']
-    states = df_temp.unique()
-    return states
+def getUniques(df, tag):
+    df_temp = df[tag]
+    types = df_temp.unique()
+    return types
 
-def getAllPhases(df):
-    df_temp = df['fase']
-    phases = df_temp.unique()
-    return phases
-
-def getAllEvents(df):
-    df_temp = df['evento']
-    events = df_temp.unique()
-    return events
-
-def getJudges(df):
+def getGroupBy(df, tag):
     df_temp = df
-    judges = df_temp.groupby(['giudice'])['giudice'].size().sort_values(ascending = False).reset_index(name = 'count')['giudice']
-    return judges
-
-def getSubjects(df):
-    df_temp = df
-    subjects = df_temp.groupby(['materia'])['materia'].size().sort_values(ascending = False).reset_index(name = 'count')['materia']
-    return subjects
-
-def getSections(df):
-    df_temp = df
-    subjects = df_temp.groupby(['sezione'])['sezione'].size().sort_values(ascending = False).reset_index(name = 'count')['sezione']
-    return subjects
-
-def getSequences(df):
-    df_temp = df
-    sequences = df_temp.groupby(['sequenza'])['sequenza'].size().sort_values(ascending = False).reset_index(name = 'count')['sequenza']
-    return sequences
-
-def getPhaseSequences(df):
-    df_temp = df
-    phaseSequences = df_temp.groupby(['fasi'])['fasi'].size().sort_values(ascending = False).reset_index(name = 'count')['fasi']
-    return phaseSequences
-
+    types = df_temp.groupby([tag])[tag].size().sort_values(ascending = False).reset_index(name = 'count')[tag]
+    return types

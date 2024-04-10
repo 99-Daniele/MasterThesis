@@ -10,11 +10,11 @@ import utils.Utilities as utilities
 df = getter.getProcessesDuration()
 
 def pageLayout():
-    sections = frame.getSections(df)
-    subjects = frame.getSubjects(df)
-    judges = frame.getJudges(df)
-    sequences = frame.getSequences(df)
-    phaseSequences = frame.getPhaseSequences(df)
+    sections = frame.getGroupBy(df, 'sezione')
+    subjects = frame.getGroupBy(df, 'materia')
+    judges = frame.getGroupBy(df, 'giudice')
+    subjects = frame.getGroupBy(df, 'sequenza')
+    phaseSequences = frame.getGroupBy(df, 'fasi')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([

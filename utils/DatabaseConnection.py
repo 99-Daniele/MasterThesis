@@ -114,11 +114,20 @@ def dropView(connection, view):
     query = "DROP VIEW " + view
     executeQuery(connection, query)
 
-def updateTable(connection, table, tuples):
+def updateTable(connection, table, dataInfo, condition):
     if not doesATableExist(connection, table):
         raise Exception("\nYou can't update this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
-    clearTable(connection, table)
-    insertIntoDatabase(connection, table, tuples)
+    removeFromDatabase(connection, table, dataInfo[1], condition)
+    connection.commit()
+    insertIntoDatabase(connection, table, dataInfo[0])
+    connection.commit()
+
+def updateTableMultiple(connection, table, dataInfo, condition):
+    if not doesATableExist(connection, table):
+        raise Exception("\nYou can't update this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
+    removeFromDatabaseMultiple(connection, table, dataInfo[1], condition)
+    connection.commit()
+    insertIntoDatabase(connection, table, dataInfo[0])
     connection.commit()
 
 def clearTable(connection, table):
@@ -130,12 +139,31 @@ def clearTable(connection, table):
 def insertIntoDatabase(connection, table, tuples):
     if not doesATableExist(connection, table):
         raise Exception("\nYou can't insert into this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
-    with alive_bar(int(len(tuples))) as bar:
-        length = len(tuples[0])
-        filler = createFiller(length)
-        for t in tuples:
-            query = ("INSERT INTO {} VALUES" + filler).format(table)
-            executeQueryWithValues(connection, query, t)
+    if len(tuples) > 0:
+        with alive_bar(int(len(tuples))) as bar:
+            length = len(tuples[0])
+            filler = createFiller(length)
+            for t in tuples:
+                query = ("INSERT INTO {} VALUES" + filler).format(table)
+                executeQueryWithValues(connection, query, t)
+                bar()
+
+def removeFromDatabase(connection, table, ids, condition):
+    if not doesATableExist(connection, table):
+        raise Exception("\nYou can't delete from this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
+    with alive_bar(int(len(ids))) as bar:
+        for id in ids:
+            query = ("DELETE FROM {} WHERE " + condition + " = " + str(id)).format(table)
+            executeQuery(connection, query)
+            bar()
+
+def removeFromDatabaseMultiple(connection, table, conditions, condition):
+    if not doesATableExist(connection, table):
+        raise Exception("\nYou can't delete from this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
+    with alive_bar(int(len(conditions))) as bar:
+        for c in conditions:
+            query = ("DELETE FROM {} WHERE " + condition + " = " + str(c[0]) + " AND ordine = " + str(c[1])).format(table)
+            executeQuery(connection, query)
             bar()
 
 def createFiller(length):
@@ -144,4 +172,3 @@ def createFiller(length):
         filler = filler + "%s, "
     filler = filler + "%s)"
     return filler
-

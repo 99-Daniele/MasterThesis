@@ -1,7 +1,8 @@
+from collections import OrderedDict
+
 import utils.DatabaseConnection as connect
 import utils.FileOperation as file
 import utils.Getters as getter
-import utils.Utilities as utilities
 
 def refreshData(connection):
     verifyDatabase(connection)
@@ -17,13 +18,20 @@ def refreshData(connection):
     statesDuration = calcStatesDuration(processStateEvents, eventsDuration)
     courtHearingsDuration = calcCourtHearingsDuration(processCourtHearingEvents)
     [processDuration, processSequence] = calcProcessesInfo(processEvents)
-    connect.updateTable(connection, 'eventitipo', eventsFiltered)
-    connect.updateTable(connection, 'durataeventi', list(eventsDuration.values()))
-    connect.updateTable(connection, 'duratafasi', phasesDuration)
-    connect.updateTable(connection, 'duratastati', statesDuration)
-    connect.updateTable(connection, 'durataprocessi', processDuration)
-    connect.updateTable(connection, 'durataudienze', courtHearingsDuration)
-    connect.updateTable(connection, 'processitipo', processSequence)
+    eventsFilteredInfo = compareData(eventsFiltered, connection, "SELECT * FROM eventitipo ORDER BY numEvento")
+    eventsDurationInfo = compareData(list(eventsDuration.values()), connection, "SELECT * FROM durataeventi ORDER BY numEvento")
+    phasesDurationInfo = compareDataMultiple(phasesDuration, connection, "SELECT * FROM duratafasi ORDER BY numProcesso, ordine", 2)
+    statesDurationInfo = compareDataMultiple(statesDuration, connection, "SELECT * FROM duratastati ORDER BY numProcesso, ordine", 3)
+    processDurationInfo = compareData(processDuration, connection, "SELECT * FROM durataprocessi ORDER BY numProcesso")
+    courtHearingsDurationInfo = compareData(courtHearingsDuration, connection, "SELECT * FROM durataudienze ORDER BY numProcesso")
+    processSequenceInfo = compareData(processSequence, connection, "SELECT * FROM processitipo ORDER BY numProcesso")
+    connect.updateTable(connection, 'eventitipo', eventsFilteredInfo, 'numEvento')
+    connect.updateTable(connection, 'durataeventi', eventsDurationInfo, 'numEvento')
+    connect.updateTableMultiple(connection, 'duratafasi', phasesDurationInfo, 'numProcesso')
+    connect.updateTableMultiple(connection, 'duratastati', statesDurationInfo, 'numProcesso')
+    connect.updateTable(connection, 'durataprocessi', processDurationInfo, 'numProcesso')
+    connect.updateTable(connection, 'durataudienze', courtHearingsDurationInfo, 'numProcesso')
+    connect.updateTable(connection, 'processitipo', processSequenceInfo, 'numProcesso')
 
 def filterEvents(events):
     eventsFiltered = []
@@ -39,7 +47,8 @@ def groupEventsByProcess(events):
             processes.update({e[4]: [e]})
         else:
             p.append(e)
-    return processes
+    processesOrdered = OrderedDict(sorted(processes.items()))
+    return processesOrdered
 
 def groupEventsByProcessPhase(processEvents):
     processPhaseEvents = {}
@@ -64,7 +73,8 @@ def groupCourtHearingByProcess(events, courtHearingsType):
                 processes.update({e[4]: [e]})
             else:
                 p.append(e)
-    return processes
+    processesOrdered = OrderedDict(sorted(processes.items()))
+    return processesOrdered
 
 def addIDEvent(p, ID):
     flag = p[0][ID]
@@ -96,7 +106,8 @@ def calcEventsDuration(processEvents):
                 nextEvent = getNextEvent(e, events[i + 1:], events[i - 1][5])
             eventsDuration.update({e[0]: (e[0], (nextEvent[5] - e[5]).days, e[5], nextEvent[5])})
             i = i + 1
-    return eventsDuration
+    eventsDurationOrderer = OrderedDict(sorted(eventsDuration.items()))
+    return eventsDurationOrderer
 
 def getNextEvent(event, events, prevDate):
     if event[3] == '5':
@@ -245,3 +256,55 @@ def verifyDatabase(connection):
     if not connect.doesAViewExist(connection, "processicambiogiudice"):
         query = "CREATE VIEW processiCambioGiudice AS SELECT numProcesso, (CASE WHEN numProcesso IN (SELECT pc.numProcesso FROM ((SELECT numProcesso FROM eventi AS e WHERE (giudice <> 'null') GROUP BY numProcesso HAVING (COUNT(DISTINCT giudice) > 1)) AS e, processi AS pc) WHERE (e.numProcesso = pc.numProcesso)) THEN 1 ELSE 0 END) AS cambioGiudice FROM processi"
         connect.createView(connection, 'processiCambioGiudice', query)
+
+def compareData(data, connection, query):
+    databaseDate = connect.getDataFromDatabase(connection, query)
+    i = 0
+    j = 0
+    dataInfo = [[], []]
+    while i < len(data) and j < len(databaseDate):
+        if data[i][0] == databaseDate[j][0]:
+            if data[i] != databaseDate[j]:
+                dataInfo[0].append(data[i])
+                dataInfo[1].append(data[i][0])
+            i = i + 1
+            j = j + 1
+        elif data[i][0] > databaseDate[j][0]:
+            dataInfo[1].append(databaseDate[j][0])
+            j = j + 1
+        else:
+            dataInfo[0].append(data[i])
+            i = i + 1
+    while i < len(data):
+        dataInfo[0].append(data[i])
+        i = i + 1
+    while j < len(databaseDate):
+            dataInfo[1].append(databaseDate[j][0])
+            j = j + 1
+    return dataInfo
+
+def compareDataMultiple(data, connection, query, order):
+    databaseDate = connect.getDataFromDatabase(connection, query)
+    i = 0
+    j = 0
+    dataInfo = [[], []]
+    while i < len(data) and j < len(databaseDate):
+        if data[i][0] == databaseDate[j][0] and data[i][order] == databaseDate[j][order]:
+            if data[i] != databaseDate[j]:
+                dataInfo[0].append(data[i])
+                dataInfo[1].append([data[i][0], data[i][order]])
+            i = i + 1
+            j = j + 1
+        elif data[i][0] > databaseDate[j][0] or (data[i][0] == databaseDate[j][0] and data[i][order] > databaseDate[j][order]):
+            dataInfo[1].append([databaseDate[j][0], databaseDate[j][order]])
+            j = j + 1
+        else:
+            dataInfo[0].append(data[i])
+            i = i + 1
+    while i < len(data):
+        dataInfo[0].append(data[i])
+        i = i + 1
+    while j < len(databaseDate):
+            dataInfo[1].append([databaseDate[j][0], databaseDate[j][order]])
+            j = j + 1
+    return dataInfo
