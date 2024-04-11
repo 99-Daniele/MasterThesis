@@ -20,15 +20,15 @@ def refreshData(connection):
     [processDuration, processSequence] = calcProcessesInfo(processEvents)
     eventsFilteredInfo = compareData(eventsFiltered, connection, "SELECT * FROM eventitipo ORDER BY numEvento")
     eventsDurationInfo = compareData(list(eventsDuration.values()), connection, "SELECT * FROM durataeventi ORDER BY numEvento")
-    phasesDurationInfo = compareDataMultiple(phasesDuration, connection, "SELECT * FROM duratafasi ORDER BY numProcesso, ordine", 2)
-    statesDurationInfo = compareDataMultiple(statesDuration, connection, "SELECT * FROM duratastati ORDER BY numProcesso, ordine", 3)
+    phasesDurationInfo = compareDataOrder(phasesDuration, connection, "SELECT * FROM duratafasi ORDER BY numProcesso, ordine", 2)
+    statesDurationInfo = compareDataOrder(statesDuration, connection, "SELECT * FROM duratastati ORDER BY numProcesso, ordine", 3)
     processDurationInfo = compareData(processDuration, connection, "SELECT * FROM durataprocessi ORDER BY numProcesso")
     courtHearingsDurationInfo = compareData(courtHearingsDuration, connection, "SELECT * FROM durataudienze ORDER BY numProcesso")
     processSequenceInfo = compareData(processSequence, connection, "SELECT * FROM processitipo ORDER BY numProcesso")
     connect.updateTable(connection, 'eventitipo', eventsFilteredInfo, 'numEvento')
     connect.updateTable(connection, 'durataeventi', eventsDurationInfo, 'numEvento')
-    connect.updateTableMultiple(connection, 'duratafasi', phasesDurationInfo, 'numProcesso')
-    connect.updateTableMultiple(connection, 'duratastati', statesDurationInfo, 'numProcesso')
+    connect.updateTableOrder(connection, 'duratafasi', phasesDurationInfo, 'numProcesso')
+    connect.updateTableOrder(connection, 'duratastati', statesDurationInfo, 'numProcesso')
     connect.updateTable(connection, 'durataprocessi', processDurationInfo, 'numProcesso')
     connect.updateTable(connection, 'durataudienze', courtHearingsDurationInfo, 'numProcesso')
     connect.updateTable(connection, 'processitipo', processSequenceInfo, 'numProcesso')
@@ -127,15 +127,17 @@ def getLastEvent(events):
     while endDate < startDate:
         i = i - 1
         endDate = events[i][5]
-    return endDate
+    return events[i]
 
 def calcPhasesDuration(processEvents, eventDuration):
     phasesDuration = []
     for p in processEvents.keys():
         for process in processEvents.get(p):
             startDate = eventDuration.get(process[2][0][0])[2]
+            startEventId = eventDuration.get(process[2][0][0])[0]
             endDate = eventDuration.get(process[2][-1][0])[3]
-            phasesDuration.append((p, process[0], process[1], (endDate - startDate).days, startDate, endDate))
+            endEventId = eventDuration.get(process[2][-1][0])[0]
+            phasesDuration.append((p, process[0], process[1], (endDate - startDate).days, startDate, endDate, startEventId, endEventId))
     return phasesDuration
 
 def calcStatesDuration(processEvents, eventDuration):
@@ -143,9 +145,11 @@ def calcStatesDuration(processEvents, eventDuration):
     for p in processEvents.keys():
         for process in processEvents.get(p):
             startDate = eventDuration.get(process[2][0][0])[2]
+            startEventId = eventDuration.get(process[2][0][0])[0]
             endDate = eventDuration.get(process[2][-1][0])[3]
+            endEventId = eventDuration.get(process[2][-1][0])[0]
             tag = process[2][0][6]
-            statesDuration.append((p, tag, process[0], process[1], (endDate - startDate).days, startDate, endDate))
+            statesDuration.append((p, tag, process[0], process[1], (endDate - startDate).days, startDate, endDate, startEventId, endEventId))
     return statesDuration
 
 def calcCourtHearingsDuration(processEvents):
@@ -153,22 +157,27 @@ def calcCourtHearingsDuration(processEvents):
     for p in processEvents.keys():
         events = processEvents.get(p)
         startDate = events[0][5]
-        endDate = getLastEvent(events)
-        courtHearingDuration.append((p, (endDate - startDate).days, startDate, endDate))
+        startEventId = events[0][0]
+        lastEvent = getLastEvent(events)
+        endDate = lastEvent[5]
+        endEventId = lastEvent[0]
+        courtHearingDuration.append((p, (endDate - startDate).days, startDate, endDate, startEventId, endEventId))
     return courtHearingDuration
 
 def calcProcessesInfo(processEvents):
     processDuration = []
     processSequence = []
     for p in processEvents.keys():
-        [startDate, endDate, processType, originalSequence, translatedSequence, finalSequence, phaseSequence] = getProcessInfo(processEvents.get(p))
-        processDuration.append((p, (endDate - startDate).days, startDate, endDate))
+        [startDate, endDate, startEventId, endEventId, processType, originalSequence, translatedSequence, finalSequence, phaseSequence] = getProcessInfo(processEvents.get(p))
+        processDuration.append((p, (endDate - startDate).days, startDate, endDate, startEventId, endEventId))
         processSequence.append((p, processType, fromListToString(originalSequence), fromListToString(translatedSequence), fromListToString(finalSequence), fromListToString(phaseSequence)))
     return [processDuration, processSequence]
 
 def getProcessInfo(events):
     startDate = events[0][5]
+    startEventId = events[0][0]
     endDate = events[-1][5]
+    endEventId = events[-1][0]
     find = False
     phase = 0
     processType = -1
@@ -177,12 +186,12 @@ def getProcessInfo(events):
     finalSequence = []
     phaseSequence = []
     for e in events:
-        [endDate, processType, find, phase] = getSequences(e, endDate, processType, find, phase, originalSequence, translatedSequence, finalSequence, phaseSequence)
+        [endDate, endEventId, processType, find, phase] = getSequences(e, endDate, endEventId, processType, find, phase, originalSequence, translatedSequence, finalSequence, phaseSequence)
         if processType == -1:
             phaseSequence = [0]
-    return [startDate, endDate, processType, originalSequence, translatedSequence, finalSequence, phaseSequence]
+    return [startDate, endDate, startEventId, endEventId, processType, originalSequence, translatedSequence, finalSequence, phaseSequence]
 
-def getSequences(e, endDate, processType, find, phase, originalSequence, translatedSequence, finalSequence, phaseSequence):
+def getSequences(e, endDate, endEventId, processType, find, phase, originalSequence, translatedSequence, finalSequence, phaseSequence):
     if not e[3].isdigit() and (len(finalSequence) == 0 or finalSequence[-1] != e[7] and not find):
         finalSequence.append(e[7])
     if e[3].isdigit() and not find:
@@ -198,6 +207,7 @@ def getSequences(e, endDate, processType, find, phase, originalSequence, transla
             phase = int(e[3])
         if int(e[3]) == 5:
             endDate = e[5]
+            endEventId = e[0]
             if e[7] == "FINE":
                 processType = 1
             else:
@@ -209,7 +219,7 @@ def getSequences(e, endDate, processType, find, phase, originalSequence, transla
     elif e[2] != originalSequence[-1]:
         originalSequence.append(e[2])
         translatedSequence.append(e[6])
-    return [endDate, processType, find, phase]
+    return [endDate, endEventId, processType, find, phase]
 
 def fromListToString(list):
     string = ",".join(str(l) for l in list)
@@ -228,26 +238,38 @@ def verifyDatabase(connection):
         connect.createTable(connection, 'eventinome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
         eventsName = file.getDataFromTextFile('utils/Preferences/eventsName.txt')
         connect.insertIntoDatabase(connection, 'eventinome', eventsName)
+    else:
+        eventsName = file.getDataFromTextFile('utils/Preferences/eventsName.txt')
+        eventsNameInfo = compareData(eventsName, connection, "SELECT * FROM eventinome ORDER BY codice")
+        connect.updateTable(connection, 'eventinome', eventsNameInfo, 'codice')
     if not connect.doesATableExist(connection, "materienome"):
         connect.createTable(connection, 'materienome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
         subjectsName = file.getDataFromTextFile('utils/Preferences/subjectsName.txt')
         connect.insertIntoDatabase(connection, 'materienome', subjectsName)
+    else:
+        subjectsName = file.getDataFromTextFile('utils/Preferences/subjectsName.txt')
+        subjectsNameInfo = compareData(subjectsName, connection, "SELECT * FROM materienome ORDER BY codice")
+        connect.updateTable(connection, 'materienome', subjectsNameInfo, 'codice')
     if not connect.doesATableExist(connection, "statinome"):
         connect.createTable(connection, 'statinome', ['stato', 'etichetta', 'abbreviazione', 'fase'], ['VARCHAR(5)', 'TEXT', 'VARCHAR(10)', 'VARCHAR(5)'], [0], [])
         statesName = file.getDataFromTextFile('utils/Preferences/statesName.txt')
         connect.insertIntoDatabase(connection, 'statinome', statesName)
+    else:
+        statesName = file.getDataFromTextFile('utils/Preferences/statesName.txt')
+        statesNameInfo = compareData(statesName, connection, "SELECT * FROM statinome ORDER BY stato")
+        connect.updateTable(connection, 'statinome', statesNameInfo, 'stato')
     if not connect.doesATableExist(connection, "eventitipo"):
         connect.createTable(connection, 'eventitipo', ['numEvento', 'evento', 'stato', 'fase'], ['BIGINT', 'TEXT', 'TEXT', 'VARCHAR(5)'], [0], [])
     if not connect.doesATableExist(connection, "durataeventi"):
         connect.createTable(connection, 'durataeventi', ['numEvento', 'durata', 'dataInizio', 'dataFine'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME'], [0], [])
     if not connect.doesATableExist(connection, "duratafasi"):
-        connect.createTable(connection, 'duratafasi', ['numProcesso', 'fase', 'ordine', 'durata', 'dataInizioFase', 'dataFineFase'], ['BIGINT', 'VARCHAR(5)', 'INT', 'INT', 'DATETIME', 'DATETIME'], [0, 2], [])
+        connect.createTable(connection, 'duratafasi', ['numProcesso', 'fase', 'ordine', 'durata', 'dataInizioFase', 'dataFineFase', 'numEventoInizioFase', 'numEventoFineFase'], ['BIGINT', 'VARCHAR(5)', 'INT', 'INT', 'DATETIME', 'DATETIME', 'BIGINT', 'BIGINT'], [0, 2], [])
     if not connect.doesATableExist(connection, "duratastati"):
-        connect.createTable(connection, 'duratastati', ['numProcesso', 'etichetta', 'stato', 'ordine', 'durata', 'dataInizioStato', 'dataFineStato'], ['BIGINT', 'TEXT', 'VARCHAR(10)', 'INT', 'INT', 'DATETIME', 'DATETIME'], [0, 3], [])
+        connect.createTable(connection, 'duratastati', ['numProcesso', 'etichetta', 'stato', 'ordine', 'durata', 'dataInizioStato', 'dataFineStato', 'numEventoInizioStato', 'numEventoFineStato'], ['BIGINT', 'TEXT', 'VARCHAR(10)', 'INT', 'INT', 'DATETIME', 'DATETIME', 'BIGINT', 'BIGINT'], [0, 3], [])
     if not connect.doesATableExist(connection, "durataprocessi"):
-        connect.createTable(connection, 'durataprocessi', ['numProcesso', 'durata', 'dataInizioProcesso', 'dataFineProcesso'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME'], [0], [])
+        connect.createTable(connection, 'durataprocessi', ['numProcesso', 'durata', 'dataInizioProcesso', 'dataFineProcesso', 'numEventoInizioProcesso', 'numEventoFineProcesso'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME', 'BIGINT', 'BIGINT'], [0], [])
     if not connect.doesATableExist(connection, "durataudienze"):
-        connect.createTable(connection, 'durataudienze', ['numProcesso', 'durata', 'dataInizioUdienza', 'dataFineUdienza'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME'], [0], [])
+        connect.createTable(connection, 'durataudienze', ['numProcesso', 'durata', 'dataInizioUdienza', 'dataFineUdienza', 'numEventoInizioUdienza', 'numEventoFineUdienza'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME', 'BIGINT', 'BIGINT'], [0], [])
     if not connect.doesATableExist(connection, "processitipo"):
         connect.createTable(connection, 'processitipo', ['numProcesso', 'processofinito', 'sequenzaStati', 'sequenzaTradotta', 'sequenzaCorta', 'sequenzaFasi'], ['BIGINT', 'INT', 'TEXT', 'TEXT','TEXT','TEXT'], [0], [])
     if not connect.doesAViewExist(connection, "aliasgiudice"):
@@ -279,11 +301,11 @@ def compareData(data, connection, query):
         dataInfo[0].append(data[i])
         i = i + 1
     while j < len(databaseDate):
-            dataInfo[1].append(databaseDate[j][0])
-            j = j + 1
+        dataInfo[1].append(databaseDate[j][0])
+        j = j + 1
     return dataInfo
 
-def compareDataMultiple(data, connection, query, order):
+def compareDataOrder(data, connection, query, order):
     databaseDate = connect.getDataFromDatabase(connection, query)
     i = 0
     j = 0

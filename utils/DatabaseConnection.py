@@ -122,10 +122,10 @@ def updateTable(connection, table, dataInfo, condition):
     insertIntoDatabase(connection, table, dataInfo[0])
     connection.commit()
 
-def updateTableMultiple(connection, table, dataInfo, condition):
+def updateTableOrder(connection, table, dataInfo, condition):
     if not doesATableExist(connection, table):
         raise Exception("\nYou can't update this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
-    removeFromDatabaseMultiple(connection, table, dataInfo[1], condition)
+    removeFromDatabaseOrder(connection, table, dataInfo[1], condition)
     connection.commit()
     insertIntoDatabase(connection, table, dataInfo[0])
     connection.commit()
@@ -153,11 +153,13 @@ def removeFromDatabase(connection, table, ids, condition):
         raise Exception("\nYou can't delete from this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
     with alive_bar(int(len(ids))) as bar:
         for id in ids:
-            query = ("DELETE FROM {} WHERE " + condition + " = " + str(id)).format(table)
+            if not isinstance(id, str):
+                id = str(id)
+            query = ("DELETE FROM {} WHERE " + condition + " = '" + id + "'").format(table)
             executeQuery(connection, query)
             bar()
 
-def removeFromDatabaseMultiple(connection, table, conditions, condition):
+def removeFromDatabaseOrder(connection, table, conditions, condition):
     if not doesATableExist(connection, table):
         raise Exception("\nYou can't delete from this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
     with alive_bar(int(len(conditions))) as bar:
