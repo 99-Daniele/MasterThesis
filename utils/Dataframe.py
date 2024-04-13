@@ -39,7 +39,7 @@ def createEventsDataFrame(events):
             startProcessDates.append(e[13])
             if e[2] == '5':
                 finishedEventProcesses.append(e[0])
-    return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "evento": tagEvents, "numEvento": eIds, "dataInizioProcesso": startProcessDates, "stato": tagStates})
+    return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "evento": tagEvents, "numEvento": eIds, "dataInizioProcesso": startProcessDates, "stato": tagStates, "giudice": judges, "sezione": sections, "materia": subjects})
 
 def createProcessesDurationDataFrame(processes):
     dates = []

@@ -8,19 +8,19 @@ import utils.Utilities as utilities
 def updateFinishYearChangeDuration(df, finished, year, change):
     df_temp = df
     if not (finished == None or len(finished) == 0):
-        df_temp = frame.getFinishedDataFrame(df_temp, finished)
+        df_temp = frame.getTypesDataFrame(df_temp, 'finito', finished)
     if not (year == None or len(year) == 0):
         df_temp = frame.getYearDataFrame(df_temp, year)
     if not (change == None or len(change) == 0):
-        df_temp = frame.getChangeJudgeDataFrame(df_temp, change)
+        df_temp = frame.getTypesDataFrame(df_temp, 'cambio', change)
     return df_temp
 
 def updateProcessesDuration(df, sequences, phases, finished, year, change):
     df_temp = df
     if not (sequences == None or len(sequences) == 0):
-        df_temp = frame.getSequencesDataFrame(df_temp, sequences)
+        df_temp = frame.getTypesDataFrame(df_temp, 'sequenza', sequences)
     if not (phases == None or len(phases) == 0):
-        df_temp = frame.getPhaseSequencesDataFrame(df_temp, phases)
+        df_temp = frame.getTypesDataFrame(df_temp, 'fasi', phases)
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
