@@ -4,15 +4,8 @@ import plotly.express as px
 import utils.Dataframe as frame
 import utils.Utilities as utilities
 
-def updateEvents(df, startDate, endDate, events):
-    if not (startDate == None or endDate == None):
-        df = frame.getDateDataFrame(df, startDate, endDate)
-    if not (events == None or len(events) == 0):
-        df = frame.getTypesDataFrame(df, 'evento', events)
-    return df
-
-def displayEvents(df, importantEventsType):
-    fig = px.scatter(df, x = "data", y = "numProcesso", color = "fase", color_discrete_sequence = utilities.phaseColorList(df), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 600)
+def displayEvents(df, type, mustEvents):
+    fig = px.scatter(df, x = "data", y = "numProcesso", color = type, labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 1200)
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.H2('EVENTI DEL PROCESSO'),
@@ -25,22 +18,20 @@ def displayEvents(df, importantEventsType):
             display_format = 'DD MM YYYY',
             style = {'width': 300}
         ),
-        ds.dcc.Dropdown(importantEventsType, multi = True, id = 'event-dropdown', placeholder = 'Seleziona tipo di evento...', style = {'width': 300}),
         ds.dcc.Graph(figure = fig, id = 'events-graph')
     ])
     @app.callback(
         ds.Output('events-graph', 'figure'),
         [ds.Input('event-dateranger', 'start_date'), 
-         ds.Input('event-dateranger', 'end_date'), 
-         ds.Input('event-dropdown', 'value')])
-    def updateOutput(startDate, endDate, event):
-         return eventUpdate(df, startDate, endDate, event)
+         ds.Input('event-dateranger', 'end_date')])
+    def updateOutput(startDate, endDate):
+         return eventUpdate(df, startDate, endDate, type, mustEvents)
     app.run_server(debug = True)
 
-def eventUpdate(df, startDate, endDate, event):
+def eventUpdate(df, startDate, endDate, type, mustEvents):
     df_temp = df.copy()
-    df_temp = updateEvents(df_temp, startDate, endDate, event)
-    fig = px.scatter(df_temp, x = "data", y = "numProcesso", color = 'fase', color_discrete_sequence = utilities.phaseColorList(df_temp), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, height = 700)
+    df_temp = frame.getDateDataFrame(df, startDate, endDate)
+    fig = px.scatter(df_temp, x = "data", y = "numProcesso", color = type, color_discrete_sequence = utilities.phaseColorList(df_temp, type), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, height = 1200)
     fig.update_layout(
         legend = dict(
             yanchor = "top",
@@ -63,7 +54,7 @@ def eventUpdate(df, startDate, endDate, event):
                 x = 0.99,
             ),
             rangeslider = dict(
-                visible = True
+                visible = False
             ),
             type = "date"
         ),
@@ -76,4 +67,6 @@ def eventUpdate(df, startDate, endDate, event):
         tickformat = "%b\n%Y",
         ticklabelmode = "period"
     )   
+    fig.update_layout(legend = dict(xanchor = "left", x = 0.1))
+    fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name not in mustEvents else False))
     return fig

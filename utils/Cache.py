@@ -7,8 +7,11 @@ def updateCache(id, cache, query):
     connection = connect.getDatabaseConnection()
     databaseData = connect.getDataFromDatabase(connection, query)
     if set(cacheData) != set(databaseData):
-        cache.update({id: databaseData})
-        file.writeOnJsonFileWithTranslation('utils/cache.json', cache)
+         cacheUpdate(id, databaseData, cache)
+
+def cacheUpdate(id, data, cache):
+    cache.update({id: data})
+    file.writeOnJsonFileWithTranslation('utils/cache.json', cache)
 
 def getData(id, query):
     cache = file.getDataFromJsonFileWithTranslation('utils/cache.json')
@@ -17,5 +20,5 @@ def getData(id, query):
     else:
         connection = connect.getDatabaseConnection()
         data = connect.getDataFromDatabase(connection, query)
-        updateCache(id, data, cache)
+        cacheUpdate(id, data, cache)
         return data

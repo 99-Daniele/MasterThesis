@@ -7,12 +7,15 @@ daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Saba
 colors = ['grey', 'blue', 'orange', 'red', 'green', 'purple']
 processState = ['NON FINITO', 'FINITO', 'STOPPATO', 'IN STALLO']
 
-def phaseColorList(df):
-    phases = df['fase'].unique().tolist()
+def phaseColorList(df, type):
+    types = df[type].unique().tolist()
     c = []
-    for p in phases:
-        if p != '-':
-            c.append(colors[int(p)])
+    for t in types:
+        df_count = df[df[type] == t].groupby(['fase'], as_index = False).count()
+        max = df_count['data'].max()
+        phase = df_count[df_count['data'] == max]['fase'].item()
+        if phase != '-':
+            c.append(colors[int(phase)])
         else:
             c.append('rgba(0, 0, 0, 0)')
     return c

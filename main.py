@@ -12,8 +12,23 @@ def displayEvents():
     import utils.Graph.EventsGraph as event
     import utils.FileOperation as file
     importantEvents = getter.getImportantEvents()
-    importantEventsType = file.getDataFromTextFile('utils\Preferences\importantEvents.txt')
-    event.displayEvents(importantEvents, importantEventsType)
+    mustEvents = file.getDataFromTextFile('utils\Preferences\mustEvents.txt')
+    event.displayEvents(importantEvents, 'evento', mustEvents)
+
+def displayPhaseEvents():
+    import utils.Getters as getter
+    import utils.Graph.EventsGraph as event
+    phaseEvents = getter.getPhaseEvents()
+    mustEvents = ['1', '2', '3', '4']
+    event.displayEvents(phaseEvents, 'fase', mustEvents)
+
+def displayStateEvents():
+    import utils.Getters as getter
+    import utils.Graph.EventsGraph as event
+    import utils.FileOperation as file
+    stateEvents = getter.getStateEvents()
+    musStates = file.getDataFromTextFile('utils\Preferences\mustStates.txt')
+    event.displayEvents(stateEvents, 'stato', musStates)
     
 def displayDuration():
     import utils.Getters as getter
@@ -91,4 +106,4 @@ def startApp():
     app.run_server(debug = True)
 
 if __name__ == '__main__':
-    refreshData()
+    displayEvents()

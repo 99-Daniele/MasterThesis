@@ -1,6 +1,6 @@
-- confronto finito e non finito
-- durata fasi finite sia per processi finiti e non finiti
+- durata fasi e udienze confronto
 - grafico eventi migliore (tipo quello precedente studente)
 - disponibile per accesso esterno --> descrizione nel readme
+- aggiustare pagine
 
 - screenshot cose significative e powerpoint
