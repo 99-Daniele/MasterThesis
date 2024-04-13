@@ -26,8 +26,9 @@ def getEvents():
     return eventsType
 
 def getTestEvents():
+    connection = connect.getDatabaseConnection()
     query = "SELECT e.numEvento AS numEvento, en.etichetta AS tipoEvento, s.stato AS codiceStato, s.fase AS faseStato, e.numProcesso AS numProcesso, e.data AS dataEvento, s.etichetta AS tipoStato, s.abbreviazione AS statoAbbr FROM eventi AS e, eventinome AS en, statinome AS s WHERE ((e.codice = en.codice) AND (e.statofinale = s.stato) AND (e.numProcesso = 109848 OR e.numProcesso = 109855 OR e.numProcesso = 109850 OR e.numProcesso = 109959)) ORDER BY e.numEvento"
-    eventsType = connect.getDataFromDatabase(query)
+    eventsType = connect.getDataFromDatabase(connection, query)
     return eventsType
 
 def getProcessesDuration():

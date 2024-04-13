@@ -95,7 +95,7 @@ def createStatesDurationsDataFrame(processes):
         tags.append(p[8])
         states.append(p[9])
         phases.append(p[10])
-    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "etichetta": tags, "fase": phases})
+    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "stato": tags, "fase": phases})
 
 def createPhasesDurationsDataFrame(processes):
     dates = []
@@ -220,7 +220,18 @@ def getAvgStdDataFrameByDate(df, type):
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
             return [df1, df2]
-        
+
+def getAvgStdDataFrameByType(df, type):
+    typeDuration = type.copy()
+    typeDuration.append('durata')
+    df1 = df[typeDuration].copy()
+    df2 = df1.groupby(type, as_index = False).mean()
+    df2['conteggio'] = df1.groupby(type).size().tolist()
+    df2['quantile'] = df1.groupby(type, as_index = False).quantile(0.75)['durata']
+    df1 = df1.sort_values(type).reset_index(drop = True)
+    df2 = df2.sort_values(type).reset_index(drop = True)
+    return [df1, df2]       
+
 def getAvgStdDataFrameByState(df):
     df1 = df[['etichetta', 'durata', 'fase']].copy()
     df2 = df1.groupby(['etichetta', 'fase'], as_index = False).mean()
@@ -255,6 +266,8 @@ def keepOnlyImportant(df, perc):
     df_temp = df_temp.sort_values(['conteggio'], ascending = False)
     i = 0
     sum = 0
+    if df_temp['conteggio'].items() == None:
+        return df
     while (i < 20 or sum < threshold) and i < len(list(df_temp['conteggio'].items())):
         sum = sum + list(df_temp['conteggio'].items())[i][1]
         i = i + 1
@@ -275,6 +288,8 @@ def getAvgDataFrameByType(df, datetype, types, order):
     df3 = df4[[types[0], 'conteggio', 'media']].copy()
     df3 = df3.rename(columns = {types[0]:'filtro'})
     i = 1
+    if types == None:
+        return None
     while i < len(types):
         df3['filtro'] = df3['filtro'] + " - " + df4[types[i]]
         i = i + 1
@@ -354,5 +369,5 @@ def getUniques(df, tag):
 
 def getGroupBy(df, tag):
     df_temp = df
-    types = df_temp.groupby([tag])[tag].size().sort_values(ascending = False).reset_index(name = 'count')[tag]
+    types = df_temp.groupby([tag])[tag].size().sort_values(ascending = False).reset_index(name = 'count')[tag].tolist()
     return types

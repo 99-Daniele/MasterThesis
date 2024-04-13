@@ -6,7 +6,7 @@ import utils.Getters as getter
 
 def refreshData(connection):
     verifyDatabase(connection)
-    events = getter.getEvents()
+    events = getter.getTestEvents()
     courtHearingsEventsType = str(tuple(file.getDataFromTextFile('utils/Preferences/courtHearingsEvents.txt')))
     eventsFiltered = filterEvents(events)
     processEvents = groupEventsByProcess(events)
@@ -54,6 +54,7 @@ def groupEventsByProcessPhase(processEvents):
     processPhaseEvents = {}
     for p in processEvents.keys():
         process = addIDEvent(processEvents.get(p), 3)
+        print(process)
         processPhaseEvents.update({p: process})
     return processPhaseEvents
 
@@ -76,13 +77,28 @@ def groupCourtHearingByProcess(events, courtHearingsType):
     processesOrdered = OrderedDict(sorted(processes.items()))
     return processesOrdered
 
+def getNrOfOrder(events, ID):
+    count = 1
+    flag = events[0][ID]
+    for e in events:
+        if e[ID] != flag:
+            flag = e[ID]
+            count = count + 1
+            if e[3] == '5':
+                return [count, True]
+    return [count, False]
+
 def addIDEvent(p, ID):
+    maxOrder = getNrOfOrder(p, ID)[0]
+    finished = getNrOfOrder(p, ID)[1]
     flag = p[0][ID]
     order = 2
     process = [[flag, 1, [p[0]]]]
     i = 1
     while i < len(p):
         if p[i][ID] != flag:
+            if order == maxOrder and finished == False:
+                return process
             process.append([p[i][ID], order, [p[i]]])
             flag = p[i][ID]
             order = order + 1

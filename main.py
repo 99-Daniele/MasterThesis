@@ -30,17 +30,23 @@ def displayStateEvents():
     musStates = file.getDataFromTextFile('utils\Preferences\mustStates.txt')
     event.displayEvents(stateEvents, 'stato', musStates)
     
-def displayDuration():
+def displayProcessDuration():
     import utils.Getters as getter
     import utils.Graph.DurationGraph as duration
     processes = getter.getProcessesDuration()
     duration.displayProcessesDuration(processes)
 
-def displayComparation():
+def displayPhaseDuration():
     import utils.Getters as getter
     import utils.Graph.ComparationGraph as comparation
-    processes = getter.getProcessesDuration()
-    comparation.displayComparation(processes, "MY")
+    phases = getter.getPhasesDuration()
+    comparation.displayTypeComparation(phases, "MY", "fase")
+
+def displayStateDuration():
+    import utils.Getters as getter
+    import utils.Graph.ComparationGraph as comparation
+    states = getter.getStateEvents()
+    comparation.displayTypeComparation(states, "MY", "stato")
 
 def startApp():
     import dash as ds
@@ -106,4 +112,4 @@ def startApp():
     app.run_server(debug = True)
 
 if __name__ == '__main__':
-    displayEvents()
+    displayPhaseDuration()

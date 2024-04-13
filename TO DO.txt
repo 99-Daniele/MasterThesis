@@ -1,5 +1,7 @@
 - durata fasi e stati confronto
+- screenshot cose significative e powerpoint
+
 - disponibile per accesso esterno --> descrizione nel readme
 - aggiustare pagine
-
-- screenshot cose significative e powerpoint
+- fare update
+- correggere grafico durata
