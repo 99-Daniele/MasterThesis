@@ -48,6 +48,7 @@ def createProcessesDurationDataFrame(processes):
     sections = []
     subjects = []
     finished = []
+    months = []
     changes = []
     pIds = []
     sequences = []
@@ -59,6 +60,8 @@ def createProcessesDurationDataFrame(processes):
         subjects.append(p[3])
         sections.append(p[4])
         finished.append(utilities.processState[p[5]])
+        month = utilities.months[p[0].month - 1]
+        months.append(month)
         if p[6] == 1:
             changes.append("SI")
         else:
@@ -66,7 +69,7 @@ def createProcessesDurationDataFrame(processes):
         pIds.append(p[7])
         sequences.append(p[8])
         phases.append(p[9])
-    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "sequenza": sequences, "fasi": phases})
+    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "mese": months, "cambio": changes, "sequenza": sequences, "fasi": phases})
 
 def createStatesDurationsDataFrame(processes):
     dates = []
@@ -233,12 +236,12 @@ def getAvgStdDataFrameByType(df, type):
     return [df1, df2]       
 
 def getAvgStdDataFrameByState(df):
-    df1 = df[['etichetta', 'durata', 'fase']].copy()
-    df2 = df1.groupby(['etichetta', 'fase'], as_index = False).mean()
-    df2['conteggio'] = df1.groupby(['etichetta', 'fase']).size().tolist()
-    df2['quantile'] = df1.groupby(['etichetta', 'fase'], as_index = False).quantile(0.75)['durata']
-    df1 = df1.sort_values(['fase', 'etichetta']).reset_index(drop = True)
-    df2 = df2.sort_values(['fase', 'etichetta']).reset_index(drop = True)
+    df1 = df[['stato', 'durata', 'fase']].copy()
+    df2 = df1.groupby(['stato', 'fase'], as_index = False).mean()
+    df2['conteggio'] = df1.groupby(['stato', 'fase']).size().tolist()
+    df2['quantile'] = df1.groupby(['stato', 'fase'], as_index = False).quantile(0.75)['durata']
+    df1 = df1.sort_values(['fase', 'stato']).reset_index(drop = True)
+    df2 = df2.sort_values(['fase', 'stato']).reset_index(drop = True)
     return [df1, df2]
 
 def getAvgStdDataFrameByPhase(df):
@@ -293,7 +296,7 @@ def getAvgDataFrameByType(df, datetype, types, order):
     while i < len(types):
         df3['filtro'] = df3['filtro'] + " - " + df4[types[i]]
         i = i + 1
-    df3 = keepOnlyImportant(df3, 0.85)
+    df3 = keepOnlyImportant(df3, 0.5)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
     order_dict = df3.set_index('filtro')[order].to_dict()
     order_list = df3['filtro'].tolist()
@@ -343,6 +346,11 @@ def getTypeDataFrame(df, tag, type):
     if type == None:
         return df
     return df[df[tag] == type]
+
+def getMonthDataFrame(df, months):
+    if months == None or len(months) == 0:
+        return df
+    return df[df['data'].dt.month.isin(months)]
 
 def getYearDataFrame(df, years):
     if years == None or len(years) == 0:

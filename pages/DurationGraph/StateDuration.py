@@ -11,7 +11,7 @@ df = getter.getStatesDuration()
 
 def pageLayout():
     years = frame.getAllYears(df)
-    states = frame.getUniques(df, 'etichetta')
+    states = frame.getUniques(df, 'stato')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([

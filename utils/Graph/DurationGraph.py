@@ -27,7 +27,7 @@ def updateProcessesDuration(df, sequences, phases, finished, year, change):
 def updateStatesDuration(df, state, finished, year, change):
     df_temp = df
     if not state == None:
-        df_temp = frame.getTypeDataFrame(df_temp, 'etichetta', state)
+        df_temp = frame.getTypeDataFrame(df_temp, 'stato', state)
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     return df_temp
 
@@ -47,8 +47,8 @@ def updateEventsDuration(df, event, finished, year, change):
 
 def displayProcessesDuration(df):
     years = frame.getAllYears(df)
-    sequences = frame.getSequences(df)
-    phases = frame.getPhaseSequences(df)
+    sequences = frame.getGroupBy(df, 'sequenza')
+    phases = frame.getGroupBy(df, 'fasi')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
@@ -78,8 +78,8 @@ def displayProcessesDuration(df):
 def durationProcessUpdate(df, finished, year, sequence, phase, change):
     df_temp = df.copy()
     df_temp = updateProcessesDuration(df_temp, sequence, phase, finished, year, change)
-    sequences = frame.getSequences(df_temp)
-    phases = frame.getPhaseSequences(df_temp)
+    sequences = frame.getGroupBy(df, 'sequenza')
+    phases = frame.getGroupBy(df, 'fasi')
     [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")
     fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600, points = False)
     fig.add_traces(
@@ -113,7 +113,7 @@ def durationProcessUpdate(df, finished, year, sequence, phase, change):
 
 def displayStatesDuration(df):
     years = frame.getAllYears(df)
-    states = frame.getUniques(df, 'etichetta')
+    states = frame.getUniques(df, 'stato')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
@@ -141,12 +141,12 @@ def durationStateUpdate(df, finished, state, year, change):
     df_temp = updateStatesDuration(df_temp, state, finished, year, change)
     if state == None:
         [allData, avgData] = frame.getAvgStdDataFrameByState(df_temp)
-        fig = px.box(allData, x = "etichetta", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata stati del processo [giorni]', 'etichetta':'Stati del processo'}, width = 1400, height = 600, points  = False)
+        fig = px.box(allData, x = "stato", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata stati del processo [giorni]', 'stato':'Stati del processo'}, width = 1400, height = 600, points  = False)
         fig.add_traces(
-            px.line(avgData, x = "etichetta", y = "durata", markers = True).update_traces(line_color = 'red').data
+            px.line(avgData, x = "stato", y = "durata", markers = True).update_traces(line_color = 'red').data
         )
         fig.add_traces(
-            px.line(avgData, x = "etichetta", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
+            px.line(avgData, x = "stato", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
         )
         fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
         return fig

@@ -36,23 +36,29 @@ def displayProcessDuration():
     processes = getter.getProcessesDuration()
     duration.displayProcessesDuration(processes)
 
-def displayPhaseDuration():
+def displayPhaseComparation():
     import utils.Getters as getter
     import utils.Graph.ComparationGraph as comparation
     phases = getter.getPhasesDuration()
-    comparation.displayTypeComparation(phases, "MY", "fase")
+    comparation.displayTypeComparation(phases, "M", "fase")
+    
+def displayPhaseDuration():
+    import utils.Getters as getter
+    import utils.Graph.DurationGraph as duration
+    phases = getter.getPhasesDuration()
+    duration.displayPhasesDuration(phases)
 
 def displayStateDuration():
     import utils.Getters as getter
     import utils.Graph.DurationGraph as duration
     states = getter.getStatesDuration()
-    duration.displayDuration(states, 'stato')
+    duration.displayStatesDuration(states)
 
 def displayComparation():
     import utils.Getters as getter
     import utils.Graph.ComparationGraph as comparation
     processes = getter.getProcessesDuration()
-    comparation.displayComparation(processes, "MY")
+    comparation.displayComparation(processes, "W")
 
 def startApp():
     import dash as ds
@@ -118,4 +124,4 @@ def startApp():
     app.run_server(debug = True)
 
 if __name__ == '__main__':
-    displayPhaseDuration()
+    displayComparation()
