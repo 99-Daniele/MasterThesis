@@ -29,7 +29,7 @@ def getPosition(name, df, type):
     pos = df.index.get_loc(df[df[type] == name].index[0])
     return pos
 
-def hideChosen(choices, sections, subjects, judges, finished, changes, sequences, phaseSequences):
+def hideProcessChosen(choices, sections, subjects, judges, finished, changes, sequences, phaseSequences):
     sectionStyle = {'width': 400}
     subjectStyle = {'width': 400}
     judgeStyle = {'width': 400}
@@ -60,6 +60,29 @@ def hideChosen(choices, sections, subjects, judges, finished, changes, sequences
         phaseSequences = None
     return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences]
 
+def hideChosen(choices, sections, subjects, judges, finished, changes):
+    sectionStyle = {'width': 400}
+    subjectStyle = {'width': 400}
+    judgeStyle = {'width': 400}
+    finishedStyle = {'width': 400}
+    changeStyle = {'width': 400}
+    if 'sezione' in choices:
+        sectionStyle = {'width': 200, 'display': 'none'}
+        sections = None
+    if 'materia' in choices:
+        subjectStyle = {'width': 200, 'display': 'none'}
+        subjects = None
+    if 'giudice' in choices:
+        judgeStyle = {'width': 200, 'display': 'none'}
+        judges = None
+    if 'finito' in choices:
+        finishedStyle = {'width': 200, 'display': 'none'}
+        finished = None
+    if 'cambio' in choices:
+        changeStyle = {'width': 200, 'display': 'none'}
+        changes = None
+    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, finished, changes]
+
 def updateProcessData(df, sections, subjects, judges, finished, change, sequences, phaseSequences):
     df_temp = df
     df_temp = frame.getTypesDataFrame(df_temp, 'sezione', sections)
@@ -69,6 +92,15 @@ def updateProcessData(df, sections, subjects, judges, finished, change, sequence
     df_temp = frame.getTypesDataFrame(df_temp, 'cambio', change)
     df_temp = frame.getTypesDataFrame(df_temp, 'sequenza', sequences)
     df_temp = frame.getTypesDataFrame(df_temp, 'fasi', phaseSequences)
+    return df_temp
+
+def updateData(df, sections, subjects, judges, finished, change):
+    df_temp = df
+    df_temp = frame.getTypesDataFrame(df_temp, 'sezione', sections)
+    df_temp = frame.getTypesDataFrame(df_temp, 'materia', subjects)
+    df_temp = frame.getTypesDataFrame(df_temp, 'giudice', judges)
+    df_temp = frame.getTypesDataFrame(df_temp, 'finito', finished)
+    df_temp = frame.getTypesDataFrame(df_temp, 'cambio', change)
     return df_temp
 
 def displayComparation(df, dateType):
@@ -130,7 +162,7 @@ def comparationUpdate(df, dateType, sections, subjects, judges, finished, change
         choices = [choiceStore]
     elif len(choices) == 1:
         choiceStore = choices[0]
-    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences] = hideChosen(choices, sections, subjects, judges, finished, changes, sequences, phaseSequences)
+    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences] = hideProcessChosen(choices, sections, subjects, judges, finished, changes, sequences, phaseSequences)
     df_data = df.copy()
     df_data = updateProcessData(df_data, sections, subjects, judges, finished, changes, sequences, phaseSequences)
     df_temp = df.copy()
@@ -149,7 +181,7 @@ def comparationUpdate(df, dateType, sections, subjects, judges, finished, change
     sections = frame.getGroupBy(df_temp, 'sezione')
     subjects = frame.getGroupBy(df_temp, 'materia')
     judges = frame.getGroupBy(df_temp, 'giudice')
-    subjects = frame.getGroupBy(df_temp, 'sequenza')
+    sequences = frame.getGroupBy(df_temp, 'sequenza')
     phaseSequences = frame.getGroupBy(df_temp, 'fasi')
     [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, dateType, choices, order)
     fig = px.line(allData, x = "data", y = "durata", height = 800).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})

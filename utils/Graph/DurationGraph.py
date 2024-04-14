@@ -542,9 +542,9 @@ def durationUpdate(df, type, typeChoice, sections, subjects, judges, finished, c
             elif choices != None and len(choices) == 1:
                 choiceStore = choices[0]
             [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, checkStyle, radioStyle, sections, subjects, judges, finished, changes] = hideChosen(choices, sections, subjects, judges, finished, changes)
-            df_data = df.copy()
-            df_data = updateData(df_data, sections, subjects, judges, finished, changes)
             df_temp = df.copy()
+            df_temp = frame.getTypeDataFrame(df_temp, 'fase', '4')
+            df_data = updateData(df_temp, sections, subjects, judges, finished, changes)
             if ds.ctx.triggered_id != None and 'section-dropdown' in ds.ctx.triggered_id:
                 df_temp = updateData(df_temp, None, subjects, judges, finished, changes)
             elif ds.ctx.triggered_id != None and 'subject-dropdown' in ds.ctx.triggered_id:
@@ -556,6 +556,8 @@ def durationUpdate(df, type, typeChoice, sections, subjects, judges, finished, c
             sections = frame.getGroupBy(df_temp, 'sezione')
             subjects = frame.getGroupBy(df_temp, 'materia')
             judges = frame.getGroupBy(df_temp, 'giudice')
+            finished = utilities.processState
+            changes = ['NO', 'SI']
         [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, "MY", choices, order)
         fig = px.line(allData, x = "data", y = "durata", height = 800).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
         fig.add_traces(
@@ -568,4 +570,4 @@ def durationUpdate(df, type, typeChoice, sections, subjects, judges, finished, c
         fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
         fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
         fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
-        return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, checkStyle, radioStyle, sections, subjects, judges, finished, changes, choices, choiceStore
+        return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, checkStyle, radioStyle, sections, subjects, judges, finished, changes, choices, choiceStore 
