@@ -29,30 +29,7 @@ def getPosition(name, df, type):
     pos = df.index.get_loc(df[df[type] == name].index[0])
     return pos
 
-def hideChosen(choices, sections, subjects, judges, finished, changes):
-    sectionStyle = {'width': 400}
-    subjectStyle = {'width': 400}
-    judgeStyle = {'width': 400}
-    finishedStyle = {'width': 400}
-    changeStyle = {'width': 400}
-    if 'sezione' in choices:
-        sectionStyle = {'width': 200, 'display': 'none'}
-        sections = None
-    if 'materia' in choices:
-        subjectStyle = {'width': 200, 'display': 'none'}
-        subjects = None
-    if 'giudice' in choices:
-        judgeStyle = {'width': 200, 'display': 'none'}
-        judges = None
-    if 'finito' in choices:
-        finishedStyle = {'width': 200, 'display': 'none'}
-        finished = None
-    if 'cambio' in choices:
-        changeStyle = {'width': 200, 'display': 'none'}
-        changes = None
-    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, finished, changes]
-
-def hideProcessChosen(choices, sections, subjects, judges, finished, changes, sequences, phaseSequences):
+def hideChosen(choices, sections, subjects, judges, finished, changes, sequences, phaseSequences):
     sectionStyle = {'width': 400}
     subjectStyle = {'width': 400}
     judgeStyle = {'width': 400}
@@ -94,16 +71,7 @@ def updateProcessData(df, sections, subjects, judges, finished, change, sequence
     df_temp = frame.getTypesDataFrame(df_temp, 'fasi', phaseSequences)
     return df_temp
 
-def updateData(df, sections, subjects, judges, finished, change):
-    df_temp = df
-    df_temp = frame.getTypesDataFrame(df_temp, 'sezione', sections)
-    df_temp = frame.getTypesDataFrame(df_temp, 'materia', subjects)
-    df_temp = frame.getTypesDataFrame(df_temp, 'giudice', judges)
-    df_temp = frame.getTypesDataFrame(df_temp, 'finito', finished)
-    df_temp = frame.getTypesDataFrame(df_temp, 'cambio', change)
-    return df_temp
-
-def displayProcessComparation(df, dateType):
+def displayComparation(df, dateType):
     sections = frame.getGroupBy(df, 'sezione')
     subjects = frame.getGroupBy(df, 'materia')
     judges = frame.getGroupBy(df, 'giudice')
@@ -154,15 +122,15 @@ def displayProcessComparation(df, dateType):
          ds.Input('order-radioitem', 'value')]
     )
     def updateOutput(sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
-        return processComparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order)
+        return comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order)
     app.run_server(debug = True)
 
-def processComparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
-    if choices != None and len(choices) < 1:
+def comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
+    if len(choices) < 1:
         choices = [choiceStore]
-    elif choices != None and len(choices) == 1:
+    elif len(choices) == 1:
         choiceStore = choices[0]
-    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences] = hideProcessChosen(choices, sections, subjects, judges, finished, changes, sequences, phaseSequences)
+    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences] = hideChosen(choices, sections, subjects, judges, finished, changes, sequences, phaseSequences)
     df_data = df.copy()
     df_data = updateProcessData(df_data, sections, subjects, judges, finished, changes, sequences, phaseSequences)
     df_temp = df.copy()
@@ -205,7 +173,7 @@ def displayTypeComparation(df, dateType, type):
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
-        ds.html.H2('CONFRONTO DURATA MEDIA FASE 1'),
+        ds.html.H2('CONFRONTO DURATA MEDIA FASE 4'),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown', placeholder = 'MATERIA', style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown', placeholder = 'GIUDICE', style = {'width': 400}),
@@ -247,9 +215,9 @@ def typeComparationUpdate(df, dateType, sections, subjects, judges, finished, ch
     elif choices != None and len(choices) == 1:
         choiceStore = choices[0]
     [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, finished, changes] = hideChosen(choices, sections, subjects, judges, finished, changes)
-    df_data = df.copy()
-    df_data = updateData(df_data, sections, subjects, judges, finished, changes)
     df_temp = df.copy()
+    df_temp = frame.getTypeDataFrame(df_temp, 'fase', '4')
+    df_data = updateData(df_temp, sections, subjects, judges, finished, changes)
     if ds.ctx.triggered_id != None and 'section-dropdown' in ds.ctx.triggered_id:
         df_temp = updateData(df_temp, None, subjects, judges, finished, changes)
     elif ds.ctx.triggered_id != None and 'subject-dropdown' in ds.ctx.triggered_id:
@@ -258,7 +226,6 @@ def typeComparationUpdate(df, dateType, sections, subjects, judges, finished, ch
         df_temp = updateData(df_temp, sections, subjects, None, finished, changes)
     else:
         df_temp = df_data
-    df_temp = frame.getTypeDataFrame(df_temp, 'fase', '1')
     sections = frame.getGroupBy(df_temp, 'sezione')
     subjects = frame.getGroupBy(df_temp, 'materia')
     judges = frame.getGroupBy(df_temp, 'giudice')

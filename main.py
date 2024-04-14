@@ -48,6 +48,12 @@ def displayStateDuration():
     states = getter.getStateEvents()
     comparation.displayTypeComparation(states, "MY", "stato")
 
+def displayComparation():
+    import utils.Getters as getter
+    import utils.Graph.ComparationGraph as comparation
+    processes = getter.getProcessesDuration()
+    comparation.displayComparation(processes, "MY")
+
 def startApp():
     import dash as ds
 
@@ -112,4 +118,4 @@ def startApp():
     app.run_server(debug = True)
 
 if __name__ == '__main__':
-    displayPhaseDuration()
+    displayComparation()
