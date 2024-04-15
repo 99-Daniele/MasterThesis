@@ -1,3 +1,4 @@
+import datetime as dt
 import pandas as pd
 
 import utils.Utilities as utilities
@@ -60,7 +61,8 @@ def createProcessesDurationDataFrame(processes):
         subjects.append(p[3])
         sections.append(p[4])
         finished.append(utilities.getProcessState(p[5]))
-        months.append(utilities.getMonth(p[0].month))
+        month = dt.datetime.strptime(p[0], '%Y-%m-%d %H:%M:%S').month
+        months.append(utilities.getMonth(month))
         if p[6] == 1:
             changes.append("SI")
         else:
