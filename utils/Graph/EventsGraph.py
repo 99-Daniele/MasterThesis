@@ -9,6 +9,8 @@ def displayEvents(df, type, mustEvents):
     sections = frame.getGroupBy(df, 'sezione')
     subjects = frame.getGroupBy(df, 'materia')
     judges = frame.getGroupBy(df, 'giudice')
+    print(sections, subjects, judges)
+    exit()
     fig = px.scatter(df, x = "data", y = "numProcesso", color = type, labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 1200)
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([

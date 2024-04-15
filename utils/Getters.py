@@ -5,8 +5,11 @@ import utils.FileOperation as file
 
 def getImportantEvents():
     importantEvents = str(tuple(file.getDataFromTextFile('utils/Preferences/importantEvents.txt')))
+    print(importantEvents)
     query = "SELECT e.numProcesso AS numProcesso, e.data AS dataEvento, et.fase AS fase, et.evento AS tipoevento, e.numEvento AS numEvento, e.codice AS codiceEvento, et.stato AS tipostato, e.statofinale AS codiceStato, a.alias AS giudice, mn.etichetta AS materiaProcesso, p.sezione AS sezioneProcesso, pt.processofinito AS processofinito, pcg.cambioGiudice AS cambioGiudice, p.dataInizio AS dataInizioProcesso FROM eventitipo AS et, eventi AS e, durataprocessi AS d, aliasgiudice AS a, processi AS p, processitipo AS pt, materienome AS mn, processicambiogiudice as pcg WHERE ((e.numEvento = et.numEvento) AND (e.numProcesso = d.numProcesso) AND (a.giudice = p.giudice) AND (p.numProcesso = d.numProcesso) AND (pt.numProcesso = p.numProcesso) AND (p.materia = mn.codice) AND (pcg.numProcesso = p.numProcesso) AND (et.evento IN " + importantEvents + ")) ORDER BY et.fase"
     events = cache.getData('eventiimportanti', query)
+    print(events)
+    exit()
     return frame.createEventsDataFrame(events)
 
 def getPhaseEvents():
