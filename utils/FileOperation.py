@@ -1,5 +1,4 @@
-from bson import json_util
-import json
+import ujson
 import os
  
 def removeFile(filename):
@@ -17,12 +16,15 @@ def getDataFromTextFile(filename):
     return data
 
 def getDataFromJsonFile(filename):
-    return json.load(open(filename, 'r'))
-
+    try:
+        return ujson.load(open(filename, 'r'))
+    except (IOError, ValueError):
+        return {}
+    
 def getDataFromJsonFileWithTranslation(filename):
     try:
-        jsonCache = json.load(open(filename, 'r'))
-        return json.loads(jsonCache, object_hook = json_util.object_hook)
+        jsonCache = ujson.load(open(filename, 'r'))
+        return ujson.loads(jsonCache)
     except (IOError, ValueError):
         return {}
 
@@ -35,9 +37,12 @@ def appendOnTextFile(filename, data):
     f.write(data)
 
 def writeOnJsonFile(filename, data):
-    json.dump(data, open(filename, 'w'))
-        
+    ujson.dump(data, open(filename, 'w'))
+
+def dataTranslate(date):
+    return date.strftime("%Y-%m-%d %H:%M:%S") 
+
 def writeOnJsonFileWithTranslation(filename, data):
-    jsonData = json.dumps(data, default = json_util.default)
-    json.dump(jsonData, open(filename, 'w'))
+    jsonData = ujson.dumps(data, default = dataTranslate)
+    ujson.dump(jsonData, open(filename, 'w'))
    

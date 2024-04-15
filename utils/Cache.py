@@ -1,17 +1,18 @@
 import utils.DatabaseConnection as connect
 import utils.FileOperation as file
 
+def cacheUpdate(id, data, cache):
+    cache.update({id: data})
+    file.writeOnJsonFileWithTranslation('utils/cache.json', cache)
+
 def updateCache(id, cache, query):
     cacheData = getData(id, query)
     cacheData = [tuple(x) for x in cacheData]
     connection = connect.getDatabaseConnection()
     databaseData = connect.getDataFromDatabase(connection, query)
     if set(cacheData) != set(databaseData):
-         cacheUpdate(id, databaseData, cache)
-
-def cacheUpdate(id, data, cache):
-    cache.update({id: data})
-    file.writeOnJsonFileWithTranslation('utils/cache.json', cache)
+        cacheUpdate(id, databaseData, cache)
+    print(id + " updated!")
 
 def getData(id, query):
     cache = file.getDataFromJsonFileWithTranslation('utils/cache.json')
@@ -21,4 +22,5 @@ def getData(id, query):
         connection = connect.getDatabaseConnection()
         data = connect.getDataFromDatabase(connection, query)
         cacheUpdate(id, data, cache)
+        print(id + " added to cache!")
         return data

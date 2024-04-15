@@ -1,7 +1,6 @@
 def refreshData():
     import utils.DatabaseConnection as connect
     import utils.DataUpdate as update
-    import utils.FileOperation as file
     import utils.Getters as getter
     connection = connect.getDatabaseConnection()
     update.refreshData(connection)
