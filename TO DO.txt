@@ -7,3 +7,5 @@
 - sistemare legenda
 - togliere mese inizio
 - correggere tutto
+
+- cache utile? --> fare tutti i get e poi tutti get con cache e vedere quale piu veloce
