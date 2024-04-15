@@ -54,7 +54,6 @@ def groupEventsByProcessPhase(processEvents):
     processPhaseEvents = {}
     for p in processEvents.keys():
         process = addIDEvent(processEvents.get(p), 3)
-        print(process)
         processPhaseEvents.update({p: process})
     return processPhaseEvents
 

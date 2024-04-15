@@ -6,3 +6,4 @@
 - correggere grafico durata
 - sistemare legenda
 - togliere mese inizio
+- correggere tutto

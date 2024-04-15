@@ -52,7 +52,7 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
     if "reset-button" == ds.ctx.triggered_id:
         startDate = minDate
         endDate = maxDate
-    df_temp = frame.getDateDataFrame(df_temp, startDate, endDate)
+    df_temp = frame.getDateDataFrame(df_temp, 'dataInizioProcesso', startDate, endDate)
     if sections != None and len(sections) > 0:
         df_temp = frame.getTypesDataFrame(df_temp, 'sezione', sections)
     if subjects != None and len(subjects) > 0:

@@ -44,12 +44,10 @@ def getDataFromDatabase(connection, query):
 def executeQuery(connection, query):
     cursor = connection.cursor(buffered = True)
     cursor.execute(query)
-    connection.commit()  
 
 def executeQueryWithValues(connection, query, values):
     cursor = connection.cursor(buffered = True)
     cursor.execute(query, values)
-    connection.commit()  
 
 def doesATableExist(connection, table):
     query = "SELECT COUNT(*) > 0 FROM information_schema.tables WHERE table_name = '" + table + "' AND table_type = 'BASE TABLE' LIMIT 1"

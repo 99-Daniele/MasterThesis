@@ -140,7 +140,7 @@ def durationStateUpdate(df, finished, state, year, change):
     df_temp = df.copy()
     df_temp = updateStatesDuration(df_temp, state, finished, year, change)
     if state == None:
-        [allData, avgData] = frame.getAvgStdDataFrameByState(df_temp)
+        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, ['stato', 'fase'])
         fig = px.box(allData, x = "stato", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata stati del processo [giorni]', 'stato':'Stati del processo'}, width = 1400, height = 600, points  = False)
         fig.add_traces(
             px.line(avgData, x = "stato", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -211,7 +211,7 @@ def durationPhaseUpdate(df, finished, phase, year, change):
     df_temp = df.copy()
     df_temp = updatePhasesDuration(df_temp, phase, finished, year, change)
     if phase == None:
-        [allData, avgData] = frame.getAvgStdDataFrameByPhase(df_temp)
+        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, 'fase')
         fig = px.box(allData, x = "fase", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, width = 1400, height = 600, points  = False)
         fig.add_traces(
             px.line(avgData, x = "fase", y = "durata", markers = True).update_traces(line_color = 'red').data
@@ -282,7 +282,7 @@ def durationEventUpdate(df, finished, event, year, change):
     df_temp = df.copy()
     df_temp = updateEventsDuration(df_temp, event, finished, year, change)
     if event == None:
-        [allData, avgData] = frame.getAvgStdDataFrameByPhase(df_temp)
+        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, 'fase')
         fig = px.box(allData, x = "fase", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, width = 1400, height = 600, points  = False)
         fig.add_traces(
             px.line(avgData, x = "fase", y = "durata", markers = True).update_traces(line_color = 'red').data

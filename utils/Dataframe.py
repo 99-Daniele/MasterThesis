@@ -181,17 +181,6 @@ def createCourtHearingsDurationDataFrame(processes):
         pIds.append(p[7])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes})
 
-def getEventType(df, type, importantEventsType, courtHearingEventsType):
-    match type:
-        case "ALL":
-            return df
-        case "IMP":
-            df = df[df['evento'].isin(importantEventsType)]
-            return df
-        case "CH":
-            df = df[df['evento'].isin(courtHearingEventsType)]
-            return df
-
 def getAvgStdDataFrameByDate(df, type):
     match type:
         case "W":
@@ -233,33 +222,6 @@ def getAvgStdDataFrameByType(df, type):
     df2['quantile'] = df1.groupby(type, as_index = False).quantile(0.75)['durata']
     df1 = df1.sort_values(type).reset_index(drop = True)
     df2 = df2.sort_values(type).reset_index(drop = True)
-    return [df1, df2]       
-
-def getAvgStdDataFrameByState(df):
-    df1 = df[['stato', 'durata', 'fase']].copy()
-    df2 = df1.groupby(['stato', 'fase'], as_index = False).mean()
-    df2['conteggio'] = df1.groupby(['stato', 'fase']).size().tolist()
-    df2['quantile'] = df1.groupby(['stato', 'fase'], as_index = False).quantile(0.75)['durata']
-    df1 = df1.sort_values(['fase', 'stato']).reset_index(drop = True)
-    df2 = df2.sort_values(['fase', 'stato']).reset_index(drop = True)
-    return [df1, df2]
-
-def getAvgStdDataFrameByPhase(df):
-    df1 = df[['fase', 'durata']].copy()
-    df2 = df1.groupby(['fase'], as_index = False).mean()
-    df2['conteggio'] = df1.groupby(['fase']).size().tolist()
-    df2['quantile'] = df1.groupby(['fase'], as_index = False).quantile(0.75)['durata']
-    df1 = df1.sort_values(['fase']).reset_index(drop = True)
-    df2 = df2.sort_values(['fase']).reset_index(drop = True)
-    return [df1, df2]
-
-def getAvgStdDataFrameByEvent(df):
-    df1 = df[['evento', 'durata']].copy()
-    df2 = df1.groupby(['evento'], as_index = False).mean()
-    df2['conteggio'] = df1.groupby(['evento']).size().tolist()
-    df2['quantile'] = df1.groupby(['evento'], as_index = False).quantile(0.75)['durata']
-    df1 = df1.sort_values(['evento']).reset_index(drop = True)
-    df2 = df2.sort_values(['evento']).reset_index(drop = True)
     return [df1, df2]
 
 def keepOnlyImportant(df, perc):
@@ -336,16 +298,16 @@ def getAvgDataFrameByType(df, datetype, types, order):
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
             df2 = df2.sort_values(['data']).reset_index(drop = True)
             return [df1, df2, df3]
-        
-def getTypesDataFrame(df, tag, types):
-    if types == None or len(types) == 0:
-        return df
-    return df[df[tag].isin(types)]
 
 def getTypeDataFrame(df, tag, type):
     if type == None:
         return df
     return df[df[tag] == type]
+
+def getTypesDataFrame(df, tag, types):
+    if types == None or len(types) == 0:
+        return df
+    return df[df[tag].isin(types)]
 
 def getMonthDataFrame(df, months):
     if months == None or len(months) == 0:
@@ -357,11 +319,11 @@ def getYearDataFrame(df, years):
         return df
     return df[df['data'].dt.year.isin(years)]
 
-def getDateDataFrame(df, startDate, endDate):
+def getDateDataFrame(df, type, startDate, endDate):
     if startDate == None or endDate == None:
         return df
-    d = df[df['dataInizioProcesso'] >= startDate]
-    d = d[d['dataInizioProcesso'] <= endDate]
+    d = df[df[type] >= startDate]
+    d = d[d[type] <= endDate]
     return d
 
 def getAllYears(df):
