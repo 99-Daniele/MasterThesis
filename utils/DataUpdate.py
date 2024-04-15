@@ -3,6 +3,7 @@ from collections import OrderedDict
 import utils.DatabaseConnection as connect
 import utils.FileOperation as file
 import utils.Getters as getter
+import utils.Utilities as utilities
 
 def refreshData(connection):
     verifyDatabase(connection)
@@ -185,7 +186,7 @@ def calcProcessesInfo(processEvents):
     for p in processEvents.keys():
         [startDate, endDate, startEventId, endEventId, processType, originalSequence, translatedSequence, finalSequence, phaseSequence] = getProcessInfo(processEvents.get(p))
         processDuration.append((p, (endDate - startDate).days, startDate, endDate, startEventId, endEventId))
-        processSequence.append((p, processType, fromListToString(originalSequence), fromListToString(translatedSequence), fromListToString(finalSequence), fromListToString(phaseSequence)))
+        processSequence.append((p, processType, utilities.fromListToString(originalSequence), utilities.fromListToString(translatedSequence), utilities.fromListToString(finalSequence), utilities.fromListToString(phaseSequence)))
     return [processDuration, processSequence]
 
 def getProcessInfo(events):
@@ -236,19 +237,15 @@ def getSequences(e, endDate, endEventId, processType, find, phase, originalSeque
         translatedSequence.append(e[6])
     return [endDate, endEventId, processType, find, phase]
 
-def fromListToString(list):
-    string = ",".join(str(l) for l in list)
-    return string
-
 def verifyDatabase(connection):
     if not connect.doesATableExist(connection, "eventi"):
         raise "\nEvents table is not present or is called differently than 'eventi'. Please change name or add such table because it's fundamental for the analysis"
     if not connect.doesATableHaveColumns(connection, "eventi", ['numEvento', 'numProcesso', 'codice', 'giudice', 'data', 'statoiniziale', 'statofinale']):
         raise "\nEvents table does not have all requested columns. The requested columns are: 'numEvento', 'numProcesso', 'codice', 'giudice', 'data', 'statoiniziale', 'statofinale'"
     if not connect.doesATableExist(connection, "processi"):
-        raise "\Processes table is not present or is called differently than 'processi'. Please change name or add such table because it's fundamental for the analysis"
+        raise "\nProcesses table is not present or is called differently than 'processi'. Please change name or add such table because it's fundamental for the analysis"
     if not connect.doesATableHaveColumns(connection, "processi", ['numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione']):
-        raise "\Processes table does not have all requested columns. The requested columns are: 'numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'"
+        raise "\nProcesses table does not have all requested columns. The requested columns are: 'numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'"
     if not connect.doesATableExist(connection, "eventinome"):
         connect.createTable(connection, 'eventinome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
         eventsName = file.getDataFromTextFile('utils/Preferences/eventsName.txt')

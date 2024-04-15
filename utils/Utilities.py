@@ -5,7 +5,6 @@ import utils.FileOperation as file
 weeks = ['02/01', '08/01', '15/01', '22/01', '29/01', '05/02', '12/02', '19/02', '26/02', '05/03', '12/03', '19/03', '26/03', '02/04', '09/04', '16/04', '23/04', '30/04', '07/05', '14/05', '21/05', '28/05', '04/06', '11/06', '18/06', '25/06', '02/07', '09/07', '16/07', '23/07', '30/07', '06/08', '13/08', '20/08', '27/08', '03/09', '10/09', '17/09', '24/09', '01/10', '08/10', '15/10', '22/10', '29/10', '05/11', '12/11', '19/11', '26/11', '03/12', '10/12', '17/12', '24/12', '31/12']
 months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
 daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica']
-processState = ['NON FINITO', 'FINITO', 'STOPPATO', 'IN STALLO']
 
 def phaseColorList(df, type):
     types = df[type].unique().tolist()
@@ -38,7 +37,13 @@ def getDayOfWeek(dowNumber):
     return daysOfWeek[dowNumber - 1]
 
 def getProcessState(state):
+    processState = file.getDataFromTextFile('utils/Preferences/processStates.txt')
     return processState[state]
 
 def getAllProcessState():
+    processState = file.getDataFromTextFile('utils/Preferences/processStates.txt')
     return processState
+
+def fromListToString(list):
+    string = ",".join(str(l) for l in list)
+    return string
