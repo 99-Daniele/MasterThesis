@@ -8,7 +8,7 @@ import utils.Utilities as utilities
 def addCountToName(name, df, choices):
     if choices == 'finito':
         count = df[df[type] == int(name)]['conteggio'].item()
-        name = utilities.processState[int(name)]
+        name = utilities.getProcessState(int(name))
     elif choices == 'cambio':
         count = df[df[type] == int(name)]['conteggio'].item()
         if int(name) == 0:
@@ -122,7 +122,7 @@ def displayComparation(df, dateType):
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown', placeholder = 'MATERIA', style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown', placeholder = 'GIUDICE', style = {'width': 400}),
-        ds.dcc.Dropdown(utilities.processState, value = [utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'PROCESSO', style = {'width': 400}),
         ds.dcc.Dropdown(utilities.months, multi = True, searchable = False, id = 'month-dropdown', placeholder = 'MESE INIZIO', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown', placeholder = 'SEQUENZA', style = {'width': 400}),
@@ -217,7 +217,7 @@ def displayTypeComparation(df, dateType, type):
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown', placeholder = 'MATERIA', style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown', placeholder = 'GIUDICE', style = {'width': 400}),
-        ds.dcc.Dropdown(utilities.processState, value = [utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'PROCESSO', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist", inline = True, style = {'display':'inline'}),
         ds.dcc.Store(data = ['sezione'], id = "choice-store"),

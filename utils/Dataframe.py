@@ -31,7 +31,7 @@ def createEventsDataFrame(events):
             judges.append(e[8])
             subjects.append(e[9])
             sections.append(e[10])
-            finished.append(utilities.processState[e[11]])
+            finished.append(utilities.getProcessState(e[11]))
             if e[12] == 1:
                 changes.append("SI")
             else:
@@ -59,9 +59,8 @@ def createProcessesDurationDataFrame(processes):
         judges.append(p[2])
         subjects.append(p[3])
         sections.append(p[4])
-        finished.append(utilities.processState[p[5]])
-        month = utilities.months[p[0].month - 1]
-        months.append(month)
+        finished.append(utilities.getProcessState(p[5]))
+        months.append(utilities.getMonth(p[0].month))
         if p[6] == 1:
             changes.append("SI")
         else:
@@ -89,7 +88,7 @@ def createStatesDurationsDataFrame(processes):
         judges.append(p[2])
         subjects.append(p[3])
         sections.append(p[4])
-        finished.append(utilities.processState[p[5]])
+        finished.append(utilities.getProcessState(p[5]))
         if p[6] == 1:
             changes.append("SI")
         else:
@@ -117,7 +116,7 @@ def createPhasesDurationsDataFrame(processes):
         judges.append(p[2])
         subjects.append(p[3])
         sections.append(p[4])
-        finished.append(utilities.processState[p[5]])
+        finished.append(utilities.getProcessState(p[5]))
         if p[6] == 1:
             changes.append("SI")
         else:
@@ -146,7 +145,7 @@ def createEventsDurationsDataFrame(processes):
         judges.append(p[2])
         subjects.append(p[3])
         sections.append(p[4])
-        finished.append(utilities.processState[p[5]])
+        finished.append(utilities.getProcessState(p[5]))
         if p[6] == 1:
             changes.append("SI")
         else:
@@ -173,7 +172,7 @@ def createCourtHearingsDurationDataFrame(processes):
         judges.append(p[2])
         subjects.append(p[3])
         sections.append(p[4])
-        finished.append(utilities.processState[p[5]])
+        finished.append(utilities.getProcessState(p[5]))
         if p[6] == 1:
             changes.append("SI")
         else:
@@ -190,8 +189,8 @@ def getAvgStdDataFrameByDate(df, type):
             df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
-            df1['data'] = df1['data'].map(lambda x: utilities.weeks[x - 1])
-            df2['data'] = df2['data'].map(lambda x: utilities.weeks[x - 1])
+            df1['data'] = df1['data'].map(lambda x: utilities.getWeek(x))
+            df2['data'] = df2['data'].map(lambda x: utilities.getWeek(x))
             return [df1, df2]
         case "M":
             df1 = df[['data', 'durata']].copy()
@@ -200,8 +199,8 @@ def getAvgStdDataFrameByDate(df, type):
             df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
-            df1['data'] = df1['data'].map(lambda x: utilities.months[x - 1])
-            df2['data'] = df2['data'].map(lambda x: utilities.months[x - 1])
+            df1['data'] = df1['data'].map(lambda x: utilities.getMonth(x))
+            df2['data'] = df2['data'].map(lambda x: utilities.getMonth(x))
             return [df1, df2]
         case "MY":
             df1 = df[['data', 'durata']].copy()
@@ -276,9 +275,9 @@ def getAvgDataFrameByType(df, datetype, types, order):
             df1['sort_column'] = df1['filtro'].map(order_dict)
             df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df1['data'] = df1['data'].map(lambda x: utilities.weeks[x - 1])
+            df1['data'] = df1['data'].map(lambda x: utilities.getWeek(x))
             df2 = df2.sort_values(['data']).reset_index(drop = True)
-            df2['data'] = df2['data'].map(lambda x: utilities.weeks[x - 1])
+            df2['data'] = df2['data'].map(lambda x: utilities.getWeek(x))
             return [df1, df2, df3]
         case "M":
             df_temp['data'] = df_temp['data'].map(lambda x: x.month)
@@ -286,9 +285,9 @@ def getAvgDataFrameByType(df, datetype, types, order):
             df1['sort_column'] = df1['filtro'].map(order_dict)
             df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df1['data'] = df1['data'].map(lambda x: utilities.months[x - 1])
+            df1['data'] = df1['data'].map(lambda x: utilities.getMonth(x))
             df2 = df2.sort_values(['data']).reset_index(drop = True)
-            df2['data'] = df2['data'].map(lambda x: utilities.months[x - 1])
+            df2['data'] = df2['data'].map(lambda x: utilities.getMonth(x))
             return [df1, df2, df3]
         case "MY":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getMonthYearDate(x))

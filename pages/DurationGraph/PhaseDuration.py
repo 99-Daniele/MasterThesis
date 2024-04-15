@@ -19,7 +19,7 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici durata', href='/durationgraph'),
         ds.html.H2('DURATA MEDIA FASI DEL PROCESSO'),
-        ds.dcc.Dropdown(utilities.processState, value = [utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown-phd', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-phd', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(phases, multi = False, searchable = False, id = 'phase-dropdown-phd', placeholder = 'Seleziona fase...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown-phd', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-phd', placeholder = 'Cambio giudice', style = {'width': 400}),

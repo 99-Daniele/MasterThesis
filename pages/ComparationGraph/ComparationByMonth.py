@@ -13,7 +13,7 @@ def pageLayout():
     sections = frame.getGroupBy(df, 'sezione')
     subjects = frame.getGroupBy(df, 'materia')
     judges = frame.getGroupBy(df, 'giudice')
-    subjects = frame.getGroupBy(df, 'sequenza')
+    sequences = frame.getGroupBy(df, 'sequenza')
     phaseSequences = frame.getGroupBy(df, 'fasi')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
@@ -25,7 +25,7 @@ def pageLayout():
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-m', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-m', placeholder = 'MATERIA', style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-m', placeholder = 'GIUDICE', style = {'width': 400}),
-        ds.dcc.Dropdown(utilities.processState, value = [utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown-m', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-m', placeholder = 'PROCESSO', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-m', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-m', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-m', placeholder = 'FASI', style = {'width': 400}),

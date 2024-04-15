@@ -54,7 +54,7 @@ def displayProcessesDuration(df):
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.H2('DURATA MEDIA PROCESSI'),
-        ds.dcc.Dropdown(utilities.processState, value = [utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown', placeholder = 'Seleziona sequenza...', style = {'width': 400}),
         ds.dcc.Dropdown(phases, multi = True, searchable = False, id = 'phase-dropdown', placeholder = 'Seleziona fasi...', style = {'width': 400}),
@@ -119,7 +119,7 @@ def displayStatesDuration(df):
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.H2('DURATA MEDIA STATI'),
-        ds.dcc.Dropdown(utilities.processState, value = [utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(states, multi = False, searchable = False, id = 'state-dropdown', placeholder = 'Seleziona stato...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
@@ -190,7 +190,7 @@ def displayPhasesDuration(df):
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.H2('DURATA MEDIA FASI'),
-        ds.dcc.Dropdown(utilities.processState, value = [utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(phases, multi = False, searchable = False, id = 'phase-dropdown', placeholder = 'Seleziona fase...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
@@ -261,7 +261,7 @@ def displayEventsDuration(df):
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.H2('DURATA MEDIA EVENTI'),
-        ds.dcc.Dropdown(utilities.processState, value = [utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'event-dropdown', placeholder = 'Seleziona evento...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
@@ -331,7 +331,7 @@ def displayCourtHearingsDuration(df):
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.H2('DURATA MEDIA UDIENZE'),
-        ds.dcc.Dropdown(utilities.processState, value = [utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'Cambio giudice', style = {'width': 400}),
         ds.dcc.Graph(id = 'processes-graph', figure = fig)
@@ -427,7 +427,7 @@ def updateData(df, sections, subjects, judges, finished, change):
 def addCountToName(name, df, choices):
     if choices == 'finito':
         count = df[df[type] == int(name)]['conteggio'].item()
-        name = utilities.processState[int(name)]
+        name = utilities.getProcessState(int(name))
     elif choices == 'cambio':
         count = df[df[type] == int(name)]['conteggio'].item()
         if int(name) == 0:
@@ -469,7 +469,7 @@ def displayDuration(df, type):
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown', placeholder = 'SEZIONE', style = {'width': 200, 'display': 'none'}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown', placeholder = 'MATERIA', style = {'width': 200, 'display': 'none'}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown', placeholder = 'GIUDICE', style = {'width': 200, 'display': 'none'}),
-        ds.dcc.Dropdown(utilities.processState, value = [utilities.processState[1]], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'PROCESSO', style = {'width': 200, 'display': 'none'}),
+        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'PROCESSO', style = {'width': 200, 'display': 'none'}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'CAMBIO', style = {'width': 200, 'display': 'none'}),
         ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio'], value = ['sezione'], id = "choice-checklist", inline = True, style = {'display':'none'}),
         ds.dcc.Store(data = ['sezione'], id = "choice-store"),
@@ -532,7 +532,7 @@ def durationUpdate(df, type, typeChoice, sections, subjects, judges, finished, c
             sections = frame.getGroupBy(df_temp, 'sezione')
             subjects = frame.getGroupBy(df_temp, 'materia')
             judges = frame.getGroupBy(df_temp, 'giudice')
-            finished = utilities.processState
+            finished = utilities.getAllProcessState()
             changes = ['NO', 'SI']
             df_data = updateData(df_data, sections, subjects, judges, finished, changes)
             [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, checkStyle, radioStyle, sections, subjects, judges, finished, changes] = hideChosen(choices, sections, subjects, judges, finished, changes)
@@ -556,7 +556,7 @@ def durationUpdate(df, type, typeChoice, sections, subjects, judges, finished, c
             sections = frame.getGroupBy(df_temp, 'sezione')
             subjects = frame.getGroupBy(df_temp, 'materia')
             judges = frame.getGroupBy(df_temp, 'giudice')
-            finished = utilities.processState
+            finished = utilities.getAllProcessState()
             changes = ['NO', 'SI']
         [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, "MY", choices, order)
         fig = px.line(allData, x = "data", y = "durata", height = 800).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
