@@ -11,8 +11,8 @@ df = getter.getProcessesDuration()
 
 def pageLayout():
     years = frame.getAllYears(df)
-    sequences = frame.getSequences(df)
-    phases = frame.getPhaseSequences(df)
+    sequences = frame.getGroupBy(df, 'sequenza')
+    phases = frame.getGroupBy(df, 'fasi')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([
@@ -38,7 +38,7 @@ def pageLayout():
         ds.Input('sequence-dropdown-prd', 'value'),
         ds.Input('phase-dropdown-prd', 'value'),
         ds.Input('change-dropdown-prd', 'value')]
-)
+    )
 
 def updateOutput(finished, year, sequence, phase, change):
     return duration.durationProcessUpdate(df, finished, year, sequence, phase, change)

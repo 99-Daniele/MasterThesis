@@ -80,6 +80,12 @@ def displayPhaseComparation():
     phases = getter.getPhasesDuration()
     comparation.displayTypeComparation(phases, "M", "fase")
 
+def displayPhaseComparation():
+    import utils.Getters as getter
+    import utils.Graph.ComparationGraph as comparation
+    phases = getter.getPhasesDuration()
+    comparation.displayTypeComparation(phases, "M", "fase")
+
 def startApp():
     import utils.App as app
     app.start()
