@@ -37,12 +37,24 @@ def displayStateEvents():
     stateEvents = getter.getStateEvents()
     mustStates = file.getDataFromTextFile('utils/Preferences/mustStates.txt')
     event.displayEvents(stateEvents, 'stato', mustStates)
+
+def displayProcessComparation():
+    import utils.Getters as getter
+    import utils.Graph.ComparationGraph as comparation
+    processes = getter.getProcessesDuration()
+    comparation.displayComparation(processes, "MY")
     
 def displayProcessDuration():
     import utils.Getters as getter
     import utils.Graph.DurationGraph as duration
     processes = getter.getProcessesDuration()
     duration.displayProcessesDuration(processes)
+    
+def displayEventDuration():
+    import utils.Getters as getter
+    import utils.Graph.DurationGraph as duration
+    events = getter.getEventsDuration()
+    duration.displayEventsDuration(events)
     
 def displayPhaseDuration():
     import utils.Getters as getter
@@ -55,12 +67,12 @@ def displayStateDuration():
     import utils.Graph.DurationGraph as duration
     states = getter.getStatesDuration()
     duration.displayStatesDuration(states)
-
-def displayProcessComparation():
+    
+def displayCourtHearingsDuration():
     import utils.Getters as getter
-    import utils.Graph.ComparationGraph as comparation
-    processes = getter.getProcessesDuration()
-    comparation.displayComparation(processes, "MY")
+    import utils.Graph.DurationGraph as duration
+    courtHearings = getter.getCourtHearingsDuration()
+    duration.displayCourtHearingsDuration(courtHearings)
 
 def displayPhaseComparation():
     import utils.Getters as getter
@@ -70,8 +82,7 @@ def displayPhaseComparation():
 
 def startApp():
     import utils.App as app
-
     app.start()
 
 if __name__ == '__main__':
-    startApp()
+    displayCourtHearingsDuration()

@@ -182,8 +182,8 @@ def createCourtHearingsDurationDataFrame(processes):
         pIds.append(p[7])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes})
 
-def getAvgStdDataFrameByDate(df, type):
-    match type:
+def getAvgStdDataFrameByDate(df, typed):
+    match typed:
         case "W":
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: utilities.getWeekNumber(x))
@@ -206,7 +206,6 @@ def getAvgStdDataFrameByDate(df, type):
             return [df1, df2]
         case "MY":
             df1 = df[['data', 'durata']].copy()
-            df1['data'] = df1['data'].dt.to_period("M")
             df1['data'] = df1['data'].map(lambda x: utilities.getMonthYearDate(x))
             df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).mean()
@@ -313,12 +312,16 @@ def getTypesDataFrame(df, tag, types):
 def getMonthDataFrame(df, months):
     if months == None or len(months) == 0:
         return df
-    return df[df['data'].dt.month.isin(months)]
+    df_temp = df.copy()
+    df_temp['data'] = df_temp['data'].map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').month)
+    return df[df_temp['data'].isin(months)]
 
 def getYearDataFrame(df, years):
     if years == None or len(years) == 0:
         return df
-    return df[df['data'].dt.year.isin(years)]
+    df_temp = df.copy()
+    df_temp['data'] = df_temp['data'].map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year)
+    return df[df_temp['data'].isin(years)]
 
 def getDateDataFrame(df, type, startDate, endDate):
     if startDate == None or endDate == None:
@@ -329,7 +332,7 @@ def getDateDataFrame(df, type, startDate, endDate):
 
 def getAllYears(df):
     df_temp = df['data']
-    df_temp = df_temp.map(lambda x: x.year).sort_values()
+    df_temp = df_temp.map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year).sort_values()
     years = df_temp.unique()
     return years
 
