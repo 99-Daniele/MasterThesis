@@ -7,6 +7,8 @@ import pages.Event as eventPage
 import pages.ComparationGraph.ComparationByMonth as comparationMonthPage
 import pages.ComparationGraph.ComparationByMonthYear as comparationMonthYearPage
 import pages.ComparationGraph.ComparationByWeek as comparationWeekPage
+import pages.ComparationGraph.PhaseComparation as phaseComparation
+import pages.ComparationGraph.StateComparation as stateComparation
 import pages.DurationGraph.PhaseDuration as phaseDurationPage
 import pages.DurationGraph.CourtHearingDuration as courtHearingDurationPage
 import pages.DurationGraph.EventDuration as eventDurationPage
@@ -43,6 +45,10 @@ def start():
                 return comparationMonthPage.pageLayout()
             case '/comparationgraph/monthyearcomparation':
                 return comparationMonthYearPage.pageLayout()
+            case '/comparationgraph/phasecomparation':
+                return phaseComparation.pageLayout()
+            case '/comparationgraph/statecomparation':
+                return stateComparation.pageLayout()
             case '/durationgraph/courthearingduration':
                 return courtHearingDurationPage.pageLayout()
             case '/durationgraph/eventduration':

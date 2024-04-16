@@ -8,6 +8,10 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Confronto per mese', href='/comparationgraph/monthcomparation'),
         ds.html.Br(),
-        ds.dcc.Link('Confronto per mese dell anno', href='/comparationgraph/monthyearcomparation')
+        ds.dcc.Link('Confronto per mese dell anno', href='/comparationgraph/monthyearcomparation'),
+        ds.html.Br(),
+        ds.dcc.Link('Confronto fasi', href='/comparationgraph/phasecomparation'),
+        ds.html.Br(),
+        ds.dcc.Link('Confronto stati', href='/comparationgraph/statecomparation')
     ])
     return layout

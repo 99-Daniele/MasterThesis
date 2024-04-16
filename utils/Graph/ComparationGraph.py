@@ -206,6 +206,8 @@ def comparationUpdate(df, dateType, sections, subjects, judges, finished, months
     return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, monthStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, sequences, phaseSequences, choices, choiceStore
 
 def displayTypeComparation(df, dateType, type):
+    types = frame.getGroupBy(df, type)
+    typesSorted = sorted(types)
     sections = frame.getGroupBy(df, 'sezione')
     subjects = frame.getGroupBy(df, 'materia')
     judges = frame.getGroupBy(df, 'giudice')
@@ -213,7 +215,8 @@ def displayTypeComparation(df, dateType, type):
     fig = px.box(df_temp, x = 'A', y = 'B')
     app = ds.Dash(suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
-        ds.html.H2('CONFRONTO DURATA MEDIA FASE'),
+        ds.html.H2('CONFRONTO DURATA MEDIA ' + type.upper() + " DEL PROCESSO"),        
+        ds.dcc.Dropdown(typesSorted, value = typesSorted[0], multi = False, searchable = False, id = 'type-dropdown', placeholder = type.upper(), style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown', placeholder = 'MATERIA', style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown', placeholder = 'GIUDICE', style = {'width': 400}),
@@ -236,7 +239,8 @@ def displayTypeComparation(df, dateType, type):
          ds.Output('judge-dropdown', 'options'),
          ds.Output('choice-checklist', 'value'),
          ds.Output('choice-store', 'data')],
-        [ds.Input('section-dropdown', 'value'),
+        [ds.Input('type-dropdown', 'value'),
+         ds.Input('section-dropdown', 'value'),
          ds.Input('subject-dropdown', 'value'),
          ds.Input('judge-dropdown', 'value'),
          ds.Input('finished-dropdown', 'value'),
@@ -245,18 +249,18 @@ def displayTypeComparation(df, dateType, type):
          ds.Input('choice-store', 'data'),
          ds.Input('order-radioitem', 'value')]
     )
-    def updateOutput(sections, subjects, judges, finished, changes, choices, choiceStore, order):
-        return typeComparationUpdate(df, dateType, sections, subjects, judges, finished, changes, choices, choiceStore, order)
+    def updateOutput(typeChoice, sections, subjects, judges, finished, changes, choices, choiceStore, order):
+        return typeComparationUpdate(df, dateType, typeChoice, type, sections, subjects, judges, finished, changes, choices, choiceStore, order)
     app.run_server(debug = True)
 
-def typeComparationUpdate(df, dateType, sections, subjects, judges, finished, changes, choices, choiceStore, order):
+def typeComparationUpdate(df, dateType, typeChoice, type, sections, subjects, judges, finished, changes, choices, choiceStore, order):
     if choices != None and len(choices) < 1:
         choices = [choiceStore]
     elif choices != None and len(choices) == 1:
         choiceStore = choices[0]
     [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, finished, changes] = hideChosen(choices, sections, subjects, judges, finished, changes)
     df_temp = df.copy()
-    df_temp = frame.getTypeDataFrame(df_temp, 'fase', '2')
+    df_temp = frame.getTypeDataFrame(df_temp, type, typeChoice)
     df_data = updateData(df_temp, sections, subjects, judges, finished, changes)
     if ds.ctx.triggered_id != None and 'section-dropdown' in ds.ctx.triggered_id:
         df_temp = updateData(df_temp, None, subjects, judges, finished, changes)
