@@ -51,8 +51,7 @@ def displayEvents(df, type, mustEvents):
 
 def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sections, subjects, judges):
     df_temp = df.copy()
-    print(minDate, maxDate)
-    if "reset-button" == ds.ctx.triggered_id:
+    if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         startDate = minDate
         endDate = maxDate
     df_temp = frame.getDateDataFrame(df_temp, 'dataInizioProcesso', startDate, endDate)
