@@ -1,3 +1,4 @@
+import datetime as dt
 import pandas as pd
 
 import utils.FileOperation as file
@@ -22,8 +23,9 @@ def getWeekNumber(date):
     return new_date.week
 
 def getMonthYearDate(date):
-    m = date.month
-    y = date.year
+    datetime = dt.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+    m = datetime.month
+    y = datetime.year
     new_date = pd.Timestamp(day = 1, month = m, year = y)
     return new_date
 

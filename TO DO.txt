@@ -6,6 +6,7 @@
 - correggere grafico durata
 - sistemare legenda
 - togliere mese inizio
+- correggere processi confronto mese inizio e finito/non finito
 - correggere tutto
 
 - cache utile? --> fare tutti i get e poi tutti get con cache e vedere quale piu veloce

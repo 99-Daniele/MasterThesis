@@ -8,14 +8,14 @@ import utils.Getters as getter
 import utils.Graph.EventsGraph as event
 
 df = getter.getAllEvents()
-sections = frame.getGroupBy(df, 'sezione')
-subjects = frame.getGroupBy(df, 'materia')
-judges = frame.getGroupBy(df, 'giudice')
 maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
 minYear = maxYear - 1
 importantEvents = file.getDataFromTextFile('utils/Preferences/importantEvents.txt')
 
 def pageLayout():
+    sections = frame.getGroupBy(df, 'sezione')
+    subjects = frame.getGroupBy(df, 'materia')
+    judges = frame.getGroupBy(df, 'giudice')
     fig = px.scatter(df, x = "data", y = "numProcesso", color = 'evento', labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 1200)
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),

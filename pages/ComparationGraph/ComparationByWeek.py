@@ -13,7 +13,7 @@ def pageLayout():
     sections = frame.getGroupBy(df, 'sezione')
     subjects = frame.getGroupBy(df, 'materia')
     judges = frame.getGroupBy(df, 'giudice')
-    subjects = frame.getGroupBy(df, 'sequenza')
+    sequences = frame.getGroupBy(df, 'sequenza')
     phaseSequences = frame.getGroupBy(df, 'fasi')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
@@ -25,11 +25,12 @@ def pageLayout():
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-w', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-w', placeholder = 'MATERIA', style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-w', placeholder = 'GIUDICE', style = {'width': 400}),
-        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-w', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState(), value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-w', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.months, multi = True, searchable = False, id = 'month-dropdown-w', placeholder = 'MESE INIZIO', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-w', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-w', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-w', placeholder = 'FASI', style = {'width': 400}),
-        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist-w", inline = True, style = {'display':'inline'}),
+        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'mese', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist-w", inline = True, style = {'display':'inline'}),
         ds.dcc.Store(data = ['sezione'], id = "choice-store-w"),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-w", inline = True, style = {'paddingLeft':'85%'}),
         ds.dcc.Graph(id = 'comparation-graph-w', figure = fig)
@@ -42,6 +43,7 @@ def pageLayout():
         ds.Output('subject-dropdown-w', 'style'),
         ds.Output('judge-dropdown-w', 'style'),
         ds.Output('finished-dropdown-w', 'style'),
+        ds.Output('month-dropdown-w', 'style'),
         ds.Output('change-dropdown-w', 'style'),
         ds.Output('sequence-dropdown-w', 'style'),
         ds.Output('phaseSequence-dropdown-w', 'style'),
@@ -56,13 +58,14 @@ def pageLayout():
         ds.Input('subject-dropdown-w', 'value'),
         ds.Input('judge-dropdown-w', 'value'),
         ds.Input('finished-dropdown-w', 'value'),
+        ds.Input('month-dropdown-w', 'value'),
         ds.Input('change-dropdown-w', 'value'),
         ds.Input('sequence-dropdown-w', 'value'),
         ds.Input('phaseSequence-dropdown-w', 'value'),
         ds.Input('choice-checklist-w', 'value'),
         ds.Input('choice-store-w', 'data'),
         ds.Input('order-radioitem-w', 'value')]
-)
+    )
 
-def updateOutput(sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
-        return comparation.comparationUpdate(df, "W", sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order)
+def updateOutput(sections, subjects, judges, finished, months, changes, sequences, phaseSequences, choices, choiceStore, order):
+    return comparation.comparationUpdate(df, "W", sections, subjects, judges, finished, months, changes, sequences, phaseSequences, choices, choiceStore, order)

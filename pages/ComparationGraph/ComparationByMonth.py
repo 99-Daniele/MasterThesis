@@ -25,14 +25,14 @@ def pageLayout():
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-m', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-m', placeholder = 'MATERIA', style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-m', placeholder = 'GIUDICE', style = {'width': 400}),
-        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-m', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState(), value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-m', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.months, multi = True, searchable = False, id = 'month-dropdown-m', placeholder = 'MESE INIZIO', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-m', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-m', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-m', placeholder = 'FASI', style = {'width': 400}),
-        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist-m", inline = True, style = {'display':'inline'}),
+        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'mese', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist-m", inline = True, style = {'display':'inline'}),
         ds.dcc.Store(data = ['sezione'], id = "choice-store-m"),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-m", inline = True, style = {'paddingLeft':'85%'}),
-
         ds.dcc.Graph(id = 'comparation-graph-m', figure = fig)
     ])
     return layout
@@ -43,6 +43,7 @@ def pageLayout():
         ds.Output('subject-dropdown-m', 'style'),
         ds.Output('judge-dropdown-m', 'style'),
         ds.Output('finished-dropdown-m', 'style'),
+        ds.Output('month-dropdown-m', 'style'),
         ds.Output('change-dropdown-m', 'style'),
         ds.Output('sequence-dropdown-m', 'style'),
         ds.Output('phaseSequence-dropdown-m', 'style'),
@@ -57,13 +58,14 @@ def pageLayout():
         ds.Input('subject-dropdown-m', 'value'),
         ds.Input('judge-dropdown-m', 'value'),
         ds.Input('finished-dropdown-m', 'value'),
+        ds.Input('month-dropdown-m', 'value'),
         ds.Input('change-dropdown-m', 'value'),
         ds.Input('sequence-dropdown-m', 'value'),
         ds.Input('phaseSequence-dropdown-m', 'value'),
         ds.Input('choice-checklist-m', 'value'),
         ds.Input('choice-store-m', 'data'),
         ds.Input('order-radioitem-m', 'value')]
-)
+    )
 
-def updateOutput(sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
-        return comparation.comparationUpdate(df, "M", sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order)
+def updateOutput(sections, subjects, judges, finished, months, changes, sequences, phaseSequences, choices, choiceStore, order):
+    return comparation.comparationUpdate(df, "M", sections, subjects, judges, finished, months, changes, sequences, phaseSequences, choices, choiceStore, order)

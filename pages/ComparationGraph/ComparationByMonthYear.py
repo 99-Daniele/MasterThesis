@@ -13,7 +13,7 @@ def pageLayout():
     sections = frame.getGroupBy(df, 'sezione')
     subjects = frame.getGroupBy(df, 'materia')
     judges = frame.getGroupBy(df, 'giudice')
-    subjects = frame.getGroupBy(df, 'sequenza')
+    sequences = frame.getGroupBy(df, 'sequenza')
     phaseSequences = frame.getGroupBy(df, 'fasi')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
@@ -25,11 +25,12 @@ def pageLayout():
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-my', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-my', placeholder = 'MATERIA', style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-my', placeholder = 'GIUDICE', style = {'width': 400}),
-        ds.dcc.Dropdown(utilities.getAllProcessState, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-my', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState(), value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-my', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.months, multi = True, searchable = False, id = 'month-dropdown-my', placeholder = 'MESE INIZIO', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-my', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-my', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-my', placeholder = 'FASI', style = {'width': 400}),
-        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist-my", inline = True, style = {'display':'inline'}),
+        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'mese', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist-my", inline = True, style = {'display':'inline'}),
         ds.dcc.Store(data = ['sezione'], id = "choice-store-my"),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-my", inline = True, style = {'paddingLeft':'85%'}),
         ds.dcc.Graph(id = 'comparation-graph-my', figure = fig)
@@ -42,6 +43,7 @@ def pageLayout():
         ds.Output('subject-dropdown-my', 'style'),
         ds.Output('judge-dropdown-my', 'style'),
         ds.Output('finished-dropdown-my', 'style'),
+        ds.Output('month-dropdown-my', 'style'),
         ds.Output('change-dropdown-my', 'style'),
         ds.Output('sequence-dropdown-my', 'style'),
         ds.Output('phaseSequence-dropdown-my', 'style'),
@@ -56,13 +58,14 @@ def pageLayout():
         ds.Input('subject-dropdown-my', 'value'),
         ds.Input('judge-dropdown-my', 'value'),
         ds.Input('finished-dropdown-my', 'value'),
+        ds.Input('month-dropdown-my', 'value'),
         ds.Input('change-dropdown-my', 'value'),
         ds.Input('sequence-dropdown-my', 'value'),
         ds.Input('phaseSequence-dropdown-my', 'value'),
         ds.Input('choice-checklist-my', 'value'),
         ds.Input('choice-store-my', 'data'),
         ds.Input('order-radioitem-my', 'value')]
-)
+    )
 
-def updateOutput(sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
-        return comparation.comparationUpdate(df, "MY", sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order)
+def updateOutput(sections, subjects, judges, finished, months, changes, sequences, phaseSequences, choices, choiceStore, order):
+    return comparation.comparationUpdate(df, "MY", sections, subjects, judges, finished, months, changes, sequences, phaseSequences, choices, choiceStore, order)
