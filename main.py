@@ -80,15 +80,15 @@ def displayPhaseComparation():
     phases = getter.getPhasesDuration()
     comparation.displayTypeComparation(phases, "M", "fase")
 
-def displayPhaseComparation():
+def displayStateComparation():
     import utils.Getters as getter
     import utils.Graph.ComparationGraph as comparation
-    phases = getter.getPhasesDuration()
-    comparation.displayTypeComparation(phases, "M", "fase")
+    states = getter.getStatesDuration()
+    comparation.displayTypeComparation(states, "M", "stato")
 
 def startApp():
     import utils.App as app
     app.start()
 
 if __name__ == '__main__':
-    displayCourtHearingsDuration()
+    displayStateComparation()
