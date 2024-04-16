@@ -13,7 +13,6 @@ def phaseColorList(df, type):
     for t in types:
         df_count = df[df[type] == t].groupby(['fase'], as_index = False).count()
         max = df_count['data'].max()
-        print(df_count[df_count['data'] == max]['fase'])
         phase = df_count[df_count['data'] == max]['fase'].tolist()[0]
         c.append(colors.get(phase))
     return c
