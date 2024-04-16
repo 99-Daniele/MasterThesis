@@ -19,7 +19,8 @@ def phaseColorList(df, type):
     return c
 
 def getWeekNumber(date):
-    new_date = pd.Timestamp(day = date.day, month = date.month, year = 2024)
+    datetime = dt.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+    new_date = pd.Timestamp(day = datetime.day, month = datetime.month, year = 2024)
     return new_date.week
 
 def getMonthYearDate(date):
