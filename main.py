@@ -109,5 +109,4 @@ def startApp():
     app.start()
 
 if __name__ == '__main__':
-    import utils.Getters as g
-    g.testSpeed()
+    startApp()
