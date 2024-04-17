@@ -1,3 +1,5 @@
+import dash as ds
+
 def refreshData():
     import utils.DatabaseConnection as connect
     import utils.DataUpdate as update
@@ -7,88 +9,104 @@ def refreshData():
     getter.updateCache()
 
 def displayAllEvents():
-    import utils.Getters as getter
-    import utils.Graph.EventsGraph as event
-    import utils.FileOperation as file
-    allEvents = getter.getAllEvents()
-    importantEvents = file.getDataFromTextFile('utils/Preferences/importantEvents.txt')
-    event.displayEvents(allEvents, 'evento', importantEvents)
+    import pages.EventGraph.AllEvents as allEventsPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = allEventsPage.pageLayout())
+    ])
+    app.run_server(debug = True)
 
 def displayImportantEvents():
-    import utils.Getters as getter
-    import utils.Graph.EventsGraph as event
-    import utils.FileOperation as file
-    importantEvents = getter.getImportantEvents()
-    mustEvents = file.getDataFromTextFile('utils/Preferences/mustEvents.txt')
-    event.displayEvents(importantEvents, 'evento', mustEvents)
+    import pages.EventGraph.ImportantEvents as importantEventsPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = importantEventsPage.pageLayout())
+    ])
+    app.run_server(debug = True)
 
 def displayPhaseEvents():
-    import utils.Getters as getter
-    import utils.Graph.EventsGraph as event
-    import utils.FileOperation as file
-    phaseEvents = getter.getPhaseEvents()
-    mustPhases = file.getDataFromTextFile('utils/Preferences/mustPhases.txt')
-    event.displayEvents(phaseEvents, 'fase', mustPhases)
+    import pages.EventGraph.PhaseEvents as phaseEventsPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = phaseEventsPage.pageLayout())
+    ])
+    app.run_server(debug = True)
 
 def displayStateEvents():
-    import utils.Getters as getter
-    import utils.Graph.EventsGraph as event
-    import utils.FileOperation as file
-    stateEvents = getter.getStateEvents()
-    mustStates = file.getDataFromTextFile('utils/Preferences/mustStates.txt')
-    event.displayEvents(stateEvents, 'stato', mustStates)
+    import pages.EventGraph.StateEvents as stateEventsPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = stateEventsPage.pageLayout())
+    ])
+    app.run_server(debug = True)
 
 def displayProcessComparation():
-    import utils.Getters as getter
-    import utils.Graph.ComparationGraph as comparation
-    processes = getter.getProcessesDuration()
-    comparation.displayComparation(processes, "MY")
-    
-def displayProcessDuration():
-    import utils.Getters as getter
-    import utils.Graph.DurationGraph as duration
-    processes = getter.getProcessesDuration()
-    duration.displayProcessesDuration(processes)
-    
-def displayEventDuration():
-    import utils.Getters as getter
-    import utils.Graph.DurationGraph as duration
-    events = getter.getEventsDuration()
-    duration.displayEventsDuration(events)
-    
-def displayPhaseDuration():
-    import utils.Getters as getter
-    import utils.Graph.DurationGraph as duration
-    phases = getter.getPhasesDuration()
-    duration.displayPhasesDuration(phases)
-
-def displayStateDuration():
-    import utils.Getters as getter
-    import utils.Graph.DurationGraph as duration
-    states = getter.getStatesDuration()
-    duration.displayStatesDuration(states)
-    
-def displayCourtHearingsDuration():
-    import utils.Getters as getter
-    import utils.Graph.DurationGraph as duration
-    courtHearings = getter.getCourtHearingsDuration()
-    duration.displayCourtHearingsDuration(courtHearings)
+    import pages.ComparationGraph.ComparationByMonthYear as processComparationPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = processComparationPage.pageLayout())
+    ])
+    app.run_server(debug = True)
 
 def displayPhaseComparation():
-    import utils.Getters as getter
-    import utils.Graph.ComparationGraph as comparation
-    phases = getter.getPhasesDuration()
-    comparation.displayTypeComparation(phases, "M", "fase")
+    import pages.ComparationGraph.PhaseComparation as phaseComparationPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = phaseComparationPage.pageLayout())
+    ])
+    app.run_server(debug = True)
 
 def displayStateComparation():
-    import utils.Getters as getter
-    import utils.Graph.ComparationGraph as comparation
-    states = getter.getStatesDuration()
-    comparation.displayTypeComparation(states, "M", "stato")
+    import pages.ComparationGraph.StateComparation as stateComparationPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = stateComparationPage.pageLayout())
+    ])
+    app.run_server(debug = True)
+    
+def displayProcessDuration():
+    import pages.DurationGraph.ProcessDuration as processDurationPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = processDurationPage.pageLayout())
+    ])
+    app.run_server(debug = True)
+    
+def displayEventDuration():
+    import pages.DurationGraph.EventDuration as eventDurationPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = eventDurationPage.pageLayout())
+    ])
+    app.run_server(debug = True)
+    
+def displayPhaseDuration():
+    import pages.DurationGraph.PhaseDuration as phaseDurationPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = phaseDurationPage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
+def displayStateDuration():
+    import pages.DurationGraph.StateDuration as stateDurationPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = stateDurationPage.pageLayout())
+    ])
+    app.run_server(debug = True)
+    
+def displayCourtHearingsDuration():
+    import pages.DurationGraph.CourtHearingDuration as courtHearingDurationPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = courtHearingDurationPage.pageLayout())
+    ])
+    app.run_server(debug = True)
 
 def startApp():
     import utils.App as app
     app.start()
 
 if __name__ == '__main__':
-    displayStateComparation()
+    displayImportantEvents()
