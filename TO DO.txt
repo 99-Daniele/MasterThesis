@@ -12,5 +12,3 @@
 - sequenza eventi
 - presenza eventi particolari (ex: cambio giudice)
 - cambiare nome materie (quelle che iniziano con 1)
-
-- cache utile? --> fare tutti i get e poi tutti get con cache e vedere quale piu veloce

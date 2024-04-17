@@ -12,7 +12,6 @@ import pages.ComparationGraph.StateComparation as stateComparation
 import pages.DurationGraph.PhaseDuration as phaseDurationPage
 import pages.DurationGraph.CourtHearingDuration as courtHearingDurationPage
 import pages.DurationGraph.EventDuration as eventDurationPage
-import pages.DurationGraph.PhaseDuration as phaseDurationPage
 import pages.DurationGraph.ProcessDuration as processDurationPage
 import pages.DurationGraph.StateDuration as stateDurationPage
 import pages.EventGraph.AllEvents as allEventsPage
@@ -22,7 +21,7 @@ import pages.EventGraph.StateEvents as stateEventsPage
 
 def start():
 
-    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app = ds.Dash(__name__, use_pages = True, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.H2('PROGETTO TRIBUNALI'),
         ds.dcc.Location(id = 'url', refresh = False),
