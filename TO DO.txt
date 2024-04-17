@@ -5,4 +5,12 @@
 - togliere mese inizio
 - correggere processi confronto mese inizio e finito/non finito
 
+- dati solo sezione 1,2,3,4
+- processi finiti e stoppati insieme
+- predizione durata non finiti
+- carico processi
+- sequenza eventi
+- presenza eventi particolari (ex: cambio giudice)
+- cambiare nome materie (quelle che iniziano con 1)
+
 - cache utile? --> fare tutti i get e poi tutti get con cache e vedere quale piu veloce
