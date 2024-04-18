@@ -343,10 +343,10 @@ def displayCourtHearingsDuration(df):
          ds.Input('change-dropdown', 'value')]
     )
     def updateOutput(finished, year, change):
-        return durationCourtHearingUpdate(df, finished, year, change)
+        return durationCourtHearingsUpdate(df, finished, year, change)
     app.run_server(debug = True)
 
-def durationCourtHearingUpdate(df, finished, year, change):
+def durationCourtHearingsUpdate(df, finished, year, change):
     df_temp = df.copy()
     df_temp = updateFinishYearChangeDuration(df_temp, finished, year, change)
     [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, "MY")

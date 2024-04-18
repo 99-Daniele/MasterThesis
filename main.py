@@ -4,8 +4,9 @@ def refreshData():
     import utils.DatabaseConnection as connect
     import utils.DataUpdate as update
     import utils.Getters as getter
-    connection = connect.getDatabaseConnection()
-    update.refreshData(connection)
+    #connection = connect.getDatabaseConnection()
+    #update.refreshData(connection)
+    print("Database updated!")
     getter.updateCache()
 
 def displayAllEvents():
@@ -41,7 +42,7 @@ def displayStateEvents():
     app.run_server(debug = True)
 
 def displayProcessComparation():
-    import pages.ComparationGraph.ComparationByMonthYear as processComparationPage
+    import pages.ComparationGraph.ComparationByMonth as processComparationPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = processComparationPage.pageLayout())
@@ -97,10 +98,10 @@ def displayStateDuration():
     app.run_server(debug = True)
     
 def displayCourtHearingsDuration():
-    import pages.DurationGraph.CourtHearingDuration as courtHearingDurationPage
+    import pages.DurationGraph.CourtHearingsDuration as courtHearingsDurationPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
-        ds.html.Div(children = courtHearingDurationPage.pageLayout())
+        ds.html.Div(children = courtHearingsDurationPage.pageLayout())
     ])
     app.run_server(debug = True)
 
@@ -109,4 +110,4 @@ def startApp():
     app.start()
 
 if __name__ == '__main__':
-    startApp()
+    refreshData()

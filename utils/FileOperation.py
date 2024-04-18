@@ -1,5 +1,6 @@
 import ujson
 import os
+import pandas as pd
  
 def removeFile(filename):
     if os.path.isfile(filename):
@@ -21,12 +22,14 @@ def getDataFromJsonFile(filename):
     except (IOError, ValueError):
         return {}
     
-def getDataFromJsonFileWithTranslation(filename):
+def getDataframeFromJsonFile(filename):
     try:
         jsonCache = ujson.load(open(filename, 'r'))
-        return ujson.loads(jsonCache)
-    except (IOError, ValueError):
-        return {}
+        jsonData = ujson.dumps(jsonCache)
+        data = ujson.loads(jsonData)
+        return pd.read_json(data, orient = 'split') 
+    except (FileNotFoundError):
+        return None
 
 def writeOnTextFile(filename, data):
     f = open(filename, 'w')
@@ -42,7 +45,8 @@ def writeOnJsonFile(filename, data):
 def dataTranslate(date):
     return date.strftime("%Y-%m-%d %H:%M:%S") 
 
-def writeOnJsonFileWithTranslation(filename, data):
-    jsonData = ujson.dumps(data, default = dataTranslate)
+def writeDataframeOnJsonFile(filename, data):
+    jsonData = data.to_json()
+    print(jsonData)
     ujson.dump(jsonData, open(filename, 'w'))
    

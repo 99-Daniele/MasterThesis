@@ -21,16 +21,16 @@ def pageLayout():
         ds.dcc.Dropdown(utilities.getAllProcessState(), value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-chd', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown-chd', placeholder = 'Seleziona anno...', style = {'width': 400}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-chd', placeholder = 'Cambio giudice', style = {'width': 400}),
-        ds.dcc.Graph(id = 'courthearing-graph', figure = fig)
+        ds.dcc.Graph(id = 'courthearings-graph', figure = fig)
     ])
     return layout
 
 @ds.callback(
-    ds.Output('courthearing-graph', 'figure'),
+    ds.Output('courthearings-graph', 'figure'),
     [ds.Input('finished-dropdown-chd', 'value'), 
         ds.Input('year-dropdown-chd', 'value'),
         ds.Input('change-dropdown-chd', 'value')]
 )
 
 def updateOutput(finished, year, change):
-    return duration.durationCourtHearingUpdate(df, finished, year, change)
+    return duration.durationCourtHearingsUpdate(df, finished, year, change)

@@ -13,11 +13,11 @@ def refreshData(connection):
     processEvents = groupEventsByProcess(events)
     processPhaseEvents = groupEventsByProcessPhase(processEvents)
     processStateEvents = groupEventsByProcessState(processEvents)
-    processCourtHearingEvents = groupCourtHearingByProcess(events, courtHearingsEventsType)
+    processCourtHearingsEvents = groupCourtHearingsByProcess(events, courtHearingsEventsType)
     eventsDuration = calcEventsDuration(processEvents)
     phasesDuration = calcPhasesDuration(processPhaseEvents, eventsDuration)
     statesDuration = calcStatesDuration(processStateEvents, eventsDuration)
-    courtHearingsDuration = calcCourtHearingsDuration(processCourtHearingEvents)
+    courtHearingsDuration = calcCourtHearingsDuration(processCourtHearingsEvents)
     [processDuration, processSequence] = calcProcessesInfo(processEvents)
     eventsFilteredInfo = compareData(eventsFiltered, connection, "SELECT * FROM eventitipo ORDER BY numEvento")
     eventsDurationInfo = compareData(list(eventsDuration.values()), connection, "SELECT * FROM durataeventi ORDER BY numEvento")
@@ -65,7 +65,7 @@ def groupEventsByProcessState(processEvents):
         processStateEvents.update({p: process})
     return processStateEvents
 
-def groupCourtHearingByProcess(events, courtHearingsType):
+def groupCourtHearingsByProcess(events, courtHearingsType):
     processes = {}
     for e in events:
         if e[1] in courtHearingsType:
@@ -169,7 +169,7 @@ def calcStatesDuration(processEvents, eventDuration):
     return statesDuration
 
 def calcCourtHearingsDuration(processEvents):
-    courtHearingDuration = []
+    courtHearingsDuration = []
     for p in processEvents.keys():
         events = processEvents.get(p)
         startDate = events[0][5]
@@ -177,8 +177,8 @@ def calcCourtHearingsDuration(processEvents):
         lastEvent = getLastEvent(events)
         endDate = lastEvent[5]
         endEventId = lastEvent[0]
-        courtHearingDuration.append((p, (endDate - startDate).days, startDate, endDate, startEventId, endEventId))
-    return courtHearingDuration
+        courtHearingsDuration.append((p, (endDate - startDate).days, startDate, endDate, startEventId, endEventId))
+    return courtHearingsDuration
 
 def calcProcessesInfo(processEvents):
     processDuration = []

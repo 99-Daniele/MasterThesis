@@ -12,3 +12,4 @@
 - sequenza eventi
 - presenza eventi particolari (ex: cambio giudice)
 - cambiare nome materie (quelle che iniziano con 1)
+- m, w, my as dropdown
