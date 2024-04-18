@@ -42,7 +42,7 @@ def displayStateEvents():
     app.run_server(debug = True)
 
 def displayProcessComparation():
-    import pages.ComparationGraph.ComparationByMonth as processComparationPage
+    import pages.ComparationGraph.ProcessComparation as processComparationPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = processComparationPage.pageLayout())
@@ -110,4 +110,4 @@ def startApp():
     app.start()
 
 if __name__ == '__main__':
-    displayPhaseComparation()
+    displayProcessComparation()

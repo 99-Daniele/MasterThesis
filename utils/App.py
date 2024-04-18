@@ -5,7 +5,7 @@ def start():
     import pages.Comparation as comparationPage
     import pages.Duration as durationPage
     import pages.Event as eventPage
-    import pages.ComparationGraph.ComparationByMonth as comparationMonthPage
+    import pages.ComparationGraph.ProcessComparation as comparationMonthPage
     import pages.ComparationGraph.ComparationByMonthYear as comparationMonthYearPage
     import pages.ComparationGraph.ComparationByWeek as comparationWeekPage
     import pages.ComparationGraph.PhaseComparation as phaseComparation

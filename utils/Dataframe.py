@@ -270,7 +270,7 @@ def getAvgDataFrameByType(df, datetype, types, order):
         i = i + 1
     df_temp = df_temp[df_temp['filtro'].isin(order_list)]
     match datetype:
-        case "W":
+        case "SETTIMANA":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getWeekNumber(x))
             df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
             df1['sort_column'] = df1['filtro'].map(order_dict)
@@ -280,8 +280,8 @@ def getAvgDataFrameByType(df, datetype, types, order):
             df2 = df2.sort_values(['data']).reset_index(drop = True)
             df2['data'] = df2['data'].map(lambda x: utilities.getWeek(x))
             return [df1, df2, df3]
-        case "M":
-            df_temp['data'] = df_temp['data'].map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').month)
+        case "MESE":
+            df_temp['data'] = df_temp['data'].map(lambda x: utilities.getMonthNumber(x))
             df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
             df1['sort_column'] = df1['filtro'].map(order_dict)
             df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
@@ -290,7 +290,7 @@ def getAvgDataFrameByType(df, datetype, types, order):
             df2 = df2.sort_values(['data']).reset_index(drop = True)
             df2['data'] = df2['data'].map(lambda x: utilities.getMonth(x))
             return [df1, df2, df3]
-        case "MY":
+        case "MESE DELL'ANNO":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getMonthYearDate(x))
             df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
             df1['sort_column'] = df1['filtro'].map(order_dict)
@@ -298,11 +298,32 @@ def getAvgDataFrameByType(df, datetype, types, order):
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
             df2 = df2.sort_values(['data']).reset_index(drop = True)
             return [df1, df2, df3]
-
-def getTypeDataFrame(df, tag, type):
-    if type == None:
-        return df
-    return df[df[tag] == type]
+        case "TRIMESTRE":
+            df_temp['data'] = df_temp['data'].map(lambda x: utilities.getTrimesterNumber(x))
+            df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
+            df1['sort_column'] = df1['filtro'].map(order_dict)
+            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
+            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
+            df1['data'] = df1['data'].map(lambda x: utilities.getTrimester(x))
+            df2 = df2.sort_values(['data']).reset_index(drop = True)
+            df2['data'] = df2['data'].map(lambda x: utilities.getTrimester(x))
+            return [df1, df2, df3]
+        case "TRIMESTRE DELL'ANNO":
+            df_temp['data'] = df_temp['data'].map(lambda x: utilities.getTrimesterYearDate(x))
+            df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
+            df1['sort_column'] = df1['filtro'].map(order_dict)
+            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
+            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
+            df2 = df2.sort_values(['data']).reset_index(drop = True)
+            return [df1, df2, df3]
+        case "ANNO":
+            df_temp['data'] = df_temp['data'].map(lambda x: utilities.getYearNumber(x))
+            df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
+            df1['sort_column'] = df1['filtro'].map(order_dict)
+            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
+            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
+            df2 = df2.sort_values(['data']).reset_index(drop = True)
+            return [df1, df2, df3]
 
 def getTypesDataFrame(df, tag, types):
     if types == None or len(types) == 0:

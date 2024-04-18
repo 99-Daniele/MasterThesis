@@ -571,4 +571,107 @@ def durationUpdate(df, type, typeChoice, sections, subjects, judges, finished, c
         fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
         fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
         return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, checkStyle, radioStyle, sections, subjects, judges, finished, changes, choices, choiceStore 
-    
+  
+def showAll():
+    sectionStyle = {'width': 400}
+    subjectStyle = {'width': 400}
+    judgeStyle = {'width': 400}
+    finishedStyle = {'width': 400}
+    changeStyle = {'width': 400}
+    choiceCheckStyle = {'display':'inline'}
+    choiceRadioStyle = {'paddingLeft':'85%'}
+    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, choiceRadioStyle]
+
+def hideAll():
+    sectionStyle = {'display': 'none'}
+    subjectStyle = {'display': 'none'}
+    judgeStyle = {'display': 'none'}
+    finishedStyle = {'display': 'none'}
+    changeStyle = {'display': 'none'}
+    choiceCheckStyle = {'display':'inline'}
+    choiceRadioStyle = {'paddingLeft':'85%'}
+    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, choiceRadioStyle]
+
+def hideChosen(choices, sections, subjects, judges, finished, changes):
+    sectionStyle = {'width': 400}
+    subjectStyle = {'width': 400}
+    judgeStyle = {'width': 400}
+    finishedStyle = {'width': 400}
+    changeStyle = {'width': 400}
+    if 'sezione' in choices:
+        sectionStyle = {'width': 200, 'display': 'none'}
+        sections = None
+    if 'materia' in choices:
+        subjectStyle = {'width': 200, 'display': 'none'}
+        subjects = None
+    if 'giudice' in choices:
+        judgeStyle = {'width': 200, 'display': 'none'}
+        judges = None
+    if 'finito' in choices:
+        finishedStyle = {'width': 200, 'display': 'none'}
+        finished = None
+    if 'cambio' in choices:
+        changeStyle = {'width': 200, 'display': 'none'}
+        changes = None
+    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, finished, changes]
+
+def typeUpdate(df, dateType, typeChoice, type, sections, subjects, judges, finished, changes, choices, choiceStore, order):
+    df_temp = df.copy()
+    if typeChoice == None:
+        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, [type])
+        [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle] = hideAll(sections, subjects, judges, finished, changes)
+        fig = px.box(allData, x = type, y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, width = 1400, height = 600, points  = False)
+        fig.add_traces(
+            px.line(avgData, x = type, y = "durata", markers = True).update_traces(line_color = 'red').data
+        )
+        fig.add_traces(
+            px.line(avgData, x = type, y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
+        )
+        fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
+        sections = frame.getGroupBy(df_temp, 'sezione')
+        subjects = frame.getGroupBy(df_temp, 'materia')
+        judges = frame.getGroupBy(df_temp, 'giudice')
+        finished = frame.getGroupBy(df_temp, 'finito')
+        months = frame.getGroupBy(df_temp, 'mese')
+        changes = frame.getGroupBy(df_temp, 'cambio')
+        return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, choices, choiceStore
+    else:
+        df_temp = frame.getTypeDataFrame(df_temp, type, typeChoice)
+        if ds.ctx.triggered_id != None and 'type-dropdown' in ds.ctx.triggered_id:
+            [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, finished, changes] = showAll(sections, subjects, judges, finished, changes)
+        else:
+            if choices != None and len(choices) < 1:
+                choices = [choiceStore]
+            elif choices != None and len(choices) == 1:
+                choiceStore = choices[0]
+            [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, finished, changes] = hideChosen(choices, sections, subjects, judges, finished, changes)
+            df_temp = df.copy()
+            df_temp = frame.getTypeDataFrame(df_temp, type, typeChoice)
+            df_data = updateData(df_temp, sections, subjects, judges, finished, changes)
+            if ds.ctx.triggered_id != None and 'section-dropdown' in ds.ctx.triggered_id:
+                df_temp = updateData(df_temp, None, subjects, judges, finished, changes)
+            elif ds.ctx.triggered_id != None and 'subject-dropdown' in ds.ctx.triggered_id:
+                df_temp = updateData(df_temp, sections, None, judges, finished, changes)
+            elif ds.ctx.triggered_id != None and 'judge-dropdown' in ds.ctx.triggered_id:
+                df_temp = updateData(df_temp, sections, subjects, None, finished, changes)
+            else:
+                df_temp = df_data
+        sections = frame.getGroupBy(df_temp, 'sezione')
+        subjects = frame.getGroupBy(df_temp, 'materia')
+        judges = frame.getGroupBy(df_temp, 'giudice')
+        finished = frame.getGroupBy(df_temp, 'finito')
+        months = frame.getGroupBy(df_temp, 'mese')
+        changes = frame.getGroupBy(df_temp, 'cambio')
+        [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, dateType, choices, order)
+        fig = px.line(allData, x = "data", y = "durata", height = 800).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+        fig.add_traces(
+            px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600).data
+        )
+        fig.for_each_trace(
+            lambda t: t.update(name = addCountToName(t.name, infoData, choices)) if t.name != addTotCountToName(infoData) else False
+        )
+        fig.update_layout(legend = dict(yanchor = "bottom", y = -1.5, xanchor = "left", x = 0))
+        fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
+        fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
+        fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
+        return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, choices, choiceStore
