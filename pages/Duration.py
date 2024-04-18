@@ -6,7 +6,7 @@ def pageLayout():
         ds.html.H2('Grafici durata'),
         ds.dcc.Link('Durata processi', href='/durationgraph/processduration'),
         ds.html.Br(),
-        ds.dcc.Link('Durata udienze', href='/durationgraph/courtHearingsDuration'),
+        ds.dcc.Link('Durata udienze', href='/durationgraph/courthearingsduration'),
         ds.html.Br(),
         ds.dcc.Link('Durata fasi', href='/durationgraph/phaseduration'),
         ds.html.Br(),

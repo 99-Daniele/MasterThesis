@@ -286,4 +286,3 @@ def typeComparationUpdate(df, dateType, typeChoice, type, sections, subjects, ju
     fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
     return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, choices, choiceStore
-

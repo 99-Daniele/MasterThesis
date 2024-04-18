@@ -9,15 +9,13 @@ def cacheUpdate(filename, data):
 
 def updateCache(filename, databaseData):
     cacheData = getData(filename)
-    print(cacheData)
-    print(type(cacheData))
     if cacheData is None:
         cacheUpdate(filename, databaseData)
     else:
         df = pd.concat([cacheData, databaseData]).drop_duplicates(keep = False)
         if not df.empty:
             cacheUpdate(filename, databaseData)
-    print(filename + " updated!")
+    print(filename[:-5] + " updated!")
 
 def getData(filename):
     filename = "utils/Cache/" + filename

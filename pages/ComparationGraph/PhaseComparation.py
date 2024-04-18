@@ -10,7 +10,7 @@ import utils.Utilities as utilities
 df = getter.getPhasesDuration()
 
 def pageLayout():
-    types = frame.getGroupBy(df, type)
+    types = frame.getGroupBy(df, 'fase')
     typesSorted = sorted(types)
     sections = frame.getGroupBy(df, 'sezione')
     subjects = frame.getGroupBy(df, 'materia')
@@ -22,16 +22,16 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici confronto', href='/comparationgraph'),
         ds.html.H2('CONFRONTO DURATA MEDIA FASI DEL PROCESSO'),        
-        ds.dcc.Dropdown(typesSorted, value = typesSorted[0], multi = False, searchable = False, id = 'type-dropdown', placeholder = type.upper(), style = {'width': 400}),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown', placeholder = 'SEZIONE', style = {'width': 400}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown', placeholder = 'MATERIA', style = {'width': 400}),
-        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown', placeholder = 'GIUDICE', style = {'width': 400}),
-        ds.dcc.Dropdown(utilities.getAllProcessState(), value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'PROCESSO', style = {'width': 400}),
-        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'CAMBIO', style = {'width': 400}),
-        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist", inline = True, style = {'display':'inline'}),
-        ds.dcc.Store(data = ['sezione'], id = "choice-ptore"),
-        ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem", inline = True, style = {'paddingLeft':'85%'}),
-        ds.dcc.Graph(id = 'comparation-graph', figure = fig)
+        ds.dcc.Dropdown(typesSorted, value = typesSorted[0], multi = False, searchable = False, id = 'type-dropdown-p', placeholder = 'FASE', style = {'width': 400}),
+        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-p', placeholder = 'SEZIONE', style = {'width': 400}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-p', placeholder = 'MATERIA', style = {'width': 400}),
+        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-p', placeholder = 'GIUDICE', style = {'width': 400}),
+        ds.dcc.Dropdown(utilities.getAllProcessState(), value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-p', placeholder = 'PROCESSO', style = {'width': 400}),
+        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-p', placeholder = 'CAMBIO', style = {'width': 400}),
+        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist-p", inline = True, style = {'display':'inline'}),
+        ds.dcc.Store(data = ['sezione'], id = "choice-store-p"),
+        ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-p", inline = True, style = {'paddingLeft':'85%'}),
+        ds.dcc.Graph(id = 'comparation-graph-p', figure = fig)
     ])
     return layout
 
@@ -46,7 +46,7 @@ def pageLayout():
         ds.Output('subject-dropdown-p', 'options'),
         ds.Output('judge-dropdown-p', 'options'),
         ds.Output('choice-checklist-p', 'value'),
-        ds.Output('choice-ptore-p', 'data')],
+        ds.Output('choice-store-p', 'data')],
     [ds.Input('type-dropdown-p', 'value'),
         ds.Input('section-dropdown-p', 'value'),
         ds.Input('subject-dropdown-p', 'value'),
@@ -54,7 +54,7 @@ def pageLayout():
         ds.Input('finished-dropdown-p', 'value'),
         ds.Input('change-dropdown-p', 'value'),
         ds.Input('choice-checklist-p', 'value'),
-        ds.Input('choice-ptore-p', 'data'),
+        ds.Input('choice-store-p', 'data'),
         ds.Input('order-radioitem-p', 'value')]
 )
 

@@ -571,3 +571,4 @@ def durationUpdate(df, type, typeChoice, sections, subjects, judges, finished, c
         fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
         fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
         return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, checkStyle, radioStyle, sections, subjects, judges, finished, changes, choices, choiceStore 
+    
