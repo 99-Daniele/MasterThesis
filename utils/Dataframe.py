@@ -184,7 +184,7 @@ def createCourtHearingsDurationDataFrame(processes):
 
 def getAvgStdDataFrameByDate(df, typed):
     match typed:
-        case "W":
+        case "SETTIMANA":
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: utilities.getWeekNumber(x))
             df1 = df1.sort_values(['data'])
@@ -194,9 +194,9 @@ def getAvgStdDataFrameByDate(df, typed):
             df1['data'] = df1['data'].map(lambda x: utilities.getWeek(x))
             df2['data'] = df2['data'].map(lambda x: utilities.getWeek(x))
             return [df1, df2]
-        case "M":
+        case "MESE":
             df1 = df[['data', 'durata']].copy()
-            df1['data'] = df1['data'].map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').month)
+            df1['data'] = df1['data'].map(lambda x: utilities.getMonthNumber(x))
             df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
@@ -204,9 +204,35 @@ def getAvgStdDataFrameByDate(df, typed):
             df1['data'] = df1['data'].map(lambda x: utilities.getMonth(x))
             df2['data'] = df2['data'].map(lambda x: utilities.getMonth(x))
             return [df1, df2]
-        case "MY":
+        case "MESE DELL'ANNO":
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: utilities.getMonthYearDate(x))
+            df1 = df1.sort_values(['data'])
+            df2 = df1.groupby(['data'], as_index = False).mean()
+            df2['conteggio'] = df1.groupby(['data']).size().tolist()
+            df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
+            return [df1, df2]
+        case "TRIMESTRE":
+            df1 = df[['data', 'durata']].copy()
+            df1['data'] = df1['data'].map(lambda x: utilities.getTrimesterNumber(x))
+            df1 = df1.sort_values(['data'])
+            df2 = df1.groupby(['data'], as_index = False).mean()
+            df2['conteggio'] = df1.groupby(['data']).size().tolist()
+            df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
+            df1['data'] = df1['data'].map(lambda x: utilities.getTrimester(x))
+            df2['data'] = df2['data'].map(lambda x: utilities.getTrimester(x))
+            return [df1, df2]
+        case "TRIMESTRE DELL'ANNO":
+            df1 = df[['data', 'durata']].copy()
+            df1['data'] = df1['data'].map(lambda x: utilities.getTrimesterYearDate(x))
+            df1 = df1.sort_values(['data'])
+            df2 = df1.groupby(['data'], as_index = False).mean()
+            df2['conteggio'] = df1.groupby(['data']).size().tolist()
+            df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
+            return [df1, df2]
+        case "ANNO":
+            df1 = df[['data', 'durata']].copy()
+            df1['data'] = df1['data'].map(lambda x: utilities.getYearNumber(x))
             df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()

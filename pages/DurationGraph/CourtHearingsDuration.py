@@ -18,19 +18,25 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici durata', href='/durationgraph'),
         ds.html.H2('DURATA MEDIA UDIENZE'),
+        ds.dcc.Checklist(["SETTIMANA", "MESE", "MESE DELL'ANNO", "TRIMESTRE", "TRIMESTRE DELL'ANNO", "ANNO"], value = ['MESE'], id = "date-checklist-chd", inline = True, style = {'display':'inline'}),
+        ds.dcc.Store(data = 'MESE', id = "date-store-chd"),
         ds.dcc.Dropdown(utilities.getAllProcessState(), value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-chd', placeholder = 'Seleziona tipo di processo...', style = {'width': 400}),
         ds.dcc.Dropdown(years, multi = True, searchable = False, id = 'year-dropdown-chd', placeholder = 'Seleziona anno...', style = {'width': 400}),
-        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-chd', placeholder = 'Cambio giudice', style = {'width': 400}),
+        ds.dcc.Dropdown(['NO', 'SI'], multi = True, searchable = False, id = 'change-dropdown-chd', placeholder = 'Cambio giudice', style = {'width': 400}),
         ds.dcc.Graph(id = 'courthearings-graph', figure = fig)
     ])
     return layout
 
 @ds.callback(
-    ds.Output('courthearings-graph', 'figure'),
-    [ds.Input('finished-dropdown-chd', 'value'), 
+    [ds.Output('courthearings-graph', 'figure'),
+        ds.Output('date-checklist-chd', 'value'),
+        ds.Output('date-store-chd', 'data')],
+    [ds.Input('date-checklist-chd', 'value'),
+        ds.Input('date-store-chd', 'data'), 
+        ds.Input('finished-dropdown-chd', 'value'),
         ds.Input('year-dropdown-chd', 'value'),
         ds.Input('change-dropdown-chd', 'value')]
 )
 
-def updateOutput(finished, year, change):
-    return duration.durationCourtHearingsUpdate(df, finished, year, change)
+def updateOutput(dateChoice, dateStore, finished, year, change):
+    return duration.durationCourtHearingsUpdate(df, dateChoice, dateStore, finished, year, change)
