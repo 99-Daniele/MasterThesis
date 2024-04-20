@@ -73,30 +73,6 @@ def displayProcessDuration():
     ])
     app.run_server(debug = True)
     
-def displayEventDuration():
-    import pages.DurationGraph.EventDuration as eventDurationPage
-    app = ds.Dash(__name__, suppress_callback_exceptions = True)
-    app.layout = ds.html.Div([
-        ds.html.Div(children = eventDurationPage.pageLayout())
-    ])
-    app.run_server(debug = True)
-    
-def displayPhaseDuration():
-    import pages.DurationGraph.PhaseDuration as phaseDurationPage
-    app = ds.Dash(__name__, suppress_callback_exceptions = True)
-    app.layout = ds.html.Div([
-        ds.html.Div(children = phaseDurationPage.pageLayout())
-    ])
-    app.run_server(debug = True)
-
-def displayStateDuration():
-    import pages.DurationGraph.StateDuration as stateDurationPage
-    app = ds.Dash(__name__, suppress_callback_exceptions = True)
-    app.layout = ds.html.Div([
-        ds.html.Div(children = stateDurationPage.pageLayout())
-    ])
-    app.run_server(debug = True)
-    
 def displayCourtHearingsDuration():
     import pages.DurationGraph.CourtHearingsDuration as courtHearingsDurationPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
@@ -110,4 +86,4 @@ def startApp():
     app.start()
 
 if __name__ == '__main__':
-    displayProcessComparation()
+    displayPhaseComparation()

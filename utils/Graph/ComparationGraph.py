@@ -38,50 +38,75 @@ def hideProcessChosen(choices, sections, subjects, judges, finished, changes, se
     sequenceStyle = {'width': 400}
     phaseSequenceStyle = {'width': 400}
     if 'sezione' in choices:
-        sectionStyle = {'width': 200, 'display': 'none'}
+        sectionStyle = {'display': 'none'}
         sections = None
     if 'materia' in choices:
-        subjectStyle = {'width': 200, 'display': 'none'}
+        subjectStyle = {'display': 'none'}
         subjects = None
     if 'giudice' in choices:
-        judgeStyle = {'width': 200, 'display': 'none'}
+        judgeStyle = {'display': 'none'}
         judges = None
     if 'finito' in choices:
-        finishedStyle = {'width': 200, 'display': 'none'}
+        finishedStyle = {'display': 'none'}
         finished = None
     if 'cambio' in choices:
-        changeStyle = {'width': 200, 'display': 'none'}
+        changeStyle = {'display': 'none'}
         changes = None
     if 'sequenza' in choices:
-        sequenceStyle = {'width': 200, 'display': 'none'}
+        sequenceStyle = {'display': 'none'}
         sequences = None
     if 'fasi' in choices:
-        phaseSequenceStyle = {'width': 200, 'display': 'none'}
+        phaseSequenceStyle = {'display': 'none'}
         phaseSequences = None
     return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences]
 
-def hideChosen(choices, sections, subjects, judges, finished, changes):
+def hideTypeChosen(choices, sections, subjects, judges, finished, changes):
+    dateCheckStyle = {'display': 'inline'}
     sectionStyle = {'width': 400}
     subjectStyle = {'width': 400}
     judgeStyle = {'width': 400}
     finishedStyle = {'width': 400}
     changeStyle = {'width': 400}
+    choiceCheckStyle = {'display': 'inline'}
+    orderRadioStyle = {'paddingLeft': '85%'}
     if 'sezione' in choices:
-        sectionStyle = {'width': 200, 'display': 'none'}
+        sectionStyle = {'display': 'none'}
         sections = None
     if 'materia' in choices:
-        subjectStyle = {'width': 200, 'display': 'none'}
+        subjectStyle = {'display': 'none'}
         subjects = None
     if 'giudice' in choices:
-        judgeStyle = {'width': 200, 'display': 'none'}
+        judgeStyle = {'display': 'none'}
         judges = None
     if 'finito' in choices:
-        finishedStyle = {'width': 200, 'display': 'none'}
+        finishedStyle = {'display': 'none'}
         finished = None
     if 'cambio' in choices:
-        changeStyle = {'width': 200, 'display': 'none'}
+        changeStyle = {'display': 'none'}
         changes = None
-    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, finished, changes]
+    return [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, changes]
+
+def showAll():
+    dateCheckStyle = {'display': 'inline'}
+    sectionStyle = {'width': 400}
+    subjectStyle = {'width': 400}
+    judgeStyle = {'width': 400}
+    finishedStyle = {'width': 400}
+    changeStyle = {'width': 400}
+    choiceCheckStyle = {'display': 'inline'}
+    orderRadioStyle = {'paddingLeft': '85%'}
+    return [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, orderRadioStyle]
+
+def hideAll():
+    dateCheckStyle = {'display': 'none'}
+    sectionStyle = {'display': 'none'}
+    subjectStyle = {'display': 'none'}
+    judgeStyle = {'display': 'none'}
+    finishedStyle = {'display': 'none'}
+    changeStyle = {'display': 'none'}
+    choiceCheckStyle = {'display': 'none'}
+    orderRadioStyle = {'display': 'none'}
+    return [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, orderRadioStyle]
 
 def updateProcessData(df, sections, subjects, judges, finished, change, sequences, phaseSequences):
     df_temp = df.copy()
@@ -94,7 +119,7 @@ def updateProcessData(df, sections, subjects, judges, finished, change, sequence
     df_temp = frame.getTypesDataFrame(df_temp, 'fasi', phaseSequences)
     return df_temp
 
-def updateData(df, sections, subjects, judges, finished, change):
+def updateTypeData(df, sections, subjects, judges, finished, change):
     df_temp = df
     df_temp = frame.getTypesDataFrame(df_temp, 'sezione', sections)
     df_temp = frame.getTypesDataFrame(df_temp, 'materia', subjects)
@@ -103,44 +128,72 @@ def updateData(df, sections, subjects, judges, finished, change):
     df_temp = frame.getTypesDataFrame(df_temp, 'cambio', change)
     return df_temp
 
-def comparationUpdate(df, dateType, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
+def updateProcessDataframeFromSelection(choice, df_temp, df_data, sections, subjects, judges, finished, changes, sequences, phaseSequences):
+    if choice != None and 'section-dropdown' in choice:
+        df_temp = updateProcessData(df_temp, None, subjects, judges, finished, changes, sequences, phaseSequences)
+    elif choice != None and 'subject-dropdown' in choice:
+        df_temp = updateProcessData(df_temp, sections, None, judges, finished, changes, sequences, phaseSequences)
+    elif choice != None and 'judge-dropdown' in choice:
+        df_temp = updateProcessData(df_temp, sections, subjects, None, finished, changes, sequences, phaseSequences)
+    elif choice != None and 'finished-dropdown' in choice:
+        df_temp = updateProcessData(df_temp, sections, subjects, judges, None, changes, sequences, phaseSequences)
+    elif choice != None and 'change-dropdown' in choice:
+        df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, None, sequences, phaseSequences)
+    elif choice != None and 'sequence-dropdown' in choice:
+        df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, changes, None, phaseSequences)
+    elif choice != None and 'phaseSequence-dropdown' in choice:
+        df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, changes, sequences, None)
+    else:
+        df_temp = df_data
+    return df_temp
+
+def updateTypeDataframeFromSelection(choice, df_temp, df_data, sections, subjects, judges, finished, changes):
+    if choice != None and 'section-dropdown' in choice:
+        df_temp = updateTypeData(df_temp, None, subjects, judges, finished, changes)
+    elif choice != None and 'subject-dropdown' in choice:
+        df_temp = updateTypeData(df_temp, sections, None, judges, finished, changes)
+    elif choice != None and 'judge-dropdown' in choice:
+        df_temp = updateTypeData(df_temp, sections, subjects, None, finished, changes)
+    elif choice != None and 'finished-dropdown' in choice:
+        df_temp = updateTypeData(df_temp, sections, subjects, judges, None, changes)
+    elif choice != None and 'change-dropdown' in choice:
+        df_temp = updateTypeData(df_temp, sections, subjects, judges, finished, None)
+    else:
+        df_temp = df_data
+    return df_temp
+
+def updateProcessTypes(df):
+    sections = frame.getGroupBy(df, 'sezione')
+    subjects = frame.getGroupBy(df, 'materia')
+    judges = frame.getGroupBy(df, 'giudice')
+    finished = frame.getGroupBy(df, 'finito')
+    changes = frame.getGroupBy(df, 'cambio')
+    sequences = frame.getGroupBy(df, 'sequenza')
+    phaseSequences = frame.getGroupBy(df, 'fasi')
+    return [sections, subjects, judges, finished, changes, sequences, phaseSequences]
+
+def updateTypes(df):
+    sections = frame.getGroupBy(df, 'sezione')
+    subjects = frame.getGroupBy(df, 'materia')
+    judges = frame.getGroupBy(df, 'giudice')
+    finished = frame.getGroupBy(df, 'finito')
+    changes = frame.getGroupBy(df, 'cambio')
+    return [sections, subjects, judges, finished, changes]
+
+def processComparationUpdate(df, dateType, date, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
+    if len(dateType) >= 1:
+        date = dateType[-1]
+    dateType = [date]
     if len(choices) < 1:
         choices = [choiceStore]
     elif len(choices) == 1:
         choiceStore = choices[0]
     [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences] = hideProcessChosen(choices, sections, subjects, judges, finished, changes, sequences, phaseSequences)
-    df_data = df.copy()
-    df_data = updateProcessData(df_data, sections, subjects, judges, finished, changes, sequences, phaseSequences)
-    sections = frame.getGroupBy(df_data, 'sezione')
-    subjects = frame.getGroupBy(df_data, 'materia')
-    judges = frame.getGroupBy(df_data, 'giudice')
-    finished = frame.getGroupBy(df_data, 'finito')
-    changes = frame.getGroupBy(df_data, 'cambio')
-    sequences = frame.getGroupBy(df_data, 'sequenza')
-    phaseSequences = frame.getGroupBy(df_data, 'fasi')
     df_temp = df.copy()
-    if ds.ctx.triggered_id != None and 'section-dropdown' in ds.ctx.triggered_id:
-        df_temp = updateProcessData(df_temp, None, subjects, judges, finished, changes, sequences, phaseSequences)
-        sections = frame.getGroupBy(df_temp, 'sezione')
-    elif ds.ctx.triggered_id != None and 'subject-dropdown' in ds.ctx.triggered_id:
-        df_temp = updateProcessData(df_temp, sections, None, judges, finished, changes, sequences, phaseSequences)
-        subjects = frame.getGroupBy(df_data, 'materia')
-    elif ds.ctx.triggered_id != None and 'judge-dropdown' in ds.ctx.triggered_id:
-        df_temp = updateProcessData(df_temp, sections, subjects, None, finished, changes, sequences, phaseSequences)
-        judges = frame.getGroupBy(df_data, 'giudice')
-    elif ds.ctx.triggered_id != None and 'finished-dropdown' in ds.ctx.triggered_id:
-        df_temp = updateProcessData(df_temp, sections, subjects, judges, None, changes, sequences, phaseSequences)
-        finished = frame.getGroupBy(df_data, 'finito')
-    elif ds.ctx.triggered_id != None and 'change-dropdown' in ds.ctx.triggered_id:
-        df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, None, sequences, phaseSequences)
-        changes = frame.getGroupBy(df_data, 'cambio')
-    elif ds.ctx.triggered_id != None and 'sequence-dropdown' in ds.ctx.triggered_id:
-        df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, changes, None, phaseSequences)
-        sequences = frame.getGroupBy(df_data, 'sequenza')
-    elif ds.ctx.triggered_id != None and 'phaseSequence-dropdown' in ds.ctx.triggered_id:
-        df_temp = updateProcessData(df_temp, sections, subjects, judges, finished, changes, sequences, None)
-        phaseSequences = frame.getGroupBy(df_data, 'fasi')
-    [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, dateType, choices, order)
+    df_data = updateProcessData(df_temp, sections, subjects, judges, finished, changes, sequences, phaseSequences)
+    df_temp = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, changes, sequences, phaseSequences)
+    [sections, subjects, judges, finished, changes, sequences, phaseSequences] = updateProcessTypes(df_temp)
+    [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order)
     fig = px.line(allData, x = "data", y = "durata", height = 800).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
     fig.add_traces(
         px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600).data
@@ -152,86 +205,54 @@ def comparationUpdate(df, dateType, sections, subjects, judges, finished, change
     fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
     fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
-    return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore
+    return fig, dateType, date, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore
 
-def displayTypeComparation(df, dateType, type):
-    types = frame.getGroupBy(df, type)
-    typesSorted = sorted(types)
-    sections = frame.getGroupBy(df, 'sezione')
-    subjects = frame.getGroupBy(df, 'materia')
-    judges = frame.getGroupBy(df, 'giudice')
-    df_temp = pd.DataFrame({'A' : [], 'B': []})
-    fig = px.box(df_temp, x = 'A', y = 'B')
-    app = ds.Dash(suppress_callback_exceptions = True)
-    app.layout = ds.html.Div([
-        ds.html.H2('CONFRONTO DURATA MEDIA ' + type.upper() + " DEL PROCESSO"),        
-        ds.dcc.Dropdown(typesSorted, value = typesSorted[0], multi = False, searchable = False, id = 'type-dropdown', placeholder = type.upper(), style = {'width': 400}),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown', placeholder = 'SEZIONE', style = {'width': 400}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown', placeholder = 'MATERIA', style = {'width': 400}),
-        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown', placeholder = 'GIUDICE', style = {'width': 400}),
-        ds.dcc.Dropdown(utilities.getAllProcessState(), value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown', placeholder = 'PROCESSO', style = {'width': 400}),
-        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown', placeholder = 'CAMBIO', style = {'width': 400}),
-        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist", inline = True, style = {'display':'inline'}),
-        ds.dcc.Store(data = ['sezione'], id = "choice-store"),
-        ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem", inline = True, style = {'paddingLeft':'85%'}),
-        ds.dcc.Graph(id = 'comparation-graph', figure = fig)
-    ])
-    @app.callback(
-        [ds.Output('comparation-graph', 'figure'),
-         ds.Output('section-dropdown', 'style'),
-         ds.Output('subject-dropdown', 'style'),
-         ds.Output('judge-dropdown', 'style'),
-         ds.Output('finished-dropdown', 'style'),
-         ds.Output('change-dropdown', 'style'),
-         ds.Output('section-dropdown', 'options'),
-         ds.Output('subject-dropdown', 'options'),
-         ds.Output('judge-dropdown', 'options'),
-         ds.Output('choice-checklist', 'value'),
-         ds.Output('choice-store', 'data')],
-        [ds.Input('type-dropdown', 'value'),
-         ds.Input('section-dropdown', 'value'),
-         ds.Input('subject-dropdown', 'value'),
-         ds.Input('judge-dropdown', 'value'),
-         ds.Input('finished-dropdown', 'value'),
-         ds.Input('change-dropdown', 'value'),
-         ds.Input('choice-checklist', 'value'),
-         ds.Input('choice-store', 'data'),
-         ds.Input('order-radioitem', 'value')]
-    )
-    def updateOutput(typeChoice, sections, subjects, judges, finished, changes, choices, choiceStore, order):
-        return typeComparationUpdate(df, dateType, typeChoice, type, sections, subjects, judges, finished, changes, choices, choiceStore, order)
-    app.run_server(debug = True)
-
-def typeComparationUpdate(df, dateType, typeChoice, type, sections, subjects, judges, finished, changes, choices, choiceStore, order):
-    if choices != None and len(choices) < 1:
-        choices = [choiceStore]
-    elif choices != None and len(choices) == 1:
-        choiceStore = choices[0]
-    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, finished, changes] = hideChosen(choices, sections, subjects, judges, finished, changes)
+def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjects, judges, finished, changes, choices, choiceStore, order):
     df_temp = df.copy()
-    df_temp = frame.getTypeDataFrame(df_temp, type, typeChoice)
-    df_data = updateData(df_temp, sections, subjects, judges, finished, changes)
-    if ds.ctx.triggered_id != None and 'section-dropdown' in ds.ctx.triggered_id:
-        df_temp = updateData(df_temp, None, subjects, judges, finished, changes)
-    elif ds.ctx.triggered_id != None and 'subject-dropdown' in ds.ctx.triggered_id:
-        df_temp = updateData(df_temp, sections, None, judges, finished, changes)
-    elif ds.ctx.triggered_id != None and 'judge-dropdown' in ds.ctx.triggered_id:
-        df_temp = updateData(df_temp, sections, subjects, None, finished, changes)
+    if typeChoice == None:
+        title = 'DURATA MEDIA ' + type[0:-1].upper() + 'I DEL PROCESSO'
+        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, [type])
+        [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, orderRadioStyle] = hideAll()
+        fig = px.box(allData, x = type, y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, width = 1400, height = 600, points  = False)
+        fig.add_traces(
+            px.line(avgData, x = type, y = "durata", markers = True).update_traces(line_color = 'red').data
+        )
+        fig.add_traces(
+            px.line(avgData, x = type, y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
+        )
+        fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
+        [sections, subjects, judges, finished, changes] = updateTypes(df_temp)
+        return fig, dateType, date, dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, changes, choices, choiceStore, title
     else:
-        df_temp = df_data
-    sections = frame.getGroupBy(df_temp, 'sezione')
-    subjects = frame.getGroupBy(df_temp, 'materia')
-    judges = frame.getGroupBy(df_temp, 'giudice')
-    [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, dateType, choices, order)
-    fig = px.line(allData, x = "data", y = "durata", height = 800).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
-    fig.add_traces(
-        px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600).data
-    )
-    fig.for_each_trace(
-        lambda t: t.update(name = addCountToName(t.name, infoData, choices)) if t.name != addTotCountToName(infoData) else False
-    )
-    fig.update_layout(legend = dict(yanchor = "bottom", y = -1.5, xanchor = "left", x = 0))
-    fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
-    fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
-    fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
-    return fig, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sections, subjects, judges, choices, choiceStore
+        title = 'CONFRONTO DURATA ' + type.upper() + ' ' + str(typeChoice).upper()
+        df_temp = frame.getTypesDataFrame(df_temp, type, [typeChoice])
+        if ds.ctx.triggered_id != None and 'type-dropdown' in ds.ctx.triggered_id:
+            [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, orderRadioStyle] = showAll()
+            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_temp, date, choices, order)
+        else:
+            if len(dateType) >= 1:
+                date = dateType[-1]
+            dateType = [date]
+            if choices != None and len(choices) < 1:
+                choices = [choiceStore]
+            elif choices != None and len(choices) == 1:
+                choiceStore = choices[0]
+            [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, changes] = hideTypeChosen(choices, sections, subjects, judges, finished, changes)
+            df_temp = df.copy()
+            df_temp = frame.getTypesDataFrame(df_temp, type, [typeChoice])
+            df_data = updateTypeData(df_temp, sections, subjects, judges, finished, changes)
+            df_temp = updateTypeDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, changes)
+            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order)
+        [sections, subjects, judges, finished, changes] = updateTypes(df_temp)
+        fig = px.line(allData, x = "data", y = "durata", height = 800).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+        fig.add_traces(
+            px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600).data
+        )
+        fig.for_each_trace(
+            lambda t: t.update(name = addCountToName(t.name, infoData, choices)) if t.name != addTotCountToName(infoData) else False
+        )
+        fig.update_layout(legend = dict(yanchor = "bottom", y = -1.5, xanchor = "left", x = 0))
+        fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
+        fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
+        fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
+        return fig, dateType, date, dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, changes, choices, choiceStore, title

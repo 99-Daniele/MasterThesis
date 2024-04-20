@@ -10,11 +10,11 @@ def start():
     import pages.ComparationGraph.ComparationByWeek as comparationWeekPage
     import pages.ComparationGraph.PhaseComparation as phaseComparation
     import pages.ComparationGraph.StateComparation as stateComparation
-    import pages.DurationGraph.PhaseDuration as phaseDurationPage
+    import pages.ComparationGraph.PhaseComparation as phaseDurationPage
     import pages.DurationGraph.CourtHearingsDuration as courtHearingsDurationPage
-    import pages.DurationGraph.EventDuration as eventDurationPage
+    import pages.ComparationGraph.EventComparation as eventDurationPage
     import pages.DurationGraph.ProcessDuration as processDurationPage
-    import pages.DurationGraph.StateDuration as stateDurationPage
+    import pages.ComparationGraph.StateComparation as stateDurationPage
     import pages.EventGraph.AllEvents as allEventsPage
     import pages.EventGraph.ImportantEvents as importantEventsPage
     import pages.EventGraph.PhaseEvents as phaseEventsPage
