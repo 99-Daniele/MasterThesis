@@ -7,7 +7,7 @@ import utils.Getters as getter
 import utils.Graph.ComparationGraph as comparation
 import utils.Utilities as utilities
 
-df = getter.getPhasesDuration()
+df = getter.getStatesDuration()
 
 def pageLayout():
     types = frame.getGroupBy(df, 'stato')
@@ -24,7 +24,7 @@ def pageLayout():
         ds.html.H2('DURATA MEDIA STATI DEL PROCESSO', id = 'title-s'),
         ds.dcc.Checklist(["SETTIMANA", "MESE", "MESE DELL'ANNO", "TRIMESTRE", "TRIMESTRE DELL'ANNO", "ANNO"], value = ['MESE'], id = "date-checklist-s", inline = True, style = {'display':'none'}),
         ds.dcc.Store(data = 'MESE', id = "date-store-s"),
-        ds.dcc.Dropdown(typesSorted, multi = False, searchable = False, id = 'type-dropdown-s', placeholder = 'FASE', style = {'width': 400}),
+        ds.dcc.Dropdown(typesSorted, multi = False, searchable = False, id = 'type-dropdown-s', placeholder = 'STATO', style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-s', placeholder = 'SEZIONE', style = {'display': 'none'}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-s', placeholder = 'MATERIA', style = {'display': 'none'}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-s', placeholder = 'GIUDICE', style = {'display': 'none'}),
@@ -56,7 +56,7 @@ def pageLayout():
         ds.Output('change-dropdown-s', 'options'),
         ds.Output('choice-checklist-s', 'value'),
         ds.Output('choice-store-s', 'data'),
-        ds.Output('title-s', 'value')],
+        ds.Output('title-s', 'children')],
     [ds.Input('type-dropdown-s', 'value'),
         ds.Input('date-checklist-s', 'value'),
         ds.Input('date-store-s', 'data'),

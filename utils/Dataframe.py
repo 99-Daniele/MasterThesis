@@ -352,17 +352,17 @@ def getDateDataFrame(df, type, startDate, endDate):
     return d
 
 def getAllYears(df):
-    df_temp = df['data']
+    df_temp = df['data'].copy()
     df_temp = df_temp.map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year).sort_values()
     years = df_temp.unique()
     return years
 
 def getUniques(df, tag):
-    df_temp = df[tag]
+    df_temp = df[tag].copy()
     types = df_temp.unique()
     return types
 
 def getGroupBy(df, tag):
-    df_temp = df
+    df_temp = df.copy()
     types = df_temp.groupby([tag])[tag].size().sort_values(ascending = False).reset_index(name = 'count')[tag].tolist()
     return types

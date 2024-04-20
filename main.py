@@ -86,4 +86,4 @@ def startApp():
     app.start()
 
 if __name__ == '__main__':
-    displayPhaseComparation()
+    displayProcessDuration()
