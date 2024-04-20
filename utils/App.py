@@ -5,16 +5,12 @@ def start():
     import pages.Comparation as comparationPage
     import pages.Duration as durationPage
     import pages.Event as eventPage
-    import pages.ComparationGraph.ProcessComparation as comparationMonthPage
-    import pages.ComparationGraph.ComparationByMonthYear as comparationMonthYearPage
-    import pages.ComparationGraph.ComparationByWeek as comparationWeekPage
-    import pages.ComparationGraph.PhaseComparation as phaseComparation
-    import pages.ComparationGraph.StateComparation as stateComparation
-    import pages.ComparationGraph.PhaseComparation as phaseDurationPage
+    import pages.ComparationGraph.EventComparation as eventComparationPage
+    import pages.ComparationGraph.PhaseComparation as phaseComparationPage
+    import pages.ComparationGraph.ProcessComparation as processComparationPage
+    import pages.ComparationGraph.StateComparation as stateComparationPage
     import pages.DurationGraph.CourtHearingsDuration as courtHearingsDurationPage
-    import pages.ComparationGraph.EventComparation as eventDurationPage
     import pages.DurationGraph.ProcessDuration as processDurationPage
-    import pages.ComparationGraph.StateComparation as stateDurationPage
     import pages.EventGraph.AllEvents as allEventsPage
     import pages.EventGraph.ImportantEvents as importantEventsPage
     import pages.EventGraph.PhaseEvents as phaseEventsPage
@@ -37,26 +33,18 @@ def start():
                 return durationPage.pageLayout()
             case '/eventgraph':
                 return eventPage.pageLayout()
-            case '/comparationgraph/weekcomparation':
-                return comparationWeekPage.pageLayout()
-            case '/comparationgraph/monthcomparation':
-                return comparationMonthPage.pageLayout()
-            case '/comparationgraph/monthyearcomparation':
-                return comparationMonthYearPage.pageLayout()
+            case '/comparationgraph/eventcomparation':
+                return eventComparationPage.pageLayout()
             case '/comparationgraph/phasecomparation':
-                return phaseComparation.pageLayout()
+                return phaseComparationPage.pageLayout()
+            case '/comparationgraph/processcomparation':
+                return processComparationPage.pageLayout()
             case '/comparationgraph/statecomparation':
-                return stateComparation.pageLayout()
+                return stateComparationPage.pageLayout()
             case '/durationgraph/courthearingsduration':
                 return courtHearingsDurationPage.pageLayout()
-            case '/durationgraph/eventduration':
-                return eventDurationPage.pageLayout()
-            case '/durationgraph/phaseduration':
-                return phaseDurationPage.pageLayout()
             case '/durationgraph/processduration':
                 return processDurationPage.pageLayout()
-            case '/durationgraph/stateduration':
-                return stateDurationPage.pageLayout()
             case '/eventgraph/allevents':
                 return allEventsPage.pageLayout()
             case '/eventgraph/importantevents':
