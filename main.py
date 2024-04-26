@@ -6,6 +6,7 @@ def refreshData():
     import utils.Getters as getter
     connection = connect.getDatabaseConnection()
     update.refreshData(connection)
+    exit()
     print("Database updated!")
     getter.updateCache()
 
@@ -86,4 +87,4 @@ def startApp():
     app.start()
 
 if __name__ == '__main__':
-    displayCourtHearingsDuration()
+    refreshData()
