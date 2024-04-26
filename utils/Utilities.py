@@ -87,3 +87,7 @@ def getAllProcessState():
 def fromListToString(list):
     string = ",".join(str(l) for l in list)
     return string
+
+def fromStringToList(string):
+    list = string.split(",")
+    return list

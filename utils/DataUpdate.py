@@ -53,18 +53,19 @@ def getDurations(events, courtHearingsType, maxDate):
     phasesDuration = []
     statesDuration = []
     courtHearingsDuration = []
+    processSequences = []
     processDuration = []
-    processTypes = []
     i = 0
     while i < len(events):
         if events[i][4] != processId:
             [processEventsDuration, filteredEvents] = getEventsDuration(processEvents, maxDate)
             eventsDuration = eventsDuration + processEventsDuration
             phasesDuration = phasesDuration + getPhasesDuration(filteredEvents)
-            #statesDuration = statesDuration + getStatesDUration(processEvents)
-            #courtHearingsDuration = courtHearingsDuration + getCourtHearingsDuration(processEvents, courtHearingsType)
-            #processDuration = processDuration + getProcessesDuration(processEvents)
-            #processTypes = processTypes + getProcessesTypes(processEvents)
+            statesDuration = statesDuration + getStatesDuration(filteredEvents)
+            courtHearingsDuration = courtHearingsDuration + getCourtHearingsDuration(filteredEvents, courtHearingsType)
+            [processSequence, phaseEventsSequenceOriginal, eventsSequence, finished] = getProcessesSequence(filteredEvents)
+            processSequences = processSequences + processSequence
+            processDuration = processDuration + getProcessesDuration(filteredEvents, finished, processSequence, phaseEventsSequenceOriginal, eventsSequence)
             processEvents = []
             processId = events[i][4]
         else:
@@ -126,10 +127,94 @@ def getPhasesDuration(events):
             firstEvent = next
             order = order + 1
             if next[3] == '5':
-                phasesDuration.append([curr[4], 5, order, 0, next[5], next[5], next[0], next[0]])
+                phasesDuration.append([next[4], 5, order, 0, next[5], next[5], next[0], next[0]])
                 return phasesDuration
         i = i + 1
     return phasesDuration
+
+def getStatesDuration(events):
+    statesDuration = []
+    i = 0
+    firstEvent = events[0]
+    order = 1
+    while i < len(events) - 1:
+        curr = events[i]
+        next = events[i + 1]
+        if next[2] != curr[2]:
+            duration = (curr[5] - firstEvent[5]).days
+            statesDuration.append([curr[4], curr[2], curr[6], order, duration, firstEvent[5], curr[5], firstEvent[0], curr[0]])
+            firstEvent = next
+            order = order + 1
+            if next[3] == '5':
+                statesDuration.append([next[4], next[2], next[6], order, 0, next[5], next[5], next[0], next[0]])
+                return statesDuration
+        i = i + 1
+    return statesDuration
+
+def getCourtHearingsDuration(events, courtHearingsType):
+    firstEvent = None
+    lastEvent = None
+    for e in events:
+        if e[6] in courtHearingsType:
+            if firstEvent == None:
+                firstEvent = e
+            lastEvent = e
+    if firstEvent == None:
+        return []
+    duration = (lastEvent[5] - firstEvent[5]).days
+    return [e[4], duration, firstEvent[5], lastEvent[5], firstEvent[0], lastEvent[0]]
+
+def getProcessesSequence(events):
+    processType = -1
+    processId = events[0][4]
+    originalSequence = [events[0][2]]
+    translatedSequence = [events[0][6]]
+    shortSequence = [events[0][7]]
+    phasesSequence = [events[0][3]]
+    phasesSequenceOriginal = [events[0][3]]
+    eventsSequence = [events[0][1]]
+    for e in events:
+        if e[3] != '0':
+            processType = 0
+        if e[2] != originalSequence[-1]:
+            originalSequence.append(e[2])
+        if e[6] != translatedSequence[-1]:
+            translatedSequence.append(e[6])
+        if not e[3].isdigit() and e[7] != shortSequence[-1]:
+            shortSequence.append(e[7])
+        if e[3].isdigit() and int(e[3]) >= int(phasesSequence[-1]) and e[7] not in shortSequence:
+            shortSequence.append(e[7])
+        if e[3].isdigit() and int(e[3]) < int(phasesSequence[-1]) and shortSequence[-1] != 'REST':
+            shortSequence.append('REST')
+        if e[3] not in phasesSequence and e[3].isdigit():
+            phasesSequence.append(e[3])
+            phasesSequence.sort()
+        if e[3] != phasesSequenceOriginal[-1] and e[3].isdigit():
+            phasesSequenceOriginal.append(e[3])
+        if e[1] != eventsSequence[-1]:
+            eventsSequence.append(e[1])
+        if phasesSequence[-1] == '5':
+            processType = 1
+    return [[processId, processType, utilities.fromListToString(originalSequence), utilities.fromListToString(translatedSequence), utilities.fromListToString(shortSequence), utilities.fromListToString(phasesSequence)], phasesSequenceOriginal, eventsSequence, processType == 1]
+
+def getProcessesDuration(events, finished, processSequence, phaseEventsSequenceOriginal, eventsSequence):
+    duration = (events[-1][5] - events[0][5]).days
+    if finished:
+        return [events[0][4], duration, events[0][5], events[-1][5], events[0][0], events[-1][0]]
+    else:
+        predictedDuration = getPredictedDuration(duration, utilities.fromStringToList(processSequence[2]), utilities.fromStringToList(processSequence[3]), utilities.fromStringToList(processSequence[4]), utilities.fromStringToList(processSequence[5]), phaseEventsSequenceOriginal, eventsSequence)
+        return [events[0][4], predictedDuration, events[0][5], events[-1][5], events[0][0], events[-1][0]]
+
+def getPredictedDuration(duration, originalSequence, translatedSequence, shortSequence, phaseSequence, phaseEventsSequenceOriginal, eventsSequence):
+    print(duration)
+    print(originalSequence)
+    print(translatedSequence)
+    print(shortSequence)
+    print(phaseSequence)
+    print(phaseEventsSequenceOriginal)
+    print(eventsSequence)
+    exit()
+
 
 def groupEventsByProcess(events):
     processes = {}
@@ -345,7 +430,7 @@ def verifyDatabase(connection):
     if not connect.doesATableExist(connection, "eventitipo"):
         connect.createTable(connection, 'eventitipo', ['numEvento', 'evento', 'stato', 'fase'], ['BIGINT', 'TEXT', 'TEXT', 'VARCHAR(5)'], [0], [])
     if not connect.doesATableExist(connection, "durataeventi"):
-        connect.createTable(connection, 'durataeventi', ['numEvento', 'durata', 'dataInizio', 'dataFine'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME'], [0], [])
+        connect.createTable(connection, 'durataeventi', ['numEvento', 'durata', 'dataInizio', 'dataFine', 'numEventoSuccessivo'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME', 'BIGINT'], [0], [])
     if not connect.doesATableExist(connection, "duratafasi"):
         connect.createTable(connection, 'duratafasi', ['numProcesso', 'fase', 'ordine', 'durata', 'dataInizioFase', 'dataFineFase', 'numEventoInizioFase', 'numEventoFineFase'], ['BIGINT', 'VARCHAR(5)', 'INT', 'INT', 'DATETIME', 'DATETIME', 'BIGINT', 'BIGINT'], [0, 2], [])
     if not connect.doesATableExist(connection, "duratastati"):
