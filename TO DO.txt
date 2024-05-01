@@ -4,8 +4,6 @@
 - sistemare legenda
 
 - dati solo sezione 1,2,3,4
-- processi finiti e stoppati insieme
-- predizione durata non finiti
 - carico processi
 - sequenza eventi
 - presenza eventi particolari (ex: cambio giudice)
