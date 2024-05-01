@@ -5,53 +5,6 @@ import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Utilities as utilities
 
-class TreeRoot:
-    def __init__(self):
-        self.children = []
-
-    def getChildren(self, id):
-        for c in self.children:
-            if c.id == id:
-                return c
-        return None
-    
-    def addChildren(self, id, currDuration, totDuration):
-        newChildren = TreeNode(id, currDuration, totDuration, [id])
-        self.children.append(newChildren)
-        return newChildren
-
-class TreeNode:
-    def __init__(self, id, currDuration, totDuration, currSequence):
-        self.children = []
-        self.id = id
-        self.count = 1
-        self.currDuration = currDuration
-        self.totDuration = totDuration
-        self.currSequence = currSequence
-
-    def getInfo(self):
-        return [self.count, self.currDuration, self.totDuration, self.currSequence]
-    
-    def getChildren(self, id):
-        for c in self.children:
-            if c.id == id:
-                return c
-        return None
-
-    def add(self, currDuration, totDuration):
-        new_currDuration = (self.count * self.currDuration + currDuration) / (self.count + 1)
-        self.currDuration = new_currDuration
-        new_totDuration = (self.count * self.totDuration + totDuration) / (self.count + 1)
-        self.totDuration = new_totDuration
-        self.count = self.count + 1
-
-    def addChildren(self, id, currDuration, totDuration):
-        newSequence = self.currSequence.copy()
-        newSequence.append(id)
-        newChildren = TreeNode(id, currDuration, totDuration, newSequence)
-        self.children.append(newChildren)
-        return newChildren
-
 def refreshData(connection):
     verifyDatabase(connection)
     maxDate = getter.getMaxDate()
@@ -73,6 +26,7 @@ def refreshData(connection):
     processDurationInfo = compareData(processDuration, connection, "SELECT * FROM durataprocessi ORDER BY numProcesso")
     courtHearingsDurationInfo = compareData(courtHearingsDuration, connection, "SELECT * FROM durataudienze ORDER BY numProcesso")
     processSequenceInfo = compareData(processSequence, connection, "SELECT * FROM processitipo ORDER BY numProcesso")
+    exit()
     connect.updateTable(connection, 'eventitipo', eventsFilteredInfo, 'numEvento')
     connect.updateTable(connection, 'durataeventi', eventsDurationInfo, 'numEvento')
     connect.updateTableOrder(connection, 'duratafasi', phasesDurationInfo, 'numProcesso')
@@ -87,19 +41,6 @@ def filterEvents(events):
         eventsFiltered.append((e[0], e[1], e[6], e[3]))
     return eventsFiltered
 
-def addSequenceToTree(sequence, tree):
-    node = tree
-    for s in sequence:
-        id = s[0]
-        currDuration = s[1]
-        totDuration = s[2]
-        new_node = node.getChildren(id)
-        if new_node == None:
-            new_node = node.addChildren(id, currDuration, totDuration)
-        else:
-            new_node.add(currDuration, totDuration)
-        node = new_node
-
 def getDurations(events, courtHearingsType, maxDate):
     processEvents = []
     processId = events[0][4]
@@ -109,11 +50,11 @@ def getDurations(events, courtHearingsType, maxDate):
     courtHearingsDuration = []
     processSequences = []
     processDuration = []
-    originalSequenceTree = TreeRoot()
-    translatedSequenceTree = TreeRoot()
-    shortSequenceTree = TreeRoot()
-    phaseSequenceTree = TreeRoot()
-    eventSequenceTree = TreeRoot()
+    originalSequenceList = []
+    translatedSequenceList = []
+    shortSequenceList = []
+    phaseSequenceList = []
+    eventSequenceList = []
     unfinishedProcesses = []
     i = 0
     with alive_bar(int(len(events))) as bar:
@@ -131,11 +72,11 @@ def getDurations(events, courtHearingsType, maxDate):
                     processSequences = processSequences + processSequence
                     if finished:
                         processDuration = processDuration + getProcessesDuration(filteredEvents)
-                        addSequenceToTree(originalSequence, originalSequenceTree)
-                        addSequenceToTree(translatedSequence, translatedSequenceTree)
-                        addSequenceToTree(shortSequence, shortSequenceTree)
-                        addSequenceToTree(phaseSequence, phaseSequenceTree)
-                        addSequenceToTree(eventSequence, eventSequenceTree)
+                        originalSequenceList.append(originalSequence)
+                        translatedSequenceList.append(translatedSequence)
+                        shortSequenceList.append(shortSequence)
+                        phaseSequenceList.append(phaseSequence)
+                        eventSequenceList.append(eventSequence)
                     else:
                         unfinishedProcesses.append([processId, firstEventDate, firstEventId, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence])
                 processEvents = []
@@ -146,7 +87,13 @@ def getDurations(events, courtHearingsType, maxDate):
             bar()
     with alive_bar(int(len(unfinishedProcesses))) as bar:
         for p in unfinishedProcesses:
-            processDuration = processDuration + getPredictedDuration(p, originalSequenceTree, translatedSequenceTree, shortSequenceTree, phaseSequenceTree, eventSequenceTree)
+            [processDuration, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence] = getPredictedDuration(p, originalSequenceList, translatedSequenceList, shortSequenceList, phaseSequenceList, eventSequenceList)
+            originalSequenceList.append(originalSequence)
+            translatedSequenceList.append(translatedSequence)
+            shortSequenceList.append(shortSequence)
+            phaseSequenceList.append(phaseSequence)
+            eventSequenceList.append(eventSequence)
+            processDuration = processDuration + processDuration
             bar()
     return [eventsDuration, phasesDuration, statesDuration, processDuration, courtHearingsDuration, processSequences]
 
@@ -168,6 +115,9 @@ def getEventsDuration(events, maxDate):
         curr = events[i]
         next = events[i + 1]
         prev = events[i - 1]
+        if curr[3] == '5' and not end:
+            end = True
+            correctEvents.append(curr)
         if curr[7] == prev[7] or curr[7] == next[7]:
             if end:
                 duration = 0
@@ -177,13 +127,14 @@ def getEventsDuration(events, maxDate):
                 duration = (next[5] - curr[5]).days
                 nextDate = next[5]
                 nextId = next[0]
+                correctEvents.append(curr)
             eventsDuration.append((curr[0], duration, curr[5], nextDate, nextId))
-            correctEvents.append(curr)
-        if next[3] == '5':
-            end = True
         i = i + 1
     curr = events[i]
     prev = events[i - 1]
+    if curr[3] == '5' and not end:
+        end = True
+        correctEvents.append(curr)
     if curr[7] == prev[7]:
         if end:
             duration = 0
@@ -193,8 +144,8 @@ def getEventsDuration(events, maxDate):
             duration = (maxDate - curr[5]).days
             nextDate = maxDate
             nextId = None
+            correctEvents.append(curr)  
         eventsDuration.append((curr[0], duration, curr[5], nextDate, nextId))
-        correctEvents.append(curr)  
     return [eventsDuration, correctEvents]
 
 def getPhasesDuration(events):
@@ -256,48 +207,48 @@ def getProcessesSequence(events):
     firstEventDate = events[0][5]
     totDuration = (events[-1][5] - firstEventDate).days
     originalSequence = [events[0][2]]
-    originalSequenceDuration = [[events[0][2], 0, totDuration]]
+    originalSequenceDuration = [totDuration, [[events[0][2], 0]]]
     translatedSequence = [events[0][6]]
-    translatedSequenceDuration = [[events[0][6], 0, totDuration]]
+    translatedSequenceDuration = [totDuration, [[events[0][6], 0]]]
     shortSequence = [events[0][7]]
-    shortSequenceDuration = [[events[0][7], 0, totDuration]]
+    shortSequenceDuration = [totDuration, [[events[0][7], 0]]]
     if events[0][3] == '0':
         phasesSequence = [events[0][3]]
     else:
         phasesSequence = ['1']
     phasesSequenceOriginal = [events[0][3]]
-    phasesSequenceOriginalDuration = [[events[0][3], 0, totDuration]]
+    phasesSequenceOriginalDuration = [totDuration, [[events[0][3], 0]]]
     eventsSequence = [events[0][1]]
-    eventsSequenceDuration = [[events[0][1], 0, totDuration]]
+    eventsSequenceDuration = [totDuration, [[events[0][1], 0]]]
     for e in events:
         duration = (e[5] - firstEventDate).days
         if e[3] != '0':
             processType = 0
         if e[2] != originalSequence[-1]:
             originalSequence.append(e[2])
-            originalSequenceDuration.append([e[2], duration, totDuration])
+            originalSequenceDuration[1].append([e[2], duration])
         if e[6] != translatedSequence[-1]:
             translatedSequence.append(e[6])
-            translatedSequenceDuration.append([e[6], duration, totDuration])
+            translatedSequenceDuration[1].append([e[6], duration])
         if not e[3].isdigit() and e[7] != shortSequence[-1]:
             shortSequence.append(e[7])
-            shortSequenceDuration.append([e[7], duration, totDuration])
+            shortSequenceDuration[1].append([e[7], duration])
         if e[3].isdigit():
             if int(e[3]) >= int(phasesSequence[-1]) and e[7] not in shortSequence:
                 shortSequence.append(e[7])
-                shortSequenceDuration.append([e[7], duration, totDuration])
+                shortSequenceDuration[1].append([e[7], duration])
             elif int(e[3]) < int(phasesSequence[-1]) and shortSequence[-1] != 'REST':
                 shortSequence.append('REST')
-                shortSequenceDuration.append(['REST', duration, totDuration])
+                shortSequenceDuration[1].append(['REST', duration])
             if e[3] not in phasesSequence:
                 phasesSequence.append(e[3])
                 phasesSequence.sort()
             if e[3] != phasesSequenceOriginal[-1]:
                 phasesSequenceOriginal.append(e[3])
-                phasesSequenceOriginalDuration.append([e[3], duration, totDuration])
+                phasesSequenceOriginalDuration[1].append([e[3], duration])
         if e[1] != eventsSequence[-1]:
             eventsSequence.append(e[1])
-            eventsSequenceDuration.append([e[1], duration, totDuration])
+            eventsSequenceDuration[1].append([e[1], duration])
         if phasesSequence[-1] == '5':
             if shortSequence[-1] == 'FINE':
                 processType = 1
@@ -310,47 +261,50 @@ def getProcessesDuration(events):
     duration = (events[-1][5] - events[0][5]).days
     return [(events[0][4], duration, events[0][5], events[-1][5], events[0][0], events[-1][0])]
 
-def getPrediction(sequence, tree):
-    node = tree.getChildren(sequence[0][0])
-    if node == None:
-        return [0, 0, 0]
-    i = 1
-    while i < len(sequence):
-        id = sequence[i][0]
-        new_node = node.getChildren(id)
-        if new_node == None:
-            i = i - 1
-            [count, curr, tot, seq] = node.getInfo()
-            if curr == 0:
-                duration = sequence[i][1]
+def getLikenessUnfinished(unfinished, finished):
+    i = 0
+    likeness = 0
+    while i < len(unfinished):
+        k = 0
+        while k < len(finished):
+            if k % 2 == 0:
+                j = i - k / 2
+                if finished[j][0] == unfinished[i][0]:
+                    break
             else:
-                perc = (sequence[i][1] - curr) / curr
-                duration = tot * (perc + 1)
-            return [duration, count, i / len(sequence)]
-        else:
-            node = new_node
-            i = i + 1
-    [count, curr, tot, seq] = node.getInfo()
-    i = i - 1
-    if curr == 0:
-        duration = sequence[i][1]
-    else:
-        perc = (sequence[i][1] - curr) / curr
-        duration = tot * (perc + 1)
-    return [duration, count, i / len(sequence)]
+                j = i + (k + 1) / 2
+                if finished[j][0] == unfinished[i][0]:
+                    break
+            k += 1
+        if k < len(finished):
+            likeness += (len(unfinished) - abs(i - j)) / len(unfinished)
+        i = i + 1
+    return likeness / len(unfinished)
+    
 
-def getPredictedDuration(unfinishedProcessInfo, originalSequenceTree, translatedSequenceTree, shortSequenceTree, phaseSequenceTree, eventSequenceTree):
+def getLikeness(unfinished, finished):
+    return getLikenessUnfinished(unfinished, finished)
+
+
+
+def getPrediction(sequence, list):
+    likelihood = []
+    for l in list:
+        likeness = getLikeness(sequence, l)
+        print(sequence, l, likeness)
+        exit()
+        likelihood.append(likeness)
+
+def getPredictedDuration(unfinishedProcessInfo, originalSequenceList, translatedSequenceList, shortSequenceList, phaseSequenceList, eventSequenceList):
     [processId, firstEventDate, firstEventId, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence] = unfinishedProcessInfo
-    [originalSequenceDuration, originalSequenceCount, originalSequenceSeq] = getPrediction(originalSequence, originalSequenceTree)
-    [translatedSequenceDuration, translatedSequenceCount, translatedSequenceSeq] = getPrediction(translatedSequence, translatedSequenceTree)
-    [shortSequenceDuration, shortSequenceCount, shortSequenceSeq] = getPrediction(shortSequence, shortSequenceTree)
-    [phaseSequenceDuration, phaseSequenceCount, phaseSequenceSeq] = getPrediction(phaseSequence, phaseSequenceTree)
-    [eventSequenceDuration, eventSequenceCount, eventSequenceSeq] = getPrediction(eventSequence, eventSequenceTree)
-    totCount = originalSequenceCount + translatedSequenceCount + shortSequenceCount + phaseSequenceCount + eventSequenceCount
-    totSeq = originalSequenceSeq + translatedSequenceSeq + shortSequenceSeq + phaseSequenceSeq + eventSequenceSeq
-    if totSeq == 0:
-        return []
-    predictedDuration = int(((originalSequenceDuration * originalSequenceCount * originalSequenceSeq) + (translatedSequenceDuration * translatedSequenceCount * translatedSequenceSeq) + (shortSequenceDuration * shortSequenceCount * shortSequenceSeq) + (phaseSequenceDuration * phaseSequenceCount * phaseSequenceSeq) + (eventSequenceDuration * eventSequenceCount * eventSequenceSeq)) / (totCount * totSeq))
+    originalSequenceDuration = getPrediction(originalSequence, originalSequenceList)
+    translatedSequenceDuration = getPrediction(translatedSequence, translatedSequenceList)
+    shortSequenceDuration = getPrediction(shortSequence, shortSequenceList)
+    phaseSequenceDuration = getPrediction(phaseSequence, phaseSequenceList)
+    eventSequenceDuration = getPrediction(eventSequence, eventSequenceList)
+    predictedDuration = int((originalSequenceDuration + translatedSequenceDuration + shortSequenceDuration + phaseSequenceDuration + eventSequenceDuration) / 5)
+    print(originalSequence)
+    exit()
     return [(processId, predictedDuration, firstEventDate, None, firstEventId, None)]
 
 def verifyDatabase(connection):
