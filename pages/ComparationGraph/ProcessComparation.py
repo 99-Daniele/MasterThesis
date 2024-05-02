@@ -1,3 +1,5 @@
+# this page shows processes comparation.
+
 import dash as ds
 import pandas as pd
 import plotly.express as px
@@ -7,8 +9,10 @@ import utils.Getters as getter
 import utils.Graph.ComparationGraph as comparation
 import utils.Utilities as utilities
 
+# get dataframe with all processes duration.
 df = getter.getProcessesDuration()
 
+# return initial layout of page.
 def pageLayout():
     sections = frame.getGroupBy(df, 'sezione')
     subjects = frame.getGroupBy(df, 'materia')
@@ -38,6 +42,7 @@ def pageLayout():
     ])
     return layout
 
+# callback with input and output.
 @ds.callback(
     [ds.Output('comparation-graph-pr', 'figure'),
         ds.Output('date-checklist-pr', 'value'),
@@ -72,5 +77,6 @@ def pageLayout():
         ds.Input('order-radioitem-pr', 'value')]
     )
 
+# return updated data based on user choice.
 def updateOutput(dateType, dateTypeStore, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
     return comparation.processComparationUpdate(df, dateType, dateTypeStore, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order)

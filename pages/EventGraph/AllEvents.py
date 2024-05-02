@@ -1,3 +1,5 @@
+# this page shows all events.
+
 import dash as ds
 import datetime as dt
 import plotly.express as px
@@ -7,11 +9,16 @@ import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Graph.EventsGraph as event
 
+# get dataframe with all events. 
+# get maxYear as the maximum year belong dataframe events and calc maxDateStart and maxDateEnd as the first and last date of the maximun 1-year interval.
+# get important events from text file.
 df = getter.getAllEvents()
 maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
-minYear = maxYear - 1
+maxDateStart = dt.date(maxYear - 1, 1, 1)
+maxDateEnd = dt.date(maxYear, 1, 1)
 importantEvents = file.getDataFromTextFile('utils/Preferences/importantEvents.txt')
 
+# return initial layout of page.
 def pageLayout():
     sections = frame.getGroupBy(df, 'sezione')
     subjects = frame.getGroupBy(df, 'materia')
@@ -24,8 +31,8 @@ def pageLayout():
         ds.html.H2('TUTTI GLI EVENTI DEL PROCESSO'),
         ds.dcc.DatePickerRange(
             id = 'event-dateranger-ae',
-            start_date = dt.date(minYear, 1, 1),
-            end_date = dt.date(maxYear, 1, 1),
+            start_date = maxDateStart,
+            end_date = maxDateEnd,
             min_date_allowed = df['data'].min(),
             max_date_allowed = df['data'].max(),
             display_format = 'DD MM YYYY',
@@ -39,6 +46,7 @@ def pageLayout():
     ])
     return layout
 
+# callback with input and output.
 @ds.callback(
     [ds.Output('events-graph-ae', 'figure'),
         ds.Output('event-dateranger-ae', 'start_date'), 
@@ -55,5 +63,6 @@ def pageLayout():
         ds.Input('subject-dropdown-ae', 'value'),
         ds.Input('judge-dropdown-ae', 'value')])
 
+# return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
     return event.eventUpdate(df, startDate, endDate, 'evento', importantEvents, minDate, maxDate, sections, subjects, judges)

@@ -1,8 +1,10 @@
-import dash as ds
+# this file handles duration graph management.
+
 import plotly.express as px
 
 import utils.Dataframe as frame
 
+# update dataframe based on user choice.
 def updateDuration(df, sequences, phases, finished, year, change):
     df_temp = df
     if not (sequences == None or len(sequences) == 0):
@@ -17,6 +19,8 @@ def updateDuration(df, sequences, phases, finished, year, change):
         df_temp = frame.getTypesDataFrame(df_temp, 'cambio', change)
     return df_temp
 
+# return all needed parameters in order to change graph after any user choice.
+# this method is only for process duration graph.
 def durationProcessUpdate(df, dateType, date, finished, year, sequence, phase, change):
     if len(dateType) >= 1:
         date = dateType[-1]
@@ -36,6 +40,8 @@ def durationProcessUpdate(df, dateType, date, finished, year, sequence, phase, c
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
     return fig, dateType, date, sequences, phases
 
+# return all needed parameters in order to change graph after any user choice.
+# this method is only for court hearings duration graph.
 def durationCourtHearingsUpdate(df, dateType, date, finished, year, change):
     if len(dateType) >= 1:
         date = dateType[-1]

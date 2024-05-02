@@ -1,3 +1,5 @@
+# this page shows state events.
+
 import dash as ds
 import datetime as dt
 import plotly.express as px
@@ -7,14 +9,20 @@ import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Graph.EventsGraph as event
 
+# get dataframe with state events. 
+# get sections, subject, judges based on dataframe events.
+# get maxYear as the maximum year belong dataframe events and calc maxDateStart and maxDateEnd as the first and last date of the maximun 1-year interval.
+# get must states from text file.
 df = getter.getStateEvents()
 sections = frame.getGroupBy(df, 'sezione')
 subjects = frame.getGroupBy(df, 'materia')
 judges = frame.getGroupBy(df, 'giudice')
 maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
-minYear = maxYear - 1
+maxDateStart = dt.date(maxYear - 1, 1, 1)
+maxDateEnd = dt.date(maxYear, 1, 1)
 mustStates = file.getDataFromTextFile('utils/Preferences/mustStates.txt')
 
+# return initial layout of page.
 def pageLayout():
     fig = px.scatter(df, x = "data", y = "numProcesso", color = 'evento', labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 1200)
     layout = ds.html.Div([
@@ -24,8 +32,8 @@ def pageLayout():
         ds.html.H2('EVENTI INIZIO STATI DEL PROCESSO'),
         ds.dcc.DatePickerRange(
             id = 'event-dateranger-se',
-            start_date = dt.date(minYear, 1, 1),
-            end_date = dt.date(maxYear, 1, 1),
+            start_date = maxDateStart,
+            end_date = maxDateEnd,
             min_date_allowed = df['data'].min(),
             max_date_allowed = df['data'].max(),
             display_format = 'DD MM YYYY',
@@ -39,6 +47,7 @@ def pageLayout():
     ])
     return layout
 
+# callback with input and output.
 @ds.callback(
     [ds.Output('events-graph-se', 'figure'),
         ds.Output('event-dateranger-se', 'start_date'), 
@@ -55,5 +64,6 @@ def pageLayout():
         ds.Input('subject-dropdown-se', 'value'),
         ds.Input('judge-dropdown-se', 'value')])
 
+# return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
     return event.eventUpdate(df, startDate, endDate, 'stato', mustStates, minDate, maxDate, sections, subjects, judges)

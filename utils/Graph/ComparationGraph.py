@@ -1,10 +1,12 @@
+# this file handles comparation graph management.
+
 import dash as ds
-import pandas as pd
 import plotly.express as px
 
 import utils.Dataframe as frame
 import utils.Utilities as utilities
 
+# returns a string with input name followed by how many times is present in the dataframe.
 def addCountToName(name, df, choices):
     if choices == 'finito':
         count = df[df[type] == int(name)]['conteggio'].item()
@@ -20,15 +22,14 @@ def addCountToName(name, df, choices):
     newName = name + " (" + str(count) + ")"
     return newName
 
+# returns a string with total sum of counts in dataframe.
 def addTotCountToName(df):
     totCount = df['conteggio'].sum()
     newName = "TUTTI (" + str(totCount) + ")"
     return newName
 
-def getPosition(name, df, type):
-    pos = df.index.get_loc(df[df[type] == name].index[0])
-    return pos
-
+# return the style of dropdown as hidden or not based on user choices: if user choices one, then corresponding dropdown will be hidden and his values will reset.
+# this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
 def hideProcessChosen(choices, sections, subjects, judges, finished, changes, sequences, phaseSequences):
     sectionStyle = {'width': 400}
     subjectStyle = {'width': 400}
@@ -60,6 +61,8 @@ def hideProcessChosen(choices, sections, subjects, judges, finished, changes, se
         phaseSequences = None
     return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences]
 
+# return the style of dropdown as hidden or not based on user choices: if user choices one, then corresponding dropdown will be hidden and his values will reset.
+# this method is for all comparation graphs except process ones since they use different parameters.
 def hideTypeChosen(choices, sections, subjects, judges, finished, changes):
     dateCheckStyle = {'display': 'inline'}
     sectionStyle = {'width': 400}
@@ -86,6 +89,7 @@ def hideTypeChosen(choices, sections, subjects, judges, finished, changes):
         changes = None
     return [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, changes]
 
+# show all hidden object such as dropdown, radioitem, checklist.
 def showAll():
     dateCheckStyle = {'display': 'inline'}
     sectionStyle = {'width': 400}
@@ -97,6 +101,7 @@ def showAll():
     orderRadioStyle = {'paddingLeft': '85%'}
     return [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, orderRadioStyle]
 
+# hide all shown object such as dropdown, radioitem, checklist.
 def hideAll():
     dateCheckStyle = {'display': 'none'}
     sectionStyle = {'display': 'none'}
@@ -108,6 +113,8 @@ def hideAll():
     orderRadioStyle = {'display': 'none'}
     return [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, orderRadioStyle]
 
+# update data base on user choices on different parameters.
+# this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
 def updateProcessData(df, sections, subjects, judges, finished, change, sequences, phaseSequences):
     df_temp = df.copy()
     df_temp = frame.getTypesDataFrame(df_temp, 'sezione', sections)
@@ -119,6 +126,8 @@ def updateProcessData(df, sections, subjects, judges, finished, change, sequence
     df_temp = frame.getTypesDataFrame(df_temp, 'fasi', phaseSequences)
     return df_temp
 
+# update data base on user choices on different parameters.
+# this method is for all comparation graphs except process ones since they use different parameters.
 def updateTypeData(df, sections, subjects, judges, finished, change):
     df_temp = df
     df_temp = frame.getTypesDataFrame(df_temp, 'sezione', sections)
@@ -128,6 +137,9 @@ def updateTypeData(df, sections, subjects, judges, finished, change):
     df_temp = frame.getTypesDataFrame(df_temp, 'cambio', change)
     return df_temp
 
+# update data base on user choices on different parameters. In order to do that is use 'updateProcessData' method with chosen parameter as None. 
+# this is done because if user wants to compare on chosen parameter, data must be updated without any filter on chosen parameter.
+# this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
 def updateProcessDataframeFromSelection(choice, df_temp, df_data, sections, subjects, judges, finished, changes, sequences, phaseSequences):
     if choice != None and 'section-dropdown' in choice:
         df_temp = updateProcessData(df_temp, None, subjects, judges, finished, changes, sequences, phaseSequences)
@@ -147,6 +159,9 @@ def updateProcessDataframeFromSelection(choice, df_temp, df_data, sections, subj
         df_temp = df_data
     return df_temp
 
+# update data base on user choices on different parameters. In order to do that is use 'updateProcessData' method with chosen parameter as None. 
+# this is done because if user wants to compare on chosen parameter, data must be updated without any filter on chosen parameter.
+# this method is for all comparation graphs except process ones since they use different parameters.
 def updateTypeDataframeFromSelection(choice, df_temp, df_data, sections, subjects, judges, finished, changes):
     if choice != None and 'section-dropdown' in choice:
         df_temp = updateTypeData(df_temp, None, subjects, judges, finished, changes)
@@ -162,6 +177,8 @@ def updateTypeDataframeFromSelection(choice, df_temp, df_data, sections, subject
         df_temp = df_data
     return df_temp
 
+# return all different types based on current dataframe.
+# this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
 def updateProcessTypes(df):
     sections = frame.getGroupBy(df, 'sezione')
     subjects = frame.getGroupBy(df, 'materia')
@@ -172,6 +189,8 @@ def updateProcessTypes(df):
     phaseSequences = frame.getGroupBy(df, 'fasi')
     return [sections, subjects, judges, finished, changes, sequences, phaseSequences]
 
+# return all different types based on current dataframe.
+# this method is for all comparation graphs except process ones since they use different parameters.
 def updateTypes(df):
     sections = frame.getGroupBy(df, 'sezione')
     subjects = frame.getGroupBy(df, 'materia')
@@ -180,6 +199,8 @@ def updateTypes(df):
     changes = frame.getGroupBy(df, 'cambio')
     return [sections, subjects, judges, finished, changes]
 
+# return all needed parameters in order to change graph after any user choice.
+# this method is only for process comparation graph.
 def processComparationUpdate(df, dateType, date, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore, order):
     if len(dateType) >= 1:
         date = dateType[-1]
@@ -207,6 +228,8 @@ def processComparationUpdate(df, dateType, date, sections, subjects, judges, fin
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
     return fig, dateType, date, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, changes, sequences, phaseSequences, choices, choiceStore
 
+# return all needed parameters in order to change graph after any user choice.
+# this method is only for all comparation graphs except process ones.
 def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjects, judges, finished, changes, choices, choiceStore, order):
     df_temp = df.copy()
     if typeChoice == None:

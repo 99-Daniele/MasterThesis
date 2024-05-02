@@ -1,3 +1,6 @@
+# this file handles whole app management. Needed imports are inside 'start' method and not outside for faster initialization.
+
+# create links for all pages.
 def start():
     import dash as ds
 

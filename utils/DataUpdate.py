@@ -1,3 +1,5 @@
+# this file handles the update of database data.
+
 from alive_progress import alive_bar
 
 import utils.DatabaseConnection as connect
@@ -5,12 +7,16 @@ import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Utilities as utilities
 
+# refresh current database data. 
+# calcs event, phases, states, process, courtHearing durations, comprare with current database data and in case update them.
 def refreshData(connection):
     verifyDatabase(connection)
     maxDate = getter.getMaxDate()
     events = getter.getEvents()
     courtHearingsEventsType = str(tuple(file.getDataFromTextFile('utils/Preferences/courtHearingsEvents.txt')))
-    eventsFiltered = filterEvents(events)
+    eventsFiltered = []
+    for e in events:
+        eventsFiltered.append((e[0], e[1], e[6], e[3]))
     [eventsDuration, phasesDuration, statesDuration, processDuration, courtHearingsDuration, processSequence] = getDurations(events, courtHearingsEventsType, maxDate)
     eventsFiltered.sort(key = lambda x: x[0])
     eventsDuration.sort(key = lambda x: x[0])
@@ -34,12 +40,8 @@ def refreshData(connection):
     connect.updateTable(connection, 'durataudienze', courtHearingsDurationInfo, 'numProcesso')
     connect.updateTable(connection, 'processitipo', processSequenceInfo, 'numProcesso')
 
-def filterEvents(events):
-    eventsFiltered = []
-    for e in events:
-        eventsFiltered.append((e[0], e[1], e[6], e[3]))
-    return eventsFiltered
-
+# return events, phases, process and court hearing durations based on events.
+# in case of unfinished processes predicts final duration.
 def getDurations(events, courtHearingsType, maxDate):
     processEvents = []
     processId = events[0][4]
@@ -91,6 +93,8 @@ def getDurations(events, courtHearingsType, maxDate):
             bar()
     return [eventsDuration, phasesDuration, statesDuration, processDuration, courtHearingsDuration, processSequences]
 
+# add sequence to dictionary.
+# if sequence already exists, update means values, otherwise add to dictonary.
 def addToDict(sequence, dict):
     id = dict.get(utilities.fromListToString(sequence[2]))
     if id == None:
@@ -107,6 +111,8 @@ def addToDict(sequence, dict):
             i += 1
         dict.update({utilities.fromListToString(sequence[2]): [new_mean, new_sequence, new_count]})
 
+# return events duration.
+# in case of unfinished events, uses as endDate given maxDate (which is the date of the last event in the database).
 def getEventsDuration(events, maxDate):
     if len(events) == 0:
         return [(), ()]
@@ -158,6 +164,7 @@ def getEventsDuration(events, maxDate):
         eventsDuration.append((curr[0], duration, curr[5], nextDate, nextId))
     return [eventsDuration, correctEvents]
 
+# return phases duration.
 def getPhasesDuration(events):
     phasesDuration = []
     i = 0
@@ -177,6 +184,7 @@ def getPhasesDuration(events):
         i = i + 1
     return phasesDuration
 
+# return states duration.
 def getStatesDuration(events):
     statesDuration = []
     i = 0
@@ -196,6 +204,7 @@ def getStatesDuration(events):
         i = i + 1
     return statesDuration
 
+# return court hearings duration.
 def getCourtHearingsDuration(events, courtHearingsType, processSequence):
     firstEvent = None
     lastEvent = None
@@ -211,6 +220,7 @@ def getCourtHearingsDuration(events, courtHearingsType, processSequence):
     duration = (lastEvent[5] - firstEvent[5]).days
     return [(e[4], duration, firstEvent[5], lastEvent[5], firstEvent[0], lastEvent[0])]
 
+# return processes sequence.
 def getProcessesSequence(events):
     processType = -1
     processId = events[0][4]
@@ -267,10 +277,12 @@ def getProcessesSequence(events):
                 #processType = 2
     return [[(processId, processType, utilities.fromListToString(originalSequence), utilities.fromListToString(translatedSequence), utilities.fromListToString(shortSequence), utilities.fromListToString(phasesSequence))], originalSequenceDuration, translatedSequenceDuration, shortSequenceDuration, phasesSequenceOriginalDuration, eventsSequenceDuration, processType != 0]
 
+# return process duration of finished process.
 def getProcessesDuration(events):
     duration = (events[-1][5] - events[0][5]).days
     return [(events[0][4], duration, events[0][5], events[-1][5], events[0][0], events[-1][0])]
 
+# return how much finished process is like to unfinished one and duration of the finished process.
 def getLikeness(unfinished, finished):
     i = 0
     likeness = 0
@@ -308,6 +320,7 @@ def getLikeness(unfinished, finished):
         i = i + 1
     return [likeness * 100, finished[1][maxPos][1], finished[0], finished[2]]
 
+# return  how much finished process is like to unfinished one and predicted duration.
 def getLikenessDuration(unfinished, finished):
     [like, duration, totDuration, count] = getLikeness(unfinished, finished)
     if like == 0:
@@ -318,11 +331,12 @@ def getLikenessDuration(unfinished, finished):
         predicted = unfinished[0] + ((totDuration - duration) * unfinished[0] / duration)
     return [like, predicted, count]
 
-def getPrediction(sequence, dict):
+# return best prediction of unfinished process.
+def getPrediction(unfinished, finished):
     prediction = 0
     tot = 0
-    for l in dict.values():
-        [like, predicted, count] = getLikenessDuration(sequence, l)
+    for f in finished.values():
+        [like, predicted, count] = getLikenessDuration(unfinished, f)
         if like == 100:
             prediction = prediction * tot
             prediction += like * predicted * count
@@ -332,6 +346,7 @@ def getPrediction(sequence, dict):
         return None
     return prediction
 
+# return predicted duration of unfinished process based on states, phases and events sequences.
 def getPredictedDuration(unfinishedProcessInfo, originalSequenceDict, translatedSequenceDict, shortSequenceDict, phaseSequenceDict, eventSequenceDict):
     [processId, firstEventDate, firstEventId, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence] = unfinishedProcessInfo
     originalCoeff = 1
@@ -375,6 +390,7 @@ def getPredictedDuration(unfinishedProcessInfo, originalSequenceDict, translated
     predictedDuration = int((originalSequenceDuration + translatedSequenceDuration + shortSequenceDuration + phaseSequenceDuration + eventSequenceDuration) / totCoeff)
     return [(processId, predictedDuration, firstEventDate, None, firstEventId, None)]
 
+# verify if user database has all needed tables and views with all needed columns.
 def verifyDatabase(connection):
     if not connect.doesATableExist(connection, "eventi"):
         raise "\nEvents table is not present or is called differently than 'eventi'. Please change name or add such table because it's fundamental for the analysis"
@@ -424,11 +440,12 @@ def verifyDatabase(connection):
         connect.createTable(connection, 'processitipo', ['numProcesso', 'processofinito', 'sequenzaStati', 'sequenzaTradotta', 'sequenzaCorta', 'sequenzaFasi'], ['BIGINT', 'INT', 'TEXT', 'TEXT','TEXT','TEXT'], [0], [])
     if not connect.doesAViewExist(connection, "aliasgiudice"):
         query = "CREATE VIEW aliasgiudice AS SELECT giudice, CONCAT('giudice ', ROW_NUMBER() OVER ()) AS alias FROM (SELECT DISTINCT giudice FROM eventi WHERE giudice <> 'null' ORDER BY giudice) AS g"
-        connect.createView(connection, 'aliasgiudice', query)
+        connect.createViewFromQuery(connection, 'aliasgiudice', query)
     if not connect.doesAViewExist(connection, "processicambiogiudice"):
         query = "CREATE VIEW processiCambioGiudice AS SELECT numProcesso, (CASE WHEN numProcesso IN (SELECT pc.numProcesso FROM ((SELECT numProcesso FROM eventi AS e WHERE (giudice <> 'null') GROUP BY numProcesso HAVING (COUNT(DISTINCT giudice) > 1)) AS e, processi AS pc) WHERE (e.numProcesso = pc.numProcesso)) THEN 1 ELSE 0 END) AS cambioGiudice FROM processi"
-        connect.createView(connection, 'processiCambioGiudice', query)
+        connect.createViewFromQuery(connection, 'processiCambioGiudice', query)
 
+# compare data with database data and return info about what has to be eliminated from or added to database.
 def compareData(data, connection, query):
     databaseDate = connect.getDataFromDatabase(connection, query)
     i = 0
@@ -455,6 +472,8 @@ def compareData(data, connection, query):
         j = j + 1
     return dataInfo
 
+# compare data with database data and return info about what has to be eliminated from or added to database.
+# this method is for rows that requires an order such as phases and states.
 def compareDataOrder(data, connection, query, order):
     databaseDate = connect.getDataFromDatabase(connection, query)
     i = 0

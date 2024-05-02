@@ -1,5 +1,8 @@
+# this page contains links to comparation graph pages.
+
 import dash as ds
 
+# return initial layout of page.
 def pageLayout():
     layout = ds.html.Div([
         ds.dcc.Link('Home', href = '/'),

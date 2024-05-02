@@ -1,8 +1,11 @@
+# this file handles dataframe managements.
+
 import datetime as dt
 import pandas as pd
 
 import utils.Utilities as utilities
 
+# from events list create events dataframe.
 def createEventsDataFrame(events):
     pIds = []
     dates = []
@@ -42,6 +45,7 @@ def createEventsDataFrame(events):
                 finishedEventProcesses.append(e[0])
     return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "evento": tagEvents, "numEvento": eIds, "dataInizioProcesso": startProcessDates, "stato": tagStates, "giudice": judges, "sezione": sections, "materia": subjects})
 
+# from processes list create processes duration dataframe.
 def createProcessesDurationDataFrame(processes):
     dates = []
     durations = []
@@ -72,7 +76,8 @@ def createProcessesDurationDataFrame(processes):
         phases.append(p[9])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "mese": months, "cambio": changes, "sequenza": sequences, "fasi": phases})
 
-def createStatesDurationsDataFrame(processes):
+# from states list create states duration dataframe.
+def createStatesDurationsDataFrame(states):
     dates = []
     durations = []
     judges = []
@@ -84,24 +89,25 @@ def createStatesDurationsDataFrame(processes):
     tags = []
     states = []
     phases = []
-    for p in processes:
-        dates.append(p[0])
-        durations.append(p[1])
-        judges.append(p[2])
-        subjects.append(p[3])
-        sections.append(p[4])
-        finished.append(utilities.getProcessState(p[5]))
-        if p[6] == 1:
+    for s in states:
+        dates.append(s[0])
+        durations.append(s[1])
+        judges.append(s[2])
+        subjects.append(s[3])
+        sections.append(s[4])
+        finished.append(utilities.getProcessState(s[5]))
+        if s[6] == 1:
             changes.append("SI")
         else:
             changes.append("NO")
-        pIds.append(p[7])
-        tags.append(p[8])
-        states.append(p[9])
-        phases.append(p[10])
+        pIds.append(s[7])
+        tags.append(s[8])
+        states.append(s[9])
+        phases.append(s[10])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "stato": tags, "fase": phases})
 
-def createPhasesDurationsDataFrame(processes):
+# from phases list create phases duration dataframe.
+def createPhasesDurationsDataFrame(phases):
     dates = []
     durations = []
     judges = []
@@ -112,7 +118,7 @@ def createPhasesDurationsDataFrame(processes):
     pIds = []
     phases = []
     orders = []
-    for p in processes:
+    for p in phases:
         dates.append(p[0])
         durations.append(p[1])
         judges.append(p[2])
@@ -128,7 +134,8 @@ def createPhasesDurationsDataFrame(processes):
         orders.append(p [9])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "fase": phases})
 
-def createEventsDurationsDataFrame(processes):
+# from events list create events duration dataframe.
+def createEventsDurationsDataFrame(events):
     dates = []
     durations = []
     judges = []
@@ -141,25 +148,26 @@ def createEventsDurationsDataFrame(processes):
     tagEvents = []
     typeEvents = []
     phases = []
-    for p in processes:
-        dates.append(p[0])
-        durations.append(p[1])
-        judges.append(p[2])
-        subjects.append(p[3])
-        sections.append(p[4])
-        finished.append(utilities.getProcessState(p[5]))
-        if p[6] == 1:
+    for e in events:
+        dates.append(e[0])
+        durations.append(e[1])
+        judges.append(e[2])
+        subjects.append(e[3])
+        sections.append(e[4])
+        finished.append(utilities.getProcessState(e[5]))
+        if e[6] == 1:
             changes.append("SI")
         else:
             changes.append("NO")
-        eIds.append(p[7])
-        pIds.append(p[8])
-        tagEvents.append(p[9])
-        typeEvents.append(p[10])
-        phases.append(p[11])
+        eIds.append(e[7])
+        pIds.append(e[8])
+        tagEvents.append(e[9])
+        typeEvents.append(e[10])
+        phases.append(e[11])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "evento": tagEvents, "fase": phases})
 
-def createCourtHearingsDurationDataFrame(processes):
+# from court hearings list create court hearings duration dataframe.
+def createCourtHearingsDurationDataFrame(courtHearings):
     dates = []
     durations = []
     judges = []
@@ -168,22 +176,23 @@ def createCourtHearingsDurationDataFrame(processes):
     finished = []
     changes = []
     pIds = []
-    for p in processes:
-        dates.append(p[0])
-        durations.append(p[1])
-        judges.append(p[2])
-        subjects.append(p[3])
-        sections.append(p[4])
-        finished.append(utilities.getProcessState(p[5]))
-        if p[6] == 1:
+    for c in courtHearings:
+        dates.append(c[0])
+        durations.append(c[1])
+        judges.append(c[2])
+        subjects.append(c[3])
+        sections.append(c[4])
+        finished.append(utilities.getProcessState(c[5]))
+        if c[6] == 1:
             changes.append("SI")
         else:
             changes.append("NO")
-        pIds.append(p[7])
+        pIds.append(c[7])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes})
 
-def getAvgStdDataFrameByDate(df, typed):
-    match typed:
+# return data group by chosen data type.
+def getAvgStdDataFrameByDate(df, dataType):
+    match dataType:
         case "SETTIMANA":
             df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: utilities.getWeekNumber(x))
@@ -239,36 +248,7 @@ def getAvgStdDataFrameByDate(df, typed):
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
             return [df1, df2]
 
-def getAvgStdDataFrameByType(df, type):
-    typeDuration = type.copy()
-    typeDuration.append('durata')
-    df1 = df[typeDuration].copy()
-    df2 = df1.groupby(type, as_index = False).mean()
-    df2['conteggio'] = df1.groupby(type).size().tolist()
-    df2['quantile'] = df1.groupby(type, as_index = False).quantile(0.75)['durata']
-    df1 = df1.sort_values(type).reset_index(drop = True)
-    df2 = df2.sort_values(type).reset_index(drop = True)
-    return [df1, df2]
-
-def keepOnlyImportant(df, perc):
-    df_temp = df.copy()
-    totCount = df_temp['conteggio'].sum()
-    threshold = totCount * perc
-    df_temp = df_temp.sort_values(['conteggio'], ascending = False)
-    i = 0
-    sum = 0
-    if df_temp['conteggio'].items() == None:
-        return df
-    while (i < 20 or sum < threshold) and i < len(list(df_temp['conteggio'].items())):
-        sum = sum + list(df_temp['conteggio'].items())[i][1]
-        i = i + 1
-    while i < len(list(df_temp['conteggio'].items())):
-        index = list(df_temp['conteggio'].items())[i][0]
-        df = df.drop(index)
-        i = i + 1
-    df.reset_index(drop = True)
-    return df
-
+# return data group by chosen data type and types.
 def getAvgDataFrameByType(df, datetype, types, order):
     df4 = df.groupby(types) \
        .agg({'giudice':'size', 'durata':'mean'}) \
@@ -350,12 +330,46 @@ def getAvgDataFrameByType(df, datetype, types, order):
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
             df2 = df2.sort_values(['data']).reset_index(drop = True)
             return [df1, df2, df3]
+        
+# return data group by chosen type.
+def getAvgStdDataFrameByType(df, type):
+    typeDuration = type.copy()
+    typeDuration.append('durata')
+    df1 = df[typeDuration].copy()
+    df2 = df1.groupby(type, as_index = False).mean()
+    df2['conteggio'] = df1.groupby(type).size().tolist()
+    df2['quantile'] = df1.groupby(type, as_index = False).quantile(0.75)['durata']
+    df1 = df1.sort_values(type).reset_index(drop = True)
+    df2 = df2.sort_values(type).reset_index(drop = True)
+    return [df1, df2]
 
+# reduce dataframe to a number of rows such that they cover at least given percentage.
+def keepOnlyImportant(df, perc):
+    df_temp = df.copy()
+    totCount = df_temp['conteggio'].sum()
+    threshold = totCount * perc
+    df_temp = df_temp.sort_values(['conteggio'], ascending = False)
+    i = 0
+    sum = 0
+    if df_temp['conteggio'].items() == None:
+        return df
+    while (i < 20 or sum < threshold) and i < len(list(df_temp['conteggio'].items())):
+        sum = sum + list(df_temp['conteggio'].items())[i][1]
+        i = i + 1
+    while i < len(list(df_temp['conteggio'].items())):
+        index = list(df_temp['conteggio'].items())[i][0]
+        df = df.drop(index)
+        i = i + 1
+    df.reset_index(drop = True)
+    return df
+
+# return dataframe rows where given tag is containde in given types.
 def getTypesDataFrame(df, tag, types):
     if types == None or len(types) == 0:
         return df
     return df[df[tag].isin(types)]
 
+# return dataframe rows where date month is contained given months.
 def getMonthDataFrame(df, months):
     if months == None or len(months) == 0:
         return df
@@ -363,6 +377,7 @@ def getMonthDataFrame(df, months):
     df_temp['data'] = df_temp['data'].map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').month)
     return df[df_temp['data'].isin(months)]
 
+# return dataframe rows where date year is contained given years.
 def getYearDataFrame(df, years):
     if years == None or len(years) == 0:
         return df
@@ -370,6 +385,7 @@ def getYearDataFrame(df, years):
     df_temp['data'] = df_temp['data'].map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year)
     return df[df_temp['data'].isin(years)]
 
+# return dataframe rows where date is between given stratDate and endDate.
 def getDateDataFrame(df, type, startDate, endDate):
     if startDate == None or endDate == None:
         return df
@@ -377,17 +393,14 @@ def getDateDataFrame(df, type, startDate, endDate):
     d = d[d[type] <= endDate]
     return d
 
+# return unique years in given dataframe dates.
 def getAllYears(df):
     df_temp = df['data'].copy()
     df_temp = df_temp.map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year).sort_values()
     years = df_temp.unique()
     return years
 
-def getUniques(df, tag):
-    df_temp = df[tag].copy()
-    types = df_temp.unique()
-    return types
-
+# return group by types with corrispondent counts.
 def getGroupBy(df, tag):
     df_temp = df.copy()
     types = df_temp.groupby([tag])[tag].size().sort_values(ascending = False).reset_index(name = 'count')[tag].tolist()

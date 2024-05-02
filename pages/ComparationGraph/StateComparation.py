@@ -1,3 +1,5 @@
+# this page shows event duration and comparation.
+
 import dash as ds
 import pandas as pd
 import plotly.express as px
@@ -7,8 +9,10 @@ import utils.Getters as getter
 import utils.Graph.ComparationGraph as comparation
 import utils.Utilities as utilities
 
+# get dataframe with all states duration.
 df = getter.getStatesDuration()
 
+# return initial layout of page.
 def pageLayout():
     types = frame.getGroupBy(df, 'stato')
     typesSorted = sorted(types)
@@ -37,6 +41,7 @@ def pageLayout():
     ])
     return layout
 
+# callback with input and output.
 @ds.callback(
     [ds.Output('comparation-graph-s', 'figure'),
         ds.Output('date-checklist-s', 'value'),
@@ -70,5 +75,6 @@ def pageLayout():
         ds.Input('order-radioitem-s', 'value')]
 )
 
+# return updated data based on user choice.
 def updateOutput(typeChoice, typeDate, typeDateStore, sections, subjects, judges, finished, changes, choices, choiceStore, order):
     return comparation.typeComparationUpdate(df, typeDate, typeDateStore, typeChoice, 'stato', sections, subjects, judges, finished, changes, choices, choiceStore, order)

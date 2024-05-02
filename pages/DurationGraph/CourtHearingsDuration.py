@@ -1,3 +1,5 @@
+# this page shows court hearings duration.
+
 import dash as ds
 import pandas as pd
 import plotly.express as px
@@ -7,8 +9,10 @@ import utils.Getters as getter
 import utils.Graph.DurationGraph as duration
 import utils.Utilities as utilities
 
+# get dataframe with all court hearings duration.
 df = getter.getCourtHearingsDuration()
 
+# return initial layout of page.
 def pageLayout():
     years = frame.getAllYears(df)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
@@ -27,6 +31,7 @@ def pageLayout():
     ])
     return layout
 
+# callback with input and output.
 @ds.callback(
     [ds.Output('courthearings-graph', 'figure'),
         ds.Output('date-checklist-chd', 'value'),
@@ -38,5 +43,6 @@ def pageLayout():
         ds.Input('change-dropdown-chd', 'value')]
 )
 
+# return updated data based on user choice.
 def updateOutput(dateChoice, dateStore, finished, year, change):
     return duration.durationCourtHearingsUpdate(df, dateChoice, dateStore, finished, year, change)

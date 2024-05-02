@@ -1,3 +1,5 @@
+# this page shows processes duration.
+
 import dash as ds
 import pandas as pd
 import plotly.express as px
@@ -7,8 +9,10 @@ import utils.Getters as getter
 import utils.Graph.DurationGraph as duration
 import utils.Utilities as utilities
 
+# get dataframe with all processes duration.
 df = getter.getProcessesDuration()
 
+# return initial layout of page.
 def pageLayout():
     years = frame.getAllYears(df)
     sequences = frame.getGroupBy(df, 'sequenza')
@@ -31,6 +35,7 @@ def pageLayout():
     ])
     return layout
 
+# callback with input and output.
 @ds.callback(
     [ds.Output('process-graph', 'figure'), 
         ds.Output('date-checklist-prd', 'value'),
@@ -46,5 +51,6 @@ def pageLayout():
         ds.Input('change-dropdown-prd', 'value')]
     )
 
+# return updated data based on user choice.
 def updateOutput(finished, dateChoice, dateStore, year, sequence, phase, change):
     return duration.durationProcessUpdate(df, dateChoice, dateStore, finished, year, sequence, phase, change)

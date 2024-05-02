@@ -1,5 +1,8 @@
+# this is the home page.
+
 import dash as ds
 
+# return initial layout of page.
 def pageLayout():
     layout = ds.html.Div([
         ds.html.H2('Progetto Tribunali'),
