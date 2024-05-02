@@ -401,7 +401,7 @@ def verifyDatabase(connection):
     if not connect.doesATableHaveColumns(connection, "processi", ['numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione']):
         raise "\nProcesses table does not have all requested columns. The requested columns are: 'numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'"
     if not connect.doesATableExist(connection, "eventinome"):
-        connect.createTable(connection, 'eventinome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
+        connect.createTable(connection, 'eventinome', ['codice', 'etichetta', 'fase'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(5)'], [0], [])
         eventsName = file.getDataFromTextFile('utils/Preferences/eventsName.txt')
         connect.insertIntoDatabase(connection, 'eventinome', eventsName)
     else:

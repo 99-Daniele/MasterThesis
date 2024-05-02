@@ -22,7 +22,7 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
     sections = frame.getGroupBy(df_temp, 'sezione')
     subjects = frame.getGroupBy(df_temp, 'materia')
     judges = frame.getGroupBy(df_temp, 'giudice')
-    fig = px.scatter(df_temp, x = "data", y = "numProcesso", color = type, color_discrete_sequence = utilities.phaseColorList(df_temp, type), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, height = 1200)
+    fig = px.scatter(df_temp, x = "data", y = "numProcesso", color = type, color_discrete_sequence = utilities.phaseColorList(df_temp, type), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 1200)
     fig.update_layout(
         legend = dict(
             yanchor = "top",

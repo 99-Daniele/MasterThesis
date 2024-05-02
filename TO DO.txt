@@ -1,6 +1,6 @@
 - screenshot cose significative e powerpoint
 
-- disponibile per accesso esterno --> descrizione readme, descrizione funzioni
+- disponibile per accesso esterno --> descrizione readme
 - sistemare legenda
 
 - carico processi
