@@ -20,7 +20,7 @@ def phaseColorList(df, type):
         df_count = df[df[type] == t].groupby(['fase'], as_index = False).count()
         max = df_count['data'].max()
         phase = df_count[df_count['data'] == max]['fase'].tolist()[0]
-        c.append(colors.get(phase))
+        c.append(colors.get(str(phase)))
     return c
 
 # return week datetime from given date. 
