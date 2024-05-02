@@ -26,7 +26,6 @@ def refreshData(connection):
     processDurationInfo = compareData(processDuration, connection, "SELECT * FROM durataprocessi ORDER BY numProcesso")
     courtHearingsDurationInfo = compareData(courtHearingsDuration, connection, "SELECT * FROM durataudienze ORDER BY numProcesso")
     processSequenceInfo = compareData(processSequence, connection, "SELECT * FROM processitipo ORDER BY numProcesso")
-    exit()
     connect.updateTable(connection, 'eventitipo', eventsFilteredInfo, 'numEvento')
     connect.updateTable(connection, 'durataeventi', eventsDurationInfo, 'numEvento')
     connect.updateTableOrder(connection, 'duratafasi', phasesDurationInfo, 'numProcesso')
@@ -50,15 +49,15 @@ def getDurations(events, courtHearingsType, maxDate):
     courtHearingsDuration = []
     processSequences = []
     processDuration = []
-    originalSequenceList = []
-    translatedSequenceList = []
-    shortSequenceList = []
-    phaseSequenceList = []
-    eventSequenceList = []
+    originalSequenceDict = {}
+    translatedSequenceDict = {}
+    shortSequenceDict = {}
+    phaseSequenceDict = {}
+    eventSequenceDict = {}
     unfinishedProcesses = []
     i = 0
     with alive_bar(int(len(events))) as bar:
-        while i < len(events):
+        while i < (len(events)):
             if events[i][4] != processId:
                 firstEventId = events[i][0]
                 firstEventDate = events[i][5]
@@ -72,13 +71,14 @@ def getDurations(events, courtHearingsType, maxDate):
                     processSequences = processSequences + processSequence
                     if finished:
                         processDuration = processDuration + getProcessesDuration(filteredEvents)
-                        originalSequenceList.append(originalSequence)
-                        translatedSequenceList.append(translatedSequence)
-                        shortSequenceList.append(shortSequence)
-                        phaseSequenceList.append(phaseSequence)
-                        eventSequenceList.append(eventSequence)
+                        addToDict(originalSequence, originalSequenceDict)
+                        addToDict(translatedSequence, translatedSequenceDict)
+                        addToDict(shortSequence, shortSequenceDict)
+                        addToDict(phaseSequence, phaseSequenceDict)
+                        addToDict(eventSequence, eventSequenceDict)
                     else:
-                        unfinishedProcesses.append([processId, firstEventDate, firstEventId, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence])
+                        if int(processSequence[0][5][-1]) > 2:
+                            unfinishedProcesses.append([processId, firstEventDate, firstEventId, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence])
                 processEvents = []
                 processId = events[i][4]
             else:
@@ -87,15 +87,25 @@ def getDurations(events, courtHearingsType, maxDate):
             bar()
     with alive_bar(int(len(unfinishedProcesses))) as bar:
         for p in unfinishedProcesses:
-            [processDuration, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence] = getPredictedDuration(p, originalSequenceList, translatedSequenceList, shortSequenceList, phaseSequenceList, eventSequenceList)
-            originalSequenceList.append(originalSequence)
-            translatedSequenceList.append(translatedSequence)
-            shortSequenceList.append(shortSequence)
-            phaseSequenceList.append(phaseSequence)
-            eventSequenceList.append(eventSequence)
-            processDuration = processDuration + processDuration
+            processDuration = processDuration + getPredictedDuration(p, originalSequenceDict, translatedSequenceDict, shortSequenceDict, phaseSequenceDict, eventSequenceDict)
             bar()
     return [eventsDuration, phasesDuration, statesDuration, processDuration, courtHearingsDuration, processSequences]
+
+def addToDict(sequence, dict):
+    id = dict.get(utilities.fromListToString(sequence[2]))
+    if id == None:
+        dict.update({utilities.fromListToString(sequence[2]): [sequence[0], sequence[1], 1]})
+    else:
+        new_count = id[2] + 1
+        new_mean = ((id[0] * id[2]) + sequence[0]) / new_count
+        new_sequence = []
+        i = 0
+        while i < len(sequence[1]):
+            s1 = id[1][i]
+            s2 = sequence[1][i]
+            new_sequence.append([s1[0], ((s1[1] * id[2]) + s2[1]) / new_count])
+            i += 1
+        dict.update({utilities.fromListToString(sequence[2]): [new_mean, new_sequence, new_count]})
 
 def getEventsDuration(events, maxDate):
     if len(events) == 0:
@@ -207,19 +217,19 @@ def getProcessesSequence(events):
     firstEventDate = events[0][5]
     totDuration = (events[-1][5] - firstEventDate).days
     originalSequence = [events[0][2]]
-    originalSequenceDuration = [totDuration, [[events[0][2], 0]]]
+    originalSequenceDuration = [totDuration, [[events[0][2], 0]], originalSequence]
     translatedSequence = [events[0][6]]
-    translatedSequenceDuration = [totDuration, [[events[0][6], 0]]]
+    translatedSequenceDuration = [totDuration, [[events[0][6], 0]], translatedSequence]
     shortSequence = [events[0][7]]
-    shortSequenceDuration = [totDuration, [[events[0][7], 0]]]
+    shortSequenceDuration = [totDuration, [[events[0][7], 0]], shortSequence]
     if events[0][3] == '0':
         phasesSequence = [events[0][3]]
     else:
         phasesSequence = ['1']
     phasesSequenceOriginal = [events[0][3]]
-    phasesSequenceOriginalDuration = [totDuration, [[events[0][3], 0]]]
+    phasesSequenceOriginalDuration = [totDuration, [[events[0][3], 0]], phasesSequenceOriginal]
     eventsSequence = [events[0][1]]
-    eventsSequenceDuration = [totDuration, [[events[0][1], 0]]]
+    eventsSequenceDuration = [totDuration, [[events[0][1], 0]], eventsSequence]
     for e in events:
         duration = (e[5] - firstEventDate).days
         if e[3] != '0':
@@ -261,50 +271,108 @@ def getProcessesDuration(events):
     duration = (events[-1][5] - events[0][5]).days
     return [(events[0][4], duration, events[0][5], events[-1][5], events[0][0], events[-1][0])]
 
-def getLikenessUnfinished(unfinished, finished):
+def getLikeness(unfinished, finished):
     i = 0
     likeness = 0
-    while i < len(unfinished):
+    l1 = len(unfinished[1])
+    l2 = len(finished[1])
+    maxPos = 0
+    if l1 >= l2:
+        return [0, 0, 0, 0]
+    while i < l1:
         k = 0
-        while k < len(finished):
+        start = True
+        end = True
+        while start or end:
             if k % 2 == 0:
-                j = i - k / 2
-                if finished[j][0] == unfinished[i][0]:
-                    break
+                j = int(i - (k / 2))
             else:
-                j = i + (k + 1) / 2
-                if finished[j][0] == unfinished[i][0]:
+                j = int(i + ((k + 1) / 2))
+            if j < 0:
+                start = False
+            elif j >= l2:
+                end = False
+            else:
+                if unfinished[1][i][0] == finished[1][j][0]:
                     break
             k += 1
-        if k < len(finished):
-            likeness += (len(unfinished) - abs(i - j)) / len(unfinished)
+        likeness = likeness * i
+        if start or end:
+            likeness += (l2 - abs(i - j)) / l2
+            maxPos = j + 1
+            if maxPos == l2:
+                maxPos -= 1
+        else:
+            likeness -= 1
+        likeness = likeness / (i + 1)
         i = i + 1
-    return likeness / len(unfinished)
-    
+    return [likeness * 100, finished[1][maxPos][1], finished[0], finished[2]]
 
-def getLikeness(unfinished, finished):
-    return getLikenessUnfinished(unfinished, finished)
+def getLikenessDuration(unfinished, finished):
+    [like, duration, totDuration, count] = getLikeness(unfinished, finished)
+    if like == 0:
+        return [0, 0, 0]
+    if duration == 0:
+        predicted = unfinished[0]
+    else:
+        predicted = unfinished[0] + ((totDuration - duration) * unfinished[0] / duration)
+    return [like, predicted, count]
 
+def getPrediction(sequence, dict):
+    prediction = 0
+    tot = 0
+    for l in dict.values():
+        [like, predicted, count] = getLikenessDuration(sequence, l)
+        if like == 100:
+            prediction = prediction * tot
+            prediction += like * predicted * count
+            tot += like * count
+            prediction = prediction / tot
+    if tot == 0:
+        return None
+    return prediction
 
-
-def getPrediction(sequence, list):
-    likelihood = []
-    for l in list:
-        likeness = getLikeness(sequence, l)
-        print(sequence, l, likeness)
-        exit()
-        likelihood.append(likeness)
-
-def getPredictedDuration(unfinishedProcessInfo, originalSequenceList, translatedSequenceList, shortSequenceList, phaseSequenceList, eventSequenceList):
+def getPredictedDuration(unfinishedProcessInfo, originalSequenceDict, translatedSequenceDict, shortSequenceDict, phaseSequenceDict, eventSequenceDict):
     [processId, firstEventDate, firstEventId, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence] = unfinishedProcessInfo
-    originalSequenceDuration = getPrediction(originalSequence, originalSequenceList)
-    translatedSequenceDuration = getPrediction(translatedSequence, translatedSequenceList)
-    shortSequenceDuration = getPrediction(shortSequence, shortSequenceList)
-    phaseSequenceDuration = getPrediction(phaseSequence, phaseSequenceList)
-    eventSequenceDuration = getPrediction(eventSequence, eventSequenceList)
-    predictedDuration = int((originalSequenceDuration + translatedSequenceDuration + shortSequenceDuration + phaseSequenceDuration + eventSequenceDuration) / 5)
-    print(originalSequence)
-    exit()
+    originalCoeff = 1
+    translatedCoeff = 0.9
+    shortCoeff = 0.8
+    phaseCoeff = 0.6
+    eventCoeff = 1.5
+    originalSequenceDuration = getPrediction(originalSequence, originalSequenceDict)
+    translatedSequenceDuration = getPrediction(translatedSequence, translatedSequenceDict)
+    shortSequenceDuration = getPrediction(shortSequence, shortSequenceDict)
+    phaseSequenceDuration = getPrediction(phaseSequence, phaseSequenceDict)
+    eventSequenceDuration = getPrediction(eventSequence, eventSequenceDict)
+    totCoeff = 0
+    if originalSequenceDuration != None:
+        totCoeff += originalCoeff
+        originalSequenceDuration = originalSequenceDuration * originalCoeff
+    else:
+        originalSequenceDuration = 0
+    if translatedSequenceDuration != None:
+        totCoeff += translatedCoeff
+        translatedSequenceDuration = translatedSequenceDuration * translatedCoeff
+    else:
+        translatedSequenceDuration = 0
+    if shortSequenceDuration != None:
+        totCoeff += shortCoeff
+        shortSequenceDuration = shortSequenceDuration * shortCoeff
+    else:
+        shortSequenceDuration = 0
+    if phaseSequenceDuration != None:
+        totCoeff += phaseCoeff
+        phaseSequenceDuration = phaseSequenceDuration * phaseCoeff
+    else:
+        phaseSequenceDuration = 0
+    if eventSequenceDuration != None:
+        totCoeff += eventCoeff
+        eventSequenceDuration = eventSequenceDuration * eventCoeff
+    else:
+        eventSequenceDuration = 0
+    if totCoeff == 0:
+        return []
+    predictedDuration = int((originalSequenceDuration + translatedSequenceDuration + shortSequenceDuration + phaseSequenceDuration + eventSequenceDuration) / totCoeff)
     return [(processId, predictedDuration, firstEventDate, None, firstEventId, None)]
 
 def verifyDatabase(connection):
