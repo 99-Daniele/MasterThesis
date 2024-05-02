@@ -393,18 +393,20 @@ def getPredictedDuration(unfinishedProcessInfo, originalSequenceDict, translated
 # verify if user database has all needed tables and views with all needed columns.
 def verifyDatabase(connection):
     if not connect.doesATableExist(connection, "eventi"):
-        raise "\nEvents table is not present or is called differently than 'eventi'. Please change name or add such table because it's fundamental for the analysis"
+        raise Exception("\nEvents table is not present or is called differently than 'eventi'. Please change name or add such table because it's fundamental for the analysis")
     if not connect.doesATableHaveColumns(connection, "eventi", ['numEvento', 'numProcesso', 'codice', 'giudice', 'data', 'statoiniziale', 'statofinale']):
-        raise "\nEvents table does not have all requested columns. The requested columns are: 'numEvento', 'numProcesso', 'codice', 'giudice', 'data', 'statoiniziale', 'statofinale'"
+        raise Exception("\nEvents table does not have all requested columns. The requested columns are: 'numEvento', 'numProcesso', 'codice', 'giudice', 'data', 'statoiniziale', 'statofinale'")
     if not connect.doesATableExist(connection, "processi"):
-        raise "\nProcesses table is not present or is called differently than 'processi'. Please change name or add such table because it's fundamental for the analysis"
+        raise Exception("\nProcesses table is not present or is called differently than 'processi'. Please change name or add such table because it's fundamental for the analysis")
     if not connect.doesATableHaveColumns(connection, "processi", ['numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione']):
-        raise "\nProcesses table does not have all requested columns. The requested columns are: 'numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'"
+        raise Exception("\nProcesses table does not have all requested columns. The requested columns are: 'numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'")
     if not connect.doesATableExist(connection, "eventinome"):
         connect.createTable(connection, 'eventinome', ['codice', 'etichetta', 'fase'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(5)'], [0], [])
         eventsName = file.getDataFromTextFile('utils/Preferences/eventsName.txt')
         connect.insertIntoDatabase(connection, 'eventinome', eventsName)
     else:
+        if not connect.doesATableHaveColumns(connection, "eventinome", ['codice', 'etichetta', 'fase']):
+            raise Exception("\nNameEvents table does not have all requested columns. The requested columns are: 'codice', 'etichetta', 'fase'")
         eventsName = file.getDataFromTextFile('utils/Preferences/eventsName.txt')
         eventsNameInfo = compareData(eventsName, connection, "SELECT * FROM eventinome ORDER BY codice")
         connect.updateTable(connection, 'eventinome', eventsNameInfo, 'codice')
@@ -413,6 +415,8 @@ def verifyDatabase(connection):
         subjectsName = file.getDataFromTextFile('utils/Preferences/subjectsName.txt')
         connect.insertIntoDatabase(connection, 'materienome', subjectsName)
     else:
+        if not connect.doesATableHaveColumns(connection, "materienome", ['codice', 'etichetta']):
+            raise Exception("\nNameSubjects table does not have all requested columns. The requested columns are: 'codice', 'etichetta'")
         subjectsName = file.getDataFromTextFile('utils/Preferences/subjectsName.txt')
         subjectsNameInfo = compareData(subjectsName, connection, "SELECT * FROM materienome ORDER BY codice")
         connect.updateTable(connection, 'materienome', subjectsNameInfo, 'codice')
@@ -421,6 +425,8 @@ def verifyDatabase(connection):
         statesName = file.getDataFromTextFile('utils/Preferences/statesName.txt')
         connect.insertIntoDatabase(connection, 'statinome', statesName)
     else:
+        if not connect.doesATableHaveColumns(connection, "statinome", ['stato', 'etichetta', 'abbreviazione', 'fase']):
+            raise Exception("\nNameEvents table does not have all requested columns. The requested columns are: 'stato', 'etichetta', 'abbreviazione', 'fase'")
         statesName = file.getDataFromTextFile('utils/Preferences/statesName.txt')
         statesNameInfo = compareData(statesName, connection, "SELECT * FROM statinome ORDER BY stato")
         connect.updateTable(connection, 'statinome', statesNameInfo, 'stato')

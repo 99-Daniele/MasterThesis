@@ -23,7 +23,7 @@ def getDataFromTextFile(filename):
             data.append(d)
         return data
     except (FileNotFoundError):
-        raise Exception(filename + " does not exists!")
+        raise Exception("\n" + filename + " does not exists!")
 
 # get data from json file.
 # in case file not existing, return empty dictionary.
@@ -51,7 +51,7 @@ def writeOnTextFile(filename, data):
         f = open(filename, 'w')
         f.write(data)
     except (FileNotFoundError):
-        raise Exception(filename + " does not exists!")
+        raise Exception("\n" + filename + " does not exists!")
 
 # append on text file.
 # in case file not existing, raise an exception.
@@ -60,7 +60,7 @@ def appendOnTextFile(filename, data):
         f = open(filename, 'a')
         f.write(data)
     except (FileNotFoundError):
-        raise Exception(filename + " does not exists!")
+        raise Exception("\n" + filename + " does not exists!")
 
 # write on json file.
 # in case file not existing, raise an exception.
@@ -68,7 +68,7 @@ def writeOnJsonFile(filename, data):
     try:
         ujson.dump(data, open(filename, 'w'))
     except (FileNotFoundError):
-        raise Exception(filename + " does not exists!")
+        raise Exception("\n" + filename + " does not exists!")
 
 # write dataframe on json file.
 # in case file not existing, raise an exception.
@@ -77,5 +77,5 @@ def writeDataframeOnJsonFile(filename, data):
         jsonData = data.to_json()
         ujson.dump(jsonData, open(filename, 'w'))
     except (FileNotFoundError):
-        raise Exception(filename + " does not exists!")
+        raise Exception("\n" + filename + " does not exists!")
    
