@@ -211,7 +211,7 @@ def getCourtHearingsDuration(events, courtHearingsType, processSequence):
     if processSequence[0][5][-1] != '4' and processSequence[0][5][-1] != '5':
         return []
     for e in events:
-        if e[6] in courtHearingsType:
+        if e[1] in courtHearingsType:
             if firstEvent == None:
                 firstEvent = e
             lastEvent = e

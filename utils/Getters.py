@@ -178,6 +178,7 @@ def updateCache():
     stateDurationDataframe = getStateDurationDataframeFromDatabase(stateDurationQuery)
     cache.updateCache('statesDuration.json', stateDurationDataframe)
     phaseDurationDataframe = getPhaseDurationDataframeFromDatabase(phaseDurationQuery)
+    print(phaseDurationDataframe)
     cache.updateCache('phasesDuration.json', phaseDurationDataframe)
     eventDurationDataframe = getEventDurationDataframeFromDatabase(eventDurationQuery)
     cache.updateCache('eventsDuration.json', eventDurationDataframe)

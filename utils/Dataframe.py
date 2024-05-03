@@ -77,7 +77,7 @@ def createProcessesDurationDataFrame(processes):
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "mese": months, "cambio": changes, "sequenza": sequences, "fasi": phases})
 
 # from states list create states duration dataframe.
-def createStatesDurationsDataFrame(states):
+def createStatesDurationsDataFrame(stateEvents):
     dates = []
     durations = []
     judges = []
@@ -89,7 +89,7 @@ def createStatesDurationsDataFrame(states):
     tags = []
     states = []
     phases = []
-    for s in states:
+    for s in stateEvents:
         dates.append(s[0])
         durations.append(s[1])
         judges.append(s[2])
@@ -107,7 +107,7 @@ def createStatesDurationsDataFrame(states):
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "stato": tags, "fase": phases})
 
 # from phases list create phases duration dataframe.
-def createPhasesDurationsDataFrame(phases):
+def createPhasesDurationsDataFrame(phaseEvents):
     dates = []
     durations = []
     judges = []
@@ -118,7 +118,7 @@ def createPhasesDurationsDataFrame(phases):
     pIds = []
     phases = []
     orders = []
-    for p in phases:
+    for p in phaseEvents:
         dates.append(p[0])
         durations.append(p[1])
         judges.append(p[2])
@@ -264,7 +264,7 @@ def getAvgDataFrameByType(df, datetype, types, order):
     while i < len(types):
         df3['filtro'] = df3['filtro'] + " - " + df4[types[i]]
         i = i + 1
-    df3 = keepOnlyImportant(df3, 0.5)
+    df3 = keepOnlyImportant(df3, 0.25)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
     order_dict = df3.set_index('filtro')[order].to_dict()
     order_list = df3['filtro'].tolist()

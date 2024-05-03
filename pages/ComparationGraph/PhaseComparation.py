@@ -11,6 +11,8 @@ import utils.Utilities as utilities
 
 # get dataframe with all phases duration.
 df = getter.getPhasesDuration()
+print(df)
+exit()
 
 # return initial layout of page.
 def pageLayout():
