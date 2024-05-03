@@ -3,7 +3,22 @@
 import datetime as dt
 import pandas as pd
 
+import utils.FileOperation as file
 import utils.Utilities as utilities
+
+# importantProcessStates, importantSections, importantSUbjects are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
+try:
+    importantProcessStates = file.getDataFromTextFile('utils/Preferences/importantProcessStates.txt')
+except:
+    importantProcessStates = None
+try:
+    importantSections = file.getDataFromTextFile('utils/Preferences/importantSections.txt')
+except:
+    importantSections = None
+try:
+    importantSubjects = file.getDataFromTextFile('utils/Preferences/importantSubjects.txt')
+except:
+    importantSubjects = None
 
 # from events list create events dataframe.
 def createEventsDataFrame(events):
@@ -59,21 +74,22 @@ def createProcessesDurationDataFrame(processes):
     sequences = []
     phases = []
     for p in processes:
-        dates.append(p[0])
-        durations.append(p[1])
-        judges.append(p[2])
-        subjects.append(p[3])
-        sections.append(p[4])
-        finished.append(utilities.getProcessState(p[5]))
-        month = dt.datetime.strptime(p[0], '%Y-%m-%d %H:%M:%S').month
-        months.append(utilities.getMonth(month))
-        if p[6] == 1:
-            changes.append("SI")
-        else:
-            changes.append("NO")
-        pIds.append(p[7])
-        sequences.append(p[8])
-        phases.append(p[9])
+        if (importantSubjects == None or p[3] in importantSubjects) and (importantSections == None or p[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(p[5]) in importantProcessStates):
+            dates.append(p[0])
+            durations.append(p[1])
+            judges.append(p[2])
+            subjects.append(p[3])
+            sections.append(p[4])
+            finished.append(utilities.getProcessState(p[5]))
+            month = dt.datetime.strptime(p[0], '%Y-%m-%d %H:%M:%S').month
+            months.append(utilities.getMonth(month))
+            if p[6] == 1:
+                changes.append("SI")
+            else:
+                changes.append("NO")
+            pIds.append(p[7])
+            sequences.append(p[8])
+            phases.append(p[9])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "mese": months, "cambio": changes, "sequenza": sequences, "fasi": phases})
 
 # from states list create states duration dataframe.
@@ -90,20 +106,21 @@ def createStatesDurationsDataFrame(stateEvents):
     states = []
     phases = []
     for s in stateEvents:
-        dates.append(s[0])
-        durations.append(s[1])
-        judges.append(s[2])
-        subjects.append(s[3])
-        sections.append(s[4])
-        finished.append(utilities.getProcessState(s[5]))
-        if s[6] == 1:
-            changes.append("SI")
-        else:
-            changes.append("NO")
-        pIds.append(s[7])
-        tags.append(s[8])
-        states.append(s[9])
-        phases.append(s[10])
+        if (importantSubjects == None or s[3] in importantSubjects) and (importantSections == None or s[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(s[5]) in importantProcessStates):
+            dates.append(s[0])
+            durations.append(s[1])
+            judges.append(s[2])
+            subjects.append(s[3])
+            sections.append(s[4])
+            finished.append(utilities.getProcessState(s[5]))
+            if s[6] == 1:
+                changes.append("SI")
+            else:
+                changes.append("NO")
+            pIds.append(s[7])
+            tags.append(s[8])
+            states.append(s[9])
+            phases.append(s[10])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "stato": tags, "fase": phases})
 
 # from phases list create phases duration dataframe.
@@ -119,19 +136,20 @@ def createPhasesDurationsDataFrame(phaseEvents):
     phases = []
     orders = []
     for p in phaseEvents:
-        dates.append(p[0])
-        durations.append(p[1])
-        judges.append(p[2])
-        subjects.append(p[3])
-        sections.append(p[4])
-        finished.append(utilities.getProcessState(p[5]))
-        if p[6] == 1:
-            changes.append("SI")
-        else:
-            changes.append("NO")
-        pIds.append(p[7])
-        phases.append(p[8])
-        orders.append(p [9])
+        if (importantSubjects == None or p[3] in importantSubjects) and (importantSections == None or p[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(p[5]) in importantProcessStates):
+            dates.append(p[0])
+            durations.append(p[1])
+            judges.append(p[2])
+            subjects.append(p[3])
+            sections.append(p[4])
+            finished.append(utilities.getProcessState(p[5]))
+            if p[6] == 1:
+                changes.append("SI")
+            else:
+                changes.append("NO")
+            pIds.append(p[7])
+            phases.append(p[8])
+            orders.append(p [9])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "fase": phases})
 
 # from events list create events duration dataframe.
@@ -149,21 +167,22 @@ def createEventsDurationsDataFrame(events):
     typeEvents = []
     phases = []
     for e in events:
-        dates.append(e[0])
-        durations.append(e[1])
-        judges.append(e[2])
-        subjects.append(e[3])
-        sections.append(e[4])
-        finished.append(utilities.getProcessState(e[5]))
-        if e[6] == 1:
-            changes.append("SI")
-        else:
-            changes.append("NO")
-        eIds.append(e[7])
-        pIds.append(e[8])
-        tagEvents.append(e[9])
-        typeEvents.append(e[10])
-        phases.append(e[11])
+        if (importantSubjects == None or e[3] in importantSubjects) and (importantSections == None or e[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(e[5]) in importantProcessStates):
+            dates.append(e[0])
+            durations.append(e[1])
+            judges.append(e[2])
+            subjects.append(e[3])
+            sections.append(e[4])
+            finished.append(utilities.getProcessState(e[5]))
+            if e[6] == 1:
+                changes.append("SI")
+            else:
+                changes.append("NO")
+            eIds.append(e[7])
+            pIds.append(e[8])
+            tagEvents.append(e[9])
+            typeEvents.append(e[10])
+            phases.append(e[11])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes, "evento": tagEvents, "fase": phases})
 
 # from court hearings list create court hearings duration dataframe.
@@ -177,17 +196,18 @@ def createCourtHearingsDurationDataFrame(courtHearings):
     changes = []
     pIds = []
     for c in courtHearings:
-        dates.append(c[0])
-        durations.append(c[1])
-        judges.append(c[2])
-        subjects.append(c[3])
-        sections.append(c[4])
-        finished.append(utilities.getProcessState(c[5]))
-        if c[6] == 1:
-            changes.append("SI")
-        else:
-            changes.append("NO")
-        pIds.append(c[7])
+        if (importantSubjects == None or c[3] in importantSubjects) and (importantSections == None or c[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(c[5]) in importantProcessStates):
+            dates.append(c[0])
+            durations.append(c[1])
+            judges.append(c[2])
+            subjects.append(c[3])
+            sections.append(c[4])
+            finished.append(utilities.getProcessState(c[5]))
+            if c[6] == 1:
+                changes.append("SI")
+            else:
+                changes.append("NO")
+            pIds.append(c[7])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "cambio": changes})
 
 # return data group by chosen data type.

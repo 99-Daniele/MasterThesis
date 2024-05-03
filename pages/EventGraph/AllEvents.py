@@ -16,7 +16,10 @@ df = getter.getAllEvents()
 maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
 maxDateStart = dt.date(maxYear - 1, 1, 1)
 maxDateEnd = dt.date(maxYear, 1, 1)
-importantEvents = file.getDataFromTextFile('utils/Preferences/importantEvents.txt')
+try:
+    importantEvents = file.getDataFromTextFile('utils/Preferences/importantEvents.txt')
+except:
+    importantEvents = None
 
 # return initial layout of page.
 def pageLayout():

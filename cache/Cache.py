@@ -6,7 +6,7 @@ import utils.FileOperation as file
 
 # convert input data into json data and then write on file.
 def cacheUpdate(filename, data):
-    filename = "utils/Cache/" + filename
+    filename = "cache/" + filename
     jsonData = data.to_json(orient = 'split')
     file.writeOnJsonFile(filename, jsonData)
 
@@ -23,6 +23,6 @@ def updateCache(filename, databaseData):
 
 # return cached data from chosen file.
 def getData(filename):
-    filename = "utils/Cache/" + filename
+    filename = "cache/" + filename
     data = file.getDataframeFromJsonFile(filename)
     return data

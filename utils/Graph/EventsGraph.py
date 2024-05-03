@@ -37,5 +37,6 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
         tickformat = "%b\n%Y",
         ticklabelmode = "period"
     )   
-    fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name not in mustEvents else False))
+    if mustEvents != None:
+        fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name not in mustEvents else False))
     return fig, startDate, endDate, sections, subjects, judges

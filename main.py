@@ -8,7 +8,7 @@ def refreshData():
     import utils.DataUpdate as update
     import utils.Getters as getter
     connection = connect.getDatabaseConnection()
-    update.refreshData(connection)
+    #update.refreshData(connection)
     print("Database updated!")
     getter.updateCache()
 
@@ -100,4 +100,4 @@ def startApp():
 
 # action performed by main
 if __name__ == '__main__':
-    displayStateComparation()
+    refreshData()

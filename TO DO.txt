@@ -1,7 +1,6 @@
 - screenshot cose significative e powerpoint
 
 - disponibile per accesso esterno --> descrizione readme
-- sistemare legenda
 
 - carico processi
 - presenza eventi particolari (es: cambio giudice)
