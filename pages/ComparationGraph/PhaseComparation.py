@@ -11,8 +11,6 @@ import utils.Utilities as utilities
 
 # get dataframe with all phases duration.
 df = getter.getPhasesDuration()
-print(df)
-exit()
 
 # return initial layout of page.
 def pageLayout():
@@ -36,7 +34,7 @@ def pageLayout():
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-ph', placeholder = 'GIUDICE', style = {'display': 'none'}),
         ds.dcc.Dropdown(utilities.getAllProcessState(), value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-ph', placeholder = 'PROCESSO', style = {'display': 'none'}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-ph', placeholder = 'CAMBIO', style = {'display': 'none'}),
-        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = 'choice-checklist-ph', inline = True, style = {'display': 'none'}),
+        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio'], value = ['sezione'], id = 'choice-checklist-ph', inline = True, style = {'display': 'none'}),
         ds.dcc.Store(data = ['sezione'], id = 'choice-store-ph'),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = 'order-radioitem-ph', inline = True, style = {'display': 'none'}),
         ds.dcc.Graph(id = 'comparation-graph-ph', figure = fig)

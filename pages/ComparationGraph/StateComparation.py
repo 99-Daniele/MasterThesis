@@ -34,7 +34,7 @@ def pageLayout():
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-s', placeholder = 'GIUDICE', style = {'display': 'none'}),
         ds.dcc.Dropdown(utilities.getAllProcessState(), value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-s', placeholder = 'PROCESSO', style = {'display': 'none'}),
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-s', placeholder = 'CAMBIO', style = {'display': 'none'}),
-        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi'], value = ['sezione'], id = 'choice-checklist-s', inline = True, style = {'display': 'none'}),
+        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio'], value = ['sezione'], id = 'choice-checklist-s', inline = True, style = {'display': 'none'}),
         ds.dcc.Store(data = ['sezione'], id = 'choice-store-s'),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = 'order-radioitem-s', inline = True, style = {'display': 'none'}),
         ds.dcc.Graph(id = 'comparation-graph-s', figure = fig)
