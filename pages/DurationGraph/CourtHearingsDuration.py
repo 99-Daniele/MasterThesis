@@ -14,6 +14,7 @@ df = getter.getCourtHearingsDuration()
 
 # return initial layout of page.
 def pageLayout():
+    df_temp = df.copy()
     finished = frame.getGroupBy(df_temp, 'finito')
     years = frame.getAllYears(df_temp)
     changes = frame.getGroupBy(df_temp, 'cambio')

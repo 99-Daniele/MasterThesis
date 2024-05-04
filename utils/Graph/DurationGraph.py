@@ -75,4 +75,4 @@ def durationCourtHearingsUpdate(df, dateType, date, finished, years, changes):
         px.line(avgData, x = "data", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
     )
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
-    return fig, dateType, finished, years, changes
+    return fig, dateType, date, finished, years, changes
