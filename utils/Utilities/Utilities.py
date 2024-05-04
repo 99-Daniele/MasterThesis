@@ -2,6 +2,7 @@
 
 import datetime as dt
 import pandas as pd
+from win32api import GetSystemMetrics
 
 import utils.FileOperation as file
 
@@ -109,3 +110,13 @@ def fromListToString(list):
 def fromStringToList(string):
     list = string.split(",")
     return list
+
+# get width based on screen dimension
+def getWidth(perc):
+    width = GetSystemMetrics(0)
+    return width * perc
+
+# get height based on screen dimension
+def getHeight(perc):
+    height = GetSystemMetrics(1)
+    return height * perc

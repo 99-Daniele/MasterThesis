@@ -217,9 +217,9 @@ def processComparationUpdate(df, dateType, date, sections, subjects, judges, fin
     df_temp = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, changes, sequences, phaseSequences)
     [sections, subjects, judges, finished, changes, sequences, phaseSequences] = updateProcessTypes(df_temp)
     [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order)
-    fig = px.line(allData, x = "data", y = "durata", width = 1600, height = 800).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+    fig = px.line(allData, x = "data", y = "durata", width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
     fig.add_traces(
-        px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1600, height = 800).data
+        px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
     )
     fig.for_each_trace(
         lambda t: t.update(name = addCountToName(t.name, infoData, choices)) if t.name != addTotCountToName(infoData) else False
@@ -237,7 +237,7 @@ def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjec
         title = 'DURATA MEDIA ' + type[0:-1].upper() + 'I DEL PROCESSO'
         [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, [type])
         [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, changeStyle, choiceCheckStyle, orderRadioStyle] = hideAll()
-        fig = px.box(allData, x = type, y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, width = 1600, height = 800, points  = False)
+        fig = px.box(allData, x = type, y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
         fig.add_traces(
             px.line(avgData, x = type, y = "durata", markers = True).update_traces(line_color = 'red').data
         )
@@ -270,9 +270,9 @@ def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjec
             df_temp = updateTypeDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, changes)
             [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order)
         [sections, subjects, judges, finished, changes] = updateTypes(df_temp)
-        fig = px.line(allData, x = "data", y = "durata", width = 1400, height = 700).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+        fig = px.line(allData, x = "data", y = "durata", width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
         fig.add_traces(
-            px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600).data
+            px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
         )
         fig.for_each_trace(
             lambda t: t.update(name = addCountToName(t.name, infoData, choices)) if t.name != addTotCountToName(infoData) else False

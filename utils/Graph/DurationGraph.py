@@ -3,10 +3,11 @@
 import plotly.express as px
 
 import utils.Dataframe as frame
+import utils.Utilities.Utilities as utilities
 
 # update dataframe based on user choice.
 def updateDuration(df, finished, years, sequences, phases, changes):
-    df_temp = df
+    df_temp = df.copy()
     if not (sequences == None or len(sequences) == 0):
         df_temp = frame.getTypesDataFrame(df_temp, 'sequenza', sequences)
     if not (phases == None or len(phases) == 0):
@@ -20,22 +21,30 @@ def updateDuration(df, finished, years, sequences, phases, changes):
     return df_temp
 
 # update types based on user choice. This method is for processes duration graph.
-def updateTypesProcess(df):
-    df_temp = df.copy()
-    finished = frame.getGroupBy(df_temp, 'finito')
-    years = frame.getAllYears(df_temp)
-    sequences = frame.getGroupBy(df_temp, 'sequenza')
-    phases = frame.getGroupBy(df_temp, 'fasi')
-    changes = frame.getGroupBy(df_temp, 'cambio')
-    return [finished, years, sequences, phases, changes]
+def updateTypesProcess(df_temp, finished, years, sequences, phases, changes):
+    df_temp_1 = updateDuration(df_temp, None, years, sequences, phases, changes)
+    new_finished = frame.getGroupBy(df_temp_1, 'finito')
+    df_temp_2 = updateDuration(df_temp, finished, None, sequences, phases, changes)
+    new_years = frame.getAllYears(df_temp_2)
+    df_temp_3 = updateDuration(df_temp, finished, years, None, phases, changes)
+    new_sequences = frame.getGroupBy(df_temp_3, 'sequenza')
+    df_temp_4 = updateDuration(df_temp, finished, years, sequences, None, changes)
+    new_phases = frame.getGroupBy(df_temp_4, 'fasi')
+    df_temp_5 = updateDuration(df_temp, finished, years, sequences, phases, None)
+    new_changes = frame.getGroupBy(df_temp_5, 'cambio')
+    df_temp = updateDuration(df_temp, finished, years, sequences, phases, changes)
+    return [df_temp, new_finished, new_years, new_sequences, new_phases, new_changes]
 
 # update types based on user choice. This method is for court hearings duration graph.
-def updateTypesCourtHearing(df):
-    df_temp = df.copy()
-    finished = frame.getGroupBy(df_temp, 'finito')
-    years = frame.getAllYears(df_temp)
-    changes = frame.getGroupBy(df_temp, 'cambio')
-    return [finished, years, changes]
+def updateTypesCourtHearings(df_temp, finished, years, changes):
+    df_temp_1 = updateDuration(df_temp, None, years, None, None, changes)
+    new_finished = frame.getGroupBy(df_temp_1, 'finito')
+    df_temp_2 = updateDuration(df_temp, finished, None, None, None, changes)
+    new_years = frame.getAllYears(df_temp_2)
+    df_temp_3 = updateDuration(df_temp, finished, years, None, None, None)
+    new_changes = frame.getGroupBy(df_temp_3, 'cambio')
+    df_temp = updateDuration(df_temp, finished, years, None, None, changes)
+    return [df_temp, new_finished, new_years, new_changes]
 
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for process duration graph.
@@ -44,10 +53,9 @@ def durationProcessUpdate(df, dateType, date, finished, years, sequences, phases
         date = dateType[-1]
     dateType = [date]
     df_temp = df.copy()
-    df_temp = updateDuration(df_temp, finished, years, sequences, phases, changes)
-    [finished, years, sequences, phases, changes] = updateTypesProcess(df_temp)
+    [df_temp, finished, years, sequences, phases, changes] = updateTypesProcess(df_temp, finished, years, sequences, phases, changes)
     [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, date)
-    fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, width = 1400, height = 600, points = False)
+    fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points = False)
     fig.add_traces(
         px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
     )
@@ -64,8 +72,7 @@ def durationCourtHearingsUpdate(df, dateType, date, finished, years, changes):
         date = dateType[-1]
     dateType = [date]
     df_temp = df.copy()
-    df_temp = updateDuration(df_temp, finished, years, None, None, changes)
-    [finished, years, changes] = updateTypesCourtHearing(df_temp)
+    [df_temp, finished, years, changes] = updateTypesCourtHearings(df_temp, finished, years, changes)
     [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, date)
     fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':"Durata dell' udienza [giorni]", 'data':'Data inizio udienza'}, width = 1400, height = 600, points = False)
     fig.add_traces(
