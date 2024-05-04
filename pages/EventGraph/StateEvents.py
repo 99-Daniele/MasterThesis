@@ -21,7 +21,7 @@ maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
 maxDateStart = dt.date(maxYear - 1, 1, 1)
 maxDateEnd = dt.date(maxYear, 1, 1)
 try:
-    mustStates = file.getDataFromTextFile('utils/Preferences/mustStates.txt')
+    mustStates = file.getDataFromTextFile('preferences/mustStates.txt')
 except:
     mustStates = None
 

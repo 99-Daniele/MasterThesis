@@ -2,10 +2,10 @@
 
 from alive_progress import alive_bar
 
-import utils.DatabaseConnection as connect
+import database.DatabaseConnection as connect
 import utils.FileOperation as file
 import utils.Getters as getter
-import utils.Utilities as utilities
+import utils.Utilities.Utilities as utilities
 
 # refresh current database data. 
 # calcs event, phases, states, process, courtHearing durations, comprare with current database data and in case update them.
@@ -13,7 +13,7 @@ def refreshData(connection):
     verifyDatabase(connection)
     maxDate = getter.getMaxDate()
     events = getter.getEvents()
-    courtHearingsEventsType = str(tuple(file.getDataFromTextFile('utils/Preferences/courtHearingsEvents.txt')))
+    courtHearingsEventsType = str(tuple(file.getDataFromTextFile('preferences/courtHearingsEvents.txt')))
     eventsFiltered = []
     for e in events:
         eventsFiltered.append((e[0], e[1], e[6], e[3]))
@@ -402,32 +402,32 @@ def verifyDatabase(connection):
         raise Exception("\nProcesses table does not have all requested columns. The requested columns are: 'numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'")
     if not connect.doesATableExist(connection, "eventinome"):
         connect.createTable(connection, 'eventinome', ['codice', 'etichetta', 'fase'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(5)'], [0], [])
-        eventsName = file.getDataFromTextFile('utils/Preferences/eventsName.txt')
+        eventsName = file.getDataFromTextFile('utils/Utilities/eventsName.txt')
         connect.insertIntoDatabase(connection, 'eventinome', eventsName)
     else:
         if not connect.doesATableHaveColumns(connection, "eventinome", ['codice', 'etichetta', 'fase']):
             raise Exception("\nNameEvents table does not have all requested columns. The requested columns are: 'codice', 'etichetta', 'fase'")
-        eventsName = file.getDataFromTextFile('utils/Preferences/eventsName.txt')
+        eventsName = file.getDataFromTextFile('utils/Utilities/eventsName.txt')
         eventsNameInfo = compareData(eventsName, connection, "SELECT * FROM eventinome ORDER BY codice")
         connect.updateTable(connection, 'eventinome', eventsNameInfo, 'codice')
     if not connect.doesATableExist(connection, "materienome"):
         connect.createTable(connection, 'materienome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
-        subjectsName = file.getDataFromTextFile('utils/Preferences/subjectsName.txt')
+        subjectsName = file.getDataFromTextFile('utils/Utilities/subjectsName.txt')
         connect.insertIntoDatabase(connection, 'materienome', subjectsName)
     else:
         if not connect.doesATableHaveColumns(connection, "materienome", ['codice', 'etichetta']):
             raise Exception("\nNameSubjects table does not have all requested columns. The requested columns are: 'codice', 'etichetta'")
-        subjectsName = file.getDataFromTextFile('utils/Preferences/subjectsName.txt')
+        subjectsName = file.getDataFromTextFile('utils/Utilities/subjectsName.txt')
         subjectsNameInfo = compareData(subjectsName, connection, "SELECT * FROM materienome ORDER BY codice")
         connect.updateTable(connection, 'materienome', subjectsNameInfo, 'codice')
     if not connect.doesATableExist(connection, "statinome"):
         connect.createTable(connection, 'statinome', ['stato', 'etichetta', 'abbreviazione', 'fase'], ['VARCHAR(5)', 'TEXT', 'VARCHAR(10)', 'VARCHAR(5)'], [0], [])
-        statesName = file.getDataFromTextFile('utils/Preferences/statesName.txt')
+        statesName = file.getDataFromTextFile('utils/Utilities/statesName.txt')
         connect.insertIntoDatabase(connection, 'statinome', statesName)
     else:
         if not connect.doesATableHaveColumns(connection, "statinome", ['stato', 'etichetta', 'abbreviazione', 'fase']):
             raise Exception("\nNameEvents table does not have all requested columns. The requested columns are: 'stato', 'etichetta', 'abbreviazione', 'fase'")
-        statesName = file.getDataFromTextFile('utils/Preferences/statesName.txt')
+        statesName = file.getDataFromTextFile('utils/Utilities/statesName.txt')
         statesNameInfo = compareData(statesName, connection, "SELECT * FROM statinome ORDER BY stato")
         connect.updateTable(connection, 'statinome', statesNameInfo, 'stato')
     if not connect.doesATableExist(connection, "eventitipo"):

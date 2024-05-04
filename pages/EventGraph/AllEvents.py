@@ -17,7 +17,7 @@ maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
 maxDateStart = dt.date(maxYear - 1, 1, 1)
 maxDateEnd = dt.date(maxYear, 1, 1)
 try:
-    importantEvents = file.getDataFromTextFile('utils/Preferences/importantEvents.txt')
+    importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
 except:
     importantEvents = None
 

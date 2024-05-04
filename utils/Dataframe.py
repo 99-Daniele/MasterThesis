@@ -4,19 +4,19 @@ import datetime as dt
 import pandas as pd
 
 import utils.FileOperation as file
-import utils.Utilities as utilities
+import utils.Utilities.Utilities as utilities
 
 # importantProcessStates, importantSections, importantSUbjects are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
 try:
-    importantProcessStates = file.getDataFromTextFile('utils/Preferences/importantProcessStates.txt')
+    importantProcessStates = file.getDataFromTextFile('preferences/importantProcessStates.txt')
 except:
     importantProcessStates = None
 try:
-    importantSections = file.getDataFromTextFile('utils/Preferences/importantSections.txt')
+    importantSections = file.getDataFromTextFile('preferences/importantSections.txt')
 except:
     importantSections = None
 try:
-    importantSubjects = file.getDataFromTextFile('utils/Preferences/importantSubjects.txt')
+    importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
 except:
     importantSubjects = None
 

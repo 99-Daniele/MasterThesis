@@ -4,7 +4,7 @@ import dash as ds
 
 # refresh database and cache data.
 def refreshData():
-    import utils.DatabaseConnection as connect
+    import database.DatabaseConnection as connect
     import utils.DataUpdate as update
     import utils.Getters as getter
     connection = connect.getDatabaseConnection()
@@ -95,7 +95,7 @@ def displayCourtHearingsDuration():
 
 # start app to allow user select graph to be displayed.
 def startApp():
-    import utils.App as app
+    import App as app
     app.start()
 
 # action performed by main

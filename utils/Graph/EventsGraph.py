@@ -4,7 +4,7 @@ import dash as ds
 import plotly.express as px
 
 import utils.Dataframe as frame
-import utils.Utilities as utilities
+import utils.Utilities.Utilities as utilities
 
 # return all needed parameters in order to change graph after any user choice.
 def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sections, subjects, judges):

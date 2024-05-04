@@ -15,7 +15,7 @@ daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Saba
 def phaseColorList(df, type):
     types = df[type].unique().tolist()
     c = []
-    colors = file.getDataFromJsonFile('utils/Preferences/phaseColors.json')
+    colors = file.getDataFromJsonFile('utils/Utilities/phaseColors.json')
     for t in types:
         df_count = df[df[type] == t].groupby(['fase'], as_index = False).count()
         max = df_count['data'].max()
@@ -92,12 +92,12 @@ def getDayOfWeek(dowNumber):
 
 # get given process state from processStates text file.
 def getProcessState(state):
-    processState = file.getDataFromTextFile('utils/Preferences/processStates.txt')
+    processState = file.getDataFromTextFile('utils/Utilities/processStates.txt')
     return processState[state]
 
 # get all process states from processStates text file.
 def getAllProcessState():
-    processState = file.getDataFromTextFile('utils/Preferences/processStates.txt')
+    processState = file.getDataFromTextFile('utils/Utilities/processStates.txt')
     return processState
 
 # transform list into string by "," join.

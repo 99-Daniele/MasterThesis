@@ -5,7 +5,7 @@ import plotly.express as px
 import textwrap
 
 import utils.Dataframe as frame
-import utils.Utilities as utilities
+import utils.Utilities.Utilities as utilities
 
 # returns a string with input name followed by how many times is present in the dataframe.
 def addCountToName(name, df, choices):

@@ -7,7 +7,7 @@ import plotly.express as px
 import utils.Dataframe as frame
 import utils.Getters as getter
 import utils.Graph.DurationGraph as duration
-import utils.Utilities as utilities
+import utils.Utilities.Utilities as utilities
 
 # get dataframe with all court hearings duration.
 df = getter.getCourtHearingsDuration()

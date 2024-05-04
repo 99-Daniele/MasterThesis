@@ -9,8 +9,8 @@ import utils.FileOperation as file
 # return database connection with user credentials. 
 # the first time user must write his credentials which are then saved in a file. After that is no longer needed to input credentials.
 def getDatabaseConnection():
-    if os.path.isfile('utils/databaseCredentials.json'):
-        credentials = file.getDataFromJsonFile('utils/databaseCredentials.json')
+    if os.path.isfile('utils/Database/databaseCredentials.json'):
+        credentials = file.getDataFromJsonFile('utils/Database/databaseCredentials.json')
         host = credentials['host']
         user = credentials['user']
         password = credentials['password']
@@ -25,7 +25,7 @@ def getDatabaseConnection():
             try:
                 connection = connectToDatabase(host, user, password, database)
                 credentials = {'host': host, 'user': user, 'password': password, 'database': database}
-                file.writeOnJsonFile('utils/databaseCredentials.json', credentials)
+                file.writeOnJsonFile('utils/Database/databaseCredentials.json', credentials)
                 return connection
             except:
                 print("\nWrong credentials!! Please give right credentials")

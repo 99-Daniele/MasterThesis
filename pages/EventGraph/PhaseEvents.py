@@ -21,7 +21,7 @@ maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
 maxDateStart = dt.date(maxYear - 1, 1, 1)
 maxDateEnd = dt.date(maxYear, 1, 1)
 try:
-    mustPhases = file.getDataFromTextFile('utils/Preferences/mustPhases.txt')
+    mustPhases = file.getDataFromTextFile('preferences/mustPhases.txt')
 except:
     mustPhases = None
 
