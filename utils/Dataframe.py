@@ -282,9 +282,9 @@ def getAvgDataFrameByType(df, datetype, types, order):
     if types == None:
         return None
     while i < len(types):
-        df3['filtro'] = df3['filtro'] + " - " + df4[types[i]]
+        df3['filtro'] =df3['filtro'].astype(str) + " - " + df4[types[i]].astype(str)
         i = i + 1
-    df3 = keepOnlyImportant(df3, 0.25)
+    df3 = keepOnlyImportant(df3, 0.5)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
     order_dict = df3.set_index('filtro')[order].to_dict()
     order_list = df3['filtro'].tolist()
@@ -292,7 +292,7 @@ def getAvgDataFrameByType(df, datetype, types, order):
     df_temp = df_temp.rename(columns = {types[0]:'filtro'})
     i = 1
     while i < len(types):
-        df_temp['filtro'] = df_temp['filtro'] + " - " + df[types[i]]
+        df_temp['filtro'] = df_temp['filtro'].astype(str) + " - " + df[types[i]].astype(str)
         i = i + 1
     df_temp = df_temp[df_temp['filtro'].isin(order_list)]
     match datetype:

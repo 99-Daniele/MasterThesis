@@ -19,7 +19,7 @@ def addCountToName(name, df, choices):
         else:
             name = "SI"
     else:
-        count = df[df['filtro'] == name]['conteggio'].item()
+        count = df[df['filtro'].astype(str) == name]['conteggio'].item()
     newName = name + " (" + str(count) + ")"
     newName = '<br>'.join(textwrap.wrap(newName, width = 50))
     return newName

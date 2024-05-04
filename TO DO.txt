@@ -1,6 +1,8 @@
 - screenshot cose significative e powerpoint
 
 - disponibile per accesso esterno --> descrizione readme
+- migliorare grafico --> anno sull'asse x
+                     --> piu carino da vedere
 
 - carico processi
 - presenza eventi particolari (es: cambio giudice)
