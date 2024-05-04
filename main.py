@@ -4,7 +4,7 @@ import dash as ds
 
 # refresh database and cache data.
 def refreshData():
-    import database.DatabaseConnection as connect
+    import utils.Database.DatabaseConnection as connect
     import utils.DataUpdate as update
     import utils.Getters as getter
     connection = connect.getDatabaseConnection()
@@ -98,6 +98,6 @@ def startApp():
     import App as app
     app.start()
 
-# action performed by main
+# action performed by main.
 if __name__ == '__main__':
     refreshData()

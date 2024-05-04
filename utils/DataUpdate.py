@@ -2,7 +2,7 @@
 
 from alive_progress import alive_bar
 
-import database.DatabaseConnection as connect
+import utils.Database.DatabaseConnection as connect
 import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Utilities.Utilities as utilities

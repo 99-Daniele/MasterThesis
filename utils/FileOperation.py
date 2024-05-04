@@ -5,7 +5,7 @@ import os
 import pandas as pd
 import ujson
 
-# remove file 
+# remove file.
 def removeFile(filename):
     if os.path.isfile(filename):
         os.remove(filename)
