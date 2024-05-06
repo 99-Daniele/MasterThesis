@@ -43,7 +43,7 @@ def pageLayout():
         ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-pr', placeholder = 'CAMBIO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-pr', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-pr', placeholder = 'FASI', style = {'width': 400}),
-        ds.dcc.Dropdown(events, multi = True, searchable = False, id = 'events-dropdown-pr', placeholder = 'EVENTI', style = {'width': 400}),
+        ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'events-dropdown-pr', placeholder = 'EVENTI', style = {'width': 400}),
         ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi', 'eventi'], value = ['sezione'], id = "choice-checklist-pr", inline = True, style = {'display':'inline'}),
         ds.dcc.Store(data = ['sezione'], id = "choice-store-pr"),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-pr", inline = True),

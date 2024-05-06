@@ -191,10 +191,10 @@ def updateProcessDataframeFromSelection(choice, df_temp, df_data, sections, subj
         df_temp_7 = df_data
     phaseSequences = frame.getGroupBy(df_temp_7, 'fasi')
     if choice != None and 'events-dropdown' in choice:
-        df_temp_8 = updateProcessData(df_temp, sections, subjects, judges, finished, changes, sequences, phaseSequences, events)
+        df_temp_8 = updateProcessData(df_temp, sections, subjects, judges, finished, changes, sequences, phaseSequences, None)
     else:
         df_temp_8 = df_data
-    phaseSequences = frame.getGroupByFromString(df_temp_8, 'eventi')
+    events = frame.getGroupByFromString(df_temp_8, 'eventi')
     return [sections, subjects, judges, finished, changes, sequences, phaseSequences, events]
 
 # update data base on user choices on different parameters. In order to do that is use 'updateProcessData' method with chosen parameter as None. 
