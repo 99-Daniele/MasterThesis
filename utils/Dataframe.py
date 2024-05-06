@@ -399,6 +399,15 @@ def getTypesDataFrame(df, tag, types):
         return df
     return df[df[tag].isin(types)]
 
+# return dataframe rows where given tag is contained in given types from string.
+def getTypesDataFrameFromString(df, tag, types):
+    if types == None or len(types) == 0:
+        return df
+    print(types)
+    print(df[tag])
+    exit()
+    return df[df[tag].isin(types)]
+
 # return dataframe rows where date month is contained given months.
 def getMonthDataFrame(df, months):
     if months == None or len(months) == 0:
@@ -434,4 +443,19 @@ def getAllYears(df):
 def getGroupBy(df, tag):
     df_temp = df.copy()
     types = df_temp.groupby([tag])[tag].size().sort_values(ascending = False).reset_index(name = 'count')[tag].tolist()
+    return types
+
+# return group by types with corrispondent counts from string.
+def getGroupByFromString(df, tag):
+    df_temp = df.copy()
+    types = {}
+    for d in df_temp[tag]:
+        typeList = utilities.fromStringToList(d)
+        for l in typeList:
+            if l in types.keys():
+                count = types.get(l) + 1
+            else:
+                count = 1
+            types.update({l: count})
+    types = list(dict(sorted(types.items(), key = lambda x: x[1], reverse = True)).keys())
     return types
