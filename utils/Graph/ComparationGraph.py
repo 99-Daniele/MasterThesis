@@ -239,12 +239,15 @@ def processComparationUpdate(df, dateType, date, sections, subjects, judges, fin
     df_data = updateProcessData(df_temp, sections, subjects, judges, finished, changes, sequences, phaseSequences)
     [sections, subjects, judges, finished, changes, sequences, phaseSequences] = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, changes, sequences, phaseSequences, importantSubjects)
     [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order)
-    fig = px.line(allData, x = "data", y = "durata", text = "conteggio", width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+    fig = px.line(allData, x = "data", y = "durata", text = "conteggio", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
     fig.add_traces(
-        px.line(typeData, x = "data", y = "durata", text = "conteggio", color = 'filtro', markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
+        px.line(typeData, x = "data", y = "durata", text = "conteggio", color = 'filtro', markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
     )
     fig.for_each_trace(
         lambda t: t.update(name = addCountToName(t.name, infoData, choices)) if t.name != addTotCountToName(infoData) else False
+    )
+    fig.for_each_trace(
+        lambda t: t.update(textfont_color = t.line.color, textposition = "top center", textfont_size = 14)
     )
     fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
     fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
@@ -294,12 +297,15 @@ def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjec
             df_data = updateTypeData(df_temp, sections, subjects, judges, finished, changes)
             [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order)
         [sections, subjects, judges, finished, changes] = updateTypeDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, changes, importantSubjects)
-        fig = px.line(allData, x = "data", y = "durata", width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+        fig = px.line(allData, x = "data", y = "durata", text = 'conteggio', labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
         fig.add_traces(
-            px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
+            px.line(typeData, x = "data", y = "durata", text = 'conteggio', color = 'filtro', markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
         )
         fig.for_each_trace(
             lambda t: t.update(name = addCountToName(t.name, infoData, choices)) if t.name != addTotCountToName(infoData) else False
+        )
+        fig.for_each_trace(
+            lambda t: t.update(textfont_color = t.line.color, textposition = "top center", textfont_size = 14)
         )
         fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
         fig.update_xaxes(gridcolor = 'grey', griddash = 'dash')
