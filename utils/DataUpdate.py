@@ -275,7 +275,7 @@ def getProcessesSequence(events):
             else:
                 processType = 1
                 #processType = 2
-    return [[(processId, processType, utilities.fromListToString(originalSequence), utilities.fromListToString(translatedSequence), utilities.fromListToString(shortSequence), utilities.fromListToString(phasesSequence))], originalSequenceDuration, translatedSequenceDuration, shortSequenceDuration, phasesSequenceOriginalDuration, eventsSequenceDuration, processType != 0]
+    return [[(processId, processType, utilities.fromListToString(originalSequence), utilities.fromListToString(translatedSequence), utilities.fromListToString(shortSequence), utilities.fromListToString(phasesSequence), utilities.fromListToString(eventsSequence))], originalSequenceDuration, translatedSequenceDuration, shortSequenceDuration, phasesSequenceOriginalDuration, eventsSequenceDuration, processType != 0]
 
 # return process duration of finished process.
 def getProcessesDuration(events):
@@ -393,20 +393,20 @@ def getPredictedDuration(unfinishedProcessInfo, originalSequenceDict, translated
 # verify if user database has all needed tables and views with all needed columns.
 def verifyDatabase(connection):
     if not connect.doesATableExist(connection, "eventi"):
-        raise Exception("\nEvents table is not present or is called differently than 'eventi'. Please change name or add such table because it's fundamental for the analysis")
+        raise Exception("\n'eventi' table is not present or is called differently than 'eventi'. Please change name or add such table because it's fundamental for the analysis")
     if not connect.doesATableHaveColumns(connection, "eventi", ['numEvento', 'numProcesso', 'codice', 'giudice', 'data', 'statoiniziale', 'statofinale']):
-        raise Exception("\nEvents table does not have all requested columns. The requested columns are: 'numEvento', 'numProcesso', 'codice', 'giudice', 'data', 'statoiniziale', 'statofinale'")
+        raise Exception("\n'eventi' table does not have all requested columns. The requested columns are: 'numEvento', 'numProcesso', 'codice', 'giudice', 'data', 'statoiniziale', 'statofinale'")
     if not connect.doesATableExist(connection, "processi"):
-        raise Exception("\nProcesses table is not present or is called differently than 'processi'. Please change name or add such table because it's fundamental for the analysis")
+        raise Exception("\n'processi' table is not present or is called differently than 'processi'. Please change name or add such table because it's fundamental for the analysis")
     if not connect.doesATableHaveColumns(connection, "processi", ['numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione']):
-        raise Exception("\nProcesses table does not have all requested columns. The requested columns are: 'numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'")
+        raise Exception("\n'processi' table does not have all requested columns. The requested columns are: 'numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'")
     if not connect.doesATableExist(connection, "eventinome"):
         connect.createTable(connection, 'eventinome', ['codice', 'etichetta', 'fase'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(5)'], [0], [])
         eventsName = file.getDataFromTextFile('utils/Utilities/eventsName.txt')
         connect.insertIntoDatabase(connection, 'eventinome', eventsName)
     else:
         if not connect.doesATableHaveColumns(connection, "eventinome", ['codice', 'etichetta', 'fase']):
-            raise Exception("\nNameEvents table does not have all requested columns. The requested columns are: 'codice', 'etichetta', 'fase'")
+            raise Exception("\n'eventinome' table does not have all requested columns. The requested columns are: 'codice', 'etichetta', 'fase'")
         eventsName = file.getDataFromTextFile('utils/Utilities/eventsName.txt')
         eventsNameInfo = compareData(eventsName, connection, "SELECT * FROM eventinome ORDER BY codice")
         connect.updateTable(connection, 'eventinome', eventsNameInfo, 'codice')
@@ -416,7 +416,7 @@ def verifyDatabase(connection):
         connect.insertIntoDatabase(connection, 'materienome', subjectsName)
     else:
         if not connect.doesATableHaveColumns(connection, "materienome", ['codice', 'etichetta']):
-            raise Exception("\nNameSubjects table does not have all requested columns. The requested columns are: 'codice', 'etichetta'")
+            raise Exception("\n'materienome' table does not have all requested columns. The requested columns are: 'codice', 'etichetta'")
         subjectsName = file.getDataFromTextFile('utils/Utilities/subjectsName.txt')
         subjectsNameInfo = compareData(subjectsName, connection, "SELECT * FROM materienome ORDER BY codice")
         connect.updateTable(connection, 'materienome', subjectsNameInfo, 'codice')
@@ -426,24 +426,46 @@ def verifyDatabase(connection):
         connect.insertIntoDatabase(connection, 'statinome', statesName)
     else:
         if not connect.doesATableHaveColumns(connection, "statinome", ['stato', 'etichetta', 'abbreviazione', 'fase']):
-            raise Exception("\nNameEvents table does not have all requested columns. The requested columns are: 'stato', 'etichetta', 'abbreviazione', 'fase'")
+            raise Exception("\n'statinome' table does not have all requested columns. The requested columns are: 'stato', 'etichetta', 'abbreviazione', 'fase'")
         statesName = file.getDataFromTextFile('utils/Utilities/statesName.txt')
         statesNameInfo = compareData(statesName, connection, "SELECT * FROM statinome ORDER BY stato")
         connect.updateTable(connection, 'statinome', statesNameInfo, 'stato')
+
     if not connect.doesATableExist(connection, "eventitipo"):
         connect.createTable(connection, 'eventitipo', ['numEvento', 'evento', 'stato', 'fase'], ['BIGINT', 'TEXT', 'TEXT', 'VARCHAR(5)'], [0], [])
+    else:
+        if not connect.doesATableHaveColumns(connection, "eventitipo", ['numEvento', 'evento', 'stato', 'fase']):
+            raise Exception("\n'eventitipo' table does not have all requested columns. The requested columns are: 'numEvento', 'evento', 'stato', 'fase")
     if not connect.doesATableExist(connection, "durataeventi"):
         connect.createTable(connection, 'durataeventi', ['numEvento', 'durata', 'dataInizio', 'dataFine', 'numEventoSuccessivo'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME', 'BIGINT'], [0], [])
+    else:
+        if not connect.doesATableHaveColumns(connection, "durataeventi", ['numEvento', 'durata', 'dataInizio', 'dataFine', 'numEventoSuccessivo']):
+            raise Exception("\n'durataeventi' table does not have all requested columns. The requested columns are: 'numEvento', 'durata', 'dataInizio', 'dataFine', 'numEventoSuccessivo'")
     if not connect.doesATableExist(connection, "duratafasi"):
         connect.createTable(connection, 'duratafasi', ['numProcesso', 'fase', 'ordine', 'durata', 'dataInizioFase', 'dataFineFase', 'numEventoInizioFase', 'numEventoFineFase'], ['BIGINT', 'VARCHAR(5)', 'INT', 'INT', 'DATETIME', 'DATETIME', 'BIGINT', 'BIGINT'], [0, 2], [])
+    else:
+        if not connect.doesATableHaveColumns(connection, "duratafasi", ['numProcesso', 'fase', 'ordine', 'durata', 'dataInizioFase', 'dataFineFase', 'numEventoInizioFase', 'numEventoFineFase']):
+            raise Exception("\'duratafasi' table does not have all requested columns. The requested columns are: 'numProcesso', 'fase', 'ordine', 'durata', 'dataInizioFase', 'dataFineFase', 'numEventoInizioFase', 'numEventoFineFase'")
     if not connect.doesATableExist(connection, "duratastati"):
         connect.createTable(connection, 'duratastati', ['numProcesso', 'etichetta', 'stato', 'ordine', 'durata', 'dataInizioStato', 'dataFineStato', 'numEventoInizioStato', 'numEventoFineStato'], ['BIGINT', 'TEXT', 'VARCHAR(10)', 'INT', 'INT', 'DATETIME', 'DATETIME', 'BIGINT', 'BIGINT'], [0, 3], [])
+    else:
+        if not connect.doesATableHaveColumns(connection, "duratastati", ['numProcesso', 'etichetta', 'stato', 'ordine', 'durata', 'dataInizioStato', 'dataFineStato', 'numEventoInizioStato', 'numEventoFineStato']):
+            raise Exception("\n'duratastati' table does not have all requested columns. The requested columns are: 'numProcesso', 'etichetta', 'stato', 'ordine', 'durata', 'dataInizioStato', 'dataFineStato', 'numEventoInizioStato', 'numEventoFineStato'")
     if not connect.doesATableExist(connection, "durataprocessi"):
         connect.createTable(connection, 'durataprocessi', ['numProcesso', 'durata', 'dataInizioProcesso', 'dataFineProcesso', 'numEventoInizioProcesso', 'numEventoFineProcesso'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME', 'BIGINT', 'BIGINT'], [0], [])
+    else:
+        if not connect.doesATableHaveColumns(connection, "durataprocessi", ['numProcesso', 'durata', 'dataInizioProcesso', 'dataFineProcesso', 'numEventoInizioProcesso', 'numEventoFineProcesso']):
+            raise Exception("\n'durataprocessi' table does not have all requested columns. The requested columns are: 'numProcesso', 'durata', 'dataInizioProcesso', 'dataFineProcesso', 'numEventoInizioProcesso', 'numEventoFineProcesso'")
     if not connect.doesATableExist(connection, "durataudienze"):
         connect.createTable(connection, 'durataudienze', ['numProcesso', 'durata', 'dataInizioUdienza', 'dataFineUdienza', 'numEventoInizioUdienza', 'numEventoFineUdienza'], ['BIGINT', 'INT', 'DATETIME', 'DATETIME', 'BIGINT', 'BIGINT'], [0], [])
+    else:
+        if not connect.doesATableHaveColumns(connection, "durataudienze", ['numProcesso', 'durata', 'dataInizioUdienza', 'dataFineUdienza', 'numEventoInizioUdienza', 'numEventoFineUdienza']):
+            raise Exception("\n'durataudienze' table does not have all requested columns. The requested columns are: 'numProcesso', 'durata', 'dataInizioUdienza', 'dataFineUdienza', 'numEventoInizioUdienza', 'numEventoFineUdienza'")
     if not connect.doesATableExist(connection, "processitipo"):
-        connect.createTable(connection, 'processitipo', ['numProcesso', 'processofinito', 'sequenzaStati', 'sequenzaTradotta', 'sequenzaCorta', 'sequenzaFasi'], ['BIGINT', 'INT', 'TEXT', 'TEXT','TEXT','TEXT'], [0], [])
+        connect.createTable(connection, 'processitipo', ['numProcesso', 'processofinito', 'sequenzaStati', 'sequenzaTradotta', 'sequenzaCorta', 'sequenzaFasi', 'sequenzaEventi'], ['BIGINT', 'INT', 'TEXT', 'TEXT','TEXT','TEXT', 'TEXT'], [0], [])
+    else:
+        if not connect.doesATableHaveColumns(connection, "processitipo", ['numProcesso', 'processofinito', 'sequenzaStati', 'sequenzaTradotta', 'sequenzaCorta', 'sequenzaFasi', 'sequenzaEventi']):
+            raise Exception("\n'processitipo' table does not have all requested columns. The requested columns are: 'numProcesso', 'processofinito', 'sequenzaStati', 'sequenzaTradotta', 'sequenzaCorta', 'sequenzaFasi', 'sequenzaEventi'")
     if not connect.doesAViewExist(connection, "aliasgiudice"):
         query = "CREATE VIEW aliasgiudice AS SELECT giudice, CONCAT('giudice ', ROW_NUMBER() OVER ()) AS alias FROM (SELECT DISTINCT giudice FROM eventi WHERE giudice <> 'null' ORDER BY giudice) AS g"
         connect.createViewFromQuery(connection, 'aliasgiudice', query)

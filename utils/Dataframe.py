@@ -69,6 +69,7 @@ def createProcessesDurationDataFrame(processes):
     pIds = []
     sequences = []
     phases = []
+    events = []
     for p in processes:
         if (importantSections == None or p[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(p[5]) in importantProcessStates):
             dates.append(p[0])
@@ -86,7 +87,8 @@ def createProcessesDurationDataFrame(processes):
             pIds.append(p[7])
             sequences.append(p[8])
             phases.append(p[9])
-    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "mese": months, "cambio": changes, "sequenza": sequences, "fasi": phases})
+            events.append(p[10])
+    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "mese": months, "cambio": changes, "sequenza": sequences, "fasi": phases, "eventi": events})
 
 # from states list create states duration dataframe.
 def createStatesDurationsDataFrame(stateEvents):

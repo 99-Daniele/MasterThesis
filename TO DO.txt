@@ -4,5 +4,4 @@
 - migliorare grafico --> anno sull'asse x
                      --> piu carino da vedere
 
-- carico processi
 - presenza eventi particolari (es: cambio giudice)
