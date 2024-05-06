@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.express as px
 
 import utils.Dataframe as frame
+import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Graph.ComparationGraph as comparation
 import utils.Utilities.Utilities as utilities
@@ -17,7 +18,13 @@ def pageLayout():
     types = frame.getGroupBy(df, 'stato')
     typesSorted = sorted(types)
     sections = frame.getGroupBy(df, 'sezione')
+    try:
+        importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
+    except:
+        importantSubjects = None
     subjects = frame.getGroupBy(df, 'materia')
+    if importantSubjects != None:
+        subjects = list(set(subjects) & set(importantSubjects))
     judges = frame.getGroupBy(df, 'giudice')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')

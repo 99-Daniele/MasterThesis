@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.express as px
 
 import utils.Dataframe as frame
+import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Graph.ComparationGraph as comparation
 import utils.Utilities.Utilities as utilities
@@ -14,8 +15,14 @@ df = getter.getProcessesDuration()
 
 # return initial layout of page.
 def pageLayout():
-    sections = frame.getGroupBy(df, 'sezione')
+    try:
+        importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
+    except:
+        importantSubjects = None
     subjects = frame.getGroupBy(df, 'materia')
+    if importantSubjects != None:
+        subjects = list(set(subjects) & set(importantSubjects))
+    sections = frame.getGroupBy(df, 'sezione')
     judges = frame.getGroupBy(df, 'giudice')
     sequences = frame.getGroupBy(df, 'sequenza')
     phaseSequences = frame.getGroupBy(df, 'fasi')
@@ -25,7 +32,7 @@ def pageLayout():
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
         ds.dcc.Link('Grafici confronto', href='/comparationgraph'),
-        ds.html.H2("CONFRONTO DURATA MEDIA PROCESSI IN BASE AL MESE DI INIZIO PROCESSO"),
+        ds.html.H2("CONFRONTO DURATA MEDIA PROCESSI"),
         ds.dcc.Checklist(["SETTIMANA", "MESE", "MESE DELL'ANNO", "TRIMESTRE", "TRIMESTRE DELL'ANNO", "ANNO"], value = ['MESE'], id = "date-checklist-pr", inline = True, style = {'display':'inline'}),
         ds.dcc.Store(data = 'MESE', id = "date-store-pr"),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-pr', placeholder = 'SEZIONE', style = {'width': 400}),

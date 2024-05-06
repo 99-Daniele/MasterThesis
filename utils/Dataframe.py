@@ -15,10 +15,6 @@ try:
     importantSections = file.getDataFromTextFile('preferences/importantSections.txt')
 except:
     importantSections = None
-try:
-    importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
-except:
-    importantSubjects = None
 
 # from events list create events dataframe.
 def createEventsDataFrame(events):
@@ -74,7 +70,7 @@ def createProcessesDurationDataFrame(processes):
     sequences = []
     phases = []
     for p in processes:
-        if (importantSubjects == None or p[3] in importantSubjects) and (importantSections == None or p[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(p[5]) in importantProcessStates):
+        if (importantSections == None or p[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(p[5]) in importantProcessStates):
             dates.append(p[0])
             durations.append(p[1])
             judges.append(p[2])
@@ -106,7 +102,7 @@ def createStatesDurationsDataFrame(stateEvents):
     states = []
     phases = []
     for s in stateEvents:
-        if (importantSubjects == None or s[3] in importantSubjects) and (importantSections == None or s[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(s[5]) in importantProcessStates):
+        if (importantSections == None or s[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(s[5]) in importantProcessStates):
             dates.append(s[0])
             durations.append(s[1])
             judges.append(s[2])
@@ -136,7 +132,7 @@ def createPhasesDurationsDataFrame(phaseEvents):
     phases = []
     orders = []
     for p in phaseEvents:
-        if (importantSubjects == None or p[3] in importantSubjects) and (importantSections == None or p[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(p[5]) in importantProcessStates):
+        if (importantSections == None or p[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(p[5]) in importantProcessStates):
             dates.append(p[0])
             durations.append(p[1])
             judges.append(p[2])
@@ -167,7 +163,7 @@ def createEventsDurationsDataFrame(events):
     typeEvents = []
     phases = []
     for e in events:
-        if (importantSubjects == None or e[3] in importantSubjects) and (importantSections == None or e[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(e[5]) in importantProcessStates):
+        if (importantSections == None or e[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(e[5]) in importantProcessStates):
             dates.append(e[0])
             durations.append(e[1])
             judges.append(e[2])
@@ -196,7 +192,7 @@ def createCourtHearingsDurationDataFrame(courtHearings):
     changes = []
     pIds = []
     for c in courtHearings:
-        if (importantSubjects == None or c[3] in importantSubjects) and (importantSections == None or c[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(c[5]) in importantProcessStates):
+        if (importantSections == None or c[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(c[5]) in importantProcessStates):
             dates.append(c[0])
             durations.append(c[1])
             judges.append(c[2])
@@ -383,7 +379,7 @@ def keepOnlyImportant(df, perc):
     df.reset_index(drop = True)
     return df
 
-# return dataframe rows where given tag is containde in given types.
+# return dataframe rows where given tag is contained in given types.
 def getTypesDataFrame(df, tag, types):
     if types == None or len(types) == 0:
         return df

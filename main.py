@@ -11,7 +11,6 @@ def refreshData():
     update.refreshData(connection)
     print("Database updated!")
     getter.updateCache()
-    getter.updateCache()
 
 # display all events.
 def displayAllEvents():
@@ -101,4 +100,4 @@ def startApp():
 
 # action performed by main.
 if __name__ == '__main__':
-    refreshData()
+    displayStateComparation()
