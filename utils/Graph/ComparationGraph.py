@@ -34,7 +34,6 @@ def hideProcessChosen(choices, sections, subjects, judges, finished, sequences, 
     finishedStyle = {'width': 400}
     sequenceStyle = {'width': 400}
     phaseSequenceStyle = {'width': 400}
-    eventStyle = {'width': 400}
     if 'sezione' in choices:
         sectionStyle = {'display': 'none'}
         sections = None
@@ -53,10 +52,7 @@ def hideProcessChosen(choices, sections, subjects, judges, finished, sequences, 
     if 'fasi' in choices:
         phaseSequenceStyle = {'display': 'none'}
         phaseSequences = None
-    if 'eventi' in choices:
-        eventStyle = {'display': 'none'}
-        events = None
-    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, sections, subjects, judges, finished, sequences, phaseSequences, events]
+    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, sequences, phaseSequences, events]
 
 # return the style of dropdown as hidden or not based on user choices: if user choices one, then corresponding dropdown will be hidden and his values will reset.
 # this method is for all comparation graphs except process ones since they use different parameters.
@@ -106,7 +102,7 @@ def hideAll():
 
 # update data base on user choices on different parameters.
 # this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
-def updateProcessData(df, sections, subjects, judges, finished, sequences, phaseSequences, events):
+def updateProcessData(df, sections, subjects, judges, finished, sequences, phaseSequences):
     df_temp = df.copy()
     df_temp = frame.getTypesDataFrame(df_temp, 'sezione', sections)
     df_temp = frame.getTypesDataFrame(df_temp, 'materia', subjects)
@@ -114,7 +110,6 @@ def updateProcessData(df, sections, subjects, judges, finished, sequences, phase
     df_temp = frame.getTypesDataFrame(df_temp, 'finito', finished)
     df_temp = frame.getTypesDataFrame(df_temp, 'sequenza', sequences)
     df_temp = frame.getTypesDataFrame(df_temp, 'fasi', phaseSequences)
-    df_temp = frame.getTypesDataFrameFromString(df_temp, 'eventi', events)
     return df_temp
 
 # update data base on user choices on different parameters.
@@ -132,42 +127,38 @@ def updateTypeData(df, sections, subjects, judges, finished):
 # this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
 def updateProcessDataframeFromSelection(choice, df_temp, df_data, sections, subjects, judges, finished, sequences, phaseSequences, events, importantSubjects):
     if choice != None and 'section-dropdown' in choice:
-        df_temp_1 = updateProcessData(df_temp, None, subjects, judges, finished, sequences, phaseSequences, events)
+        df_temp_1 = updateProcessData(df_temp, None, subjects, judges, finished, sequences, phaseSequences)
     else:
         df_temp_1 = df_data
     sections = frame.getGroupBy(df_temp_1, 'sezione')
     if choice != None and 'subject-dropdown' in choice:
-        df_temp_2 = updateProcessData(df_temp, sections, None, judges, finished, sequences, phaseSequences, events)
+        df_temp_2 = updateProcessData(df_temp, sections, None, judges, finished, sequences, phaseSequences)
     else:
         df_temp_2 = df_data
     subjects = frame.getGroupBy(df_temp_2, 'materia')
     if importantSubjects != None:
         subjects = list(set(subjects) & set(importantSubjects))
     if choice != None and 'judge-dropdown' in choice:
-        df_temp_3 = updateProcessData(df_temp, sections, subjects, None, finished, sequences, phaseSequences, events)
+        df_temp_3 = updateProcessData(df_temp, sections, subjects, None, finished, sequences, phaseSequences)
     else:
         df_temp_3 = df_data
     judges = frame.getGroupBy(df_temp_3, 'giudice')
     if choice != None and 'finished-dropdown' in choice:
-        df_temp_4 = updateProcessData(df_temp, sections, subjects, judges, None, sequences, phaseSequences, events)
+        df_temp_4 = updateProcessData(df_temp, sections, subjects, judges, None, sequences, phaseSequences)
     else:
         df_temp_4 = df_data
     finished = frame.getGroupBy(df_temp_4, 'finito')
     if choice != None and 'sequence-dropdown' in choice:
-        df_temp_5 = updateProcessData(df_temp, sections, subjects, judges, finished, None, phaseSequences, events)
+        df_temp_5 = updateProcessData(df_temp, sections, subjects, judges, finished, None, phaseSequences)
     else:
         df_temp_5 = df_data
     sequences = frame.getGroupBy(df_temp_5, 'sequenza')
     if choice != None and 'phaseSequence-dropdown' in choice:
-        df_temp_6 = updateProcessData(df_temp, sections, subjects, judges, finished, sequences, None, events)
+        df_temp_6 = updateProcessData(df_temp, sections, subjects, judges, finished, sequences, None)
     else:
         df_temp_6 = df_data
     phaseSequences = frame.getGroupBy(df_temp_6, 'fasi')
-    if choice != None and 'events-dropdown' in choice:
-        df_temp_7 = updateProcessData(df_temp, sections, subjects, judges, finished, sequences, phaseSequences, None)
-    else:
-        df_temp_7 = df_data
-    events = frame.getGroupByFromString(df_temp_7, 'eventi')
+    events = frame.getGroupByFromString(df_data, 'eventi')
     return [sections, subjects, judges, finished, sequences, phaseSequences, events]
 
 # update data base on user choices on different parameters. In order to do that is use 'updateProcessData' method with chosen parameter as None. 
@@ -200,23 +191,33 @@ def updateTypeDataframeFromSelection(choice, df_temp, df_data, sections, subject
 
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for process comparation graph.
-def processComparationUpdate(df, dateType, date, sections, subjects, judges, finished, sequences, phaseSequences, events, choices, choiceStore, order):
+def processComparationUpdate(df, dateType, date, sections, subjects, judges, finished, sequences, phaseSequences, events, choices, choicesOptions, choiceStore, order):
     try:
         importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
     except:
         importantSubjects = None
+    if events != None and len(events) > 0:
+        eventsChoice = events.copy()
+        if 'eventi' not in choicesOptions:
+            choicesOptions.append('eventi')
+    else:
+        eventsChoice = None
+        if 'eventi' in choicesOptions:
+            choicesOptions.remove('eventi')
+        if 'eventi' in choices:
+            choices.remove('eventi')
     if len(dateType) >= 1:
         date = dateType[-1]
     dateType = [date]
     if len(choices) < 1:
         choices = [choiceStore]
-    elif len(choices) == 1:
+    elif len(choices) == 1 and choices[0] != 'eventi':
         choiceStore = choices[0]
-    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, sections, subjects, judges, finished, sequences, phaseSequences, events] = hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, events)
+    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, sequences, phaseSequences, events] = hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, events)
     df_temp = df.copy()
-    df_data = updateProcessData(df_temp, sections, subjects, judges, finished, sequences, phaseSequences, events)
+    df_data = updateProcessData(df_temp, sections, subjects, judges, finished, sequences, phaseSequences)
     [sections, subjects, judges, finished, sequences, phaseSequences, events] = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, sequences, phaseSequences, events, importantSubjects)
-    [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order)
+    [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order, eventsChoice)
     xticks = frame.getUniques(allData, 'data')
     fig = px.line(allData, x = "data", y = "durata", text = "conteggio", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
     fig.add_traces(
@@ -232,7 +233,7 @@ def processComparationUpdate(df, dateType, date, sections, subjects, judges, fin
     fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
     fig.update_xaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
     fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
-    return fig, dateType, date, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, sections, subjects, judges, finished, sequences, phaseSequences, events, choices, choiceStore
+    return fig, dateType, date, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, sections, subjects, judges, finished, sequences, phaseSequences, events, choices, choicesOptions, choiceStore
 
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for all comparation graphs except process ones.
@@ -263,7 +264,7 @@ def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjec
             [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle] = showAll()
             choices = ['sezione']
             [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished] = hideTypeChosen(choices, sections, subjects, judges, finished)
-            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_temp, date, choices, order)
+            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_temp, date, choices, order, events)
             df_data = df_temp
         else:
             if len(dateType) >= 1:
@@ -275,7 +276,7 @@ def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjec
                 choiceStore = choices[0]
             [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished] = hideTypeChosen(choices, sections, subjects, judges, finished)
             df_data = updateTypeData(df_temp, sections, subjects, judges, finished)
-            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order)
+            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order, events)
         xticks = frame.getUniques(allData, 'data')
         [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, importantSubjects)
         fig = px.line(allData, x = "data", y = "durata", text = 'conteggio', labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})

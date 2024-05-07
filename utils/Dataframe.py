@@ -1,6 +1,7 @@
 # this file handles dataframe managements.
 
 import datetime as dt
+import numpy as np
 import pandas as pd
 
 import utils.FileOperation as file
@@ -259,64 +260,39 @@ def getAvgStdDataFrameByDate(df, dataType):
             return [df1, df2]
 
 # return data group by chosen data type and types.
-def getAvgDataFrameByType(df, datetype, types, order):
+def getAvgDataFrameByType(df, datetype, types, order, eventsChoice):
     if types == None:
         return None
-    if 'eventi' not in types:
-        df4 = df.groupby(types) \
-        .agg({'giudice':'size', 'durata':'mean'}) \
-        .rename(columns = {'giudice':'conteggio','durata':'media'}) \
-        .reset_index()
-        for t in types: 
-            df4.drop(df4[df4[t] == 'null'].index, inplace = True)
-        df3 = df4[[types[0], 'conteggio', 'media']].copy()
-        df3 = df3.rename(columns = {types[0]:'filtro'})
-        i = 1
-        while i < len(types):
-            df3['filtro'] = df3['filtro'].astype(str) + " - " + df4[types[i]].astype(str)
-            i = i + 1
-        df3 = keepOnlyImportant(df3, 0.5)
-        df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
-        order_dict = df3.set_index('filtro')[order].to_dict()
-        order_list = df3['filtro'].tolist()
-        df_temp = df[['data', 'durata', types[0]]].copy()
-        df_temp = df_temp.rename(columns = {types[0]:'filtro'})
-        i = 1
-        while i < len(types):
-            df_temp['filtro'] = df_temp['filtro'].astype(str) + " - " + df[types[i]].astype(str)
-            i = i + 1
-        df_temp = df_temp[df_temp['filtro'].isin(order_list)]
-    else:
-        events = getGroupByFromString(df, 'eventi')
-        df3 = pd.DataFrame(columns = ['filtro', 'conteggio', 'media'])
-        df_temp = pd.DataFrame(columns = ['data', 'durata', 'filtro'])
-        for e in events:
-            df5 = getTypesDataFrameFromString(df, 'eventi', e)
-            df5['eventi'] = e
-            df4 = df5.groupby(types) \
-            .agg({'giudice':'size', 'durata':'mean'}) \
-            .rename(columns = {'giudice':'conteggio','durata':'media'}) \
-            .reset_index()
-            for t in types: 
-                df4.drop(df4[df4[t] == 'null'].index, inplace = True)
-            df4 = df4.rename(columns = {types[0]:'filtro'})
-            i = 1
-            while i < len(types):
-                df4['filtro'] = df4['filtro'].astype(str) + " - " + df4[types[i]].astype(str)
-                i = i + 1
-            df3 = df3._append(df4, ignore_index = True)
-            df6 = df5[['data', 'durata', types[0]]].copy()
-            df6 = df6.rename(columns = {types[0]:'filtro'})
-            i = 1
-            while i < len(types):
-                df6['filtro'] = df6['filtro'].astype(str) + " - " + df5[types[i]].astype(str)
-                i = i + 1
-            df_temp = df_temp._append(df6, ignore_index = True)
-        df3 = keepOnlyImportant(df3, 0.5)
-        df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
-        order_dict = df3.set_index('filtro')[order].to_dict()
-        order_list = df3['filtro'].tolist()
-        df_temp = df_temp[df_temp['filtro'].isin(order_list)]
+    df5 = df.copy()
+    if eventsChoice != None and len(eventsChoice) > 0:
+        for i, row in df5.iterrows():
+            if set(eventsChoice).issubset(set(utilities.fromStringToList(row["eventi"]))):
+                df5.at[i, "eventi"] = utilities.fromListToString(eventsChoice) + " SI"
+            else:
+                df5.at[i, "eventi"] = utilities.fromListToString(eventsChoice) + " NO"
+    df4 = df5.groupby(types) \
+    .agg({'giudice':'size', 'durata':'mean'}) \
+    .rename(columns = {'giudice':'conteggio','durata':'media'}) \
+    .reset_index()
+    for t in types: 
+        df4.drop(df4[df4[t] == 'null'].index, inplace = True)
+    df3 = df4[[types[0], 'conteggio', 'media']].copy()
+    df3 = df3.rename(columns = {types[0]:'filtro'})
+    i = 1
+    while i < len(types):
+        df3['filtro'] = df3['filtro'].astype(str) + " - " + df4[types[i]].astype(str)
+        i = i + 1
+    df3 = keepOnlyImportant(df3, 0.5)
+    df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
+    order_dict = df3.set_index('filtro')[order].to_dict()
+    order_list = df3['filtro'].tolist()
+    df_temp = df5[['data', 'durata', types[0]]].copy()
+    df_temp = df_temp.rename(columns = {types[0]:'filtro'})
+    i = 1
+    while i < len(types):
+        df_temp['filtro'] = df_temp['filtro'].astype(str) + " - " + df5[types[i]].astype(str)
+        i = i + 1
+    df_temp = df_temp[df_temp['filtro'].isin(order_list)]
     match datetype:
         case "SETTIMANA":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getWeekNumber(x))
