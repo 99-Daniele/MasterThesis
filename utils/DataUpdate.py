@@ -273,8 +273,7 @@ def getProcessesSequence(events):
             if shortSequence[-1] == 'FINE':
                 processType = 1
             else:
-                processType = 1
-                #processType = 2
+                processType = 2
     return [[(processId, processType, utilities.fromListToString(originalSequence), utilities.fromListToString(translatedSequence), utilities.fromListToString(shortSequence), utilities.fromListToString(phasesSequence), utilities.fromListToString(eventsSequence))], originalSequenceDuration, translatedSequenceDuration, shortSequenceDuration, phasesSequenceOriginalDuration, eventsSequenceDuration, processType != 0]
 
 # return process duration of finished process.

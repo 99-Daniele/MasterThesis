@@ -46,7 +46,10 @@ def createEventsDataFrame(events):
             judges.append(e[8])
             subjects.append(e[9])
             sections.append(e[10])
-            finished.append(utilities.getProcessState(e[11]))
+            if e[11] == 2:
+                finished.append(utilities.getProcessState(1))
+            else:
+                finished.append(utilities.getProcessState(e[11]))
             if e[12] == 1:
                 changes.append("SI")
             else:
@@ -77,7 +80,10 @@ def createProcessesDurationDataFrame(processes):
             judges.append(p[2])
             subjects.append(p[3])
             sections.append(p[4])
-            finished.append(utilities.getProcessState(p[5]))
+            if p[5] == 2:
+                finished.append(utilities.getProcessState(1))
+            else:
+                finished.append(utilities.getProcessState(p[5]))
             month = dt.datetime.strptime(p[0], '%Y-%m-%d %H:%M:%S').month
             months.append(utilities.getMonth(month))
             if p[6] == 1:
@@ -110,7 +116,10 @@ def createStatesDurationsDataFrame(stateEvents):
             judges.append(s[2])
             subjects.append(s[3])
             sections.append(s[4])
-            finished.append(utilities.getProcessState(s[5]))
+            if s[5] == 2:
+                finished.append(utilities.getProcessState(1))
+            else:
+                finished.append(utilities.getProcessState(s[5]))
             if s[6] == 1:
                 changes.append("SI")
             else:
@@ -140,7 +149,10 @@ def createPhasesDurationsDataFrame(phaseEvents):
             judges.append(p[2])
             subjects.append(p[3])
             sections.append(p[4])
-            finished.append(utilities.getProcessState(p[5]))
+            if p[5] == 2:
+                finished.append(utilities.getProcessState(1))
+            else:
+                finished.append(utilities.getProcessState(p[5]))
             if p[6] == 1:
                 changes.append("SI")
             else:
@@ -171,7 +183,10 @@ def createEventsDurationsDataFrame(events):
             judges.append(e[2])
             subjects.append(e[3])
             sections.append(e[4])
-            finished.append(utilities.getProcessState(e[5]))
+            if e[5] == 2:
+                finished.append(utilities.getProcessState(1))
+            else:
+                finished.append(utilities.getProcessState(e[5]))
             if e[6] == 1:
                 changes.append("SI")
             else:
@@ -200,7 +215,10 @@ def createCourtHearingsDurationDataFrame(courtHearings):
             judges.append(c[2])
             subjects.append(c[3])
             sections.append(c[4])
-            finished.append(utilities.getProcessState(c[5]))
+            if c[5] == 2:
+                finished.append(utilities.getProcessState(1))
+            else:
+                finished.append(utilities.getProcessState(c[5]))
             if c[6] == 1:
                 changes.append("SI")
             else:
