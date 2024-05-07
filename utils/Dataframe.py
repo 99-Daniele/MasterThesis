@@ -381,9 +381,11 @@ def getAvgDataFrameByType(df, datetype, types, order):
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
             df2['conteggio'] = df_temp.groupby(['data']).size().tolist()
             df2 = df2.sort_values(['data']).reset_index(drop = True)
+            df1['data'] = df1['data'].map(lambda x: utilities.getMonthYear(x))
+            df2['data'] = df2['data'].map(lambda x: utilities.getMonthYear(x))
             return [df1, df2, df3]
         case "TRIMESTRE":
-            df_temp['data'] = df_temp['data'].map(lambda x: utilities.getTrimesterNumber(x))
+            df_temp['data'] = df_temp['data'].map(lambda x: utilities.getTrimesterDate(x))
             df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
             df1['conteggio'] = df_temp.groupby(['data', 'filtro']).size().tolist()
             df1['sort_column'] = df1['filtro'].map(order_dict)
@@ -403,6 +405,8 @@ def getAvgDataFrameByType(df, datetype, types, order):
             df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
             df2['conteggio'] = df_temp.groupby(['data']).size().tolist()
             df2 = df2.sort_values(['data']).reset_index(drop = True)
+            df1['data'] = df1['data'].map(lambda x: utilities.getTrimesterYear(x))
+            df2['data'] = df2['data'].map(lambda x: utilities.getTrimesterYear(x))
             return [df1, df2, df3]
         case "ANNO":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getYearNumber(x))

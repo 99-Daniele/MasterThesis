@@ -64,7 +64,7 @@ def durationProcessUpdate(df, dateType, date, finished, years, sequences, phases
         px.line(avgData, x = "data", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
     )
     fig.update_layout(xaxis_tickvals = xticks)
-    fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
+    fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
     return fig, dateType, date, finished, years, sequences, phases, changes
 
 # return all needed parameters in order to change graph after any user choice.
@@ -85,5 +85,5 @@ def durationCourtHearingsUpdate(df, dateType, date, finished, years, changes):
         px.line(avgData, x = "data", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
     )
     fig.update_layout(xaxis_tickvals = xticks)
-    fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
+    fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
     return fig, dateType, date, finished, years, changes
