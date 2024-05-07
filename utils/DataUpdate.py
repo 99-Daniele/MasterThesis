@@ -333,61 +333,64 @@ def getLikenessDuration(unfinished, finished):
 
 # return best prediction of unfinished process.
 def getPrediction(unfinished, finished):
-    prediction = 0
-    tot = 0
+    prediction100 = 0
+    prediction99 = 0
+    prediction95 = 0
+    tot100 = 0
+    tot99 = 0
+    tot95 = 0
     for f in finished.values():
         [like, predicted, count] = getLikenessDuration(unfinished, f)
         if like == 100:
-            prediction = prediction * tot
-            prediction += like * predicted * count
-            tot += like * count
-            prediction = prediction / tot
-    if tot == 0:
-        return None
-    return prediction
+            prediction100 = prediction100 * tot100
+            prediction100 += like * predicted * count
+            tot100 += like * count
+            prediction100 = prediction100 / tot100
+        if like > 99:
+            prediction99 = prediction99 * tot99
+            prediction99 += like * predicted * count
+            tot99 += like * count
+            prediction99 = prediction99 / tot99
+        if like > 95:
+            prediction95 = prediction95 * tot95
+            prediction95 += like * predicted * count
+            tot95 += like * count
+            prediction95 = prediction95 / tot95
+    if tot100 == 0:
+        if tot99 == 0:
+            if tot95 == 0:
+                return None
+            else:
+                return prediction95
+        else:
+            return prediction99
+    else:
+        return prediction100
 
 # return predicted duration of unfinished process based on states, phases and events sequences.
 def getPredictedDuration(unfinishedProcessInfo, originalSequenceDict, translatedSequenceDict, shortSequenceDict, phaseSequenceDict, eventSequenceDict):
     [processId, firstEventDate, firstEventId, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence] = unfinishedProcessInfo
-    originalCoeff = 1
-    translatedCoeff = 0.9
-    shortCoeff = 0.8
-    phaseCoeff = 0.6
-    eventCoeff = 1.5
-    originalSequenceDuration = getPrediction(originalSequence, originalSequenceDict)
-    translatedSequenceDuration = getPrediction(translatedSequence, translatedSequenceDict)
-    shortSequenceDuration = getPrediction(shortSequence, shortSequenceDict)
-    phaseSequenceDuration = getPrediction(phaseSequence, phaseSequenceDict)
     eventSequenceDuration = getPrediction(eventSequence, eventSequenceDict)
-    totCoeff = 0
-    if originalSequenceDuration != None:
-        totCoeff += originalCoeff
-        originalSequenceDuration = originalSequenceDuration * originalCoeff
+    if eventSequenceDuration == None:
+        originalSequenceDuration = getPrediction(originalSequence, originalSequenceDict)
+        if originalSequenceDuration == None:
+            translatedSequenceDuration = getPrediction(translatedSequence, translatedSequenceDict)
+            if translatedSequenceDuration == None:
+                shortSequenceDuration = getPrediction(shortSequence, shortSequenceDict)
+                if shortSequenceDuration == None:
+                    phaseSequenceDuration = getPrediction(phaseSequence, phaseSequenceDict)
+                    if phaseSequenceDuration == None:
+                        return []
+                    else:
+                        predictedDuration =  phaseSequenceDuration
+                else:
+                    predictedDuration = shortSequenceDuration
+            else:
+                predictedDuration = translatedSequenceDuration
+        else:
+            predictedDuration = originalSequenceDuration
     else:
-        originalSequenceDuration = 0
-    if translatedSequenceDuration != None:
-        totCoeff += translatedCoeff
-        translatedSequenceDuration = translatedSequenceDuration * translatedCoeff
-    else:
-        translatedSequenceDuration = 0
-    if shortSequenceDuration != None:
-        totCoeff += shortCoeff
-        shortSequenceDuration = shortSequenceDuration * shortCoeff
-    else:
-        shortSequenceDuration = 0
-    if phaseSequenceDuration != None:
-        totCoeff += phaseCoeff
-        phaseSequenceDuration = phaseSequenceDuration * phaseCoeff
-    else:
-        phaseSequenceDuration = 0
-    if eventSequenceDuration != None:
-        totCoeff += eventCoeff
-        eventSequenceDuration = eventSequenceDuration * eventCoeff
-    else:
-        eventSequenceDuration = 0
-    if totCoeff == 0:
-        return []
-    predictedDuration = int((originalSequenceDuration + translatedSequenceDuration + shortSequenceDuration + phaseSequenceDuration + eventSequenceDuration) / totCoeff)
+        predictedDuration = eventSequenceDuration
     return [(processId, predictedDuration, firstEventDate, None, firstEventId, None)]
 
 # verify if user database has all needed tables and views with all needed columns.
