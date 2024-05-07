@@ -26,6 +26,7 @@ def pageLayout():
     if importantSubjects != None:
         subjects = list(set(subjects) & set(importantSubjects))
     judges = frame.getGroupBy(df, 'giudice')
+    finished = frame.getGroupBy(df, 'finito')
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([
@@ -39,9 +40,8 @@ def pageLayout():
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-e', placeholder = 'SEZIONE', style = {'display': 'none'}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-e', placeholder = 'MATERIA', style = {'display': 'none'}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-e', placeholder = 'GIUDICE', style = {'display': 'none'}),
-        ds.dcc.Dropdown(utilities.getAllProcessState(), value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-e', placeholder = 'PROCESSO', style = {'display': 'none'}),
-        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-e', placeholder = 'CAMBIO', style = {'display': 'none'}),
-        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio'], value = ['sezione'], id = 'choice-checklist-e', inline = True, style = {'display': 'none'}),
+        ds.dcc.Dropdown(finished, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-e', placeholder = 'PROCESSO', style = {'display': 'none'}),
+        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito'], value = ['sezione'], id = 'choice-checklist-e', inline = True, style = {'display': 'none'}),
         ds.dcc.Store(data = ['sezione'], id = 'choice-store-e'),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = 'order-radioitem-e', inline = True, style = {'display': 'none'}),
         ds.dcc.Graph(id = 'comparation-graph-e', figure = fig)
@@ -58,14 +58,12 @@ def pageLayout():
         ds.Output('subject-dropdown-e', 'style'),
         ds.Output('judge-dropdown-e', 'style'),
         ds.Output('finished-dropdown-e', 'style'),
-        ds.Output('change-dropdown-e', 'style'),
         ds.Output('choice-checklist-e', 'style'),
         ds.Output('order-radioitem-e', 'style'),
         ds.Output('section-dropdown-e', 'options'),
         ds.Output('subject-dropdown-e', 'options'),
         ds.Output('judge-dropdown-e', 'options'),
         ds.Output('finished-dropdown-e', 'options'),
-        ds.Output('change-dropdown-e', 'options'),
         ds.Output('choice-checklist-e', 'value'),
         ds.Output('choice-store-e', 'data'),
         ds.Output('title-e', 'children')],
@@ -76,12 +74,11 @@ def pageLayout():
         ds.Input('subject-dropdown-e', 'value'),
         ds.Input('judge-dropdown-e', 'value'),
         ds.Input('finished-dropdown-e', 'value'),
-        ds.Input('change-dropdown-e', 'value'),
         ds.Input('choice-checklist-e', 'value'),
         ds.Input('choice-store-e', 'data'),
         ds.Input('order-radioitem-e', 'value')]
 )
 
 # return updated data based on user choice.
-def updateOutput(typeChoice, typeDate, typeDateStore, sections, subjects, judges, finished, changes, choices, choiceStore, order):
-    return comparation.typeComparationUpdate(df, typeDate, typeDateStore, typeChoice, 'evento', sections, subjects, judges, finished, changes, choices, choiceStore, order)
+def updateOutput(typeChoice, typeDate, typeDateStore, sections, subjects, judges, finished, choices, choiceStore, order):
+    return comparation.typeComparationUpdate(df, typeDate, typeDateStore, typeChoice, 'evento', sections, subjects, judges, finished, choices, choiceStore, order)

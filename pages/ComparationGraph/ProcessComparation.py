@@ -24,6 +24,7 @@ def pageLayout():
         subjects = list(set(subjects) & set(importantSubjects))
     sections = frame.getGroupBy(df, 'sezione')
     judges = frame.getGroupBy(df, 'giudice')
+    finished = frame.getGroupBy(df, 'finito')
     sequences = frame.getGroupBy(df, 'sequenza')
     phaseSequences = frame.getGroupBy(df, 'fasi')
     events = frame.getGroupByFromString(df, 'eventi')
@@ -39,12 +40,11 @@ def pageLayout():
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-pr', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-pr', placeholder = 'MATERIA', style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-pr', placeholder = 'GIUDICE', style = {'width': 400}),
-        ds.dcc.Dropdown(utilities.getAllProcessState(), value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-pr', placeholder = 'PROCESSO', style = {'width': 400}),
-        ds.dcc.Dropdown(['NO', 'SI'], multi = False, searchable = False, id = 'change-dropdown-pr', placeholder = 'CAMBIO', style = {'width': 400}),
+        ds.dcc.Dropdown(finished, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-pr', placeholder = 'PROCESSO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-pr', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-pr', placeholder = 'FASI', style = {'width': 400}),
         ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'events-dropdown-pr', placeholder = 'EVENTI', style = {'width': 400}),
-        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'cambio', 'sequenza', 'fasi', 'eventi'], value = ['sezione'], id = "choice-checklist-pr", inline = True, style = {'display':'inline'}),
+        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'sequenza', 'fasi', 'eventi'], value = ['sezione'], id = "choice-checklist-pr", inline = True, style = {'display':'inline'}),
         ds.dcc.Store(data = ['sezione'], id = "choice-store-pr"),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-pr", inline = True),
         ds.dcc.Graph(id = 'comparation-graph-pr', figure = fig)
@@ -60,7 +60,6 @@ def pageLayout():
         ds.Output('subject-dropdown-pr', 'style'),
         ds.Output('judge-dropdown-pr', 'style'),
         ds.Output('finished-dropdown-pr', 'style'),
-        ds.Output('change-dropdown-pr', 'style'),
         ds.Output('sequence-dropdown-pr', 'style'),
         ds.Output('phaseSequence-dropdown-pr', 'style'),
         ds.Output('events-dropdown-pr', 'style'),
@@ -68,7 +67,6 @@ def pageLayout():
         ds.Output('subject-dropdown-pr', 'options'),
         ds.Output('judge-dropdown-pr', 'options'),
         ds.Output('finished-dropdown-pr', 'options'),
-        ds.Output('change-dropdown-pr', 'options'),
         ds.Output('sequence-dropdown-pr', 'options'),
         ds.Output('phaseSequence-dropdown-pr', 'options'),
         ds.Output('events-dropdown-pr', 'options'),
@@ -80,7 +78,6 @@ def pageLayout():
         ds.Input('subject-dropdown-pr', 'value'),
         ds.Input('judge-dropdown-pr', 'value'),
         ds.Input('finished-dropdown-pr', 'value'),
-        ds.Input('change-dropdown-pr', 'value'),
         ds.Input('sequence-dropdown-pr', 'value'),
         ds.Input('phaseSequence-dropdown-pr', 'value'),
         ds.Input('events-dropdown-pr', 'value'),
@@ -90,5 +87,5 @@ def pageLayout():
     )
 
 # return updated data based on user choice.
-def updateOutput(dateType, dateTypeStore, sections, subjects, judges, finished, changes, sequences, phaseSequences, events, choices, choiceStore, order):
-    return comparation.processComparationUpdate(df, dateType, dateTypeStore, sections, subjects, judges, finished, changes, sequences, phaseSequences, events, choices, choiceStore, order)
+def updateOutput(dateType, dateTypeStore, sections, subjects, judges, finished, sequences, phaseSequences, events, choices, choiceStore, order):
+    return comparation.processComparationUpdate(df, dateType, dateTypeStore, sections, subjects, judges, finished, sequences, phaseSequences, events, choices, choiceStore, order)
