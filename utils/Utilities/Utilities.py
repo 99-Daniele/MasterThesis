@@ -43,9 +43,8 @@ def getMonthYearDate(date):
     new_date = pd.Timestamp(day = 1, month = m, year = y)
     return new_date
 
-# return trimester based on given date.
-def getTrimesterNumber(date):
-    month = dt.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').month
+# return trimester number based on given month.
+def getTrimesterNumber(month):
     if month <= 3:
         return 1
     elif month <= 6:
@@ -55,19 +54,18 @@ def getTrimesterNumber(date):
     else:
         return 4
 
+# return trimester date based on given date.
+def getTrimesterDate(date):
+    month = dt.datetime.strptime(date, '%Y-%m-%d %H:%M:%S').month
+    return getTrimesterNumber(month)
+
 # return datetime of 1st of the trimester with month and year of given date.
 def getTrimesterYearDate(date):
     datetime = dt.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
-    if datetime.month <= 3:
-        m = 1
-    elif datetime.month <= 6:
-        m = 4
-    elif datetime.month <= 9:
-        m = 7
-    else:
-        m = 10
-    y = datetime.year
-    new_date = pd.Timestamp(day = 1, month = m, year = y)
+    m = datetime.month
+    month = (getTrimesterNumber(m) - 1) * 3 + 1
+    year = datetime.year
+    new_date = pd.Timestamp(day = 1, month = month, year = year)
     return new_date
 
 # return year datetime from given date. 
@@ -83,9 +81,24 @@ def getWeek(weekNumber):
 def getMonth(monthNumber):
     return months[monthNumber - 1]
 
+# get given month from months and given year.
+def getMonthYear(date):
+    m = date.month
+    month = getMonth(m)
+    y = date.year
+    return month + " " + str(y)
+
 # get given trimester from trimesters.
 def getTrimester(trimesterNumber):
     return trimesters[trimesterNumber - 1]
+
+# get given trimester from trimesters and given year.
+def getTrimesterYear(date):
+    m = date.month
+    t = getTrimesterNumber(m)
+    trimester = getTrimester(t)
+    y = date.year
+    return trimester + " " + str(y)
 
 # get given day of week from daysOfWeek.
 def getDayOfWeek(dowNumber):

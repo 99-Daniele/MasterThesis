@@ -256,10 +256,12 @@ def getAvgStdDataFrameByDate(df, dataType):
             df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
+            df1['data'] = df1['data'].map(lambda x: utilities.getMonthYear(x))
+            df2['data'] = df2['data'].map(lambda x: utilities.getMonthYear(x))
             return [df1, df2]
         case "TRIMESTRE":
             df1 = df[['data', 'durata']].copy()
-            df1['data'] = df1['data'].map(lambda x: utilities.getTrimesterNumber(x))
+            df1['data'] = df1['data'].map(lambda x: utilities.getTrimesterDate(x))
             df1 = df1.sort_values(['data'])
             df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
@@ -274,6 +276,8 @@ def getAvgStdDataFrameByDate(df, dataType):
             df2 = df1.groupby(['data'], as_index = False).mean()
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
+            df1['data'] = df1['data'].map(lambda x: utilities.getTrimesterYear(x))
+            df2['data'] = df2['data'].map(lambda x: utilities.getTrimesterYear(x))
             return [df1, df2]
         case "ANNO":
             df1 = df[['data', 'durata']].copy()
@@ -506,3 +510,8 @@ def getGroupByFromString(df, tag):
             types.update({l: count})
     types = list(dict(sorted(types.items(), key = lambda x: x[1], reverse = True)).keys())
     return types
+
+def getUniques(df, tag):
+    df_temp = df[tag].copy()
+    uniques = df_temp.unique()
+    return uniques

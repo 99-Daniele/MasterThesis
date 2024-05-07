@@ -33,7 +33,7 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici confronto', href='/comparationgraph'),
         ds.html.H2('DURATA MEDIA STATI DEL PROCESSO', id = 'title-s'),
-        ds.dcc.Checklist(["SETTIMANA", "MESE", "MESE DELL'ANNO", "TRIMESTRE", "TRIMESTRE DELL'ANNO", "ANNO"], value = ['MESE'], id = "date-checklist-s", inline = True, style = {'display':'none'}),
+        ds.dcc.Checklist(["SETTIMANA", "MESE", "MESE DELL'ANNO", "TRIMESTRE", "TRIMESTRE DELL'ANNO", "ANNO"], value = ['MESE'], id = "date-checklist-s", inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Store(data = 'MESE', id = "date-store-s"),
         ds.dcc.Dropdown(typesSorted, multi = False, searchable = False, id = 'type-dropdown-s', placeholder = 'STATO', style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-s', placeholder = 'SEZIONE', style = {'display': 'none'}),

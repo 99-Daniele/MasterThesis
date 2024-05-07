@@ -55,13 +55,15 @@ def durationProcessUpdate(df, dateType, date, finished, years, sequences, phases
     df_temp = df.copy()
     [df_temp, finished, years, sequences, phases, changes] = updateTypesProcess(df_temp, finished, years, sequences, phases, changes)
     [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, date)
-    fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points = False)
+    xticks = frame.getUniques(avgData, 'data')
+    fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
     fig.add_traces(
         px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
     )
     fig.add_traces(
         px.line(avgData, x = "data", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
     )
+    fig.update_layout(xaxis_tickvals = xticks)
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
     return fig, dateType, date, finished, years, sequences, phases, changes
 
@@ -74,12 +76,14 @@ def durationCourtHearingsUpdate(df, dateType, date, finished, years, changes):
     df_temp = df.copy()
     [df_temp, finished, years, changes] = updateTypesCourtHearings(df_temp, finished, years, changes)
     [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, date)
-    fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':"Durata dell' udienza [giorni]", 'data':'Data inizio udienza'}, width = 1400, height = 600, points = False)
+    xticks = frame.getUniques(avgData, 'data')
+    fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':"Durata dell' udienza [giorni]", 'data':'Data inizio udienza'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
     fig.add_traces(
         px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
     )
     fig.add_traces(
         px.line(avgData, x = "data", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
     )
+    fig.update_layout(xaxis_tickvals = xticks)
     fig.update_yaxes(gridcolor = 'grey', griddash = 'dash')
     return fig, dateType, date, finished, years, changes
