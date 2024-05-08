@@ -219,7 +219,7 @@ def processComparationUpdate(df, dateType, date, sections, subjects, judges, fin
     [sections, subjects, judges, finished, sequences, phaseSequences, events] = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, sequences, phaseSequences, events, importantSubjects)
     [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order, eventsChoice)
     xticks = frame.getUniques(allData, 'data')
-    fig = px.line(allData, x = "data", y = "durata", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+    fig = px.line(allData, x = "data", y = "durata", text = "conteggio", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
     fig.add_traces(
         px.line(typeData, x = "data", y = "durata", text = "conteggio", color = 'filtro', markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
     )
@@ -281,7 +281,7 @@ def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjec
             [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order, None)
         xticks = frame.getUniques(allData, 'data')
         [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, importantSubjects)
-        fig = px.line(allData, x = "data", y = "durata", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+        fig = px.line(allData, x = "data", y = "durata", text = "conteggio", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
         fig.add_traces(
             px.line(typeData, x = "data", y = "durata", text = 'conteggio', color = 'filtro', markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
         )
