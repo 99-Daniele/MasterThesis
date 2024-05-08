@@ -8,7 +8,6 @@ import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Graph.ComparationGraph as comparation
-import utils.Utilities.Utilities as utilities
 
 # get dataframe with all phases duration.
 df = getter.getPhasesDuration()

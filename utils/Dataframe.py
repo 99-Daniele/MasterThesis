@@ -282,7 +282,7 @@ def getAvgDataFrameByType(df, datetype, types, order, eventsChoice):
     while i < len(types):
         df3['filtro'] = df3['filtro'].astype(str) + " - " + df4[types[i]].astype(str)
         i = i + 1
-    df3 = keepOnlyImportant(df3, 0.5)
+    df3 = keepOnlyImportant(df3, 0.25)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
     order_dict = df3.set_index('filtro')[order].to_dict()
     order_list = df3['filtro'].tolist()
@@ -387,7 +387,7 @@ def keepOnlyImportant(df, perc):
     sum = 0
     if df_temp['conteggio'].items() == None:
         return df
-    while (i < 20 or sum < threshold) and i < len(list(df_temp['conteggio'].items())):
+    while (i < 15 or sum < threshold) and i < len(list(df_temp['conteggio'].items())):
         sum = sum + list(df_temp['conteggio'].items())[i][1]
         i = i + 1
     while i < len(list(df_temp['conteggio'].items())):

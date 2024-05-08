@@ -219,7 +219,7 @@ def processComparationUpdate(df, dateType, date, sections, subjects, judges, fin
     [sections, subjects, judges, finished, sequences, phaseSequences, events] = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, sequences, phaseSequences, events, importantSubjects)
     [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order, eventsChoice)
     xticks = frame.getUniques(allData, 'data')
-    fig = px.line(allData, x = "data", y = "durata", text = "conteggio", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+    fig = px.line(allData, x = "data", y = "durata", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
     fig.add_traces(
         px.line(typeData, x = "data", y = "durata", text = "conteggio", color = 'filtro', markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
     )
@@ -245,7 +245,8 @@ def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjec
         importantSubjects = None
     if typeChoice == None:
         title = 'DURATA MEDIA ' + type[0:-1].upper() + 'I DEL PROCESSO'
-        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, [type])
+        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, [type])        
+        xticks = frame.getUniques(allData, type)
         [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle] = hideAll()
         fig = px.box(allData, x = type, y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata fasi del processo [giorni]', 'fase':'Fase del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
         fig.add_traces(
@@ -254,6 +255,7 @@ def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjec
         fig.add_traces(
             px.line(avgData, x = type, y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
         )
+        fig.update_layout(xaxis_tickvals = xticks)
         fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
         [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_temp, sections, subjects, judges, finished, importantSubjects)
         return fig, dateType, date, dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, choices, choiceStore, title
@@ -264,7 +266,7 @@ def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjec
             [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle] = showAll()
             choices = ['sezione']
             [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished] = hideTypeChosen(choices, sections, subjects, judges, finished)
-            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_temp, date, choices, order, events)
+            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_temp, date, choices, order, None)
             df_data = df_temp
         else:
             if len(dateType) >= 1:
@@ -276,10 +278,10 @@ def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjec
                 choiceStore = choices[0]
             [dateCheckStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished] = hideTypeChosen(choices, sections, subjects, judges, finished)
             df_data = updateTypeData(df_temp, sections, subjects, judges, finished)
-            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order, events)
+            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order, None)
         xticks = frame.getUniques(allData, 'data')
         [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, importantSubjects)
-        fig = px.line(allData, x = "data", y = "durata", text = 'conteggio', labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+        fig = px.line(allData, x = "data", y = "durata", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
         fig.add_traces(
             px.line(typeData, x = "data", y = "durata", text = 'conteggio', color = 'filtro', markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
         )

@@ -8,10 +8,14 @@ import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Graph.ComparationGraph as comparation
-import utils.Utilities.Utilities as utilities
 
-# get dataframe with all events duration.
+# get dataframe with important events duration.
 df = getter.getEventsDuration()
+try:
+    importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
+    df = df[df['evento'].isin(importantEvents) == True]
+except:
+    None
 
 # return initial layout of page.
 def pageLayout():
