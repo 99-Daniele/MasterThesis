@@ -423,7 +423,7 @@ def verifyDatabase(connection):
         subjectsNameInfo = compareData(subjectsName, connection, "SELECT * FROM materienome ORDER BY codice")
         connect.updateTable(connection, 'materienome', subjectsNameInfo, 'codice')
     if not connect.doesATableExist(connection, "statinome"):
-        connect.createTable(connection, 'statinome', ['stato', 'etichetta', 'abbreviazione', 'fase'], ['VARCHAR(5)', 'TEXT', 'VARCHAR(10)', 'VARCHAR(5)'], [0], [])
+        connect.createTable(connection, 'statinome', ['stato', 'etichetta', 'abbreviazione', 'fase'], ['VARCHAR(5)', 'TEXT', 'VARCHAR(16)', 'VARCHAR(5)'], [0], [])
         statesName = file.getDataFromTextFile('utils/Utilities/statesName.txt')
         connect.insertIntoDatabase(connection, 'statinome', statesName)
     else:
