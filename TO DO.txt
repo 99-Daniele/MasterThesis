@@ -3,7 +3,6 @@
 - migliore visualizzazione carico --> come?
 - filtro processi con/senza evento
 - filtro quando un evento particolare avviene? (fase, stato)
-- distinguere stoppati e finiti
 - verificare quali eventi siano stoppati e quali finiti
 - processi/fasi/stati durata 0?
 - media o mediana?
