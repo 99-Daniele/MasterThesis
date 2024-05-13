@@ -8,7 +8,7 @@ def refreshData():
     import utils.DataUpdate as update
     import utils.Getters as getter
     connection = connect.getDatabaseConnection()
-    update.refreshData(connection)
+    #update.refreshData(connection)
     print("Database updated!")
     getter.updateCache()
 

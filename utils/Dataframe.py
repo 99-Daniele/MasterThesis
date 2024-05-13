@@ -7,7 +7,7 @@ import pandas as pd
 import utils.FileOperation as file
 import utils.Utilities.Utilities as utilities
 
-# importantProcessStates, importantSections, importantSUbjects are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
+# importantProcessStates, importantSections are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
 try:
     importantProcessStates = file.getDataFromTextFile('preferences/importantProcessStates.txt')
 except:
