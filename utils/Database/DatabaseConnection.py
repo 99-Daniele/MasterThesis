@@ -5,6 +5,7 @@ import mysql.connector as cnx
 import os
 
 import utils.FileOperation as file
+import utils.Utilities.Utilities as utilities
 
 # return database connection with user credentials. 
 # the first time user must write his credentials which are then saved in a file. After that is no longer needed to input credentials.
@@ -64,12 +65,21 @@ def doesATableExist(connection, table):
     return r[0][0] == 1
 
 # return if a table contains specific columns.
-def doesATableHaveColumns(connection, table, columns):
-    for column in columns:
-        query = "SELECT COUNT(*) > 0 FROM information_schema.columns WHERE table_name = '" + table + "' AND column_name = '" + column + "'"
+def doesATableHaveColumns(connection, table, columns, types):
+    i = 0
+    while i < len(columns):
+        column = columns[i]
+        type = types[i].lower()
+        if len(type) >= 7 and type[:7] == 'varchar':
+            type_len = utilities.findSubstringBetweenChars(type, "(", ")")
+            type = 'varchar'
+            query = "SELECT COUNT(*) > 0 FROM information_schema.columns WHERE table_name = '" + table + "' AND column_name = '" + column + "' AND data_type = '" + type + "' AND character_maximum_length >= " + type_len
+        else:
+            query = "SELECT COUNT(*) > 0 FROM information_schema.columns WHERE table_name = '" + table + "' AND column_name = '" + column + "' AND data_type = '" + type + "'"
         r = getDataFromDatabase(connection, query)
         if r[0][0] == 0:
             return False
+        i = i + 1
     return True
 
 # return if a view exists in user database.

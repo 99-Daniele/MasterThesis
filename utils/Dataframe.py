@@ -7,7 +7,7 @@ import pandas as pd
 import utils.FileOperation as file
 import utils.Utilities.Utilities as utilities
 
-# importantProcessStates, importantSections, importantSUbjects are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
+# importantProcessStates, importantSections are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
 try:
     importantProcessStates = file.getDataFromTextFile('preferences/importantProcessStates.txt')
 except:
@@ -46,10 +46,7 @@ def createEventsDataFrame(events):
             judges.append(e[8])
             subjects.append(e[9])
             sections.append(e[10])
-            if e[11] == 2:
-                finished.append(utilities.getProcessState(1))
-            else:
-                finished.append(utilities.getProcessState(e[11]))
+            finished.append(utilities.getProcessState(e[11]))
             startProcessDates.append(e[12])
             if e[2] == '5':
                 finishedEventProcesses.append(e[0])
@@ -75,10 +72,7 @@ def createProcessesDurationDataFrame(processes):
             judges.append(p[2])
             subjects.append(p[3])
             sections.append(p[4])
-            if p[5] == 2:
-                finished.append(utilities.getProcessState(1))
-            else:
-                finished.append(utilities.getProcessState(p[5]))
+            finished.append(utilities.getProcessState(p[5]))
             month = dt.datetime.strptime(p[0], '%Y-%m-%d %H:%M:%S').month
             months.append(utilities.getMonth(month))
             pIds.append(p[6])
@@ -106,10 +100,7 @@ def createStatesDurationsDataFrame(stateEvents):
             judges.append(s[2])
             subjects.append(s[3])
             sections.append(s[4])
-            if s[5] == 2:
-                finished.append(utilities.getProcessState(1))
-            else:
-                finished.append(utilities.getProcessState(s[5]))
+            finished.append(utilities.getProcessState(s[5]))
             pIds.append(s[6])
             tags.append(s[7])
             states.append(s[8])
@@ -134,10 +125,7 @@ def createPhasesDurationsDataFrame(phaseEvents):
             judges.append(p[2])
             subjects.append(p[3])
             sections.append(p[4])
-            if p[5] == 2:
-                finished.append(utilities.getProcessState(1))
-            else:
-                finished.append(utilities.getProcessState(p[5]))
+            finished.append(utilities.getProcessState(p[5]))
             pIds.append(p[6])
             phases.append(p[7])
             orders.append(p [8])
@@ -163,10 +151,7 @@ def createEventsDurationsDataFrame(events):
             judges.append(e[2])
             subjects.append(e[3])
             sections.append(e[4])
-            if e[5] == 2:
-                finished.append(utilities.getProcessState(1))
-            else:
-                finished.append(utilities.getProcessState(e[5]))
+            finished.append(utilities.getProcessState(e[5]))
             eIds.append(e[6])
             pIds.append(e[7])
             tagEvents.append(e[8])
@@ -190,10 +175,7 @@ def createCourtHearingsDurationDataFrame(courtHearings):
             judges.append(c[2])
             subjects.append(c[3])
             sections.append(c[4])
-            if c[5] == 2:
-                finished.append(utilities.getProcessState(1))
-            else:
-                finished.append(utilities.getProcessState(c[5]))
+            finished.append(utilities.getProcessState(c[5]))
             pIds.append(c[6])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished})
 

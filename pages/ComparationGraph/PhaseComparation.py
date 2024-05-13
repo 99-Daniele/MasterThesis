@@ -17,10 +17,7 @@ def pageLayout():
     types = frame.getGroupBy(df, 'fase')
     typesSorted = sorted(types)
     sections = frame.getGroupBy(df, 'sezione')
-    try:
-        importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
-    except:
-        importantSubjects = None
+    importantSubjects = getter.getImportantSubjects()
     subjects = frame.getGroupBy(df, 'materia')
     if importantSubjects != None:
         subjects = list(set(subjects) & set(importantSubjects))

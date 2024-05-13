@@ -6,6 +6,7 @@ import textwrap
 
 import utils.Dataframe as frame
 import utils.FileOperation as file
+import utils.Getters as getter
 import utils.Utilities.Utilities as utilities
 
 # returns a string with input name followed by how many times is present in the dataframe.
@@ -192,10 +193,7 @@ def updateTypeDataframeFromSelection(choice, df_temp, df_data, sections, subject
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for process comparation graph.
 def processComparationUpdate(df, dateType, date, sections, subjects, judges, finished, sequences, phaseSequences, events, choices, choicesOptions, choiceStore, order):
-    try:
-        importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
-    except:
-        importantSubjects = None
+    importantSubjects = getter.getImportantSubjects()
     if events != None and len(events) > 0:
         eventsChoice = events.copy()
         if 'eventi' not in choicesOptions:
@@ -239,10 +237,7 @@ def processComparationUpdate(df, dateType, date, sections, subjects, judges, fin
 # this method is only for all comparation graphs except process ones.
 def typeComparationUpdate(df, dateType, date, typeChoice, type, sections, subjects, judges, finished, choices, choiceStore, order):
     df_temp = df.copy()
-    try:
-        importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
-    except:
-        importantSubjects = None
+    importantSubjects = getter.getImportantSubjects()
     if typeChoice == None:
         title = 'DURATA MEDIA ' + type[0:-1].upper() + 'I DEL PROCESSO'
         [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, [type])        
