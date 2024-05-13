@@ -1,4 +1,28 @@
-- screenshot cose significative e powerpoint
+- verifica nome e fasi stati ed eventi  
+- filtro anno grafico confronto
+- migliore visualizzazione carico --> come?
+- filtro processi con/senza evento
+- filtro quando un evento particolare avviene? (fase, stato)
+- distinguere stoppati e finiti
+- verificare quali eventi siano stoppati e quali finiti
+- processi/fasi/stati durata 0?
+- media o mediana?
+- precisazione conclusioni o decisione?
+- nomi in inglese
+
+- verifica valore predetto
+- valore predetto sulla base di giudice, materia, sezione, data, carico processi giudice in quel momento
+- valore predetto di un processo finito --> errore medio
+
+- analisi limitata a inizio 2022
+- grafico eventi con primo evento per ogni fase --> buchi?
+- grafico materie-sezioni
+- grafico materie-giudici
+- grafico stessa materia diverso giudice/sezione
+- evento 'rinvio precisazione conclusioni' --> cos'è? materie, giudici, tipi di processo? 
+- grafici durata fasi/stati/eventi non importante --> metterlo solo se necessario
 
 - disponibile per accesso esterno --> descrizione readme
 - migliorare grafico --> piu carino da vedere
+
+

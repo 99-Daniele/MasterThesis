@@ -133,3 +133,8 @@ def getWidth(perc):
 def getHeight(perc):
     height = GetSystemMetrics(1)
     return height * perc
+
+def findSubstringBetweenChars(string, startChar, endChar):
+    startIndex = string.find(startChar)
+    endIndex = string.find(endChar)
+    return string[startIndex + 1: endIndex]
