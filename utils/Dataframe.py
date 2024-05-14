@@ -240,18 +240,17 @@ def getAvgStdDataFrameByDate(df, dataType):
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
             return [df1, df2]
-
+        
 # return data group by chosen data type and types.
-def getAvgDataFrameByType(df, datetype, types, order, eventsChoice):
-    if types == None:
+def getAvgDataFrameByType(df, datetype, typesChoice, order, eventChoice):
+    if typesChoice == None:
         return None
     df5 = df.copy()
-    if eventsChoice != None and len(eventsChoice) > 0:
-        for i, row in df5.iterrows():
-            if set(eventsChoice).issubset(set(utilities.fromStringToList(row["eventi"]))):
-                df5.at[i, "eventi"] = utilities.fromListToString(eventsChoice) + " SI"
-            else:
-                df5.at[i, "eventi"] = utilities.fromListToString(eventsChoice) + " NO"
+    types = typesChoice.copy()
+    if eventChoice != None and eventChoice in types:
+        df5 = getEventDataFrame(df5, eventChoice)
+        index = types.index(eventChoice)
+        types[index] = 'evento'
     df4 = df5.groupby(types) \
     .agg({'giudice':'size', 'durata':'mean'}) \
     .rename(columns = {'giudice':'conteggio','durata':'media'}) \
@@ -414,6 +413,18 @@ def getDateDataFrame(df, type, startDate, endDate):
     d = df[df[type] >= startDate]
     d = d[d[type] <= endDate]
     return d
+
+#return dataframe wos where event sequence contains or not a particular event
+def getEventDataFrame(df, event):
+    if event == None:
+        return df
+    df_temp = df.copy()
+    for i, row in df_temp.iterrows():
+        if event in utilities.fromStringToList(row["eventi"]):
+            df_temp.at[i, "evento"] = "CON " + event
+        else:
+            df_temp.at[i, "evento"] = "SENZA " + event
+    return df_temp
 
 # return unique years in given dataframe dates.
 def getAllYears(df):
