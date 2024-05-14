@@ -170,7 +170,7 @@ def updateProcessDataframeFromSelection(choice, df_temp, df_data, sections, subj
     else:
         df_temp_6 = df_data
     phaseSequences = frame.getGroupBy(df_temp_6, 'fasi')
-    if choice != None and 'events-dropdown' in choice:
+    if choice != None and ('events-dropdown' in choice or 'events-radioitem' in choice):
         df_temp_7 = updateProcessData(df_temp, sections, subjects, judges, finished, sequences, phaseSequences, None, None)
     else:
         df_temp_7 = df_data
@@ -246,7 +246,7 @@ def processComparationUpdate(df, dateType, date, sections, subjects, judges, fin
     fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
     fig.update_xaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
     fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
-    return fig, dateType, date, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, event, choices, choicesOptions, choiceStore
+    return fig, dateType, date, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choices, choicesOptions, choiceStore
 
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for all comparation graphs except process ones.

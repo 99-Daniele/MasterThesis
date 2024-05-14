@@ -67,7 +67,6 @@ def pageLayout():
         ds.Output('finished-dropdown-pr', 'options'),
         ds.Output('sequence-dropdown-pr', 'options'),
         ds.Output('phaseSequence-dropdown-pr', 'options'),
-        ds.Output('events-dropdown-pr', 'value'),
         ds.Output('events-dropdown-pr', 'options'),
         ds.Output('choice-checklist-pr', 'value'),
         ds.Output('choice-checklist-pr', 'options'),
