@@ -382,13 +382,15 @@ def keepOnlyImportant(df, perc):
 def getTypesDataFrame(df, tag, types):
     if types == None or len(types) == 0:
         return df
-    return df[df[tag].isin(types)]
+    df_temp = df.copy()
+    return df_temp[df_temp[tag].isin(types)]
 
 # return dataframe rows where given tag is contained in given types from string.
 def getTypesDataFrameFromString(df, tag, type):
     if type == None:
         return df
-    return df[df[tag].str.contains(type)]
+    df_temp = df.copy()
+    return df_temp[df_temp[tag].str.contains(type)]
 
 # return dataframe rows where date month is contained given months.
 def getMonthDataFrame(df, months):
@@ -396,7 +398,7 @@ def getMonthDataFrame(df, months):
         return df
     df_temp = df.copy()
     df_temp['data'] = df_temp['data'].map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').month)
-    return df[df_temp['data'].isin(months)]
+    return df_temp[df_temp['data'].isin(months)]
 
 # return dataframe rows where date year is contained given years.
 def getYearDataFrame(df, years):
@@ -404,13 +406,14 @@ def getYearDataFrame(df, years):
         return df
     df_temp = df.copy()
     df_temp['data'] = df_temp['data'].map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year)
-    return df[df_temp['data'].isin(years)]
+    return df_temp[df_temp['data'].isin(years)]
 
 # return dataframe rows where date is between given stratDate and endDate.
 def getDateDataFrame(df, type, startDate, endDate):
     if startDate == None or endDate == None:
         return df
-    d = df[df[type] >= startDate]
+    df_temp = df.copy()
+    d = df_temp[df_temp[type] >= startDate]
     d = d[d[type] <= endDate]
     return d
 
@@ -419,6 +422,7 @@ def getEventDataFrame(df, event):
     if event == None:
         return df
     df_temp = df.copy()
+    df['evento'] = df['eventi']
     for i, row in df_temp.iterrows():
         if event in utilities.fromStringToList(row["eventi"]):
             df_temp.at[i, "evento"] = "CON " + event
