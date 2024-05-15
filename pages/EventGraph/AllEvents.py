@@ -13,9 +13,6 @@ import utils.Graph.EventsGraph as event
 # get maxYear as the maximum year belong dataframe events and calc maxDateStart and maxDateEnd as the first and last date of the maximun 1-year interval.
 # get important events from text file.
 df = getter.getAllEvents()
-maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
-maxDateStart = dt.date(maxYear - 1, 1, 1)
-maxDateEnd = dt.date(maxYear, 1, 1)
 try:
     importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
 except:
@@ -23,6 +20,9 @@ except:
 
 # return initial layout of page.
 def pageLayout():
+    maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
+    maxDateStart = dt.date(maxYear - 1, 1, 1)
+    maxDateEnd = dt.date(maxYear, 1, 1)
     sections = frame.getGroupBy(df, 'sezione')
     subjects = frame.getGroupBy(df, 'materia')
     judges = frame.getGroupBy(df, 'giudice')

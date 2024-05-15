@@ -1,6 +1,7 @@
 # this page shows processes comparation.
 
 import dash as ds
+import datetime as dt
 import pandas as pd
 import plotly.express as px
 
@@ -29,9 +30,20 @@ def pageLayout():
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
         ds.dcc.Link('Grafici confronto', href='/comparationgraph'),
-        ds.html.H2("CONFRONTO DURATA MEDIA PROCESSI"),
+        ds.html.H2("CONFRONTO DURATA MEDIA PROCESSI"),        
+        ds.dcc.RadioItems(['media', 'mediana'], value = 'media', id = "avg-radioitem-pr", inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Checklist(["SETTIMANA", "MESE", "MESE DELL'ANNO", "TRIMESTRE", "TRIMESTRE DELL'ANNO", "ANNO"], value = ['MESE'], id = "date-checklist-pr", inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Store(data = 'MESE', id = "date-store-pr"),
+        ds.dcc.DatePickerRange(
+            id = 'event-dateranger-pr',
+            start_date = df['data'].min(),
+            end_date = df['data'].max(),
+            min_date_allowed = df['data'].min(),
+            max_date_allowed = df['data'].max(),
+            display_format = 'DD MM YYYY',
+            style = {'width': 300}
+        ),
+        ds.html.Button("RESET", id = "reset-button-pr"),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-pr', placeholder = 'SEZIONE', style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-pr', placeholder = 'MATERIA', style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-pr', placeholder = 'GIUDICE', style = {'width': 400}),
@@ -47,6 +59,7 @@ def pageLayout():
         ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist-pr", inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Store(data = 'sezione', id = "choice-store-pr"),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-pr", inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.Checklist(['CONTEGGIO'], value = ['CONTEGGIO'], id = "text-checklist-pr"),
         ds.dcc.Graph(id = 'comparation-graph-pr', figure = fig)
     ])
     return layout
@@ -56,6 +69,8 @@ def pageLayout():
     [ds.Output('comparation-graph-pr', 'figure'),
         ds.Output('date-checklist-pr', 'value'),
         ds.Output('date-store-pr', 'data'),
+        ds.Output('event-dateranger-pr', 'start_date'), 
+        ds.Output('event-dateranger-pr', 'end_date'),
         ds.Output('section-dropdown-pr', 'style'),
         ds.Output('subject-dropdown-pr', 'style'),
         ds.Output('judge-dropdown-pr', 'style'),
@@ -74,8 +89,14 @@ def pageLayout():
         ds.Output('choice-checklist-pr', 'value'),
         ds.Output('choice-checklist-pr', 'options'),
         ds.Output('choice-store-pr', 'data')],
-    [ds.Input('date-checklist-pr', 'value'),
+    [ds.Input('avg-radioitem-pr', 'value'),
+        ds.Input('date-checklist-pr', 'value'),
         ds.Input('date-store-pr', 'data'),
+        ds.Input('event-dateranger-pr', 'start_date'), 
+        ds.Input('event-dateranger-pr', 'end_date'), 
+        ds.Input('event-dateranger-pr', 'min_date_allowed'), 
+        ds.Input('event-dateranger-pr', 'max_date_allowed'), 
+        ds.Input('reset-button-pr', 'n_clicks'),
         ds.Input('section-dropdown-pr', 'value'),
         ds.Input('subject-dropdown-pr', 'value'),
         ds.Input('judge-dropdown-pr', 'value'),
@@ -87,9 +108,10 @@ def pageLayout():
         ds.Input('choice-checklist-pr', 'value'),
         ds.Input('choice-checklist-pr', 'options'),
         ds.Input('choice-store-pr', 'data'),
-        ds.Input('order-radioitem-pr', 'value')]
+        ds.Input('order-radioitem-pr', 'value'),
+        ds.Input('text-checklist-pr', 'value')]
     )
 
 # return updated data based on user choice.
-def updateOutput(dateType, dateTypeStore, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, choices, choicesOptions, choiceStore, order):
-    return comparation.processComparationUpdate(df, dateType, dateTypeStore, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, choices, choicesOptions, choiceStore, order)
+def updateOutput(avgChoice, dateType, dateTypeStore, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, choices, choicesOptions, choiceStore, order, text):
+    return comparation.processComparationUpdate(df, avgChoice, dateType, dateTypeStore, startDate, endDate, minDate, maxDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, choices, choicesOptions, choiceStore, order, text)

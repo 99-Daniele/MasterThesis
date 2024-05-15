@@ -240,9 +240,25 @@ def getAvgStdDataFrameByDate(df, dataType):
             df2['conteggio'] = df1.groupby(['data']).size().tolist()
             df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
             return [df1, df2]
-        
+
+def getAvgTotDataframe(df_temp, order_dict, avgChoice):
+    if avgChoice == 'media':
+        df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
+    else:
+        df1 = df_temp.groupby(['data', 'filtro'], as_index = False).median()
+    df1['conteggio'] = df_temp.groupby(['data', 'filtro']).size().tolist()
+    df1['sort_column'] = df1['filtro'].map(order_dict)
+    df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
+    if avgChoice == 'media':
+        df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
+    else:
+        df2 = df_temp.groupby(['data'], as_index = False)['durata'].median()
+    df2['conteggio'] = df_temp.groupby(['data']).size().tolist()
+    df2 = df2.sort_values(['data']).reset_index(drop = True)
+    return [df1, df2]
+
 # return data group by chosen data type and types.
-def getAvgDataFrameByType(df, datetype, typesChoice, order, eventChoice):
+def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoice):
     if typesChoice == None:
         return None
     df5 = df.copy()
@@ -251,10 +267,16 @@ def getAvgDataFrameByType(df, datetype, typesChoice, order, eventChoice):
         df5 = getEventDataFrame(df5, eventChoice)
         index = types.index(eventChoice)
         types[index] = 'evento'
-    df4 = df5.groupby(types) \
-    .agg({'giudice':'size', 'durata':'mean'}) \
-    .rename(columns = {'giudice':'conteggio','durata':'media'}) \
-    .reset_index()
+    if avgChoice == 'media':
+        df4 = df5.groupby(types) \
+            .agg({'giudice':'size', 'durata':'mean'}) \
+            .rename(columns = {'giudice':'conteggio','durata':'media'}) \
+            .reset_index()
+    else:
+        df4 = df5.groupby(types) \
+            .agg({'giudice':'size', 'durata':'median'}) \
+            .rename(columns = {'giudice':'conteggio','durata':'media'}) \
+            .reset_index()
     for t in types: 
         df4.drop(df4[df4[t] == 'null'].index, inplace = True)
     df3 = df4[[types[0], 'conteggio', 'media']].copy()
@@ -277,73 +299,37 @@ def getAvgDataFrameByType(df, datetype, typesChoice, order, eventChoice):
     match datetype:
         case "SETTIMANA":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getWeekNumber(x))
-            df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
-            df1['conteggio'] = df_temp.groupby(['data', 'filtro']).size().tolist()
-            df1['sort_column'] = df1['filtro'].map(order_dict)
-            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
-            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df2['conteggio'] = df_temp.groupby(['data']).size().tolist()
+            [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
             df1['data'] = df1['data'].map(lambda x: utilities.getWeek(x))
-            df2 = df2.sort_values(['data']).reset_index(drop = True)
             df2['data'] = df2['data'].map(lambda x: utilities.getWeek(x))
             return [df1, df2, df3]
         case "MESE":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getMonthNumber(x))
-            df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
-            df1['conteggio'] = df_temp.groupby(['data', 'filtro']).size().tolist()
-            df1['sort_column'] = df1['filtro'].map(order_dict)
-            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
-            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df2['conteggio'] = df_temp.groupby(['data']).size().tolist()
+            [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
             df1['data'] = df1['data'].map(lambda x: utilities.getMonth(x))
-            df2 = df2.sort_values(['data']).reset_index(drop = True)
             df2['data'] = df2['data'].map(lambda x: utilities.getMonth(x))
             return [df1, df2, df3]
         case "MESE DELL'ANNO":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getMonthYearDate(x))
-            df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
-            df1['conteggio'] = df_temp.groupby(['data', 'filtro']).size().tolist()
-            df1['sort_column'] = df1['filtro'].map(order_dict)
-            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
-            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df2['conteggio'] = df_temp.groupby(['data']).size().tolist()
-            df2 = df2.sort_values(['data']).reset_index(drop = True)
+            [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
             df1['data'] = df1['data'].map(lambda x: utilities.getMonthYear(x))
             df2['data'] = df2['data'].map(lambda x: utilities.getMonthYear(x))
             return [df1, df2, df3]
         case "TRIMESTRE":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getTrimesterDate(x))
-            df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
-            df1['conteggio'] = df_temp.groupby(['data', 'filtro']).size().tolist()
-            df1['sort_column'] = df1['filtro'].map(order_dict)
-            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
-            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df2['conteggio'] = df_temp.groupby(['data']).size().tolist()
+            [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
             df1['data'] = df1['data'].map(lambda x: utilities.getTrimester(x))
-            df2 = df2.sort_values(['data']).reset_index(drop = True)
             df2['data'] = df2['data'].map(lambda x: utilities.getTrimester(x))
             return [df1, df2, df3]
         case "TRIMESTRE DELL'ANNO":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getTrimesterYearDate(x))
-            df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
-            df1['conteggio'] = df_temp.groupby(['data', 'filtro']).size().tolist()
-            df1['sort_column'] = df1['filtro'].map(order_dict)
-            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
-            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df2['conteggio'] = df_temp.groupby(['data']).size().tolist()
-            df2 = df2.sort_values(['data']).reset_index(drop = True)
+            [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
             df1['data'] = df1['data'].map(lambda x: utilities.getTrimesterYear(x))
             df2['data'] = df2['data'].map(lambda x: utilities.getTrimesterYear(x))
             return [df1, df2, df3]
         case "ANNO":
             df_temp['data'] = df_temp['data'].map(lambda x: utilities.getYearNumber(x))
-            df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()
-            df1['conteggio'] = df_temp.groupby(['data', 'filtro']).size().tolist()
-            df1['sort_column'] = df1['filtro'].map(order_dict)
-            df1 = df1.sort_values(['sort_column', 'data'], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
-            df2 = df_temp.groupby(['data'], as_index = False)['durata'].mean()
-            df2['conteggio'] = df_temp.groupby(['data']).size().tolist()
-            df2 = df2.sort_values(['data']).reset_index(drop = True)
+            [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
             return [df1, df2, df3]
         
 # return data group by chosen type.

@@ -1,12 +1,13 @@
 - verifica nome e fasi stati ed eventi  
-
-- filtro anno grafico confronto
-- migliore visualizzazione carico --> come?
-- filtro quando un evento particolare avviene? (fase, stato)
 - processi/fasi/stati durata 0?
-- media o mediana?
 - precisazione conclusioni o decisione?
+
+- filtro quando un evento particolare avviene? (fase, stato)
 - nomi in inglese
+- stessi filtri grafico durata e confronto
+- grafico durata processo e confronto insieme?
+- df_temp e df
+- df1, df2, df_data nomi migliori
 
 - verifica valore predetto
 - valore predetto sulla base di giudice, materia, sezione, data, carico processi giudice in quel momento
