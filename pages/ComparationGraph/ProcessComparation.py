@@ -5,7 +5,6 @@ import pandas as pd
 import plotly.express as px
 
 import utils.Dataframe as frame
-import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Graph.ComparationGraph as comparation
 
@@ -39,8 +38,12 @@ def pageLayout():
         ds.dcc.Dropdown(finished, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-pr', placeholder = 'PROCESSO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-pr', placeholder = 'SEQUENZA', style = {'width': 400}),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-pr', placeholder = 'FASI', style = {'width': 400}),
-        ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'events-dropdown-pr', placeholder = 'EVENTI', style = {'width': 400}),
-        ds.dcc.RadioItems(['CON', 'SENZA'], value = 'CON', id = "events-radioitem-pr", inline = True, style = {'display': 'none'}),
+        ds.html.Div(children = [
+            ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'events-dropdown-pr', placeholder = 'EVENTI', style = {'width': 400}),
+            ds.dcc.RadioItems(['CON', 'SENZA'], value = 'CON', id = "events-radioitem-pr", inline = True, style = {'display': 'none'}, inputStyle = {'margin-left': "20px"})
+            ],
+            style = {'display': 'inline-flex'}
+        ),
         ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist-pr", inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Store(data = 'sezione', id = "choice-store-pr"),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-pr", inline = True, inputStyle = {'margin-left': "20px"}),

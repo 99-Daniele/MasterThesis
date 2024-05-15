@@ -5,7 +5,6 @@ import plotly.express as px
 import textwrap
 
 import utils.Dataframe as frame
-import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Utilities.Utilities as utilities
 
@@ -59,6 +58,7 @@ def hideProcessChosen(choices, sections, subjects, judges, finished, sequences, 
         eventRadioStyle = {'display': 'none'}
     elif event in choices:
         eventStyle = {'display': 'none'}
+        eventRadioStyle = {'display': 'none'}
         event = None
     return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event]
 
@@ -119,9 +119,8 @@ def updateProcessData(df, sections, subjects, judges, finished, sequences, phase
     df_temp = frame.getTypesDataFrame(df_temp, 'sequenza', sequences)
     df_temp = frame.getTypesDataFrame(df_temp, 'fasi', phaseSequences)
     if eventChoice != None:
-        df_temp_2 = df_temp.copy()
-        df_temp_2 = frame.getEventDataFrame(df_temp_2, eventChoice)
-        return df_temp_2[df_temp_2['evento'] == eventRadio + " " + eventChoice]
+        df_temp = frame.getEventDataFrame(df_temp, eventChoice)
+        return df_temp[df_temp['evento'] == eventRadio + " " + eventChoice]
     return df_temp
 
 # update data base on user choices on different parameters.
@@ -228,7 +227,7 @@ def processComparationUpdate(df, dateType, date, sections, subjects, judges, fin
         choiceStore = choices[0]
     [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event] = hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice)
     df_temp = df.copy()
-    df_data = updateProcessData(df_temp, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio)
+    df_data = updateProcessData(df_temp, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio)
     [sections, subjects, judges, finished, sequences, phaseSequences, event] = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio, importantSubjects)
     [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, date, choices, order, eventChoice)
     xticks = frame.getUniques(allData, 'data')
