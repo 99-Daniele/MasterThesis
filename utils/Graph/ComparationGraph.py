@@ -225,37 +225,55 @@ def processComparationUpdate(df, avgChoice, dateType, date, startDate, endDate, 
     if len(dateType) >= 1:
         date = dateType[-1]
     dateType = [date]
-    if len(choices) < 1:
-        choices = [choiceStore]
-    elif len(choices) == 1:
-        choiceStore = choices[0]
-    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event] = hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice)
     df_temp = df.copy()
-    df_data = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio)
-    [sections, subjects, judges, finished, sequences, phaseSequences, event] = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio, importantSubjects)
-    [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, date, choices, order, eventChoice)
-    xticks = frame.getUniques(allData, 'data')
-    if text == ['CONTEGGIO']:
-        fig = px.line(allData, x = "data", y = "durata", text = "conteggio", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+    if len(choices) == 0:
+        [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event] = hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice)
+        df_data = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio)
+        [sections, subjects, judges, finished, sequences, phaseSequences, event] = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio, importantSubjects)
+        [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, date, avgChoice)
+        xticks = frame.getUniques(avgData, 'data')
+        fig = px.box(allData, x = "data", y = "durata", color_discrete_sequence = ['#91BBF3'], labels = {'durata':'Durata del processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = 'suspectedoutliers')
         fig.add_traces(
-            px.line(typeData, x = "data", y = "durata", text = "conteggio", color = 'filtro', markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
+            px.line(avgData, x = "data", y = "durata", markers = True).update_traces(line_color = 'red').data
         )
+        if text == ['TESTO']:
+            fig.add_traces(
+                px.line(avgData, x = "data", y = "quantile", text = "conteggio", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
+            )
+        else:
+            fig.add_traces(
+                px.line(avgData, x = "data", y = "quantile", markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
+            )
+        fig.update_layout(xaxis_tickvals = xticks)
+        fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
+        return fig, dateType, date, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choices, choicesOptions, choiceStore
     else:
-        fig = px.line(allData, x = "data", y = "durata", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
-        fig.add_traces(
-            px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
+        [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event] = hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice)
+        df_data = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio)
+        [sections, subjects, judges, finished, sequences, phaseSequences, event] = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio, importantSubjects)
+        [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, date, choices, order, eventChoice)
+        xticks = frame.getUniques(allData, 'data')
+        if text == ['TESTO']:
+            fig = px.line(allData, x = "data", y = "durata", text = "conteggio", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+            fig.add_traces(
+                px.line(typeData, x = "data", y = "durata", text = "conteggio", color = 'filtro', markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
+            )
+        else:
+            fig = px.line(allData, x = "data", y = "durata", labels = {'durata':'Durata processo [giorni]', 'data':'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = addTotCountToName(infoData), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+            fig.add_traces(
+                px.line(typeData, x = "data", y = "durata", color = 'filtro', markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
+            )
+        fig.for_each_trace(
+            lambda t: t.update(name = addCountToName(t.name, infoData, choices)) if t.name != addTotCountToName(infoData) else False
         )
-    fig.for_each_trace(
-        lambda t: t.update(name = addCountToName(t.name, infoData, choices)) if t.name != addTotCountToName(infoData) else False
-    )
-    fig.for_each_trace(
-        lambda t: t.update(textfont_color = t.line.color, textposition = "top center", textfont_size = 14)
-    )
-    fig.update_layout(xaxis_tickvals = xticks)
-    fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
-    fig.update_xaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
-    fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
-    return fig, dateType, date, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choices, choicesOptions, choiceStore
+        fig.for_each_trace(
+            lambda t: t.update(textfont_color = t.line.color, textposition = "top center", textfont_size = 14)
+        )
+        fig.update_layout(xaxis_tickvals = xticks)
+        fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != addTotCountToName(infoData) else False))
+        fig.update_xaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
+        fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
+        return fig, dateType, date, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choices, choicesOptions, choiceStore
 
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for all comparation graphs except process ones.

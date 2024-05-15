@@ -4,8 +4,6 @@
 
 - filtro quando un evento particolare avviene? (fase, stato)
 - nomi in inglese
-- stessi filtri grafico durata e confronto
-- grafico durata processo e confronto insieme?
 - df_temp e df
 - df1, df2, df_data nomi migliori
 

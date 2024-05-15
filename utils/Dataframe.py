@@ -179,68 +179,62 @@ def createCourtHearingsDurationDataFrame(courtHearings):
             pIds.append(c[6])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished})
 
+# return avg and tot dataframe.
+def getAvgTotDataframeByDate(df1, avgChoice):
+    df1 = df1.sort_values(['data'])
+    df_q = df1.groupby(['data'], as_index = False).quantile(0.75)
+    df3 = df1.iloc[:0,:].copy()
+    for i, row in df_q.iterrows():
+        df_temp = df1[df1['data'] == row['data']]
+        df_temp = df_temp[df_temp['durata'] <= row['durata']]
+        df3 = pd.concat([df3, df_temp], ignore_index = True)
+    if avgChoice == 'media':
+        df2 = df3.groupby(['data'], as_index = False).mean()
+    else:
+        df2 = df3.groupby(['data'], as_index = False).median()
+    df2['conteggio'] = df3.groupby(['data']).size().tolist()
+    df2['quantile'] = df3.groupby(['data'], as_index = False).quantile(0.75)['durata']
+    return [df3, df2]
+
 # return data group by chosen data type.
-def getAvgStdDataFrameByDate(df, dataType):
+def getAvgStdDataFrameByDate(df, dataType, avgChoice):
+    df1 = df[['data', 'durata']].copy()
     match dataType:
         case "SETTIMANA":
-            df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: utilities.getWeekNumber(x))
-            df1 = df1.sort_values(['data'])
-            df2 = df1.groupby(['data'], as_index = False).mean()
-            df2['conteggio'] = df1.groupby(['data']).size().tolist()
-            df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
+            [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice)
             df1['data'] = df1['data'].map(lambda x: utilities.getWeek(x))
             df2['data'] = df2['data'].map(lambda x: utilities.getWeek(x))
             return [df1, df2]
         case "MESE":
-            df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: utilities.getMonthNumber(x))
-            df1 = df1.sort_values(['data'])
-            df2 = df1.groupby(['data'], as_index = False).mean()
-            df2['conteggio'] = df1.groupby(['data']).size().tolist()
-            df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
+            [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice)
             df1['data'] = df1['data'].map(lambda x: utilities.getMonth(x))
             df2['data'] = df2['data'].map(lambda x: utilities.getMonth(x))
             return [df1, df2]
         case "MESE DELL'ANNO":
-            df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: utilities.getMonthYearDate(x))
-            df1 = df1.sort_values(['data'])
-            df2 = df1.groupby(['data'], as_index = False).mean()
-            df2['conteggio'] = df1.groupby(['data']).size().tolist()
-            df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
+            [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice)
             df1['data'] = df1['data'].map(lambda x: utilities.getMonthYear(x))
             df2['data'] = df2['data'].map(lambda x: utilities.getMonthYear(x))
             return [df1, df2]
         case "TRIMESTRE":
-            df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: utilities.getTrimesterDate(x))
-            df1 = df1.sort_values(['data'])
-            df2 = df1.groupby(['data'], as_index = False).mean()
-            df2['conteggio'] = df1.groupby(['data']).size().tolist()
-            df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
+            [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice)
             df1['data'] = df1['data'].map(lambda x: utilities.getTrimester(x))
             df2['data'] = df2['data'].map(lambda x: utilities.getTrimester(x))
             return [df1, df2]
         case "TRIMESTRE DELL'ANNO":
-            df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: utilities.getTrimesterYearDate(x))
-            df1 = df1.sort_values(['data'])
-            df2 = df1.groupby(['data'], as_index = False).mean()
-            df2['conteggio'] = df1.groupby(['data']).size().tolist()
-            df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
+            [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice)
             df1['data'] = df1['data'].map(lambda x: utilities.getTrimesterYear(x))
             df2['data'] = df2['data'].map(lambda x: utilities.getTrimesterYear(x))
             return [df1, df2]
         case "ANNO":
-            df1 = df[['data', 'durata']].copy()
             df1['data'] = df1['data'].map(lambda x: utilities.getYearNumber(x))
-            df1 = df1.sort_values(['data'])
-            df2 = df1.groupby(['data'], as_index = False).mean()
-            df2['conteggio'] = df1.groupby(['data']).size().tolist()
-            df2['quantile'] = df1.groupby(['data'], as_index = False).quantile(0.75)['durata']
-            return [df1, df2]
+            return getAvgTotDataframeByDate(df1, avgChoice)
 
+# return avg and tot dataframe.
 def getAvgTotDataframe(df_temp, order_dict, avgChoice):
     if avgChoice == 'media':
         df1 = df_temp.groupby(['data', 'filtro'], as_index = False).mean()

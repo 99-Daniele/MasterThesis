@@ -56,10 +56,10 @@ def pageLayout():
             ],
             style = {'display': 'inline-flex'}
         ),
-        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'sequenza', 'fasi'], value = ['sezione'], id = "choice-checklist-pr", inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.Checklist(['sezione', 'materia', 'giudice', 'finito', 'sequenza', 'fasi'], value = [], id = "choice-checklist-pr", inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Store(data = 'sezione', id = "choice-store-pr"),
         ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-pr", inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.Checklist(['CONTEGGIO'], value = ['CONTEGGIO'], id = "text-checklist-pr"),
+        ds.dcc.Checklist(['TESTO'], value = ['TESTO'], id = "text-checklist-pr"),
         ds.dcc.Graph(id = 'comparation-graph-pr', figure = fig)
     ])
     return layout
