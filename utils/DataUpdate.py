@@ -57,18 +57,19 @@ def getDurations(events, courtHearingsType, maxDate):
     phaseSequenceDict = {}
     eventSequenceDict = {}
     unfinishedProcesses = []
+    endPhase = '4'
     with alive_bar(int(len(events))) as bar:
         for i in range(len(events)):
             if events[i][4] != processId:
                 firstEventId = events[i][0]
                 firstEventDate = events[i][5]
-                [processEventsDuration, filteredEvents] = getEventsDuration(processEvents, maxDate)
+                [processEventsDuration, filteredEvents] = getEventsDuration(processEvents, maxDate, endPhase)
                 if len(filteredEvents) > 0:
                     eventsDuration = eventsDuration + processEventsDuration
-                    phasesDuration = phasesDuration + getPhasesDuration(filteredEvents)
-                    statesDuration = statesDuration + getStatesDuration(filteredEvents)
-                    [processSequence, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence, finished] = getProcessesSequence(filteredEvents)
-                    courtHearingsDuration = courtHearingsDuration + getCourtHearingsDuration(filteredEvents, courtHearingsType, processSequence)
+                    phasesDuration = phasesDuration + getPhasesDuration(filteredEvents, endPhase)
+                    statesDuration = statesDuration + getStatesDuration(filteredEvents, endPhase)
+                    [processSequence, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence, finished] = getProcessesSequence(filteredEvents, endPhase)
+                    courtHearingsDuration = courtHearingsDuration + getCourtHearingsDuration(filteredEvents, courtHearingsType, processSequence, '2')
                     processSequences = processSequences + processSequence
                     if finished:
                         processDuration = processDuration + getProcessesDuration(filteredEvents)
@@ -109,7 +110,7 @@ def addToDict(sequence, dict):
 
 # return events duration.
 # in case of unfinished events, uses as endDate given maxDate (which is the date of the last event in the database).
-def getEventsDuration(events, maxDate):
+def getEventsDuration(events, maxDate, endPhase):
     if len(events) == 0:
         return [(), ()]
     curr = events[0]
@@ -127,7 +128,7 @@ def getEventsDuration(events, maxDate):
         curr = events[i]
         next = events[i + 1]
         prev = events[i - 1]
-        if curr[3] == '5' and not end:
+        if curr[3] == endPhase and not end:
             end = True
             correctEvents.append(curr)
         if curr[7] == prev[7] or curr[7] == next[7]:
@@ -144,7 +145,7 @@ def getEventsDuration(events, maxDate):
         i = i + 1
     curr = events[i]
     prev = events[i - 1]
-    if curr[3] == '5' and not end:
+    if curr[3] == endPhase and not end:
         end = True
         correctEvents.append(curr)
     if curr[7] == prev[7]:
@@ -161,7 +162,7 @@ def getEventsDuration(events, maxDate):
     return [eventsDuration, correctEvents]
 
 # return phases duration.
-def getPhasesDuration(events):
+def getPhasesDuration(events, endPhase):
     phasesDuration = []
     firstEvent = events[0]
     order = 1
@@ -173,13 +174,13 @@ def getPhasesDuration(events):
             phasesDuration.append((curr[4], curr[3], order, duration, firstEvent[5], curr[5], firstEvent[0], curr[0]))
             firstEvent = next
             order = order + 1
-            if next[3] == '5':
-                phasesDuration.append((next[4], '5', order, 0, next[5], next[5], next[0], next[0]))
+            if next[3] == endPhase:
+                phasesDuration.append((next[4], endPhase, order, 0, next[5], next[5], next[0], next[0]))
                 return phasesDuration
     return phasesDuration
 
 # return states duration.
-def getStatesDuration(events):
+def getStatesDuration(events, endPhase):
     statesDuration = []
     firstEvent = events[0]
     order = 1
@@ -191,16 +192,16 @@ def getStatesDuration(events):
             statesDuration.append((curr[4], curr[6], curr[2], order, duration, firstEvent[5], curr[5], firstEvent[0], curr[0]))
             firstEvent = next
             order = order + 1
-            if next[3] == '5':
+            if next[3] == endPhase:
                 statesDuration.append((next[4], next[6], next[2], order, 0, next[5], next[5], next[0], next[0]))
                 return statesDuration
     return statesDuration
 
 # return court hearings duration.
-def getCourtHearingsDuration(events, courtHearingsType, processSequence):
+def getCourtHearingsDuration(events, courtHearingsType, processSequence, minPhase):
     firstEvent = None
     lastEvent = None
-    if processSequence[0][5][-1] != '4' and processSequence[0][5][-1] != '5':
+    if processSequence[0][5][-1].isdigit and int(processSequence[0][5][-1]) > minPhase:
         return []
     for e in events:
         if e[1] in courtHearingsType:
@@ -213,7 +214,7 @@ def getCourtHearingsDuration(events, courtHearingsType, processSequence):
     return [(e[4], duration, firstEvent[5], lastEvent[5], firstEvent[0], lastEvent[0])]
 
 # return processes sequence.
-def getProcessesSequence(events):
+def getProcessesSequence(events, endPhase):
     processType = -1
     processId = events[0][4]
     firstEventDate = events[0][5]
@@ -261,7 +262,7 @@ def getProcessesSequence(events):
         if e[1] != eventsSequence[-1]:
             eventsSequence.append(e[1])
             eventsSequenceDuration[1].append([e[1], duration])
-        if phasesSequence[-1] == '5':
+        if phasesSequence[-1] == endPhase:
             if shortSequence[-1] == 'FINE':
                 processType = 1
             else:
