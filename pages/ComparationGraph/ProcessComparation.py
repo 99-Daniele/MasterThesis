@@ -53,7 +53,7 @@ def pageLayout():
         ),
         ds.html.Button("RESET", id = "reset-button-pr"),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-pr', placeholder = 'SEZIONE', style = {'width': 400}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-pr', placeholder = 'MATERIA', style = {'width': 400}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-pr', placeholder = 'MATERIA', style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-pr', placeholder = 'GIUDICE', style = {'width': 400}),
         ds.dcc.Dropdown(finished, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-pr', placeholder = 'PROCESSO', style = {'width': 400}),
         ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-pr', placeholder = 'SEQUENZA', style = {'width': 400}),

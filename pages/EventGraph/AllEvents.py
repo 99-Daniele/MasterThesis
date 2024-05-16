@@ -43,7 +43,7 @@ def pageLayout():
         ),
         ds.html.Button("RESET", id = "reset-button-ae"),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-ae', placeholder = 'SEZIONE', style = {'width': 285}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-ae', placeholder = 'MATERIA', style = {'width': 285}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-ae', placeholder = 'MATERIA', style = {'width': 285}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-ae', placeholder = 'GIUDICE', style = {'width': 285}),
         ds.dcc.Graph(figure = fig, id = 'events-graph-ae')
     ])

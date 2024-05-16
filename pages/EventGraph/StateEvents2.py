@@ -46,7 +46,7 @@ def pageLayout():
                 ),
                 ds.html.Button("RESET", id = "reset-button-se"),
                 ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-se', placeholder = 'SEZIONE', style = {'width': 285}),
-                ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-se', placeholder = 'MATERIA', style = {'width': 285}),
+                ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-se', placeholder = 'MATERIA', style = {'width': 285}, optionHeight = 80),
                 ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-se', placeholder = 'GIUDICE', style = {'width': 285})
                 ],
                 className = 'filter'

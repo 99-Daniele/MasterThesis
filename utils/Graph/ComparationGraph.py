@@ -195,7 +195,7 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
     [sections, subjects, judges, finished, sequences, phaseSequences, event] = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, dateTag, sectionTag, subjectTag, judgeTag, finishedTag, sequenceTag, phaseSequenceTag, eventsTag, eventTag, countTag, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio, importantSubjects)
     if choices == None or len(choices) == 0:
         orderRadioStyle = {'display': 'none'}
-        [allData, avgData] = frame.getAvgStdDataFrameByDate(df_temp, dateType, avgChoice, dateTag, durationTag, countTag, quantileTag)
+        [allData, avgData] = frame.getAvgStdDataFrameByDate(df_data, dateType, avgChoice, dateTag, durationTag, countTag, quantileTag)
         xticks = frame.getUniques(avgData, dateTag)
         fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = ['#91BBF3'], labels = {durationTag:'Durata del processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
         fig.add_traces(

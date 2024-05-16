@@ -54,7 +54,7 @@ def pageLayout():
         ),
         ds.dcc.Dropdown(typesSorted, multi = False, searchable = False, id = 'type-dropdown-s', placeholder = 'STATO', style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-s', placeholder = 'SEZIONE', style = {'display': 'none'}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-s', placeholder = 'MATERIA', style = {'display': 'none'}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-s', placeholder = 'MATERIA', style = {'display': 'none'}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-s', placeholder = 'GIUDICE', style = {'display': 'none'}),
         ds.dcc.Dropdown(finished, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-s', placeholder = 'PROCESSO', style = {'display': 'none'}),
         ds.dcc.Checklist([sectionTag, subjectTag, judgeTag, finishedTag], value = [], id = 'choice-checklist-s', inline = True, style = {'display': 'none'}),
