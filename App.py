@@ -49,4 +49,4 @@ def start():
                 return stateEventsPage.pageLayout()
             case _:
                 return homePage.pageLayout()
-    app.run_server()
+    app.run_server(debug = False)
