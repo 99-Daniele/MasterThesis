@@ -14,9 +14,9 @@ import utils.Graph.EventsGraph as event
 # get maxYear as the maximum year belong dataframe events and calc maxDateStart and maxDateEnd as the first and last date of the maximun 1-year interval.
 # get must states from text file.
 df = getter.getStateEvents()
-sections = frame.getGroupBy(df, 'sezione')
-subjects = frame.getGroupBy(df, 'materia')
-judges = frame.getGroupBy(df, 'giudice')
+sections = frame.getGroupBy(df, 'sezione', 'conteggio')
+subjects = frame.getGroupBy(df, 'materia', 'conteggio')
+judges = frame.getGroupBy(df, 'giudice', 'conteggio')
 maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
 maxDateStart = dt.date(maxYear - 1, 1, 1)
 maxDateEnd = dt.date(maxYear, 1, 1)

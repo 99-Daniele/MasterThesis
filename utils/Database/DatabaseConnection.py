@@ -7,6 +7,17 @@ import os
 import utils.FileOperation as file
 import utils.Utilities.Utilities as utilities
 
+# return connection based on given host, username, password and database name. 
+def connectToDatabase(h, usr, psw, db):
+    connection = cnx.connect(
+        host = h,
+        user = usr,
+        password = psw,
+        database = db,
+        auth_plugin = 'mysql_native_password'
+    )
+    return connection
+
 # return database connection with user credentials. 
 # the first time user must write his credentials which are then saved in a file. After that is no longer needed to input credentials.
 def getDatabaseConnection():
@@ -30,17 +41,6 @@ def getDatabaseConnection():
                 return connection
             except:
                 print("\nWrong credentials!! Please give right credentials")
-
-# return connection based on given host, username, password and database name. 
-def connectToDatabase(h, usr, psw, db):
-    connection = cnx.connect(
-        host = h,
-        user = usr,
-        password = psw,
-        database = db,
-        auth_plugin = 'mysql_native_password'
-    )
-    return connection
 
 # get data from database with given query.
 def getDataFromDatabase(connection, query):
@@ -66,8 +66,7 @@ def doesATableExist(connection, table):
 
 # return if a table contains specific columns.
 def doesATableHaveColumns(connection, table, columns, types):
-    i = 0
-    while i < len(columns):
+    for i in range(len(columns)):
         column = columns[i]
         type = types[i].lower()
         if len(type) >= 7 and type[:7] == 'varchar':
@@ -79,7 +78,6 @@ def doesATableHaveColumns(connection, table, columns, types):
         r = getDataFromDatabase(connection, query)
         if r[0][0] == 0:
             return False
-        i = i + 1
     return True
 
 # return if a view exists in user database.
@@ -94,21 +92,17 @@ def createTable(connection, tableName, columnNames, columnTypes, primaryKeys, no
     if doesATableExist(connection, tableName):
         dropTable(connection, tableName)
     query = "CREATE TABLE " + tableName + "("
-    i = 0
-    while i < len(columnNames):
+    for i in range(len(columnNames)):
         query = query + columnNames[i] + " " + columnTypes[i]
         if i in notNullables:
             query = query + " NOT NULL"
         query = query + ", "
-        i = i + 1
     query = query + "PRIMARY KEY ("
-    j = 0
-    while j < len(primaryKeys):
+    for j in range(len(primaryKeys)):
         key = primaryKeys[j]
         query = query + columnNames[key]
         if j < len(primaryKeys) - 1:
             query = query + ", "
-        j = j + 1
     query = query + "));"
     executeQuery(connection, query)
 
@@ -125,7 +119,6 @@ def createViewFromQuery(connection, view, query):
     if doesAViewExist(connection, view):
         dropView(connection, view)
     executeQuery(connection, query)
-    return
 
 # drop table from user database.
 # in case chosen table doesn't exists an exception is raised.
@@ -156,10 +149,10 @@ def updateTable(connection, table, dataInfo, condition):
 # update chosen table based on given dataInfo and conditions: firstly are removed unneeded rows and then add needed rows.
 # in case chosen table doesn't exists an exception is raised.
 # this method is when the data to be removed needs an additional 'order' parameter condition.
-def updateTableOrder(connection, table, dataInfo, condition):
+def updateTableWithOrder(connection, table, dataInfo, condition):
     if not doesATableExist(connection, table):
         raise Exception("\nYou can't update this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
-    removeFromDatabaseOrder(connection, table, dataInfo[1], condition)
+    removeFromDatabaseWithOrder(connection, table, dataInfo[1], condition)
     connection.commit()
     insertIntoDatabase(connection, table, dataInfo[0])
     connection.commit()
@@ -202,7 +195,7 @@ def removeFromDatabase(connection, table, ids, condition):
 # remove from database given table if condition holds.
 # in case chosen table doesn't exists an exception is raised.
 # this method is when the data to be removed needs an additional 'order' parameter condition.
-def removeFromDatabaseOrder(connection, table, conditions, condition):
+def removeFromDatabaseWithOrder(connection, table, conditions, condition):
     if not doesATableExist(connection, table):
         raise Exception("\nYou can't delete from this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
     with alive_bar(int(len(conditions))) as bar:

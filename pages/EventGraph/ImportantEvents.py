@@ -14,12 +14,6 @@ import utils.Graph.EventsGraph as event
 # get maxYear as the maximum year belong dataframe events and calc maxDateStart and maxDateEnd as the first and last date of the maximun 1-year interval.
 # get must events from text file.
 df = getter.getImportantEvents()
-sections = frame.getGroupBy(df, 'sezione')
-subjects = frame.getGroupBy(df, 'materia')
-judges = frame.getGroupBy(df, 'giudice')
-maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
-maxDateStart = dt.date(maxYear - 1, 1, 1)
-maxDateEnd = dt.date(maxYear, 1, 1)
 try:
     mustEvents = file.getDataFromTextFile('preferences/mustEvents.txt')
 except:
@@ -27,6 +21,12 @@ except:
 
 # return initial layout of page.
 def pageLayout():
+    sections = frame.getGroupBy(df, 'sezione', 'conteggio')
+    subjects = frame.getGroupBy(df, 'materia', 'conteggio')
+    judges = frame.getGroupBy(df, 'giudice', 'conteggio')
+    maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
+    maxDateStart = dt.date(maxYear - 1, 1, 1)
+    maxDateEnd = dt.date(maxYear, 1, 1)
     fig = px.scatter(df, x = "data", y = "numProcesso", color = 'evento', labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 1200)
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),

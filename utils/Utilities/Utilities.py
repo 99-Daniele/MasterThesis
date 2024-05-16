@@ -124,6 +124,12 @@ def fromStringToList(string):
     list = string.split(",")
     return list
 
+# find substring between from given string two characters.
+def findSubstringBetweenChars(string, startChar, endChar):
+    startIndex = string.find(startChar)
+    endIndex = string.find(endChar)
+    return string[startIndex + 1: endIndex]
+
 # get width based on screen dimension
 def getWidth(perc):
     width = GetSystemMetrics(0)
@@ -133,8 +139,3 @@ def getWidth(perc):
 def getHeight(perc):
     height = GetSystemMetrics(1)
     return height * perc
-
-def findSubstringBetweenChars(string, startChar, endChar):
-    startIndex = string.find(startChar)
-    endIndex = string.find(endChar)
-    return string[startIndex + 1: endIndex]

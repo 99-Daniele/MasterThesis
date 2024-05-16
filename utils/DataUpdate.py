@@ -34,8 +34,8 @@ def refreshData(connection):
     processSequenceInfo = compareData(processSequence, connection, "SELECT * FROM processitipo ORDER BY numProcesso")
     connect.updateTable(connection, 'eventitipo', eventsFilteredInfo, 'numEvento')
     connect.updateTable(connection, 'durataeventi', eventsDurationInfo, 'numEvento')
-    connect.updateTableOrder(connection, 'duratafasi', phasesDurationInfo, 'numProcesso')
-    connect.updateTableOrder(connection, 'duratastati', statesDurationInfo, 'numProcesso')
+    connect.updateTableWithOrder(connection, 'duratafasi', phasesDurationInfo, 'numProcesso')
+    connect.updateTableWithOrder(connection, 'duratastati', statesDurationInfo, 'numProcesso')
     connect.updateTable(connection, 'durataprocessi', processDurationInfo, 'numProcesso')
     connect.updateTable(connection, 'durataudienze', courtHearingsDurationInfo, 'numProcesso')
     connect.updateTable(connection, 'processitipo', processSequenceInfo, 'numProcesso')
@@ -57,9 +57,8 @@ def getDurations(events, courtHearingsType, maxDate):
     phaseSequenceDict = {}
     eventSequenceDict = {}
     unfinishedProcesses = []
-    i = 0
     with alive_bar(int(len(events))) as bar:
-        while i < (len(events)):
+        for i in range(len(events)):
             if events[i][4] != processId:
                 firstEventId = events[i][0]
                 firstEventDate = events[i][5]
@@ -85,7 +84,6 @@ def getDurations(events, courtHearingsType, maxDate):
                 processId = events[i][4]
             else:
                 processEvents.append(events[i])
-            i = i + 1
             bar()
     with alive_bar(int(len(unfinishedProcesses))) as bar:
         for p in unfinishedProcesses:
@@ -103,12 +101,10 @@ def addToDict(sequence, dict):
         new_count = id[2] + 1
         new_mean = ((id[0] * id[2]) + sequence[0]) / new_count
         new_sequence = []
-        i = 0
-        while i < len(sequence[1]):
+        for i in range(len(sequence[1])):
             s1 = id[1][i]
             s2 = sequence[1][i]
             new_sequence.append([s1[0], ((s1[1] * id[2]) + s2[1]) / new_count])
-            i += 1
         dict.update({utilities.fromListToString(sequence[2]): [new_mean, new_sequence, new_count]})
 
 # return events duration.
@@ -167,10 +163,9 @@ def getEventsDuration(events, maxDate):
 # return phases duration.
 def getPhasesDuration(events):
     phasesDuration = []
-    i = 0
     firstEvent = events[0]
     order = 1
-    while i < len(events) - 1:
+    for i in range(len(events) - 1):
         curr = events[i]
         next = events[i + 1]
         if next[3] != curr[3]:
@@ -181,16 +176,14 @@ def getPhasesDuration(events):
             if next[3] == '5':
                 phasesDuration.append((next[4], '5', order, 0, next[5], next[5], next[0], next[0]))
                 return phasesDuration
-        i = i + 1
     return phasesDuration
 
 # return states duration.
 def getStatesDuration(events):
     statesDuration = []
-    i = 0
     firstEvent = events[0]
     order = 1
-    while i < len(events) - 1:
+    for i in range(len(events) - 1):
         curr = events[i]
         next = events[i + 1]
         if next[2] != curr[2]:
@@ -201,7 +194,6 @@ def getStatesDuration(events):
             if next[3] == '5':
                 statesDuration.append((next[4], next[6], next[2], order, 0, next[5], next[5], next[0], next[0]))
                 return statesDuration
-        i = i + 1
     return statesDuration
 
 # return court hearings duration.
@@ -283,14 +275,13 @@ def getProcessesDuration(events):
 
 # return how much finished process is like to unfinished one and duration of the finished process.
 def getLikeness(unfinished, finished):
-    i = 0
     likeness = 0
     l1 = len(unfinished[1])
     l2 = len(finished[1])
     maxPos = 0
     if l1 >= l2:
         return [0, 0, 0, 0]
-    while i < l1:
+    for i in range(l1):
         k = 0
         start = True
         end = True
@@ -316,7 +307,6 @@ def getLikeness(unfinished, finished):
         else:
             likeness -= 1
         likeness = likeness / (i + 1)
-        i = i + 1
     return [likeness * 100, finished[1][maxPos][1], finished[0], finished[2]]
 
 # return  how much finished process is like to unfinished one and predicted duration.

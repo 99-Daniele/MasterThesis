@@ -8,7 +8,7 @@ def refreshData():
     import utils.DataUpdate as update
     import utils.Getters as getter
     connection = connect.getDatabaseConnection()
-    update.refreshData(connection)
+    #update.refreshData(connection)
     print("Database updated!")
     getter.updateCache()
 
@@ -75,21 +75,12 @@ def displayStateComparation():
     ])
     app.run_server(debug = True)
 
-# display processes duration graph.    
-def displayProcessDuration():
-    import pages.DurationGraph.ProcessDuration as processDurationPage
+# display events comparation graph.
+def displayEventComparation():
+    import pages.ComparationGraph.EventComparation as eventComparationPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
-        ds.html.Div(children = processDurationPage.pageLayout())
-    ])
-    app.run_server(debug = True)
-    
-# display processes court hearings graph.   
-def displayCourtHearingsDuration():
-    import pages.DurationGraph.CourtHearingsDuration as courtHearingsDurationPage
-    app = ds.Dash(__name__, suppress_callback_exceptions = True)
-    app.layout = ds.html.Div([
-        ds.html.Div(children = courtHearingsDurationPage.pageLayout())
+        ds.html.Div(children = eventComparationPage.pageLayout())
     ])
     app.run_server(debug = True)
 
@@ -100,4 +91,4 @@ def startApp():
 
 # action performed by main.
 if __name__ == '__main__':
-    displayProcessComparation()
+    displayStateComparation()

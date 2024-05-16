@@ -6,14 +6,11 @@ def start():
 
     import pages.Home as homePage
     import pages.Comparation as comparationPage
-    import pages.Duration as durationPage
     import pages.Event as eventPage
     import pages.ComparationGraph.EventComparation as eventComparationPage
     import pages.ComparationGraph.PhaseComparation as phaseComparationPage
     import pages.ComparationGraph.ProcessComparation as processComparationPage
     import pages.ComparationGraph.StateComparation as stateComparationPage
-    import pages.DurationGraph.CourtHearingsDuration as courtHearingsDurationPage
-    import pages.DurationGraph.ProcessDuration as processDurationPage
     import pages.EventGraph.AllEvents as allEventsPage
     import pages.EventGraph.ImportantEvents as importantEventsPage
     import pages.EventGraph.PhaseEvents as phaseEventsPage
@@ -32,8 +29,6 @@ def start():
         match pathname:
             case '/comparationgraph':
                 return comparationPage.pageLayout()
-            case '/durationgraph':
-                return durationPage.pageLayout()
             case '/eventgraph':
                 return eventPage.pageLayout()
             case '/comparationgraph/eventcomparation':
@@ -44,10 +39,6 @@ def start():
                 return processComparationPage.pageLayout()
             case '/comparationgraph/statecomparation':
                 return stateComparationPage.pageLayout()
-            case '/durationgraph/courthearingsduration':
-                return courtHearingsDurationPage.pageLayout()
-            case '/durationgraph/processduration':
-                return processDurationPage.pageLayout()
             case '/eventgraph/allevents':
                 return allEventsPage.pageLayout()
             case '/eventgraph/importantevents':
