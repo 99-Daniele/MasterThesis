@@ -7,22 +7,23 @@ import utils.Dataframe as frame
 import utils.Utilities.Utilities as utilities
 
 # update types based on current dataframe.
-def updateTypes(df):
+def updateTypes(df, sectionTag, subjectTag, judgeTag, countTag):
     df_temp = df.copy()
-    sections = frame.getGroupBy(df_temp, 'sezione', 'conteggio')
-    subjects = frame.getGroupBy(df_temp, 'materia', 'conteggio')
-    judges = frame.getGroupBy(df_temp, 'giudice', 'conteggio')
+    sections = frame.getGroupBy(df_temp, sectionTag, countTag)
+    subjects = frame.getGroupBy(df_temp, subjectTag, countTag)
+    judges = frame.getGroupBy(df_temp, judgeTag, countTag)
     return [sections, subjects, judges]
 
 # update types based on user selections.
-def updateTypesBySelection(df, sections, subjects, judges):
+def updateTypesBySelection(df, processDateTag, sectionTag, subjectTag, judgeTag, startDate, endDate, sections, subjects, judges):
     df_temp = df.copy()
+    df_temp = frame.getDateDataFrame(df_temp, processDateTag, startDate, endDate)
     if sections != None and len(sections) > 0:
-        df_temp = frame.getTypesDataFrame(df_temp, 'sezione', sections)
+        df_temp = frame.getTypesDataFrame(df_temp, sectionTag, sections)
     if subjects != None and len(subjects) > 0:
-        df_temp = frame.getTypesDataFrame(df_temp, 'materia', subjects)
+        df_temp = frame.getTypesDataFrame(df_temp, subjectTag, subjects)
     if judges != None and len(judges) > 0:
-        df_temp = frame.getTypesDataFrame(df_temp, 'giudice', judges)
+        df_temp = frame.getTypesDataFrame(df_temp, judgeTag, judges)
     return df_temp
 
 # return all needed parameters in order to change graph after any user choice.
@@ -31,10 +32,16 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         startDate = minDate
         endDate = maxDate
-    df_temp = frame.getDateDataFrame(df_temp, 'dataInizioProcesso', startDate, endDate)
-    df_temp = updateTypesBySelection(df, sections, subjects, judges)
-    [sections, subjects, judges] = updateTypes(df_temp)
-    fig = px.scatter(df_temp, x = "data", y = "numProcesso", color = type, color_discrete_sequence = utilities.phaseColorList(df_temp, type), labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = utilities.getWidth(1))
+    dateTag = df.columns[0]
+    numProcessTag = df.columns[1]
+    processDateTag = df.columns[5]
+    sectionTag = df.columns[8]
+    subjectTag = df.columns[9]
+    judgeTag = df.columns[7]
+    countTag = 'conteggio'
+    df_temp = updateTypesBySelection(df_temp, processDateTag, sectionTag, subjectTag, judgeTag, startDate, endDate, sections, subjects, judges)
+    [sections, subjects, judges] = updateTypes(df_temp, sectionTag, subjectTag, judgeTag, countTag)
+    fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_sequence = utilities.phaseColorList(df_temp, type), labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = utilities.getWidth(1))
     fig.update_layout(
         legend = dict(
             yanchor = "top",

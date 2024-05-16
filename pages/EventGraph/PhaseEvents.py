@@ -21,51 +21,58 @@ except:
 
 # return initial layout of page.
 def pageLayout():
-    sections = frame.getGroupBy(df, 'sezione', 'conteggio')
-    subjects = frame.getGroupBy(df, 'materia', 'conteggio')
-    judges = frame.getGroupBy(df, 'giudice', 'conteggio')
-    maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
+    dateTag = df.columns[0]
+    numProcessTag = df.columns[1]
+    eventTag = df.columns[3]
+    sectionTag = df.columns[8]
+    subjectTag = df.columns[9]
+    judgeTag = df.columns[7]
+    countTag = 'conteggio'
+    maxYear = dt.datetime.strptime(df[dateTag].max(), '%Y-%m-%d %H:%M:%S').year
     maxDateStart = dt.date(maxYear - 1, 1, 1)
     maxDateEnd = dt.date(maxYear, 1, 1)
-    fig = px.scatter(df, x = "data", y = "numProcesso", color = 'evento', labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 1200)
+    sections = frame.getGroupBy(df, sectionTag, countTag)
+    subjects = frame.getGroupBy(df, subjectTag, countTag)
+    judges = frame.getGroupBy(df, judgeTag, countTag)
+    fig = px.scatter(df, x = dateTag, y = numProcessTag, color = eventTag, labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = 1400, height = 1200)
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
         ds.dcc.Link('Grafici eventi', href='/eventgraph'),
-        ds.html.H2('EVENTI INIZIO FASI DEL PROCESSO'),
+        ds.html.H2('TUTTI GLI EVENTI DEL PROCESSO'),
         ds.dcc.DatePickerRange(
-            id = 'event-dateranger-pe',
+            id = 'event-dateranger-phe',
             start_date = maxDateStart,
             end_date = maxDateEnd,
-            min_date_allowed = df['data'].min(),
-            max_date_allowed = df['data'].max(),
+            min_date_allowed = df[dateTag].min(),
+            max_date_allowed = df[dateTag].max(),
             display_format = 'DD MM YYYY',
             style = {'width': 300}
         ),
-        ds.html.Button("RESET", id = "reset-button-pe"),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-pe', placeholder = 'SEZIONE', style = {'width': 285}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-pe', placeholder = 'MATERIA', style = {'width': 285}, optionHeight = 80),
-        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-pe', placeholder = 'GIUDICE', style = {'width': 285}),
-        ds.dcc.Graph(figure = fig, id = 'events-graph-pe')
+        ds.html.Button("RESET", id = 'reset-button-phe'),
+        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-phe', placeholder = 'SEZIONE', style = {'width': 400}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-phe', placeholder = 'MATERIA', style = {'width': 400}, optionHeight = 80),
+        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-phe', placeholder = 'GIUDICE', style = {'width': 400}),
+        ds.dcc.Graph(figure = fig, id = 'events-graph-phe')
     ])
     return layout
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('events-graph-pe', 'figure'),
-        ds.Output('event-dateranger-pe', 'start_date'), 
-        ds.Output('event-dateranger-pe', 'end_date'),
-        ds.Output('section-dropdown-pe', 'options'),
-        ds.Output('subject-dropdown-pe', 'options'),
-        ds.Output('judge-dropdown-pe', 'options')],
-    [ds.Input('event-dateranger-pe', 'start_date'), 
-        ds.Input('event-dateranger-pe', 'end_date'), 
-        ds.Input('event-dateranger-pe', 'min_date_allowed'), 
-        ds.Input('event-dateranger-pe', 'max_date_allowed'), 
-        ds.Input('reset-button-pe', 'n_clicks'),
-        ds.Input('section-dropdown-pe', 'value'),
-        ds.Input('subject-dropdown-pe', 'value'),
-        ds.Input('judge-dropdown-pe', 'value')])
+    [ds.Output('events-graph-phe', 'figure'),
+        ds.Output('event-dateranger-phe', 'start_date'), 
+        ds.Output('event-dateranger-phe', 'end_date'),
+        ds.Output('section-dropdown-phe', 'options'),
+        ds.Output('subject-dropdown-phe', 'options'),
+        ds.Output('judge-dropdown-phe', 'options')],
+    [ds.Input('event-dateranger-phe', 'start_date'), 
+        ds.Input('event-dateranger-phe', 'end_date'), 
+        ds.Input('event-dateranger-phe', 'min_date_allowed'), 
+        ds.Input('event-dateranger-phe', 'max_date_allowed'), 
+        ds.Input('reset-button-phe', 'n_clicks'),
+        ds.Input('section-dropdown-phe', 'value'),
+        ds.Input('subject-dropdown-phe', 'value'),
+        ds.Input('judge-dropdown-phe', 'value')])
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):

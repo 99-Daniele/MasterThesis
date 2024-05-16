@@ -91,4 +91,4 @@ def startApp():
 
 # action performed by main.
 if __name__ == '__main__':
-    startApp()
+    displayStateEvents()

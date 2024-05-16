@@ -246,10 +246,14 @@ def getAvgTotDataframe(df, order_dict, avgChoice, dateTag, durationTag, countTag
         df = df1[df1[dateTag] == row[dateTag]]
         df = df[df[durationTag] <= row[durationTag]]
         df3 = pd.concat([df3, df], ignore_index = True)
+    df3 = df3.sort_values([dateTag]).reset_index(drop = True)
     df2 = df3.groupby([dateTag]) \
         .agg({durationTag:avgChoice, countTag: 'sum'}) \
         .reset_index()
     df2 = df2.sort_values([dateTag]).reset_index(drop = True)
+    print(df3)
+    exit()
+    print(df2)
     return [df3, df2]
 
 # return data group by chosen data type and types.

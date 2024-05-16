@@ -21,5 +21,6 @@
 
 - disponibile per accesso esterno --> descrizione readme
 - migliorare grafico --> piu carino da vedere
+- dimensione grafici
 
 

@@ -20,13 +20,20 @@ except:
 
 # return initial layout of page.
 def pageLayout():
-    maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
+    dateTag = df.columns[0]
+    numProcessTag = df.columns[1]
+    eventTag = df.columns[3]
+    sectionTag = df.columns[8]
+    subjectTag = df.columns[9]
+    judgeTag = df.columns[7]
+    countTag = 'conteggio'
+    maxYear = dt.datetime.strptime(df[dateTag].max(), '%Y-%m-%d %H:%M:%S').year
     maxDateStart = dt.date(maxYear - 1, 1, 1)
     maxDateEnd = dt.date(maxYear, 1, 1)
-    sections = frame.getGroupBy(df, 'sezione', 'conteggio')
-    subjects = frame.getGroupBy(df, 'materia', 'conteggio')
-    judges = frame.getGroupBy(df, 'giudice', 'conteggio')
-    fig = px.scatter(df, x = "data", y = "numProcesso", color = 'evento', labels = {'numProcesso':'Codice Processo', 'data':'Data inizio processo'}, width = 1400, height = 1200)
+    sections = frame.getGroupBy(df, sectionTag, countTag)
+    subjects = frame.getGroupBy(df, subjectTag, countTag)
+    judges = frame.getGroupBy(df, judgeTag, countTag)
+    fig = px.scatter(df, x = dateTag, y = numProcessTag, color = eventTag, labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = 1400, height = 1200)
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
@@ -36,15 +43,15 @@ def pageLayout():
             id = 'event-dateranger-ae',
             start_date = maxDateStart,
             end_date = maxDateEnd,
-            min_date_allowed = df['data'].min(),
-            max_date_allowed = df['data'].max(),
+            min_date_allowed = df[dateTag].min(),
+            max_date_allowed = df[dateTag].max(),
             display_format = 'DD MM YYYY',
             style = {'width': 300}
         ),
-        ds.html.Button("RESET", id = "reset-button-ae"),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-ae', placeholder = 'SEZIONE', style = {'width': 285}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-ae', placeholder = 'MATERIA', style = {'width': 285}, optionHeight = 80),
-        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-ae', placeholder = 'GIUDICE', style = {'width': 285}),
+        ds.html.Button("RESET", id = 'reset-button-ae'),
+        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-ae', placeholder = 'SEZIONE', style = {'width': 400}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-ae', placeholder = 'MATERIA', style = {'width': 400}, optionHeight = 80),
+        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-ae', placeholder = 'GIUDICE', style = {'width': 400}),
         ds.dcc.Graph(figure = fig, id = 'events-graph-ae')
     ])
     return layout
