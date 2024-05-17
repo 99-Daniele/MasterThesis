@@ -4,8 +4,6 @@
 
 - filtro quando un evento particolare avviene? (fase, stato)
 - nomi in inglese
-- df_temp e df
-- df1, df2, df_data nomi migliori
 
 - verifica valore predetto
 - valore predetto sulla base di giudice, materia, sezione, data, carico processi giudice in quel momento
@@ -22,5 +20,7 @@
 - disponibile per accesso esterno --> descrizione readme
 - migliorare grafico --> piu carino da vedere
 - dimensione grafici
+- df_temp e df
+- df1, df2, df_data nomi migliori
 
 

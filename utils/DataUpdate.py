@@ -5,6 +5,7 @@ from alive_progress import alive_bar
 import utils.Database.DatabaseConnection as connect
 import utils.FileOperation as file
 import utils.Getters as getter
+import utils.Prediction as prediction
 import utils.Utilities.Utilities as utilities
 
 # refresh current database data. 
@@ -49,20 +50,24 @@ def getDurations(events, courtHearingsType, maxDate):
     phasesDuration = []
     statesDuration = []
     courtHearingsDuration = []
-    processSequences = []
-    processDuration = []
+    processesSequences = []
+    processesDuration = []
     originalSequenceDict = {}
     translatedSequenceDict = {}
     shortSequenceDict = {}
     phaseSequenceDict = {}
     eventSequenceDict = {}
+    finishedProcesses = []
     unfinishedProcesses = []
     endPhase = '4'
-    with alive_bar(int(len(events))) as bar:
-        for i in range(len(events)):
+    with alive_bar(int(len(events) / 4)) as bar:
+        for i in range(int(len(events) / 4)):
             if events[i][4] != processId:
                 firstEventId = events[i][0]
                 firstEventDate = events[i][5]
+                processJudge = events[i][8]
+                processSubject = events[i][9]
+                processSection = events[i][10]
                 [processEventsDuration, filteredEvents] = getEventsDuration(processEvents, maxDate, endPhase)
                 if len(filteredEvents) > 0:
                     eventsDuration = eventsDuration + processEventsDuration
@@ -70,17 +75,21 @@ def getDurations(events, courtHearingsType, maxDate):
                     statesDuration = statesDuration + getStatesDuration(filteredEvents, endPhase)
                     [processSequence, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence, finished] = getProcessesSequence(filteredEvents, endPhase)
                     courtHearingsDuration = courtHearingsDuration + getCourtHearingsDuration(filteredEvents, courtHearingsType, processSequence, '2')
-                    processSequences = processSequences + processSequence
+                    processesSequences = processesSequences + processSequence
                     if finished:
-                        processDuration = processDuration + getProcessesDuration(filteredEvents)
-                        addToDict(originalSequence, originalSequenceDict)
-                        addToDict(translatedSequence, translatedSequenceDict)
-                        addToDict(shortSequence, shortSequenceDict)
-                        addToDict(phaseSequence, phaseSequenceDict)
-                        addToDict(eventSequence, eventSequenceDict)
+                        processDuration = getProcessesDuration(filteredEvents)
+                        processesDuration = processesDuration + processDuration
+                        #finishedProcesses.append([processDuration[0][0], processDuration[0][1], processDuration[0][2], events[i][8], events[i][9], events[i][10], originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence])
+                        finishedProcesses.append([processId, processDuration[0][1], firstEventDate, processJudge, processSubject, processSection])
+                        #addToDict(originalSequence, originalSequenceDict)
+                        #addToDict(translatedSequence, translatedSequenceDict)
+                        #addToDict(shortSequence, shortSequenceDict)
+                        #addToDict(phaseSequence, phaseSequenceDict)
+                        #addToDict(eventSequence, eventSequenceDict)
                     else:
                         if int(processSequence[0][5][-1]) > 2:
-                            unfinishedProcesses.append([processId, firstEventDate, firstEventId, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence])
+                            #unfinishedProcesses.append([processId, firstEventDate, firstEventId, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence])
+                            unfinishedProcesses.append([processId, firstEventDate, processJudge, processSubject, processSection])
                 processEvents = []
                 processId = events[i][4]
             else:
@@ -88,9 +97,10 @@ def getDurations(events, courtHearingsType, maxDate):
             bar()
     with alive_bar(int(len(unfinishedProcesses))) as bar:
         for p in unfinishedProcesses:
-            processDuration = processDuration + getPredictedDuration(p, originalSequenceDict, translatedSequenceDict, shortSequenceDict, phaseSequenceDict, eventSequenceDict)
+            prediction.predictDuration(finishedProcesses, p)
+            #processesDuration = processesDuration + getPredictedDuration(p, originalSequenceDict, translatedSequenceDict, shortSequenceDict, phaseSequenceDict, eventSequenceDict)
             bar()
-    return [eventsDuration, phasesDuration, statesDuration, processDuration, courtHearingsDuration, processSequences]
+    return [eventsDuration, phasesDuration, statesDuration, processesDuration, courtHearingsDuration, processesSequences]
 
 # add sequence to dictionary.
 # if sequence already exists, update means values, otherwise add to dictonary.
