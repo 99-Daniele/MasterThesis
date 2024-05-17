@@ -218,23 +218,23 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, eventChoice, dateTag, durationTag, eventsTag, eventTag, countTag, avgTag, filterTag)
         xticks = frame.getUniques(allData, dateTag)
         if text == ['TESTO']:
-            fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(infoData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+            fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
             fig.add_traces(
                 px.line(typeData, x = dateTag, y = durationTag, text = countTag, color = filterTag, markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
             )
         else:
-            fig = px.line(allData, x = dateTag, y = durationTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(infoData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+            fig = px.line(allData, x = dateTag, y = durationTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
             fig.add_traces(
                 px.line(typeData, x = dateTag, y = durationTag, color = filterTag, markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
             )
         fig.for_each_trace(
-            lambda t: t.update(name = frame.addCountToName(infoData, t.name, filterTag, countTag)) if t.name != frame.addTotCountToName(infoData, countTag) else False
+            lambda t: t.update(name = frame.addCountToName(infoData, t.name, filterTag, countTag)) if t.name != frame.addTotCountToName(allData, countTag) else False
         )
         fig.for_each_trace(
             lambda t: t.update(textfont_color = t.line.color, textposition = "top center", textfont_size = 14)
         )
         fig.update_layout(xaxis_tickvals = xticks)
-        fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != frame.addTotCountToName(infoData, countTag) else False))
+        fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != frame.addTotCountToName(allData, countTag) else False))
         fig.update_xaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
         fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
         return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choicesOptions
@@ -309,23 +309,23 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
             [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_temp, avgChoice, dateType, choices, order, None, dateTag, durationTag, None, None, countTag, avgTag, filterTag)
             xticks = frame.getUniques(allData, dateTag)
             if text == ['TESTO']:
-                fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(infoData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+                fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
                 fig.add_traces(
                     px.line(typeData, x = dateTag, y = durationTag, text = countTag, color = filterTag, markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
                 )
             else:
-                fig = px.line(allData, x = dateTag, y = durationTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(infoData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+                fig = px.line(allData, x = dateTag, y = durationTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
                 fig.add_traces(
                     px.line(typeData, x = dateTag, y = durationTag, color = filterTag, markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
                 )
             fig.for_each_trace(
-                lambda t: t.update(name = frame.addCountToName(infoData, t.name, filterTag, countTag)) if t.name != frame.addTotCountToName(infoData, countTag) else False
+                lambda t: t.update(name = frame.addCountToName(infoData, t.name, filterTag, countTag)) if t.name != frame.addTotCountToName(allData, countTag) else False
             )
             fig.for_each_trace(
                 lambda t: t.update(textfont_color = t.line.color, textposition = "top center", textfont_size = 14)
             )
             fig.update_layout(xaxis_tickvals = xticks)
-            fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != frame.addTotCountToName(infoData, countTag) else False))
+            fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != frame.addTotCountToName(allData, countTag) else False))
             fig.update_xaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
             fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
             return fig, startDate, endDate, dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, title

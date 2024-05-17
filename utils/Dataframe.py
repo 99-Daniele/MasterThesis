@@ -240,21 +240,11 @@ def getAvgTotDataframe(df, order_dict, avgChoice, dateTag, durationTag, countTag
     df1[countTag] = df.groupby([dateTag, filterTag]).size().tolist()
     df1['sort_column'] = df1[filterTag].map(order_dict)
     df1 = df1.sort_values(['sort_column', dateTag], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
-    df_q = df1.groupby([dateTag], as_index = False)[durationTag].quantile(0.75)
-    df3 = df1.iloc[:0,:].copy()
-    for i, row in df_q.iterrows():
-        df = df1[df1[dateTag] == row[dateTag]]
-        df = df[df[durationTag] <= row[durationTag]]
-        df3 = pd.concat([df3, df], ignore_index = True)
-    df3 = df3.sort_values([dateTag]).reset_index(drop = True)
-    df2 = df3.groupby([dateTag]) \
-        .agg({durationTag:avgChoice, countTag: 'sum'}) \
+    df2 = df1.groupby([dateTag]) \
+        .agg({countTag: 'sum', durationTag:avgChoice}) \
         .reset_index()
     df2 = df2.sort_values([dateTag]).reset_index(drop = True)
-    print(df3)
-    exit()
-    print(df2)
-    return [df3, df2]
+    return [df1, df2]
 
 # return data group by chosen data type and types.
 def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoice, dateTag, durationTag, eventsTag, eventTag, countTag, avgTag, filterTag):
@@ -460,14 +450,14 @@ def getUniques(df, tag):
     return uniques
 
 # returns a string with input name followed by how many times is present in the dataframe.
-def addCountToName(df, name, filterColumn, countColumn):
-    count = df[df[filterColumn].astype(str) == name][countColumn].item()
+def addCountToName(df, name, filterTag, countTag):
+    count = df[df[filterTag].astype(str) == name][countTag].item()
     newName = name + " (" + str(count) + ")"
     newName = '<br>'.join(textwrap.wrap(newName, width = 50))
     return newName
 
 # returns a string with total sum of counts in dataframe.
-def addTotCountToName(df, countColumn):
-    totCount = df[countColumn].sum()
+def addTotCountToName(df, countTag):
+    totCount = df[countTag].sum()
     newName = "TUTTI (" + str(totCount) + ")"
     return newName

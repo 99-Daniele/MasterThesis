@@ -201,7 +201,7 @@ def getStatesDuration(events, endPhase):
 def getCourtHearingsDuration(events, courtHearingsType, processSequence, minPhase):
     firstEvent = None
     lastEvent = None
-    if processSequence[0][5][-1].isdigit and int(processSequence[0][5][-1]) > minPhase:
+    if processSequence[0][5][-1].isdigit and int(processSequence[0][5][-1]) > int(minPhase):
         return []
     for e in events:
         if e[1] in courtHearingsType:
