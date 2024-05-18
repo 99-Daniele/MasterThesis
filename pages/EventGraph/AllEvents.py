@@ -7,7 +7,7 @@ import plotly.express as px
 import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.Getters as getter
-import utils.Graph.EventsGraph as event
+import utils.graph.EventsGraph as event
 
 # get dataframe with all events. 
 # get maxYear as the maximum year belong dataframe events and calc maxDateStart and maxDateEnd as the first and last date of the maximun 1-year interval.

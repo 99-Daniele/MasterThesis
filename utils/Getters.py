@@ -1,7 +1,7 @@
 # this file handles data getters.
 
 import cache.Cache as cache
-import utils.Database.DatabaseConnection as connect
+import utils.database.DatabaseConnection as connect
 import utils.Dataframe as frame
 import utils.FileOperation as file
 

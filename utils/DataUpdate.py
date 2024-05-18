@@ -2,11 +2,11 @@
 
 from alive_progress import alive_bar
 
-import utils.Database.DatabaseConnection as connect
+import utils.database.DatabaseConnection as connect
 import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Prediction as prediction
-import utils.Utilities.Utilities as utilities
+import utils.utilities.Utilities as utilities
 
 # refresh current database data. 
 # calcs event, phases, states, process, courtHearing durations, comprare with current database data and in case update them.
@@ -60,8 +60,8 @@ def getDurations(events, courtHearingsType, maxDate):
     finishedProcesses = []
     unfinishedProcesses = []
     endPhase = '4'
-    with alive_bar(int(len(events) / 4)) as bar:
-        for i in range(int(len(events) / 4)):
+    with alive_bar(int(len(events) / 10)) as bar:
+        for i in range(int(len(events) / 10)):
             if events[i][4] != processId:
                 firstEventId = events[i][0]
                 firstEventDate = events[i][5]

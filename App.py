@@ -7,14 +7,14 @@ def start():
     import pages.Home as homePage
     import pages.Comparation as comparationPage
     import pages.Event as eventPage
-    import pages.ComparationGraph.EventComparation as eventComparationPage
-    import pages.ComparationGraph.PhaseComparation as phaseComparationPage
-    import pages.ComparationGraph.ProcessComparation as processComparationPage
-    import pages.ComparationGraph.StateComparation as stateComparationPage
-    import pages.EventGraph.AllEvents as allEventsPage
-    import pages.EventGraph.ImportantEvents as importantEventsPage
-    import pages.EventGraph.PhaseEvents as phaseEventsPage
-    import pages.EventGraph.StateEvents as stateEventsPage
+    import pages.comparationGraph.EventComparation as eventComparationPage
+    import pages.comparationGraph.PhaseComparation as phaseComparationPage
+    import pages.comparationGraph.ProcessComparation as processComparationPage
+    import pages.comparationGraph.StateComparation as stateComparationPage
+    import pages.eventGraph.AllEvents as allEventsPage
+    import pages.eventGraph.ImportantEvents as importantEventsPage
+    import pages.eventGraph.PhaseEvents as phaseEventsPage
+    import pages.eventGraph.StateEvents as stateEventsPage
 
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([

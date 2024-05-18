@@ -6,7 +6,7 @@ import plotly.express as px
 
 import utils.Dataframe as frame
 import utils.Getters as getter
-import utils.Graph.ComparationGraph as comparation
+import utils.graph.ComparationGraph as comparation
 
 # get dataframe with all events duration.
 df = getter.getEventsDuration()

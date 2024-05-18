@@ -139,3 +139,20 @@ def getWidth(perc):
 def getHeight(perc):
     height = GetSystemMetrics(1)
     return height * perc
+
+def fromAlphanumericStringToInt(string):
+    translation = file.getDataFromJsonFile('cache/translation.json')
+    if translation == {}:
+        translation = {string: 1}
+        file.writeOnJsonFile('cache/translation.json', translation)
+        return 1
+    else:
+        number = translation.get(string)
+        if number == None:
+            last = sorted(translation.values())[-1]
+            translation.update({string: last + 1})
+            file.writeOnJsonFile('cache/translation.json', translation)
+            return last + 1
+        else:
+            return number
+

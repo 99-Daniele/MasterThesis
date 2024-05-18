@@ -5,7 +5,7 @@ import pandas as pd
 import textwrap
 
 import utils.FileOperation as file
-import utils.Utilities.Utilities as utilities
+import utils.utilities.Utilities as utilities
 
 # importantProcessStates and importantSections are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
 try:

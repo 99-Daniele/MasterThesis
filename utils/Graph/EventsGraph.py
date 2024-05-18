@@ -4,7 +4,7 @@ import dash as ds
 import plotly.express as px
 
 import utils.Dataframe as frame
-import utils.Utilities.Utilities as utilities
+import utils.utilities.Utilities as utilities
 
 # update types based on current dataframe.
 def updateTypes(df, sectionTag, subjectTag, judgeTag, countTag):

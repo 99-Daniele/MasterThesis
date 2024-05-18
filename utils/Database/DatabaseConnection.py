@@ -5,7 +5,7 @@ import mysql.connector as cnx
 import os
 
 import utils.FileOperation as file
-import utils.Utilities.Utilities as utilities
+import utils.utilities.Utilities as utilities
 
 # return connection based on given host, username, password and database name. 
 def connectToDatabase(h, usr, psw, db):

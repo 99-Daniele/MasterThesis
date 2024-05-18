@@ -5,7 +5,7 @@ import plotly.express as px
 
 import utils.Dataframe as frame
 import utils.Getters as getter
-import utils.Utilities.Utilities as utilities
+import utils.utilities.Utilities as utilities
 
 # hide page components if user select it.
 def hideChosen(choices, tags, styles, parameters):

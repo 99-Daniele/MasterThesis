@@ -4,7 +4,7 @@ import dash as ds
 
 # refresh database and cache data.
 def refreshData():
-    import utils.Database.DatabaseConnection as connect
+    import utils.database.DatabaseConnection as connect
     import utils.DataUpdate as update
     import utils.Getters as getter
     connection = connect.getDatabaseConnection()
@@ -14,7 +14,7 @@ def refreshData():
 
 # display all events.
 def displayAllEvents():
-    import pages.EventGraph.AllEvents as allEventsPage
+    import pages.eventGraph.AllEvents as allEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = allEventsPage.pageLayout())
@@ -23,7 +23,7 @@ def displayAllEvents():
 
 # display important events.
 def displayImportantEvents():
-    import pages.EventGraph.ImportantEvents as importantEventsPage
+    import pages.eventGraph.ImportantEvents as importantEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = importantEventsPage.pageLayout())
@@ -32,7 +32,7 @@ def displayImportantEvents():
 
 # display phase events.
 def displayPhaseEvents():
-    import pages.EventGraph.PhaseEvents as phaseEventsPage
+    import pages.eventGraph.PhaseEvents as phaseEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = phaseEventsPage.pageLayout())
@@ -41,7 +41,7 @@ def displayPhaseEvents():
 
 # display state events.
 def displayStateEvents():
-    import pages.EventGraph.StateEvents as stateEventsPage
+    import pages.eventGraph.StateEvents as stateEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = stateEventsPage.pageLayout())
@@ -50,7 +50,7 @@ def displayStateEvents():
 
 # display processes comparation graph.
 def displayProcessComparation():
-    import pages.ComparationGraph.ProcessComparation as processComparationPage
+    import pages.comparationGraph.ProcessComparation as processComparationPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = processComparationPage.pageLayout())
@@ -59,7 +59,7 @@ def displayProcessComparation():
 
 # display phases comparation graph.
 def displayPhaseComparation():
-    import pages.ComparationGraph.PhaseComparation as phaseComparationPage
+    import pages.comparationGraph.PhaseComparation as phaseComparationPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = phaseComparationPage.pageLayout())
@@ -68,7 +68,7 @@ def displayPhaseComparation():
 
 # display states comparation graph.
 def displayStateComparation():
-    import pages.ComparationGraph.StateComparation as stateComparationPage
+    import pages.comparationGraph.StateComparation as stateComparationPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = stateComparationPage.pageLayout())
@@ -77,7 +77,7 @@ def displayStateComparation():
 
 # display events comparation graph.
 def displayEventComparation():
-    import pages.ComparationGraph.EventComparation as eventComparationPage
+    import pages.comparationGraph.EventComparation as eventComparationPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = eventComparationPage.pageLayout())

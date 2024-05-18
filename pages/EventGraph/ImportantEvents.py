@@ -7,7 +7,7 @@ import plotly.express as px
 import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.Getters as getter
-import utils.Graph.EventsGraph as event
+import utils.graph.EventsGraph as event
 
 # get dataframe with important events. 
 # get sections, subject, judges based on dataframe events.
