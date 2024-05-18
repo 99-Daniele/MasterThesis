@@ -140,18 +140,26 @@ def getHeight(perc):
     height = GetSystemMetrics(1)
     return height * perc
 
-def fromAlphanumericStringToInt(string):
-    translation = file.getDataFromJsonFile('cache/translation.json')
+# return date distance to current day.
+def distanceAtToday(date):
+    date = date.to_pydatetime()
+    todayDate = dt.datetime.today().strftime('%d-%m-%Y')
+    todayDate = dt.datetime.strptime(todayDate, '%d-%m-%Y')
+    return abs((date - todayDate).days)
+
+# translate alphanumeric string to integer.
+def fromAlphanumericStringToInt(string, filename):
+    translation = file.getDataFromJsonFile(filename)
     if translation == {}:
         translation = {string: 1}
-        file.writeOnJsonFile('cache/translation.json', translation)
+        file.writeOnJsonFile(filename, translation)
         return 1
     else:
         number = translation.get(string)
         if number == None:
             last = sorted(translation.values())[-1]
             translation.update({string: last + 1})
-            file.writeOnJsonFile('cache/translation.json', translation)
+            file.writeOnJsonFile(filename, translation)
             return last + 1
         else:
             return number
