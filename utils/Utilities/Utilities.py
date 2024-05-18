@@ -142,7 +142,6 @@ def getHeight(perc):
 
 # return date distance to current day.
 def distanceAtToday(date):
-    date = date.to_pydatetime()
     todayDate = dt.datetime.today().strftime('%d-%m-%Y')
     todayDate = dt.datetime.strptime(todayDate, '%d-%m-%Y')
     return abs((date - todayDate).days)
