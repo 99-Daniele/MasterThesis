@@ -1,6 +1,8 @@
 # this file handles the update of database data.
 
 from alive_progress import alive_bar
+import random as rd
+from sklearn.metrics import accuracy_score
 
 import utils.database.DatabaseConnection as connect
 import utils.FileOperation as file
@@ -12,13 +14,14 @@ import utils.utilities.Utilities as utilities
 # calcs event, phases, states, process, courtHearing durations, comprare with current database data and in case update them.
 def refreshData(connection):
     verifyDatabase(connection)
+    minDate = getter.getMinDate()
     maxDate = getter.getMaxDate()
     events = getter.getEvents()
     courtHearingsEventsType = str(tuple(file.getDataFromTextFile('preferences/courtHearingsEvents.txt')))
     eventsFiltered = []
     for e in events:
         eventsFiltered.append((e[0], e[1], e[6], e[3]))
-    [eventsDuration, phasesDuration, statesDuration, processDuration, courtHearingsDuration, processSequence] = getDurations(events, courtHearingsEventsType, maxDate)
+    [eventsDuration, phasesDuration, statesDuration, processDuration, courtHearingsDuration, processSequence] = getDurations(events, courtHearingsEventsType, minDate, maxDate)
     eventsFiltered.sort(key = lambda x: x[0])
     eventsDuration.sort(key = lambda x: x[0])
     phasesDuration.sort(key = lambda x: [x[0], x[2]])
@@ -43,9 +46,14 @@ def refreshData(connection):
 
 # return events, phases, process and court hearing durations based on events.
 # in case of unfinished processes predicts final duration.
-def getDurations(events, courtHearingsType, maxDate):
+def getDurations(events, courtHearingsType, minDate, maxDate):
     processEvents = []
     processId = events[0][4]
+    firstEventId = events[0][0]
+    firstEventDate = events[0][5]
+    processJudge = events[0][8]
+    processSubject = events[0][9]
+    processSection = events[0][10]
     eventsDuration = []
     phasesDuration = []
     statesDuration = []
@@ -60,14 +68,14 @@ def getDurations(events, courtHearingsType, maxDate):
     finishedProcesses = []
     unfinishedProcesses = []
     endPhase = '4'
-    with alive_bar(int(len(events) / 10)) as bar:
-        for i in range(int(len(events) / 10)):
+    numProcessTag = 'numProcesso'
+    durationTag = 'durata'
+    judgeTag = 'giudice'
+    subjectTag = 'materia'
+    sectionTag = 'sezione'
+    with alive_bar(int(len(events))) as bar:
+        for i in range(int(len(events))):
             if events[i][4] != processId:
-                firstEventId = events[i][0]
-                firstEventDate = events[i][5]
-                processJudge = events[i][8]
-                processSubject = events[i][9]
-                processSection = events[i][10]
                 [processEventsDuration, filteredEvents] = getEventsDuration(processEvents, maxDate, endPhase)
                 if len(filteredEvents) > 0:
                     eventsDuration = eventsDuration + processEventsDuration
@@ -79,8 +87,8 @@ def getDurations(events, courtHearingsType, maxDate):
                     if finished:
                         processDuration = getProcessesDuration(filteredEvents)
                         processesDuration = processesDuration + processDuration
-                        #finishedProcesses.append([processDuration[0][0], processDuration[0][1], processDuration[0][2], events[i][8], events[i][9], events[i][10], originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence])
-                        finishedProcesses.append([processId, processDuration[0][1], firstEventDate, processJudge, processSubject, processSection])
+                        finishedProcesses.append([processId, processDuration[0][1], firstEventDate, processJudge, processSubject, processSection, eventSequence])
+                        #finishedProcesses.append([processId, processDuration[0][1], firstEventDate, processJudge, processSubject, processSection])
                         #addToDict(originalSequence, originalSequenceDict)
                         #addToDict(translatedSequence, translatedSequenceDict)
                         #addToDict(shortSequence, shortSequenceDict)
@@ -88,17 +96,24 @@ def getDurations(events, courtHearingsType, maxDate):
                         #addToDict(eventSequence, eventSequenceDict)
                     else:
                         if int(processSequence[0][5][-1]) > 2:
-                            #unfinishedProcesses.append([processId, firstEventDate, firstEventId, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence])
-                            unfinishedProcesses.append([processId, firstEventDate, processJudge, processSubject, processSection])
+                            unfinishedProcesses.append([processId, firstEventDate, firstEventId, processJudge, processSubject, processSection, eventSequence, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence])
                 processEvents = []
                 processId = events[i][4]
+                firstEventId = events[i][0]
+                firstEventDate = events[i][5]
+                processJudge = events[i][8]
+                processSubject = events[i][9]
+                processSection = events[i][10]
             else:
                 processEvents.append(events[i])
-            bar()
+            bar() 
+    trainModel(finishedProcesses, minDate, maxDate)
+    #model = prediction.trainModel(finishedProcesses, numProcessTag, durationTag, 'dataInizioProcesso', judgeTag, subjectTag, sectionTag)
     with alive_bar(int(len(unfinishedProcesses))) as bar:
         for p in unfinishedProcesses:
-            prediction.predictDuration(finishedProcesses, p)
-            #processesDuration = processesDuration + getPredictedDuration(p, originalSequenceDict, translatedSequenceDict, shortSequenceDict, phaseSequenceDict, eventSequenceDict)
+            #prediction.predictDuration(model, p)
+            processDuration = getPredictedDuration(p, originalSequenceDict, translatedSequenceDict, shortSequenceDict, phaseSequenceDict, eventSequenceDict)
+            processesDuration = processesDuration + processDuration
             bar()
     return [eventsDuration, phasesDuration, statesDuration, processesDuration, courtHearingsDuration, processesSequences]
 
@@ -291,7 +306,7 @@ def getLikeness(unfinished, finished):
     l2 = len(finished[1])
     maxPos = 0
     if l1 >= l2:
-        return [0, 0, 0, 0]
+        return [0, 0, 0]
     for i in range(l1):
         k = 0
         start = True
@@ -318,54 +333,108 @@ def getLikeness(unfinished, finished):
         else:
             likeness -= 1
         likeness = likeness / (i + 1)
-    return [likeness * 100, finished[1][maxPos][1], finished[0], finished[2]]
+    return [likeness * 100, finished[1][maxPos][1], finished[0]]
 
 # return  how much finished process is like to unfinished one and predicted duration.
-def getLikenessDuration(unfinished, finished):
-    [like, duration, totDuration, count] = getLikeness(unfinished, finished)
+def getLikenessSequence(unfinished, finished):
+    [like, duration, totDuration] = getLikeness(unfinished, finished)
     if like == 0:
-        return [0, 0, 0]
+        return [0, 0]
     if duration == 0:
         predicted = unfinished[0]
     else:
         predicted = unfinished[0] + ((totDuration - duration) * unfinished[0] / duration)
-    return [like, predicted, count]
+    return [like, predicted]
+
+def getLikenessDate(date1, date2, maxDuration):
+    return (1 - (abs((date2 - date1).days) / maxDuration)) * 100
+
+def getLikenessType(type1, type2):
+    if type1 == type2:
+        return 50
+    else:
+        return 0
+    
+def getLikenessDuration(unfinished, finished, maxDuration, dateCoeff, subjectCoeff, sectionCoeff, sequenceCoeff):
+    totCoeff = dateCoeff + subjectCoeff + sectionCoeff + sequenceCoeff
+    likeDate = getLikenessDate(unfinished[3], finished[2], maxDuration)
+    likeSubject = getLikenessType(unfinished[5], finished[4])
+    likeSection = getLikenessType(unfinished[6], finished[5])
+    [likeSequence, predicted] = getLikenessSequence(unfinished, finished[6])
+    totLike = (likeDate * dateCoeff + likeSubject * subjectCoeff + likeSection * sectionCoeff + likeSequence * sequenceCoeff) / totCoeff
+    return [totLike, predicted]
 
 # return best prediction of unfinished process.
-def getPrediction(unfinished, finished):
-    prediction100 = 0
-    prediction99 = 0
-    prediction95 = 0
-    tot100 = 0
-    tot99 = 0
-    tot95 = 0
-    for f in finished.values():
-        [like, predicted, count] = getLikenessDuration(unfinished, f)
-        if like == 100:
-            prediction100 = prediction100 * tot100
-            prediction100 += like * predicted * count
-            tot100 += like * count
-            prediction100 = prediction100 / tot100
-        if like > 99:
-            prediction99 = prediction99 * tot99
-            prediction99 += like * predicted * count
-            tot99 += like * count
-            prediction99 = prediction99 / tot99
-        if like > 95:
-            prediction95 = prediction95 * tot95
-            prediction95 += like * predicted * count
-            tot95 += like * count
-            prediction95 = prediction95 / tot95
-    if tot100 == 0:
-        if tot99 == 0:
-            if tot95 == 0:
-                return None
-            else:
-                return prediction95
-        else:
-            return prediction99
+def getPrediction(unfinished, finished, maxDuration, dateCoeff, subjectCoeff, sectionCoeff, sequenceCoeff):
+    prediction = 0
+    tot = 0
+    for f in finished:
+        [like, predicted] = getLikenessDuration(unfinished, f, maxDuration, dateCoeff, subjectCoeff, sectionCoeff, sequenceCoeff)
+        if like > 90:
+            prediction = prediction * tot
+            prediction += like * predicted
+            tot += like
+            prediction = prediction / tot
+    if tot > 0:
+        return prediction
     else:
-        return prediction100
+        return None
+
+def trainModel(finishedProcessesInfo, minDate, maxDate):
+    maxDuration = (maxDate - minDate).days
+    dateCoeff = 0.5
+    subjectCoeff = 0.5
+    sectionCoeff = 0.5
+    sequenceCoeff = 0.5
+    accuracy = 100
+    while accuracy > 10:
+        errors = []
+        find = True
+        with alive_bar(int(len(finishedProcessesInfo))) as bar:
+            for i in range(len(finishedProcessesInfo)):
+                p = finishedProcessesInfo[i]
+                exactDuration = p[1]
+                date = p[2]
+                judge = p[3]
+                subject = p[4]
+                section = p[5]
+                sequence = p[6][1]
+                sequenceUnion = p[6][2]
+                if len(sequence) > 10:
+                    j = rd.randint(5, len(sequence) - 2)
+                    newDuration = sequence[j][1]
+                    newSequence = sequence[:j]
+                    newSequenceUnion = sequenceUnion[:j]
+                    newSequenceInfo = [newDuration, newSequence, newSequenceUnion, date, judge, subject, section]
+                    prediction = getPrediction(newSequenceInfo, finishedProcessesInfo[:i] + finishedProcessesInfo[i + 1:], maxDuration, dateCoeff, subjectCoeff, sectionCoeff, sequenceCoeff)
+                    if prediction != None:
+                        error = abs(prediction - exactDuration) * 100 / exactDuration
+                        if error > 30:
+                            break
+                        else:
+                            errors.append(error)    
+                    else:
+                        break
+                bar()
+        if len(errors) > len(finishedProcessesInfo) / 3:
+            accuracy = sum(errors) / len(errors)
+        else:
+            accuracy = 100
+        if dateCoeff >= 10:
+            subjectCoeff += 0.5
+            dateCoeff = 0.5
+        else:
+            dateCoeff += 0.5
+        if subjectCoeff >= 10:
+            sectionCoeff += 0.5
+            subjectCoeff = 0.5
+        if sectionCoeff >= 10:
+            sequenceCoeff += 0.5
+            sectionCoeff = 0.5
+        print(accuracy, len(finishedProcessesInfo) - len(errors), dateCoeff, subjectCoeff, sectionCoeff, sequenceCoeff) 
+    print(accuracy, dateCoeff, subjectCoeff, sectionCoeff, sequenceCoeff)
+    exit()
+    return None
 
 # return predicted duration of unfinished process based on states, phases and events sequences.
 def getPredictedDuration(unfinishedProcessInfo, originalSequenceDict, translatedSequenceDict, shortSequenceDict, phaseSequenceDict, eventSequenceDict):
@@ -414,12 +483,12 @@ def verifyDatabase(connection):
         eventsNameInfo = compareData(eventsName, connection, "SELECT * FROM eventinome ORDER BY codice")
         connect.updateTable(connection, 'eventinome', eventsNameInfo, 'codice')
     if not connect.doesATableExist(connection, "materienome"):
-        connect.createTable(connection, 'materienome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
+        connect.createTable(connection, 'materienome', ['codice', 'descrizione', 'rituale', 'etichetta'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(4)', 'TEXT'], [0], [])
         subjectsName = file.getDataFromTextFile('utils/Utilities/subjectsName.txt')
         connect.insertIntoDatabase(connection, 'materienome', subjectsName)
     else:
-        if not connect.doesATableHaveColumns(connection, "materienome", ['codice', 'descrizione', 'rituale'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(4)']):
-            raise Exception("\n'materienome' table does not have all requested columns. The requested columns are: 'codice'(VARCHAR(10)), 'descrizione'(TEXT), 'rituale'(VARCHAR(4))")
+        if not connect.doesATableHaveColumns(connection, "materienome", ['codice', 'descrizione', 'rituale', 'etichetta'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(4)', 'TEXT']):
+            raise Exception("\n'materienome' table does not have all requested columns. The requested columns are: 'codice'(VARCHAR(10)), 'descrizione'(TEXT), 'rituale'(VARCHAR(4)), 'etichetta'(TEXT)")
         subjectsName = file.getDataFromTextFile('utils/Utilities/subjectsName.txt')
         subjectsNameInfo = compareData(subjectsName, connection, "SELECT * FROM materienome ORDER BY codice")
         connect.updateTable(connection, 'materienome', subjectsNameInfo, 'codice')
