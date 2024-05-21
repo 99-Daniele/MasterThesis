@@ -73,8 +73,8 @@ def getDurations(events, courtHearingsType, minDate, maxDate):
     judgeTag = 'giudice'
     subjectTag = 'materia'
     sectionTag = 'sezione'
-    with alive_bar(int(len(events))) as bar:
-        for i in range(int(len(events))):
+    with alive_bar(int(len(events) / 10)) as bar:
+        for i in range(int(len(events) / 10)):
             if events[i][4] != processId:
                 [processEventsDuration, filteredEvents] = getEventsDuration(processEvents, maxDate, endPhase)
                 if len(filteredEvents) > 0:
@@ -351,25 +351,28 @@ def getLikenessDate(date1, date2, maxDuration):
 
 def getLikenessType(type1, type2):
     if type1 == type2:
-        return 50
+        return 100
     else:
         return 0
     
-def getLikenessDuration(unfinished, finished, maxDuration, dateCoeff, subjectCoeff, sectionCoeff, sequenceCoeff):
-    totCoeff = dateCoeff + subjectCoeff + sectionCoeff + sequenceCoeff
+def getLikenessDuration(unfinished, finished, maxDuration, dateCoeff, subjectCoeff, sectionCoeff):
+    totCoeff = dateCoeff + subjectCoeff + sectionCoeff
     likeDate = getLikenessDate(unfinished[3], finished[2], maxDuration)
     likeSubject = getLikenessType(unfinished[5], finished[4])
     likeSection = getLikenessType(unfinished[6], finished[5])
     [likeSequence, predicted] = getLikenessSequence(unfinished, finished[6])
-    totLike = (likeDate * dateCoeff + likeSubject * subjectCoeff + likeSection * sectionCoeff + likeSequence * sequenceCoeff) / totCoeff
+    if likeSequence <= 90:
+        return [0, 0]
+    totLike = (((likeDate * dateCoeff + likeSubject * subjectCoeff + likeSection * sectionCoeff) / totCoeff) + likeSequence) / 2
+    totLike = likeSequence
     return [totLike, predicted]
 
 # return best prediction of unfinished process.
-def getPrediction(unfinished, finished, maxDuration, dateCoeff, subjectCoeff, sectionCoeff, sequenceCoeff):
+def getPrediction(unfinished, finished, maxDuration, dateCoeff, subjectCoeff, sectionCoeff):
     prediction = 0
     tot = 0
     for f in finished:
-        [like, predicted] = getLikenessDuration(unfinished, f, maxDuration, dateCoeff, subjectCoeff, sectionCoeff, sequenceCoeff)
+        [like, predicted] = getLikenessDuration(unfinished, f, maxDuration, dateCoeff, subjectCoeff, sectionCoeff)
         if like > 90:
             prediction = prediction * tot
             prediction += like * predicted
@@ -385,11 +388,10 @@ def trainModel(finishedProcessesInfo, minDate, maxDate):
     dateCoeff = 0.5
     subjectCoeff = 0.5
     sectionCoeff = 0.5
-    sequenceCoeff = 0.5
     accuracy = 100
     while accuracy > 10:
         errors = []
-        find = True
+        count = 0
         with alive_bar(int(len(finishedProcessesInfo))) as bar:
             for i in range(len(finishedProcessesInfo)):
                 p = finishedProcessesInfo[i]
@@ -401,19 +403,20 @@ def trainModel(finishedProcessesInfo, minDate, maxDate):
                 sequence = p[6][1]
                 sequenceUnion = p[6][2]
                 if len(sequence) > 10:
+                    count += 1
                     j = rd.randint(5, len(sequence) - 2)
                     newDuration = sequence[j][1]
                     newSequence = sequence[:j]
                     newSequenceUnion = sequenceUnion[:j]
                     newSequenceInfo = [newDuration, newSequence, newSequenceUnion, date, judge, subject, section]
-                    prediction = getPrediction(newSequenceInfo, finishedProcessesInfo[:i] + finishedProcessesInfo[i + 1:], maxDuration, dateCoeff, subjectCoeff, sectionCoeff, sequenceCoeff)
+                    prediction = getPrediction(newSequenceInfo, finishedProcessesInfo[:i] + finishedProcessesInfo[i + 1:], maxDuration, dateCoeff, subjectCoeff, sectionCoeff)
                     if prediction != None:
                         error = abs(prediction - exactDuration) * 100 / exactDuration
-                        if error > 30:
+                        if error > 100 and len(errors) < count / 5:
                             break
-                        else:
+                        elif error < 30:
                             errors.append(error)    
-                    else:
+                    elif len(errors) < count / 5:
                         break
                 bar()
         if len(errors) > len(finishedProcessesInfo) / 3:
@@ -428,11 +431,8 @@ def trainModel(finishedProcessesInfo, minDate, maxDate):
         if subjectCoeff >= 10:
             sectionCoeff += 0.5
             subjectCoeff = 0.5
-        if sectionCoeff >= 10:
-            sequenceCoeff += 0.5
-            sectionCoeff = 0.5
-        print(accuracy, len(finishedProcessesInfo) - len(errors), dateCoeff, subjectCoeff, sectionCoeff, sequenceCoeff) 
-    print(accuracy, dateCoeff, subjectCoeff, sectionCoeff, sequenceCoeff)
+        print(accuracy, len(finishedProcessesInfo) - len(errors), dateCoeff, subjectCoeff, sectionCoeff) 
+    print(accuracy, dateCoeff, subjectCoeff, sectionCoeff)
     exit()
     return None
 
