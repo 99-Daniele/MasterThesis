@@ -1,45 +1,26 @@
 # this file handles the update of database data.
 
 from alive_progress import alive_bar
-import datetime as dt
-import pandas as pd
+import random as rd
+from sklearn.metrics import accuracy_score
 
-import cache.Cache as cache
 import utils.database.DatabaseConnection as connect
-import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.Getters as getter
+import utils.Prediction as prediction
 import utils.utilities.Utilities as utilities
 
 # refresh current database data. 
 # calcs event, phases, states, process, courtHearing durations, comprare with current database data and in case update them.
 def refreshData(connection):
-    import time
     verifyDatabase(connection)
     minDate = getter.getMinDate()
     maxDate = getter.getMaxDate()
     events = getter.getEvents()
     courtHearingsEventsType = str(tuple(file.getDataFromTextFile('preferences/courtHearingsEvents.txt')))
-    numEventTag = 'numEvento'
-    numProcessTag = 'numProcesso'
-    eventTag = 'evento'
-    durationTag = 'durata'
-    judgeTag = 'giudice'
-    dateTag = 'data'
-    stateTag = 'stato'
-    phaseTag = 'fase'
-    subjectTag = 'materia'
-    sectionTag = 'sezione'
-    finishedTag = 'finito'
-    nextDateTag = 'succData'
-    nextIdTag = 'succId'
-    endPhase = '4'
-    start = time.time()
-    #updateEventsDataframe(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase)
-    processEvents = getProcessEvents(events)
-    #updateEventsDurationDataframe(processEvents, maxDate, endPhase, numEventTag, numProcessTag, eventTag, durationTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag)
-    print(time.time() - start)
-    exit()
+    eventsFiltered = []
+    for e in events:
+        eventsFiltered.append((e[0], e[1], e[6], e[3]))
     [eventsDuration, phasesDuration, statesDuration, processDuration, courtHearingsDuration, processSequence] = getDurations(events, courtHearingsEventsType, minDate, maxDate)
     eventsFiltered.sort(key = lambda x: x[0])
     eventsDuration.sort(key = lambda x: x[0])
@@ -48,17 +29,6 @@ def refreshData(connection):
     processDuration.sort(key = lambda x: x[0])
     courtHearingsDuration.sort(key = lambda x: x[0])
     processSequence.sort(key = lambda x: x[0])
-    cache.updateCache('importantEvents.json', importantEventsDataframe)
-    cache.updateCache('stateEvents.json', stateEventsDataframe)
-    cache.updateCache('phaseEvents.json', phaseEventsDataframe)
-    cache.updateCache('courtHearingsEvents.json', courtHearingsEventsDataframe)
-    cache.updateCache('processesDuration.json', processDurationDataframe)
-    cache.updateCache('statesDuration.json', stateDurationDataframe)
-    cache.updateCache('phasesDuration.json', phaseDurationDataframe)
-    eventDurationDataframe = frame.keepOnlyRelevant(eventDurationDataframe, 0.005, 'evento', 'conteggio')
-    cache.updateCache('eventsDuration.json', eventDurationDataframe)
-    cache.updateCache('courtHearingsDuration.json', courtHearingsDurationDataframe)
-    return
     eventsFilteredInfo = compareData(eventsFiltered, connection, "SELECT * FROM eventitipo ORDER BY numEvento")
     eventsDurationInfo = compareData(eventsDuration, connection, "SELECT * FROM durataeventi ORDER BY numEvento")
     phasesDurationInfo = compareDataOrder(phasesDuration, connection, "SELECT * FROM duratafasi ORDER BY numProcesso, ordine", 2)
@@ -73,146 +43,6 @@ def refreshData(connection):
     connect.updateTable(connection, 'durataprocessi', processDurationInfo, 'numProcesso')
     connect.updateTable(connection, 'durataudienze', courtHearingsDurationInfo, 'numProcesso')
     connect.updateTable(connection, 'processitipo', processSequenceInfo, 'numProcesso')
-
-# update events dataframe.
-def updateEventsDataframe(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase):
-    updateAllEventsDataframe(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase)
-    updateImportantEventsDataframe(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase)
-    updateStateEventsDataframe(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase)
-    updatePhaseEventsDataframe(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase)
-
-# update all events dataframe.
-def updateAllEventsDataframe(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase):
-    allEventsDataframe = frame.createEventsDataFrame(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase)
-    allEventsDataframe = allEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
-    cache.updateCache('allEvents.json', allEventsDataframe)
-
-# update important events dataframe.
-def updateImportantEventsDataframe(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase):
-    importantEventsDataframe = frame.createEventsDataFrame(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase)
-    try:
-        importantEvents = list(file.getDataFromTextFile('preferences/importantEvents.txt'))
-        importantEventsDataframe = importantEventsDataframe[importantEventsDataframe[eventTag].isin(importantEvents)]
-    except:
-        pass
-    importantEventsDataframe = importantEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
-    cache.updateCache('importantEvents.json', importantEventsDataframe)
-
-# update state events dataframe.
-def updateStateEventsDataframe(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase):
-    stateEventsDataframe = frame.createEventsDataFrame(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase)
-    stateEventsDataframe = stateEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
-    stateEventsDataframe = stateEventsDataframe.groupby([numProcessTag, stateTag], as_index = False).first()
-    try:
-        importantStates = list(file.getDataFromTextFile('preferences/importantStates.txt'))
-        stateEventsDataframe = stateEventsDataframe[stateEventsDataframe[stateTag].isin(importantStates)]
-    except:
-        pass
-    stateEventsDataframe = stateEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
-    cache.updateCache('stateEvents.json', stateEventsDataframe)
-
-# update phase events dataframe.
-def updatePhaseEventsDataframe(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase):
-    phaseEventsDataframe = frame.createEventsDataFrame(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase)
-    phaseEventsDataframe = phaseEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
-    phaseEventsDataframe = phaseEventsDataframe.groupby([numProcessTag, phaseTag], as_index = False).first()
-    phaseEventsDataframe = phaseEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
-    cache.updateCache('phaseEvents.json', phaseEventsDataframe)
-
-# group events by process.
-def getProcessEvents(events):
-    allProcessEvents = []
-    processId = events[0][1]
-    processSubject = events[0][7]
-    processSection = events[0][8]
-    processEvents = [processId, processSubject, processSection, -1]
-    end = False
-    with alive_bar(int(len(events))) as bar:
-        for i in range(int(len(events))):
-            if events[i][1] != processId or end:
-                allProcessEvents.append(processEvents)
-                processEvents = [processId, processSubject, processSection, -1]
-                processId = events[i][1]
-                processSubject = events[i][7]
-                processSection = events[i][8]
-                end = False
-            else:
-                if events[i][6] != '0':
-                    processEvents[3] = 0
-                if events[i][6] == '4':
-                    if events[i][5] == 'FINE':
-                        processEvents[3] = 1
-                    else:
-                        processEvents[3] = 2
-                    end = True
-                processEvents.append(events[i])
-            bar()
-    return allProcessEvents
-
-# update events duration dataframe.
-def updateEventsDurationDataframe(processEvents, maxDate, endPhase, numEventTag, numProcessTag, eventTag, durationTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag):
-    eventsDuration = calcEventsDuration(processEvents, maxDate, endPhase)
-    eventsDurationDataframe = frame.createEventsDurationsDataFrame(eventsDuration, numEventTag, numProcessTag, eventTag, durationTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, finishedTag,  nextDateTag, nextIdTag)
-    cache.updateCache('eventsDuration.json', eventsDurationDataframe)
-
-# calc events durations.
-def calcEventsDuration(processEvents, maxDate, endPhase):
-    eventsDuration = []
-    with alive_bar(int(len(processEvents))) as bar:
-        for i in range(int(len(processEvents))):
-            [processEventsDuration, filteredEvents] = getEventDuration(processEvents[i], maxDate, endPhase)
-            eventsDuration.extend(processEventsDuration)
-            bar()
-    return eventsDuration
-
-# return events duration.
-# in case of unfinished events, uses as endDate given maxDate (which is the date of the last event in the database).
-def getEventDuration(events, maxDate, endPhase):
-    processId = events[0]
-    subject = events[1]
-    section = events[2]
-    finished = events[3]
-    if len(events) == 4:
-        return [(), ()]
-    events = events[4:]
-    eventsDuration = []
-    correctEvents = []
-    end = False
-    for i in range(len(events) - 1):
-        curr = events[i]
-        next = events[i + 1]
-        if curr[6] == endPhase and not end:
-            end = True
-            correctEvents.append(curr)
-        currDateDt = dt.datetime.strptime(curr[4], '%Y-%m-%d %H:%M:%S')
-        nextDateDt = dt.datetime.strptime(next[4], '%Y-%m-%d %H:%M:%S')
-        if end:
-            duration = 0
-            nextDate = curr[4]
-            nextId = curr[0]
-        else:
-            duration = (nextDateDt - currDateDt).days
-            nextDate = next[4]
-            nextId = next[0]
-            correctEvents.append(curr)
-        eventsDuration.append([curr[0], processId, curr[2], duration, curr[4], curr[3], curr[5], curr[6], subject, section, finished, nextDate, nextId])
-    curr = events[-1]
-    currDateDt = dt.datetime.strptime(curr[4], '%Y-%m-%d %H:%M:%S')
-    maxDateDt = dt.datetime.strptime(maxDate, '%Y-%m-%d %H:%M:%S')
-    if curr[6] == endPhase and not end:
-        end = True
-        correctEvents.append(curr)
-    if end:
-        duration = 0
-        nextDate = curr[4]
-        nextId = curr[0]
-    else:
-        duration = (maxDateDt - currDateDt).days
-        nextDate = maxDate
-        nextId = None
-        correctEvents.append(curr)  
-    eventsDuration.append((curr[0], processId, curr[2], duration, curr[4], curr[3], curr[5], curr[6], subject, section, finished, nextDate, nextId))
-    return [eventsDuration, correctEvents]
 
 # return events, phases, process and court hearing durations based on events.
 # in case of unfinished processes predicts final duration.
@@ -257,16 +87,16 @@ def getDurations(events, courtHearingsType, minDate, maxDate):
                     if finished:
                         processDuration = getProcessesDuration(filteredEvents)
                         processesDuration = processesDuration + processDuration
-                        #finishedProcesses.append([processId, processDuration[0][1], firstEventDate, processJudge, processSubject, processSection, eventSequence])
+                        finishedProcesses.append([processId, processDuration[0][1], firstEventDate, processJudge, processSubject, processSection, eventSequence])
                         #finishedProcesses.append([processId, processDuration[0][1], firstEventDate, processJudge, processSubject, processSection])
                         #addToDict(originalSequence, originalSequenceDict)
                         #addToDict(translatedSequence, translatedSequenceDict)
                         #addToDict(shortSequence, shortSequenceDict)
                         #addToDict(phaseSequence, phaseSequenceDict)
                         #addToDict(eventSequence, eventSequenceDict)
-                    #else:
-                    #    if int(processSequence[0][5][-1]) > 2:
-                    #        unfinishedProcesses.append([processId, firstEventDate, firstEventId, processJudge, processSubject, processSection, eventSequence, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence])
+                    else:
+                        if int(processSequence[0][5][-1]) > 2:
+                            unfinishedProcesses.append([processId, firstEventDate, firstEventId, processJudge, processSubject, processSection, eventSequence, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence])
                 processEvents = []
                 processId = events[i][4]
                 firstEventId = events[i][0]
@@ -277,13 +107,13 @@ def getDurations(events, courtHearingsType, minDate, maxDate):
             else:
                 processEvents.append(events[i])
             bar() 
-    #trainModel(finishedProcesses, minDate, maxDate)
+    trainModel(finishedProcesses, minDate, maxDate)
     #model = prediction.trainModel(finishedProcesses, numProcessTag, durationTag, 'dataInizioProcesso', judgeTag, subjectTag, sectionTag)
     with alive_bar(int(len(unfinishedProcesses))) as bar:
         for p in unfinishedProcesses:
             #prediction.predictDuration(model, p)
-            #processDuration = getPredictedDuration(p, originalSequenceDict, translatedSequenceDict, shortSequenceDict, phaseSequenceDict, eventSequenceDict)
-            #processesDuration = processesDuration + processDuration
+            processDuration = getPredictedDuration(p, originalSequenceDict, translatedSequenceDict, shortSequenceDict, phaseSequenceDict, eventSequenceDict)
+            processesDuration = processesDuration + processDuration
             bar()
     return [eventsDuration, phasesDuration, statesDuration, processesDuration, courtHearingsDuration, processesSequences]
 
@@ -305,18 +135,16 @@ def addToDict(sequence, dict):
 
 # return events duration.
 # in case of unfinished events, uses as endDate given maxDate (which is the date of the last event in the database).
-def getEventDuration2(events, maxDate, endPhase):
+def getEventsDuration(events, maxDate, endPhase):
     if len(events) == 0:
-        return [[], []]
+        return [(), ()]
     curr = events[0]
-    currDateDt = dt.datetime.strptime(curr[4], '%Y-%m-%d %H:%M:%S')
     if len(events) == 1:
-        eventsDuration = [[curr[0], 0, curr[4], curr[4], curr[0]]]
+        eventsDuration = [(curr[0], 0, curr[5], curr[5], curr[0])]
         correctEvents = [curr]
         return [eventsDuration, correctEvents]
     next = events[1]
-    nextDateDt = dt.datetime.strptime(next[4], '%Y-%m-%d %H:%M:%S')
-    first = [curr[0], (nextDateDt - currDateDt).days, curr[4], next[4], next[0]]
+    first = (curr[0], (next[5] - curr[5]).days, curr[5], next[5], next[0])
     eventsDuration = [first]
     correctEvents = [curr]
     i = 1
@@ -325,41 +153,37 @@ def getEventDuration2(events, maxDate, endPhase):
         curr = events[i]
         next = events[i + 1]
         prev = events[i - 1]
-        if curr[6] == endPhase and not end:
+        if curr[3] == endPhase and not end:
             end = True
             correctEvents.append(curr)
-        if curr[2] == prev[2] or curr[2] == next[2]:
-            currDateDt = dt.datetime.strptime(curr[4], '%Y-%m-%d %H:%M:%S')
-            nextDateDt = dt.datetime.strptime(next[4], '%Y-%m-%d %H:%M:%S')
+        if curr[7] == prev[7] or curr[7] == next[7]:
             if end:
                 duration = 0
-                nextDate = curr[4]
+                nextDate = curr[5]
                 nextId = curr[0]
             else:
-                duration = (nextDateDt - currDateDt).days
-                nextDate = next[4]
+                duration = (next[5] - curr[5]).days
+                nextDate = next[5]
                 nextId = next[0]
                 correctEvents.append(curr)
-            eventsDuration.append([curr[0], duration, curr[4], nextDate, nextId])
+            eventsDuration.append((curr[0], duration, curr[5], nextDate, nextId))
         i = i + 1
     curr = events[i]
     prev = events[i - 1]
-    if curr[6] == endPhase and not end:
+    if curr[3] == endPhase and not end:
         end = True
         correctEvents.append(curr)
-    if curr[2] == prev[2]:
-        currDateDt = dt.datetime.strptime(curr[4], '%Y-%m-%d %H:%M:%S')
-        maxDateDt = dt.datetime.strptime(maxDate, '%Y-%m-%d %H:%M:%S')
+    if curr[7] == prev[7]:
         if end:
             duration = 0
-            nextDate = curr[4]
+            nextDate = curr[5]
             nextId = curr[0]
         else:
-            duration = (maxDateDt - currDateDt).days
+            duration = (maxDate - curr[5]).days
             nextDate = maxDate
             nextId = None
             correctEvents.append(curr)  
-        eventsDuration.append([curr[0], duration, curr[4], nextDate, nextId])
+        eventsDuration.append((curr[0], duration, curr[5], nextDate, nextId))
     return [eventsDuration, correctEvents]
 
 # return phases duration.
@@ -474,6 +298,169 @@ def getProcessesSequence(events, endPhase):
 def getProcessesDuration(events):
     duration = (events[-1][5] - events[0][5]).days
     return [(events[0][4], duration, events[0][5], events[-1][5], events[0][0], events[-1][0])]
+
+# return how much finished process is like to unfinished one and duration of the finished process.
+def getLikeness(unfinished, finished):
+    likeness = 0
+    l1 = len(unfinished[1])
+    l2 = len(finished[1])
+    maxPos = 0
+    if l1 >= l2:
+        return [0, 0, 0]
+    for i in range(l1):
+        k = 0
+        start = True
+        end = True
+        while start or end:
+            if k % 2 == 0:
+                j = int(i - (k / 2))
+            else:
+                j = int(i + ((k + 1) / 2))
+            if j < 0:
+                start = False
+            elif j >= l2:
+                end = False
+            else:
+                if unfinished[1][i][0] == finished[1][j][0]:
+                    break
+            k += 1
+        likeness = likeness * i
+        if start or end:
+            likeness += (l2 - abs(i - j)) / l2
+            maxPos = j + 1
+            if maxPos == l2:
+                maxPos -= 1
+        else:
+            likeness -= 1
+        likeness = likeness / (i + 1)
+    return [likeness * 100, finished[1][maxPos][1], finished[0]]
+
+# return  how much finished process is like to unfinished one and predicted duration.
+def getLikenessSequence(unfinished, finished):
+    [like, duration, totDuration] = getLikeness(unfinished, finished)
+    if like == 0:
+        return [0, 0]
+    if duration == 0:
+        predicted = unfinished[0]
+    else:
+        predicted = unfinished[0] + ((totDuration - duration) * unfinished[0] / duration)
+    return [like, predicted]
+
+def getLikenessDate(date1, date2, maxDuration):
+    return (1 - (abs((date2 - date1).days) / maxDuration)) * 100
+
+def getLikenessType(type1, type2):
+    if type1 == type2:
+        return 100
+    else:
+        return 0
+    
+def getLikenessDuration(unfinished, finished, maxDuration, dateCoeff, subjectCoeff, sectionCoeff):
+    totCoeff = dateCoeff + subjectCoeff + sectionCoeff
+    likeDate = getLikenessDate(unfinished[3], finished[2], maxDuration)
+    likeSubject = getLikenessType(unfinished[5], finished[4])
+    likeSection = getLikenessType(unfinished[6], finished[5])
+    [likeSequence, predicted] = getLikenessSequence(unfinished, finished[6])
+    if likeSequence <= 90:
+        return [0, 0]
+    totLike = (((likeDate * dateCoeff + likeSubject * subjectCoeff + likeSection * sectionCoeff) / totCoeff) + likeSequence) / 2
+    totLike = likeSequence
+    return [totLike, predicted]
+
+# return best prediction of unfinished process.
+def getPrediction(unfinished, finished, maxDuration, dateCoeff, subjectCoeff, sectionCoeff):
+    prediction = 0
+    tot = 0
+    for f in finished:
+        [like, predicted] = getLikenessDuration(unfinished, f, maxDuration, dateCoeff, subjectCoeff, sectionCoeff)
+        if like > 90:
+            prediction = prediction * tot
+            prediction += like * predicted
+            tot += like
+            prediction = prediction / tot
+    if tot > 0:
+        return prediction
+    else:
+        return None
+
+def trainModel(finishedProcessesInfo, minDate, maxDate):
+    maxDuration = (maxDate - minDate).days
+    dateCoeff = 0.5
+    subjectCoeff = 0.5
+    sectionCoeff = 0.5
+    accuracy = 100
+    while accuracy > 10:
+        errors = []
+        count = 0
+        with alive_bar(int(len(finishedProcessesInfo))) as bar:
+            for i in range(len(finishedProcessesInfo)):
+                p = finishedProcessesInfo[i]
+                exactDuration = p[1]
+                date = p[2]
+                judge = p[3]
+                subject = p[4]
+                section = p[5]
+                sequence = p[6][1]
+                sequenceUnion = p[6][2]
+                if len(sequence) > 10:
+                    count += 1
+                    j = rd.randint(5, len(sequence) - 2)
+                    newDuration = sequence[j][1]
+                    newSequence = sequence[:j]
+                    newSequenceUnion = sequenceUnion[:j]
+                    newSequenceInfo = [newDuration, newSequence, newSequenceUnion, date, judge, subject, section]
+                    prediction = getPrediction(newSequenceInfo, finishedProcessesInfo[:i] + finishedProcessesInfo[i + 1:], maxDuration, dateCoeff, subjectCoeff, sectionCoeff)
+                    if prediction != None:
+                        error = abs(prediction - exactDuration) * 100 / exactDuration
+                        if error > 100 and len(errors) < count / 5:
+                            break
+                        elif error < 30:
+                            errors.append(error)    
+                    elif len(errors) < count / 5:
+                        break
+                bar()
+        if len(errors) > len(finishedProcessesInfo) / 3:
+            accuracy = sum(errors) / len(errors)
+        else:
+            accuracy = 100
+        if dateCoeff >= 10:
+            subjectCoeff += 0.5
+            dateCoeff = 0.5
+        else:
+            dateCoeff += 0.5
+        if subjectCoeff >= 10:
+            sectionCoeff += 0.5
+            subjectCoeff = 0.5
+        print(accuracy, len(finishedProcessesInfo) - len(errors), dateCoeff, subjectCoeff, sectionCoeff) 
+    print(accuracy, dateCoeff, subjectCoeff, sectionCoeff)
+    exit()
+    return None
+
+# return predicted duration of unfinished process based on states, phases and events sequences.
+def getPredictedDuration(unfinishedProcessInfo, originalSequenceDict, translatedSequenceDict, shortSequenceDict, phaseSequenceDict, eventSequenceDict):
+    [processId, firstEventDate, firstEventId, originalSequence, translatedSequence, shortSequence, phaseSequence, eventSequence] = unfinishedProcessInfo
+    eventSequenceDuration = getPrediction(eventSequence, eventSequenceDict)
+    if eventSequenceDuration == None:
+        originalSequenceDuration = getPrediction(originalSequence, originalSequenceDict)
+        if originalSequenceDuration == None:
+            translatedSequenceDuration = getPrediction(translatedSequence, translatedSequenceDict)
+            if translatedSequenceDuration == None:
+                shortSequenceDuration = getPrediction(shortSequence, shortSequenceDict)
+                if shortSequenceDuration == None:
+                    phaseSequenceDuration = getPrediction(phaseSequence, phaseSequenceDict)
+                    if phaseSequenceDuration == None:
+                        return []
+                    else:
+                        predictedDuration =  phaseSequenceDuration
+                else:
+                    predictedDuration = shortSequenceDuration
+            else:
+                predictedDuration = translatedSequenceDuration
+        else:
+            predictedDuration = originalSequenceDuration
+    else:
+        predictedDuration = eventSequenceDuration
+    return [(processId, predictedDuration, firstEventDate, None, firstEventId, None)]
 
 # verify if user database has all needed tables and views with all needed columns.
 def verifyDatabase(connection):

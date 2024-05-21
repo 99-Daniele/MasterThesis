@@ -10,7 +10,6 @@ def refreshData():
     connection = connect.getDatabaseConnection()
     update.refreshData(connection)
     print("Database updated!")
-    getter.updateCache()
 
 # display all events.
 def displayAllEvents():

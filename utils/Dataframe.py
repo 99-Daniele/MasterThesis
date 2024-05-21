@@ -18,39 +18,14 @@ except:
     importantSections = None
 
 # from events list create events dataframe.
-def createEventsDataFrame(events):
-    pIds = []
-    dates = []
-    phases = []
-    tagEvents = []
-    eIds = []
-    typeEvents = []
-    tagStates = []
-    typeStates = []
-    judges = []
-    subjects = []
-    sections = []
-    finished = []
-    startProcessDates = []
-    finishedEventProcesses = []
-    for e in events:
-        if e[2] != '5' or e[0] not in finishedEventProcesses:
-            pIds.append(e[0])
-            dates.append(e[1])
-            phases.append(e[2])
-            tagEvents.append(e[3])
-            eIds.append(e[4])
-            typeEvents.append(e[5])
-            tagStates.append(e[6])
-            typeStates.append(e[7])
-            judges.append(e[8])
-            subjects.append(e[9])
-            sections.append(e[10])
-            finished.append(utilities.getProcessState(e[11]))
-            startProcessDates.append(e[12])
-            if e[2] == '5':
-                finishedEventProcesses.append(e[0])
-    return pd.DataFrame(data = {"data": dates, "numProcesso": pIds, "fase": phases, "evento": tagEvents, "numEvento": eIds, "dataInizioProcesso": startProcessDates, "stato": tagStates, "giudice": judges, "sezione": sections, "materia": subjects})
+def createEventsDataFrame(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase):
+    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag])
+    dfNotEnd = df[df[phaseTag] != endPhase].reset_index(drop = True)
+    dfEnd = df[df[phaseTag] == endPhase].reset_index(drop = True)
+    dfEnd = dfEnd.groupby(numProcessTag, as_index = False).first().reset_index(drop = True)
+    df = pd.concat([dfNotEnd, dfEnd])
+    df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
+    return df
 
 # from processes list create processes duration dataframe.
 def createProcessesDurationDataFrame(processes):
@@ -129,32 +104,10 @@ def createPhasesDurationsDataFrame(phaseEvents):
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "fase": phases})
 
 # from events list create events duration dataframe.
-def createEventsDurationsDataFrame(events):
-    dates = []
-    durations = []
-    judges = []
-    sections = []
-    subjects = []
-    finished = []
-    eIds = []
-    pIds = []
-    tagEvents = []
-    typeEvents = []
-    phases = []
-    for e in events:
-        if (importantSections == None or e[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(e[5]) in importantProcessStates):
-            dates.append(e[0])
-            durations.append(e[1])
-            judges.append(e[2])
-            subjects.append(e[3])
-            sections.append(e[4])
-            finished.append(utilities.getProcessState(e[5]))
-            eIds.append(e[6])
-            pIds.append(e[7])
-            tagEvents.append(e[8])
-            typeEvents.append(e[9])
-            phases.append(e[10])
-    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "evento": tagEvents, "fase": phases})
+def createEventsDurationsDataFrame(events, numEventTag, numProcessTag, eventTag, durationTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag):
+    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventTag, durationTag, dateTag, judgeTag, stateTag, phaseTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
+    df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
+    return df
 
 # from court hearings list create court hearings duration dataframe.
 def createCourtHearingsDurationDataFrame(courtHearings):
