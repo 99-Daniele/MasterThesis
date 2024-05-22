@@ -16,7 +16,7 @@ def updateCache(filename, databaseData):
     if cacheData is None:
         cacheUpdate(filename, databaseData)
     else:
-        df = pd.concat([cacheData, databaseData]).drop_duplicates(keep = False)
+        df = pd.concat([cacheData.astype(databaseData.dtypes), databaseData.astype(cacheData.dtypes)])
         if not df.empty:
             cacheUpdate(filename, databaseData)
     print(filename[:-5] + " updated!")

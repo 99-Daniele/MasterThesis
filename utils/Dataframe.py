@@ -9,11 +9,11 @@ import utils.utilities.Utilities as utilities
 
 # importantProcessStates and importantSections are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
 try:
-    importantProcessStates = file.getDataFromTextFile('preferences/importantProcessStates.txt')
+    importantProcessStates = list(file.getDataFromTextFile('preferences/importantProcessStates.txt'))
 except:
     importantProcessStates = None
 try:
-    importantSections = file.getDataFromTextFile('preferences/importantSections.txt')
+    importantSections = list(file.getDataFromTextFile('preferences/importantSections.txt'))
 except:
     importantSections = None
 
@@ -53,81 +53,25 @@ def createProcessesDurationDataFrame(processes):
             events.append(p[9])
     return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "sequenza": sequences, "fasi": phases, "eventi": events})
 
-# from states list create states duration dataframe.
-def createStatesDurationsDataFrame(stateEvents):
-    dates = []
-    durations = []
-    judges = []
-    sections = []
-    subjects = []
-    finished = []
-    pIds = []
-    tags = []
-    states = []
-    phases = []
-    for s in stateEvents:
-        if (importantSections == None or s[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(s[5]) in importantProcessStates):
-            dates.append(s[0])
-            durations.append(s[1])
-            judges.append(s[2])
-            subjects.append(s[3])
-            sections.append(s[4])
-            finished.append(utilities.getProcessState(s[5]))
-            pIds.append(s[6])
-            tags.append(s[7])
-            states.append(s[8])
-            phases.append(s[9])
-    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "stato": tags, "fase": phases})
-
-# from phases list create phases duration dataframe.
-def createPhasesDurationsDataFrame(phaseEvents):
-    dates = []
-    durations = []
-    judges = []
-    sections = []
-    subjects = []
-    finished = []
-    pIds = []
-    phases = []
-    orders = []
-    for p in phaseEvents:
-        if (importantSections == None or p[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(p[5]) in importantProcessStates):
-            dates.append(p[0])
-            durations.append(p[1])
-            judges.append(p[2])
-            subjects.append(p[3])
-            sections.append(p[4])
-            finished.append(utilities.getProcessState(p[5]))
-            pIds.append(p[6])
-            phases.append(p[7])
-            orders.append(p [8])
-    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished, "fase": phases})
-
-# from events list create events duration dataframe.
-def createEventsDurationsDataFrame(events, numEventTag, numProcessTag, eventTag, durationTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag):
-    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventTag, durationTag, dateTag, judgeTag, stateTag, phaseTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
-    df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
+# from process list create process duration dataframe.
+def createProcessDurationsDataFrame(process, numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, endDateTag, endIdTag):
+    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, endDateTag, endIdTag])
+    if importantProcessStates != None:
+        df = df[df[finishedTag].isin(importantProcessStates)]
+    if importantSections != None:
+        df = df[df[sectionTag].isin(importantSections)]
+    df = df.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
     return df
 
-# from court hearings list create court hearings duration dataframe.
-def createCourtHearingsDurationDataFrame(courtHearings):
-    dates = []
-    durations = []
-    judges = []
-    sections = []
-    subjects = []
-    finished = []
-    pIds = []
-    for c in courtHearings:
-        if (importantSections == None or c[4] in importantSections) and (importantProcessStates == None or utilities.getProcessState(c[5]) in importantProcessStates):
-            dates.append(c[0])
-            durations.append(c[1])
-            judges.append(c[2])
-            subjects.append(c[3])
-            sections.append(c[4])
-            finished.append(utilities.getProcessState(c[5]))
-            pIds.append(c[6])
-    return pd.DataFrame(data = {"data": dates, "durata": durations, "giudice": judges,  "materia": subjects, "sezione": sections, "finito": finished})
+# from events list create type duration dataframe.
+def createTypeDurationsDataFrame(events, numEventTag, numProcessTag, eventTag, durationTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag):
+    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventTag, durationTag, dateTag, judgeTag, stateTag, phaseTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
+    if importantProcessStates != None:
+        df = df[df[finishedTag].isin(importantProcessStates)]
+    if importantSections != None:
+        df = df[df[sectionTag].isin(importantSections)]
+    df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
+    return df
 
 # return avg and tot dataframe.
 def getAvgTotDataframeByDate(df1, avgChoice, dateTag, durationTag, countTag, quantileTag):

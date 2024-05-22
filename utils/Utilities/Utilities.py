@@ -106,7 +106,7 @@ def getDayOfWeek(dowNumber):
 
 # get given process state from processStates text file.
 def getProcessState(state):
-    processState = file.getDataFromTextFile('utils/Utilities/processStates.txt')
+    processState = list(file.getDataFromTextFile('utils/Utilities/processStates.txt'))
     return processState[state]
 
 # get all process states from processStates text file.
