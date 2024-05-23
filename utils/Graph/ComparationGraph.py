@@ -176,20 +176,20 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         eventChoice = None
         if len(choicesOptions) == 7:
             choicesOptions.pop()
-    dateTag = df.columns[0]
-    durationTag = df.columns[1]
+    dateTag = 'data'
+    durationTag = 'durata'
     countTag = 'conteggio'
     quantileTag = 'quantile'
     filterTag = 'filtro'
     avgTag = 'media'
-    sectionTag = df.columns[4]
-    subjectTag = df.columns[3]
-    judgeTag = df.columns[2]
-    finishedTag = df.columns[5]
-    sequenceTag = df.columns[6]
-    phaseSequenceTag = df.columns[7]
-    eventsTag = df.columns[8]
+    sectionTag = 'sezione'
+    subjectTag = 'materia'
+    judgeTag = 'giudice'
+    finishedTag = 'finito'
     eventTag = 'evento'
+    sequenceTag = 'sequenza'
+    phaseSequenceTag = 'fasi'
+    eventsTag = 'eventi'
     df_temp = df.copy()
     [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event] = hideProcessChosen(choices, sectionTag, subjectTag, judgeTag, finishedTag, sequenceTag, phaseSequenceTag, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice)
     df_data = updateProcessData(df_temp, dateTag, sectionTag, subjectTag, judgeTag, finishedTag, sequenceTag, phaseSequenceTag, eventsTag, eventTag, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio)
@@ -246,16 +246,16 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         startDate = minDate
         endDate = maxDate
-    dateTag = df.columns[0]
-    durationTag = df.columns[1]
+    dateTag = 'data'
+    durationTag = 'durata'
     countTag = 'conteggio'
     quantileTag = 'quantile'
     filterTag = 'filtro'
     avgTag = 'media'
-    sectionTag = df.columns[4]
-    subjectTag = df.columns[3]
-    judgeTag = df.columns[2]
-    finishedTag = df.columns[5]    
+    sectionTag = 'sezione'
+    subjectTag = 'materia'
+    judgeTag = 'giudice'
+    finishedTag = 'finito'
     df_temp = df.copy()
     if typeChoice == None:
         title = 'DURATA MEDIA ' + type[0:-1].upper() + 'I DEL PROCESSO'

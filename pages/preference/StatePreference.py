@@ -3,9 +3,10 @@
 import dash as ds
 import pandas as pd
 
+import utils.DataUpdate as update
 import utils.FileOperation as file
 import utils.Getters as getter
-import utils.DataUpdate as update
+import utils.utilities.Utilities as utilities
 
 df = getter.getStateNamesDataframe()
 
@@ -44,8 +45,8 @@ def update_dateframe(button, data):
     pairs = zip(data, dbData)
     if any(x != y for x, y in pairs):
         newDataDf = pd.DataFrame(data)
-        newDataDf = newDataDf.drop(['conteggio', 'fase_db', 'durata'], axis = 1)
-        listData = str(list(newDataDf.itertuples(index = False, name = None)))
-        file.writeOnTextFile('preferences/statesName.txt', listData)
+        newDataDf = newDataDf.drop(['conteggio', 'descrizione', 'fase_db', 'durata'], axis = 1)
+        strData = utilities.fromListToString(list(newDataDf.itertuples(index = False, name = None)))
+        file.writeOnTextFile('preferences/statesName.txt', strData)
         update.refreshData()
     return data

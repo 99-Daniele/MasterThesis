@@ -20,13 +20,13 @@ except:
 
 # return initial layout of page.
 def pageLayout():
-    dateTag = df.columns[0]
-    numProcessTag = df.columns[1]
-    eventTag = df.columns[3]
-    sectionTag = df.columns[8]
-    subjectTag = df.columns[9]
-    judgeTag = df.columns[7]
+    numProcessTag = 'numProcesso'
+    dateTag = 'data'
+    sectionTag = 'sezione'
+    subjectTag = 'materia'
+    judgeTag = 'giudice'
     countTag = 'conteggio'
+    eventTag = 'evento'
     maxYear = dt.datetime.strptime(df[dateTag].max(), '%Y-%m-%d %H:%M:%S').year
     maxDateStart = dt.date(maxYear - 1, 1, 1)
     maxDateEnd = dt.date(maxYear, 1, 1)

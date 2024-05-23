@@ -1,4 +1,4 @@
-# this page shows events duration and comparation.
+# this page shows state events.
 
 import dash as ds
 import pandas as pd
@@ -14,11 +14,11 @@ typeTag = 'evento'
 
 # return initial layout of page.
 def pageLayout():
-    dateTag = 'data'
-    sectionTag = 'sezione'
-    subjectTag = 'materia'
-    judgeTag = 'giudice'
-    finishedTag = 'finito'
+    dateTag = df.columns[0]
+    sectionTag = df.columns[4]
+    subjectTag = df.columns[3]
+    judgeTag = df.columns[2]
+    finishedTag = df.columns[5]
     countTag = 'conteggio'
     types = frame.getGroupBy(df, typeTag, countTag)
     typesSorted = sorted(types)
@@ -34,7 +34,7 @@ def pageLayout():
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('Grafici confronto', href='/comparationgraph'),
+        ds.dcc.Link('Grafici tipo eventi', href='/typeevent'),
         ds.html.H2('DURATA MEDIA EVENTI DEL PROCESSO', id = 'title-e'),
         ds.dcc.RadioItems(['media', 'mediana'], value = 'media', id = 'avg-radioitem-e', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems(["SETTIMANA", "MESE", "MESE DELL'ANNO", "TRIMESTRE", "TRIMESTRE DELL'ANNO", "ANNO"], value = 'MESE', id = 'date-radioitem-e', inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),

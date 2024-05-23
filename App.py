@@ -8,6 +8,7 @@ def start():
     import pages.Comparation as comparationPage
     import pages.Event as eventPage
     import pages.Preference as preferencePage
+    import pages.TypeEvent as typeEventPage
     import pages.comparationGraph.EventComparation as eventComparationPage
     import pages.comparationGraph.PhaseComparation as phaseComparationPage
     import pages.comparationGraph.ProcessComparation as processComparationPage
@@ -17,6 +18,11 @@ def start():
     import pages.eventGraph.PhaseEvents as phaseEventsPage
     import pages.eventGraph.StateEvents as stateEventsPage
     import pages.preference.StatePreference as statePreferencePage
+    import pages.typeEventGraph.PhaseSequence as eventsStatePage
+    import pages.typeEventGraph.PhaseEvents as eventsPhasePage
+    import pages.typeEventGraph.StateSequence as sequenceStatePage
+    import pages.typeEventGraph.PhaseSequence as sequencePhasePage
+    import pages.typeEventGraph.EventSequence as sequenceEventPage
 
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -35,6 +41,8 @@ def start():
                 return eventPage.pageLayout()
             case '/preference':
                 return preferencePage.pageLayout()
+            case '/typeevent':
+                return typeEventPage.pageLayout()
             case '/comparationgraph/eventcomparation':
                 return eventComparationPage.pageLayout()
             case '/comparationgraph/phasecomparation':
@@ -53,6 +61,16 @@ def start():
                 return stateEventsPage.pageLayout()
             case '/preference/statepreference':
                 return statePreferencePage.pageLayout()
+            case '/typeevent/stateevent':
+                return eventsStatePage.pageLayout()
+            case '/typeevent/phaseevent':
+                return eventsPhasePage.pageLayout()
+            case '/typeevent/statesequence':
+                return sequenceStatePage.pageLayout()
+            case '/typeevent/phasesequence':
+                return sequencePhasePage.pageLayout()
+            case '/typeevent/eventsequence':
+                return sequenceEventPage.pageLayout()
             case _:
                 return homePage.pageLayout()
     app.run_server(debug = False)

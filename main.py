@@ -74,6 +74,51 @@ def displayEventComparation():
     ])
     app.run_server(debug = True)
 
+# display state events graph.
+def displayStatesEvents():
+    import pages.typeEventGraph.StateEvents as stateEventsPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = stateEventsPage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
+# display phase events graph.
+def displayPhaseEvents():
+    import pages.typeEventGraph.PhaseEvents as phaseEventsPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = phaseEventsPage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
+# display state sequence graph.
+def displayStatesSequence():
+    import pages.typeEventGraph.StateSequence as stateSequencePage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = stateSequencePage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
+# display phase sequence graph.
+def displayPhaseSequence():
+    import pages.typeEventGraph.PhaseSequence as phaseSequencePage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = phaseSequencePage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
+# display event sequence graph.
+def displayEventSequence():
+    import pages.typeEventGraph.EventSequence as eventSequencePage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = eventSequencePage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
 # display state names.
 def displayStateNames():
     import pages.preference.StatePreference as statePreferencePage

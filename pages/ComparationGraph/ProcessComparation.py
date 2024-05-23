@@ -14,14 +14,14 @@ df = getter.getProcessesDuration()
 
 # return initial layout of page.
 def pageLayout():
-    dateTag = df.columns[0]
-    sectionTag = df.columns[4]
-    subjectTag = df.columns[3]
-    judgeTag = df.columns[2]
-    finishedTag = df.columns[5]
-    sequenceTag = df.columns[6]
-    phaseSequenceTag = df.columns[7]
-    eventsTag = df.columns[8]
+    dateTag = 'data'
+    sectionTag = 'sezione'
+    subjectTag = 'materia'
+    judgeTag = 'giudice'
+    finishedTag = 'finito'
+    sequenceTag = 'sequenza'
+    phaseSequenceTag = 'fasi'
+    eventSequenceTag = 'eventi'
     countTag = 'conteggio'
     importantSubjects = getter.getImportantSubjects()
     subjects = frame.getGroupBy(df, subjectTag, countTag)
@@ -32,7 +32,7 @@ def pageLayout():
     finished = frame.getGroupBy(df, finishedTag, countTag)
     sequences = frame.getGroupBy(df, sequenceTag, countTag)
     phaseSequences = frame.getGroupBy(df, phaseSequenceTag, countTag)
-    events = frame.getGroupByFromString(df, eventsTag)
+    events = frame.getGroupByFromString(df, eventSequenceTag)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([

@@ -250,6 +250,20 @@ def getAvgStdDataFrameByType(df, type, avgChoice, durationTag, countTag, quantil
     df2 = df2.sort_values(type).reset_index(drop = True)
     return [df1, df2]
 
+# return data group by chosen type.
+def getAvgStdDataFrameByTypeChoice(df, type, durationTag, countTag, quantileTag):
+    typeDuration = type.copy()
+    typeDuration.append(durationTag)
+    df1 = df[typeDuration].copy()
+    df1[durationTag] = df1[durationTag].astype(int)
+    df1 = keepOnlyRelevant(df1, 0.05, type[0], countTag)
+    df2 = df1.groupby(type, as_index = False).mean()
+    df2[countTag] = df1.groupby(type).size().tolist()
+    df2[quantileTag] = df1.groupby(type, as_index = False).quantile(0.75)[durationTag]
+    df1 = df1.sort_values(type).reset_index(drop = True)
+    df2 = df2.sort_values(type).reset_index(drop = True)
+    return [df1, df2]
+
 # return dataframe with rows which type is present a relevant number of times.
 def keepOnlyRelevant(df, perc, tag, countTag):
     df_temp = df.copy()

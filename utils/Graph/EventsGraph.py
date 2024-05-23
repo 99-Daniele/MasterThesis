@@ -32,14 +32,13 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         startDate = minDate
         endDate = maxDate
-    dateTag = df.columns[0]
-    numProcessTag = df.columns[1]
-    processDateTag = df.columns[5]
-    sectionTag = df.columns[8]
-    subjectTag = df.columns[9]
-    judgeTag = df.columns[7]
+    dateTag = 'data'
     countTag = 'conteggio'
-    df_temp = updateTypesBySelection(df_temp, processDateTag, sectionTag, subjectTag, judgeTag, startDate, endDate, sections, subjects, judges)
+    sectionTag = 'sezione'
+    subjectTag = 'materia'
+    judgeTag = 'giudice'
+    numProcessTag = 'numProcesso'
+    df_temp = updateTypesBySelection(df_temp, dateTag, sectionTag, subjectTag, judgeTag, startDate, endDate, sections, subjects, judges)
     [sections, subjects, judges] = updateTypes(df_temp, sectionTag, subjectTag, judgeTag, countTag)
     fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_sequence = utilities.phaseColorList(df_temp, type), labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = utilities.getWidth(1))
     fig.update_layout(

@@ -14,11 +14,11 @@ typeTag = 'fase'
 
 # return initial layout of page.
 def pageLayout():
-    dateTag = df.columns[0]
-    sectionTag = df.columns[4]
-    subjectTag = df.columns[3]
-    judgeTag = df.columns[2]
-    finishedTag = df.columns[5]
+    dateTag = 'data'
+    sectionTag = 'sezione'
+    subjectTag = 'materia'
+    judgeTag = 'giudice'
+    finishedTag = 'finito'
     countTag = 'conteggio'
     types = frame.getGroupBy(df, typeTag, countTag)
     typesSorted = sorted(types)

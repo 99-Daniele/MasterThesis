@@ -468,7 +468,7 @@ def getProcessDuration(events, eventSequence, phaseSequence, stateSequence):
     currDateDt = dt.datetime.strptime(currDate, '%Y-%m-%d %H:%M:%S')
     nextDateDt = dt.datetime.strptime(nextDate, '%Y-%m-%d %H:%M:%S')
     duration = (nextDateDt - currDateDt).days
-    return (processId, duration, currDate, currEventId, judge, subject, section, finished, stateSequence, phaseSequence, eventSequence, nextDate, nextEventId)
+    return (processId, duration, currDate, currEventId, judge, subject, section, finished, utilities.fromListToString(stateSequence), utilities.fromListToString(phaseSequence), utilities.fromListToString(eventSequence), nextDate, nextEventId)
 
 # verify if user database has all needed tables and views with all needed columns.
 def verifyDatabase(connection):
@@ -482,6 +482,8 @@ def verifyDatabase(connection):
         raise Exception("\n'subjectsName.txt' file is not present or is called differently than 'subjectsName.txt")
     try:
         statesName = file.getDataFromTextFile('preferences/statesName.txt')
+        print(statesName)
+        exit()
     except:
         raise Exception("\n'statesName.txt' file is not present or is called differently than 'statesName.txt")
     try:
@@ -513,11 +515,11 @@ def verifyDatabase(connection):
         subjectsNameInfo = compareData(subjectsName, connection, "SELECT * FROM materienome ORDER BY codice")
         connect.updateTable(connection, 'materienome', subjectsNameInfo, 'codice')
     if not connect.doesATableExist(connection, "statinome"):
-        connect.createTable(connection, 'statinome', ['stato', 'etichetta', 'abbreviazione', 'fase'], ['VARCHAR(5)', 'TEXT', 'TEXT', 'VARCHAR(5)'], [0], [])
+        connect.createTable(connection, 'statinome', ['stato', 'etichetta', 'fase'], ['VARCHAR(5)', 'TEXT', 'VARCHAR(5)'], [0], [])
         connect.insertIntoDatabase(connection, 'statinome', statesName)
     else:
-        if not connect.doesATableHaveColumns(connection, "statinome", ['stato', 'etichetta', 'abbreviazione', 'fase'], ['VARCHAR(5)', 'TEXT', 'TEXT', 'VARCHAR(5)']):
-            raise Exception("\n'statinome' table does not have all requested columns. The requested columns are: 'stato'(VARCHAR(5)), 'etichetta'(TEXT), 'abbreviazione'(TEXT), 'fase'(VARCHAR(5))")
+        if not connect.doesATableHaveColumns(connection, "statinome", ['stato', 'etichetta', 'fase'], ['VARCHAR(5)', 'TEXT', 'VARCHAR(5)']):
+            raise Exception("\n'statinome' table does not have all requested columns. The requested columns are: 'stato'(VARCHAR(5)), 'etichetta'(TEXT), 'fase'(VARCHAR(5))")
         statesNameInfo = compareData(statesName, connection, "SELECT * FROM statinome ORDER BY stato")
         connect.updateTable(connection, 'statinome', statesNameInfo, 'stato') 
     if not connect.doesATableExist(connection, "giudicinome"):
@@ -527,7 +529,7 @@ def verifyDatabase(connection):
         if not connect.doesATableHaveColumns(connection, "giudicinome", ['giudice', 'alias'], ['VARCHAR(100)', 'TEXT']):
             raise Exception("\n'giudicinome' table does not have all requested columns. The requested columns are: 'giudice'(VARCHAR(100)), 'alias'(TEXT)")
         judgesNameInfo = compareData(judgesName, connection, "SELECT * FROM giudicinome ORDER BY giudice")
-        connect.updateTable(connection, 'giudicinome', judgesNameInfo, 'giudice')    
+        connect.updateTable(connection, 'giudicinome', judgesNameInfo, 'giudice')  
 
 # compare data with database data and return info about what has to be eliminated from or added to database.
 def compareData(data, connection, query):
@@ -540,24 +542,6 @@ def compareData(data, connection, query):
     while i < len(data) and j < len(databaseData):
         dataInfo[0].append(data[i])
         dataInfo[1].append(data[i][0])
-    return dataInfo
-    while i < len(data) and j < len(databaseData):
-        if data[i][0] == databaseData[j][0]:
-            if data[i] != databaseData[j]:
-                dataInfo[0].append(data[i])
-                dataInfo[1].append(data[i][0])
-            i = i + 1
-            j = j + 1
-        elif data[i][0] > databaseData[j][0]:
-            dataInfo[1].append(databaseData[j][0])
-            j = j + 1
-        else:
-            dataInfo[0].append(data[i])
-            i = i + 1
-    while i < len(data):
-        dataInfo[0].append(data[i])
-        i = i + 1
-    while j < len(databaseData):
-        dataInfo[1].append(databaseData[j][0])
-        j = j + 1
+        i += 1
+        j += 1
     return dataInfo
