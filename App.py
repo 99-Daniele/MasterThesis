@@ -7,6 +7,7 @@ def start():
     import pages.Home as homePage
     import pages.Comparation as comparationPage
     import pages.Event as eventPage
+    import pages.Preference as preferencePage
     import pages.comparationGraph.EventComparation as eventComparationPage
     import pages.comparationGraph.PhaseComparation as phaseComparationPage
     import pages.comparationGraph.ProcessComparation as processComparationPage
@@ -15,6 +16,7 @@ def start():
     import pages.eventGraph.ImportantEvents as importantEventsPage
     import pages.eventGraph.PhaseEvents as phaseEventsPage
     import pages.eventGraph.StateEvents as stateEventsPage
+    import pages.preference.StatePreference as statePreferencePage
 
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -31,6 +33,8 @@ def start():
                 return comparationPage.pageLayout()
             case '/eventgraph':
                 return eventPage.pageLayout()
+            case '/preference':
+                return preferencePage.pageLayout()
             case '/comparationgraph/eventcomparation':
                 return eventComparationPage.pageLayout()
             case '/comparationgraph/phasecomparation':
@@ -47,6 +51,8 @@ def start():
                 return phaseEventsPage.pageLayout()
             case '/eventgraph/stateevents':
                 return stateEventsPage.pageLayout()
+            case '/preference/statepreference':
+                return statePreferencePage.pageLayout()
             case _:
                 return homePage.pageLayout()
     app.run_server(debug = False)

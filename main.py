@@ -2,15 +2,6 @@
 
 import dash as ds
 
-# refresh database and cache data.
-def refreshData():
-    import utils.database.DatabaseConnection as connect
-    import utils.DataUpdate as update
-    import utils.Getters as getter
-    connection = connect.getDatabaseConnection()
-    update.refreshData(connection)
-    print("Database updated!")
-
 # display all events.
 def displayAllEvents():
     import pages.eventGraph.AllEvents as allEventsPage
@@ -83,11 +74,25 @@ def displayEventComparation():
     ])
     app.run_server(debug = True)
 
+# display state names.
+def displayStateNames():
+    import pages.preference.StatePreference as statePreferencePage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = statePreferencePage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
 # start app to allow user select graph to be displayed.
 def startApp():
     import App as app
     app.start()
 
+# refresh database and cache data.
+def refreshData():
+    import utils.DataUpdate as update
+    update.refreshData()
+
 # action performed by main.
 if __name__ == '__main__':
-    refreshData()
+    displayStateNames()

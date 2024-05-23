@@ -78,4 +78,3 @@ def writeDataframeOnJsonFile(filename, data):
         ujson.dump(jsonData, open(filename, 'w'))
     except (FileNotFoundError):
         raise Exception("\n" + filename + " does not exists!")
-   

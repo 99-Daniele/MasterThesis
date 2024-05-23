@@ -5,6 +5,7 @@ import pandas as pd
 import textwrap
 
 import utils.FileOperation as file
+import utils.Getters as getter
 import utils.utilities.Utilities as utilities
 
 # importantProcessStates and importantSections are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
@@ -18,8 +19,8 @@ except:
     importantSections = None
 
 # from events list create events dataframe.
-def createEventsDataFrame(events, numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, endPhase):
-    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag])
+def createEventsDataFrame(events, numEventTag, numProcessTag, eventCodeTag, eventTag, judgeCodeTag, judgeTag, dateTag, stateCodeTag, stateTag, phaseTag, subjectCodeTag, subjectTag, sectionTag, endPhase):
+    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, eventTag, judgeCodeTag, judgeTag, dateTag, stateCodeTag, stateTag, phaseTag, subjectCodeTag, subjectTag, sectionTag])
     dfNotEnd = df[df[phaseTag] != endPhase].reset_index(drop = True)
     dfEnd = df[df[phaseTag] == endPhase].reset_index(drop = True)
     dfEnd = dfEnd.groupby(numProcessTag, as_index = False).first().reset_index(drop = True)
@@ -64,14 +65,32 @@ def createProcessDurationsDataFrame(process, numProcessTag, durationTag, dateTag
     return df
 
 # from events list create type duration dataframe.
-def createTypeDurationsDataFrame(events, numEventTag, numProcessTag, eventTag, durationTag, judgeTag, dateTag, stateTag, phaseTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag):
-    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventTag, durationTag, dateTag, judgeTag, stateTag, phaseTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
+def createTypeDurationsDataFrame(events, numEventTag, numProcessTag, eventCodeTag, eventTag, durationTag, dateTag, judgeCodeTag, judgeTag, stateCodeTag, stateTag, phaseTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag):
+    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, eventTag, durationTag, dateTag, judgeCodeTag, judgeTag, stateCodeTag, stateTag, phaseTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
+    filteredDf = df.copy()
     if importantProcessStates != None:
-        df = df[df[finishedTag].isin(importantProcessStates)]
+        filteredDf = filteredDf[filteredDf[finishedTag].isin(importantProcessStates)]
     if importantSections != None:
-        df = df[df[sectionTag].isin(importantSections)]
-    df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
+        filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
+    filteredDf = filteredDf.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
+    return [df, filteredDf]
+
+def createStateNameDataframe(stateNames, stateCodeTag, descrTag, tagTag, dbPhaseTag, phaseTag):
+    df = pd.DataFrame(stateNames, columns = [stateCodeTag, descrTag, tagTag, dbPhaseTag, phaseTag])
+    df[stateCodeTag] = df[stateCodeTag].astype(str)
     return df
+
+def createStateNameDataframeWithInfo(statesDuration, stateNames, stateTag,  durationTag, countTag):
+    statesDuration = statesDuration.groupby([stateTag]) \
+        .agg({statesDuration.columns[2]: 'size', durationTag: 'mean'}) \
+        .rename(columns = {statesDuration.columns[2]:countTag}) \
+        .reset_index()
+    statesDuration[durationTag] = statesDuration[durationTag].astype(float).apply('{:,.2f}'.format)
+    stateNames[stateTag] = stateNames[stateTag].astype(str)
+    result = stateNames.join(statesDuration.set_index(stateTag), on = stateTag)
+    result = result.fillna(0)
+    result = result.sort_values([stateTag])
+    return result
 
 # return avg and tot dataframe.
 def getAvgTotDataframeByDate(df1, avgChoice, dateTag, durationTag, countTag, quantileTag):
