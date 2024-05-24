@@ -10,7 +10,7 @@ import utils.graph.TypeEventsGraph as typeEvent
 
 # get dataframe with all events duration.
 df = getter.getEventsDuration()
-typeTag = 'codicestato'
+typeTag = 'fase'
 
 # return initial layout of page.
 def pageLayout():
@@ -35,8 +35,8 @@ def pageLayout():
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
         ds.dcc.Link('Grafici tipo eventi', href='/typeevent'),
-        ds.html.H2('EVENTI STATO'),
-        ds.dcc.Dropdown(types, value = types[0], multi = False, searchable = True, clearable = False, id = 'type-dropdown-se', placeholder = 'STATO', style = {'width': 400}),
+        ds.html.H2('EVENTI FASE'),
+        ds.dcc.Dropdown(types, value = types[0], multi = False, searchable = True, clearable = False, id = 'type-dropdown-phe', placeholder = 'FASE', style = {'width': 400}),
         #ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-e', placeholder = 'SEZIONE', style = {'display': 'none'}),
         #ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-e', placeholder = 'MATERIA', style = {'display': 'none'}, optionHeight = 80),
         #ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-e', placeholder = 'GIUDICE', style = {'display': 'none'}),
@@ -44,16 +44,16 @@ def pageLayout():
         #ds.dcc.Checklist([sectionTag, subjectTag, judgeTag, finishedTag], value = [], id = 'choice-checklist-e', inline = True, style = {'display': 'none'}),
         #ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = 'order-radioitem-e', inline = True, style = {'display': 'none'}),
         #ds.dcc.Checklist(['TESTO'], value = ['TESTO'], id = 'text-checklist-e'),
-        ds.dcc.RadioItems(['PRIMO', 'TUTTI'], value = 'TUTTI', id = 'display-radioitem-se', inline = True),
-        ds.dcc.Graph(id = 'typeevent-graph-se', figure = fig)
+        ds.dcc.RadioItems(['PRIMO', 'TUTTI'], value = 'TUTTI', id = 'display-radioitem-phe', inline = True),
+        ds.dcc.Graph(id = 'typeevent-graph-phe', figure = fig)
     ])
     return layout
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('typeevent-graph-se', 'figure')],
-    [ds.Input('type-dropdown-se', 'value'),
-     ds.Input('display-radioitem-se', 'value')]
+    [ds.Output('typeevent-graph-phe', 'figure')],
+    [ds.Input('type-dropdown-phe', 'value'),
+     ds.Input('display-radioitem-phe', 'value')]
 )
 
 # return updated data based on user choice.

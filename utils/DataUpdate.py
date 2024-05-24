@@ -482,8 +482,7 @@ def verifyDatabase(connection):
         raise Exception("\n'subjectsName.txt' file is not present or is called differently than 'subjectsName.txt")
     try:
         statesName = file.getDataFromTextFile('preferences/statesName.txt')
-        print(statesName)
-        exit()
+        statesName = list(statesName[0])
     except:
         raise Exception("\n'statesName.txt' file is not present or is called differently than 'statesName.txt")
     try:

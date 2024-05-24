@@ -140,4 +140,4 @@ def refreshData():
 
 # action performed by main.
 if __name__ == '__main__':
-    displayStateNames()
+    displayProcessComparation()
