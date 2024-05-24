@@ -7,20 +7,35 @@ import plotly.express as px
 import utils.Dataframe as frame
 import utils.Getters as getter
 import utils.graph.ComparationGraph as comparation
+import utils.utilities.Utilities as utilities
 
 # get dataframe with all events duration.
 df = getter.getEventsDuration()
-typeTag = 'evento'
+eventTag = utilities.getTagName('eventTag')
 
 # return initial layout of page.
 def pageLayout():
-    dateTag = 'data'
-    sectionTag = 'sezione'
-    subjectTag = 'materia'
-    judgeTag = 'giudice'
-    finishedTag = 'finito'
-    countTag = 'conteggio'
-    types = frame.getGroupBy(df, typeTag, countTag)
+    avgTag = utilities.getTagName('avgTag') 
+    countTag = utilities.getTagName('countTag') 
+    dateTag = utilities.getTagName('dateTag') 
+    event = utilities.getPlaceholderName('event') 
+    finishedTag = utilities.getTagName('finishedTag') 
+    judge = utilities.getPlaceholderName('judge') 
+    judgeTag = utilities.getTagName('judgeTag') 
+    median = utilities.getPlaceholderName('median') 
+    month = utilities.getPlaceholderName('month')
+    monthYear = utilities.getPlaceholderName('monthYear') 
+    process = utilities.getPlaceholderName('process')  
+    section = utilities.getPlaceholderName('section') 
+    sectionTag = utilities.getTagName('sectionTag')
+    subject = utilities.getPlaceholderName('subject')  
+    subjectTag = utilities.getTagName('subjectTag') 
+    text = utilities.getPlaceholderName('text') 
+    trimester = utilities.getPlaceholderName('trimester') 
+    trimesterYear = utilities.getPlaceholderName('trimesterYear')
+    week = utilities.getPlaceholderName('week')
+    year = utilities.getPlaceholderName('year')
+    types = frame.getGroupBy(df, eventTag, countTag)
     typesSorted = sorted(types)
     sections = frame.getGroupBy(df, sectionTag, countTag)
     importantSubjects = getter.getImportantSubjects()
@@ -36,8 +51,8 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici confronto', href='/comparationgraph'),
         ds.html.H2('DURATA MEDIA EVENTI DEL PROCESSO', id = 'title-e'),
-        ds.dcc.RadioItems(['media', 'mediana'], value = 'media', id = 'avg-radioitem-e', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.RadioItems(["SETTIMANA", "MESE", "MESE DELL'ANNO", "TRIMESTRE", "TRIMESTRE DELL'ANNO", "ANNO"], value = 'MESE', id = 'date-radioitem-e', inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-e', inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.RadioItems([week, month, monthYear, trimester, trimesterYear, year], value = month, id = 'date-radioitem-e', inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
         ds.html.Div(children = [
             ds.dcc.DatePickerRange(
                 id = 'event-dateranger-e',
@@ -52,14 +67,14 @@ def pageLayout():
             ],
             style = {'display':'flex'}
         ),
-        ds.dcc.Dropdown(typesSorted, multi = False, searchable = False, id = 'type-dropdown-e', placeholder = 'EVENTO', style = {'width': 400}),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-e', placeholder = 'SEZIONE', style = {'display': 'none'}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-e', placeholder = 'MATERIA', style = {'display': 'none'}, optionHeight = 80),
-        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-e', placeholder = 'GIUDICE', style = {'display': 'none'}),
-        ds.dcc.Dropdown(finished, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-e', placeholder = 'PROCESSO', style = {'display': 'none'}),
+        ds.dcc.Dropdown(typesSorted, multi = False, searchable = False, id = 'type-dropdown-e', placeholder = event, style = {'width': 400}),
+        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-e', placeholder = section, style = {'display': 'none'}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-e', placeholder = subject, style = {'display': 'none'}, optionHeight = 80),
+        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-e', placeholder = judge, style = {'display': 'none'}),
+        ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-e', placeholder = process, style = {'display': 'none'}),
         ds.dcc.Checklist([sectionTag, subjectTag, judgeTag, finishedTag], value = [], id = 'choice-checklist-e', inline = True, style = {'display': 'none'}),
-        ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = 'order-radioitem-e', inline = True, style = {'display': 'none'}),
-        ds.dcc.Checklist(['TESTO'], value = ['TESTO'], id = 'text-checklist-e'),
+        ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = 'order-radioitem-e', inline = True, style = {'display': 'none'}),
+        ds.dcc.Checklist([text], value = [text], id = 'text-checklist-e'),
         ds.dcc.Graph(id = 'comparation-graph-e', figure = fig)
     ])
     return layout
@@ -102,4 +117,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, choices, order, text):
-    return comparation.typeComparationUpdate(df, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, typeTag, sections, subjects, judges, finished, choices, order, text)
+    return comparation.typeComparationUpdate(df, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, eventTag, sections, subjects, judges, finished, choices, order, text)

@@ -1,28 +1,46 @@
 # this page shows processes comparation.
 
 import dash as ds
-import datetime as dt
 import pandas as pd
 import plotly.express as px
 
 import utils.Dataframe as frame
 import utils.Getters as getter
 import utils.graph.ComparationGraph as comparation
+import utils.utilities.Utilities as utilities
 
 # get dataframe with all processes duration.
 df = getter.getProcessesDuration()
 
 # return initial layout of page.
 def pageLayout():
-    dateTag = 'data'
-    sectionTag = 'sezione'
-    subjectTag = 'materia'
-    judgeTag = 'giudice'
-    finishedTag = 'finito'
-    sequenceTag = 'sequenza'
-    phaseSequenceTag = 'fasi'
-    eventSequenceTag = 'eventi'
-    countTag = 'conteggio'
+    avgTag = utilities.getTagName('avgTag') 
+    countTag = utilities.getTagName('countTag') 
+    dateTag = utilities.getTagName('dateTag') 
+    eventSequence = utilities.getPlaceholderName('eventSequence')
+    eventSequenceTag = utilities.getTagName('eventSequenceTag')
+    finishedTag = utilities.getTagName('finishedTag') 
+    judge = utilities.getPlaceholderName('judge') 
+    judgeTag = utilities.getTagName('judgeTag') 
+    median = utilities.getPlaceholderName('median') 
+    month = utilities.getPlaceholderName('month')
+    monthYear = utilities.getPlaceholderName('monthYear') 
+    phaseSequence = utilities.getPlaceholderName('phaseSequence')
+    phaseSequenceTag = utilities.getTagName('phaseSequenceTag')
+    process = utilities.getPlaceholderName('process')  
+    section = utilities.getPlaceholderName('section') 
+    sectionTag = utilities.getTagName('sectionTag')
+    sequence = utilities.getPlaceholderName('sequence')
+    sequenceTag = utilities.getTagName('sequenceTag')
+    subject = utilities.getPlaceholderName('subject')  
+    subjectTag = utilities.getTagName('subjectTag') 
+    text = utilities.getPlaceholderName('text') 
+    trimester = utilities.getPlaceholderName('trimester') 
+    trimesterYear = utilities.getPlaceholderName('trimesterYear')
+    week = utilities.getPlaceholderName('week')
+    withTag = utilities.getPlaceholderName('with')
+    withOut = utilities.getPlaceholderName('without')
+    year = utilities.getPlaceholderName('year') 
     importantSubjects = getter.getImportantSubjects()
     subjects = frame.getGroupBy(df, subjectTag, countTag)
     if importantSubjects != None:
@@ -40,8 +58,8 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici confronto', href='/comparationgraph'),
         ds.html.H2("CONFRONTO DURATA MEDIA PROCESSI"),        
-        ds.dcc.RadioItems(['media', 'mediana'], value = 'media', id = "avg-radioitem-pr", inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.RadioItems(["SETTIMANA", "MESE", "MESE DELL'ANNO", "TRIMESTRE", "TRIMESTRE DELL'ANNO", "ANNO"], value = 'MESE', id = "date-radioitem-pr", inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-pr', inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.RadioItems([week, month, monthYear, trimester, trimesterYear, year], value = month, id = 'date-radioitem-pr', inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
         ds.dcc.DatePickerRange(
             id = 'event-dateranger-pr',
             start_date = df[dateTag].min(),
@@ -52,21 +70,21 @@ def pageLayout():
             style = {'width': 300}
         ),
         ds.html.Button("RESET", id = "reset-button-pr"),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-pr', placeholder = 'SEZIONE', style = {'width': 400}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-pr', placeholder = 'MATERIA', style = {'width': 400}, optionHeight = 80),
-        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-pr', placeholder = 'GIUDICE', style = {'width': 400}),
-        ds.dcc.Dropdown(finished, value = ['FINITO'], multi = True, searchable = False, id = 'finished-dropdown-pr', placeholder = 'PROCESSO', style = {'width': 400}),
-        ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-pr', placeholder = 'SEQUENZA', style = {'width': 400}),
-        ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-pr', placeholder = 'FASI', style = {'width': 400}),
+        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-pr', placeholder = section, style = {'width': 400}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-pr', placeholder = subject, style = {'width': 400}, optionHeight = 80),
+        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-pr', placeholder = judge, style = {'width': 400}),
+        ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-pr', placeholder = process, style = {'width': 400}),
+        ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-pr', placeholder = sequence, style = {'width': 400}),
+        ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-pr', placeholder = phaseSequence, style = {'width': 400}),
         ds.html.Div(children = [
-            ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'events-dropdown-pr', placeholder = 'EVENTI', style = {'width': 400}),
-            ds.dcc.RadioItems(['CON', 'SENZA'], value = 'CON', id = "events-radioitem-pr", inline = True, style = {'display': 'none'}, inputStyle = {'margin-left': "20px"})
+            ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'events-dropdown-pr', placeholder = eventSequence, style = {'width': 400}),
+            ds.dcc.RadioItems([withTag, withOut], value = withTag, id = "events-radioitem-pr", inline = True, style = {'display': 'none'}, inputStyle = {'margin-left': "20px"})
             ],
             style = {'display': 'inline-flex'}
         ),
         ds.dcc.Checklist([sectionTag, subjectTag, judgeTag, finishedTag, sequenceTag, phaseSequenceTag], value = [], id = "choice-checklist-pr", inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.RadioItems(['conteggio', 'media'], value = 'conteggio', id = "order-radioitem-pr", inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.Checklist(['TESTO'], value = ['TESTO'], id = "text-checklist-pr"),
+        ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = "order-radioitem-pr", inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.Checklist([text], value = [text], id = "text-checklist-pr"),
         ds.dcc.Graph(id = 'comparation-graph-pr', figure = fig)
     ])
     return layout

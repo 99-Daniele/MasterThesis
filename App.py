@@ -18,11 +18,11 @@ def start():
     import pages.eventGraph.PhaseEvents as phaseEventsPage
     import pages.eventGraph.StateEvents as stateEventsPage
     import pages.preference.StatePreference as statePreferencePage
-    import pages.typeEventGraph.PhaseSequence as eventsStatePage
-    import pages.typeEventGraph.PhaseEvents as eventsPhasePage
-    import pages.typeEventGraph.StateSequence as sequenceStatePage
-    import pages.typeEventGraph.PhaseSequence as sequencePhasePage
     import pages.typeEventGraph.EventSequence as sequenceEventPage
+    import pages.typeEventGraph.PhaseEvents as eventsPhasePage
+    import pages.typeEventGraph.PhaseSequence as sequencePhasePage
+    import pages.typeEventGraph.StateEvents as eventsStatePage
+    import pages.typeEventGraph.StateSequence as sequenceStatePage
 
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -73,4 +73,4 @@ def start():
                 return sequenceEventPage.pageLayout()
             case _:
                 return homePage.pageLayout()
-    app.run_server(debug = False)
+    app.run_server(debug = True)

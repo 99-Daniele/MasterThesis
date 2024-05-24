@@ -176,24 +176,24 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         eventChoice = None
         if len(choicesOptions) == 7:
             choicesOptions.pop()
-    dateTag = 'data'
-    durationTag = 'durata'
-    countTag = 'conteggio'
-    quantileTag = 'quantile'
-    filterTag = 'filtro'
-    avgTag = 'media'
-    sectionTag = 'sezione'
-    subjectTag = 'materia'
-    judgeTag = 'giudice'
-    finishedTag = 'finito'
-    eventTag = 'evento'
-    sequenceTag = 'sequenza'
-    phaseSequenceTag = 'fasi'
-    eventsTag = 'eventi'
+    dateTag = utilities.getTagName('dateTag')
+    durationTag = utilities.getTagName('durationTag')
+    countTag = utilities.getTagName('countTag')
+    quantileTag = utilities.getTagName('quantileTag')
+    filterTag = utilities.getTagName('filterTag')
+    avgTag = utilities.getTagName('avgTag')
+    sectionTag = utilities.getTagName('sectionTag')
+    subjectTag = utilities.getTagName('subjectTag')
+    judgeTag = utilities.getTagName('judgeTag')
+    finishedTag = utilities.getTagName('finishedTag')
+    eventTag = utilities.getTagName('eventTag')
+    sequenceTag = utilities.getTagName('sequenceTag')
+    phaseSequenceTag = utilities.getTagName('phaseSequenceTag')
+    eventSequenceTag = utilities.getTagName('eventSequenceTag')
     df_temp = df.copy()
     [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event] = hideProcessChosen(choices, sectionTag, subjectTag, judgeTag, finishedTag, sequenceTag, phaseSequenceTag, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice)
-    df_data = updateProcessData(df_temp, dateTag, sectionTag, subjectTag, judgeTag, finishedTag, sequenceTag, phaseSequenceTag, eventsTag, eventTag, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio)
-    [sections, subjects, judges, finished, sequences, phaseSequences, event] = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, dateTag, sectionTag, subjectTag, judgeTag, finishedTag, sequenceTag, phaseSequenceTag, eventsTag, eventTag, countTag, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio, importantSubjects)
+    df_data = updateProcessData(df_temp, dateTag, sectionTag, subjectTag, judgeTag, finishedTag, sequenceTag, phaseSequenceTag, eventSequenceTag, eventTag, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio)
+    [sections, subjects, judges, finished, sequences, phaseSequences, event] = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, dateTag, sectionTag, subjectTag, judgeTag, finishedTag, sequenceTag, phaseSequenceTag, eventSequenceTag, eventTag, countTag, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio, importantSubjects)
     if choices == None or len(choices) == 0:
         orderRadioStyle = {'display': 'none'}
         [allData, avgData] = frame.getAvgStdDataFrameByDate(df_data, dateType, avgChoice, dateTag, durationTag, countTag, quantileTag)
@@ -215,7 +215,7 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choicesOptions
     else:
         orderRadioStyle = {'display': 'block'}
-        [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, eventChoice, dateTag, durationTag, eventsTag, eventTag, countTag, avgTag, filterTag)
+        [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, eventChoice, dateTag, durationTag, eventSequenceTag, eventTag, countTag, avgTag, filterTag)
         xticks = frame.getUniques(allData, dateTag)
         if text == ['TESTO']:
             fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
@@ -246,16 +246,16 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         startDate = minDate
         endDate = maxDate
-    dateTag = 'data'
-    durationTag = 'durata'
-    countTag = 'conteggio'
-    quantileTag = 'quantile'
-    filterTag = 'filtro'
-    avgTag = 'media'
-    sectionTag = 'sezione'
-    subjectTag = 'materia'
-    judgeTag = 'giudice'
-    finishedTag = 'finito'
+    dateTag = utilities.getTagName('dateTag')
+    durationTag = utilities.getTagName('durationTag')
+    countTag = utilities.getTagName('countTag')
+    quantileTag = utilities.getTagName('quantileTag')
+    filterTag = utilities.getTagName('filterTag')
+    avgTag = utilities.getTagName('avgTag')
+    sectionTag = utilities.getTagName('sectionTag')
+    subjectTag = utilities.getTagName('subjectTag')
+    judgeTag = utilities.getTagName('judgeTag')
+    finishedTag = utilities.getTagName('finishedTag')
     df_temp = df.copy()
     if typeChoice == None:
         title = 'DURATA MEDIA ' + type[0:-1].upper() + 'I DEL PROCESSO'

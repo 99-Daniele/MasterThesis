@@ -163,3 +163,12 @@ def fromAlphanumericStringToInt(string, filename):
         else:
             return number
 
+def getTagName(tag):
+    tags = file.getDataFromJsonFile('utils/Utilities/tags.json')
+    tagName = tags.get(tag)
+    return tagName
+
+def getPlaceholderName(placeholder):
+    placeholders = file.getDataFromJsonFile('utils/Utilities/placeholder.json')
+    placeholderName = placeholders.get(placeholder)
+    return placeholderName

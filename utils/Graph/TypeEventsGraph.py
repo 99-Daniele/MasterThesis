@@ -4,11 +4,10 @@ import dash as ds
 import plotly.express as px
 
 import utils.Dataframe as frame
-import utils.Getters as getter
 import utils.utilities.Utilities as utilities
 
 # update type events based on user choice.
-def typeEventUpdate(df, type, typeChoice, first):
+def typeEventUpdate(df, type, typeChoice, first, avg, text):
     dateTag = 'data'
     durationTag = 'durata'
     countTag = 'conteggio'

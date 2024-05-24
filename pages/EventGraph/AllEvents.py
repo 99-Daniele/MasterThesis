@@ -8,25 +8,28 @@ import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.Getters as getter
 import utils.graph.EventsGraph as event
+import utils.utilities.Utilities as utilities
 
 # get dataframe with all events. 
-# get maxYear as the maximum year belong dataframe events and calc maxDateStart and maxDateEnd as the first and last date of the maximun 1-year interval.
 # get important events from text file.
 df = getter.getAllEvents()
 try:
     importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
 except:
     importantEvents = None
+eventTag = utilities.getTagName('eventTag')
 
 # return initial layout of page.
 def pageLayout():
-    numProcessTag = 'numProcesso'
-    dateTag = 'data'
-    sectionTag = 'sezione'
-    subjectTag = 'materia'
-    judgeTag = 'giudice'
-    countTag = 'conteggio'
-    eventTag = 'evento'
+    countTag = utilities.getTagName('countTag') 
+    dateTag = utilities.getTagName('dateTag') 
+    judge = utilities.getPlaceholderName('judge') 
+    judgeTag = utilities.getTagName('judgeTag') 
+    numProcessTag = utilities.getTagName('numProcessTag')
+    section = utilities.getPlaceholderName('section') 
+    sectionTag = utilities.getTagName('sectionTag')
+    subject = utilities.getPlaceholderName('subject')  
+    subjectTag = utilities.getTagName('subjectTag') 
     maxYear = dt.datetime.strptime(df[dateTag].max(), '%Y-%m-%d %H:%M:%S').year
     maxDateStart = dt.date(maxYear - 1, 1, 1)
     maxDateEnd = dt.date(maxYear, 1, 1)
@@ -49,9 +52,9 @@ def pageLayout():
             style = {'width': 300}
         ),
         ds.html.Button("RESET", id = 'reset-button-ae'),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-ae', placeholder = 'SEZIONE', style = {'width': 400}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-ae', placeholder = 'MATERIA', style = {'width': 400}, optionHeight = 80),
-        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-ae', placeholder = 'GIUDICE', style = {'width': 400}),
+        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-ae', placeholder = section, style = {'width': 400}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-ae', placeholder = subject, style = {'width': 400}, optionHeight = 80),
+        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-ae', placeholder = judge, style = {'width': 400}),
         ds.dcc.Graph(figure = fig, id = 'events-graph-ae')
     ])
     return layout
@@ -75,4 +78,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
-    return event.eventUpdate(df, startDate, endDate, 'evento', importantEvents, minDate, maxDate, sections, subjects, judges)
+    return event.eventUpdate(df, startDate, endDate, eventTag, importantEvents, minDate, maxDate, sections, subjects, judges)

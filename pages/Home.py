@@ -10,6 +10,8 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici confronto', href = '/comparationgraph'),
         ds.html.Br(),
+        ds.dcc.Link('Grafici tipo eventi', href = '/typeevent'),
+        ds.html.Br(),
         ds.dcc.Link('Parametri', href = '/preference')
     ])
     return layout

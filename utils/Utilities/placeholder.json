@@ -1,0 +1,22 @@
+{
+    "event": "EVENTO",
+    "eventSequence": "EVENTI",
+    "judge": "GIUDICE",
+    "median": "mediana",
+    "month": "MESE",
+    "monthYear": "MESE DELL'ANNO",
+    "phase": "FASE",
+    "phaseSequence": "FASI",
+    "process": "PROCESSO",
+    "section": "SEZIONE",
+    "sequence": "SEQUENZA",
+    "state": "STATO",
+    "subject": "MATERIA",
+    "text": "TESTO",
+    "trimester": "TRIMESTRE",
+    "trimesterYear": "TRIMESTRE DELL'ANNO",
+    "week": "SETTIMANA",
+    "with": "CON",
+    "without": "SENZA",
+    "year": "ANNO"
+}
