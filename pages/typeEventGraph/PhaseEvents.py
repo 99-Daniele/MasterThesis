@@ -15,7 +15,13 @@ phaseTag = utilities.getTagName('phaseTag')
 
 # return initial layout of page.
 def pageLayout():
+    all = utilities.getPlaceholderName('all')
+    avgTag = utilities.getTagName('avgTag')
     countTag = utilities.getTagName('countTag')
+    first = utilities.getPlaceholderName('first')
+    median = utilities.getPlaceholderName('median')
+    phase = utilities.getPlaceholderName('phase')
+    text = utilities.getPlaceholderName('text')
     df_temp = df.sort_values(by = [phaseTag]).reset_index(drop = True)
     types = frame.getGroupBy(df_temp, phaseTag, countTag)
     df_temp = pd.DataFrame({'A' : (), 'B': ()})
@@ -25,10 +31,10 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici tipo eventi', href='/typeevent'),
         ds.html.H2('EVENTI FASE'),
-        ds.dcc.Dropdown(types, value = types[0], multi = False, searchable = True, clearable = False, id = 'type-dropdown-phe', placeholder = 'STATO', style = {'width': 400}),
-        ds.dcc.RadioItems(['PRIMO', 'TUTTI'], value = 'TUTTI', id = 'display-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.RadioItems(['media', 'mediana'], value = 'media', id = 'avg-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.Checklist(['TESTO'], value = ['TESTO'], id = 'text-checklist-phe'),
+        ds.dcc.Dropdown(types, value = types[0], multi = False, searchable = True, clearable = False, id = 'type-dropdown-phe', placeholder = phase, style = {'width': 400}),
+        ds.dcc.RadioItems([first, all], value = all, id = 'display-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.Checklist([text], value = [text], id = 'text-checklist-phe'),
         ds.dcc.Graph(id = 'typeevent-graph-phe', figure = fig)
     ])
     return layout

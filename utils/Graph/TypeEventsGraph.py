@@ -8,20 +8,14 @@ import utils.utilities.Utilities as utilities
 
 # update type events based on user choice.
 def typeEventUpdate(df, type, typeChoice, first, avg, text):
-    dateTag = 'data'
-    durationTag = 'durata'
-    countTag = 'conteggio'
-    quantileTag = 'quantile'
-    filterTag = 'filtro'
-    avgTag = 'media'
-    sectionTag = 'sezione'
-    subjectTag = 'materia'
-    judgeTag = 'giudice'
-    finishedTag = 'finito' 
-    codeEventTag = 'codiceevento' 
-    numProcessTag = 'numProcesso'
+    codeEventTag = utilities.getTagName('codeEventTag')
+    countTag = utilities.getTagName('countTag')
+    durationTag = utilities.getTagName('durationTag')
+    firstTag = utilities.getPlaceholderName("first")
+    numProcessTag = utilities.getTagName('numProcessTag')
+    quantileTag = utilities.getTagName('quantileTag')
     df_temp = df.copy()
-    if first == "PRIMO":
+    if first == firstTag:
         df_temp = df_temp.groupby([type, numProcessTag]).first().reset_index()
     df_temp = frame.getTypesDataFrame(df_temp, type, [typeChoice])
     [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df_temp, [codeEventTag], durationTag, countTag, quantileTag)      

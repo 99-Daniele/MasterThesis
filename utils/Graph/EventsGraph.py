@@ -7,15 +7,22 @@ import utils.Dataframe as frame
 import utils.utilities.Utilities as utilities
 
 # update types based on current dataframe.
-def updateTypes(df, sectionTag, subjectTag, judgeTag, countTag):
+def updateTypes(df):
+    judgeTag = utilities.getTagName('judgeTag')
+    sectionTag = utilities.getTagName('sectionTag')
+    subjectTag = utilities.getTagName('subjectTag')
     df_temp = df.copy()
-    sections = frame.getGroupBy(df_temp, sectionTag, countTag)
-    subjects = frame.getGroupBy(df_temp, subjectTag, countTag)
-    judges = frame.getGroupBy(df_temp, judgeTag, countTag)
+    sections = frame.getGroupBy(df_temp, sectionTag)
+    subjects = frame.getGroupBy(df_temp, subjectTag)
+    judges = frame.getGroupBy(df_temp, judgeTag)
     return [sections, subjects, judges]
 
 # update types based on user selections.
-def updateTypesBySelection(df, processDateTag, sectionTag, subjectTag, judgeTag, startDate, endDate, sections, subjects, judges):
+def updateTypesBySelection(df, startDate, endDate, sections, subjects, judges):
+    judgeTag = utilities.getTagName('judgeTag')
+    processDateTag = utilities.getTagName('dateTag')
+    sectionTag = utilities.getTagName('sectionTag')
+    subjectTag = utilities.getTagName('subjectTag')
     df_temp = df.copy()
     df_temp = frame.getDateDataFrame(df_temp, processDateTag, startDate, endDate)
     if sections != None and len(sections) > 0:
@@ -32,14 +39,10 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         startDate = minDate
         endDate = maxDate
-    dateTag = 'data'
-    countTag = 'conteggio'
-    sectionTag = 'sezione'
-    subjectTag = 'materia'
-    judgeTag = 'giudice'
-    numProcessTag = 'numProcesso'
-    df_temp = updateTypesBySelection(df_temp, dateTag, sectionTag, subjectTag, judgeTag, startDate, endDate, sections, subjects, judges)
-    [sections, subjects, judges] = updateTypes(df_temp, sectionTag, subjectTag, judgeTag, countTag)
+    dateTag = utilities.getTagName('dateTag')
+    numProcessTag = utilities.getTagName('numProcessTag')
+    df_temp = updateTypesBySelection(df_temp, startDate, endDate, sections, subjects, judges)
+    [sections, subjects, judges] = updateTypes(df_temp)
     fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_sequence = utilities.phaseColorList(df_temp, type), labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = utilities.getWidth(1))
     fig.update_layout(
         legend = dict(

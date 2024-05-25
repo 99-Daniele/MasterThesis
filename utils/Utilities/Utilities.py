@@ -6,21 +6,17 @@ from win32api import GetSystemMetrics
 
 import utils.FileOperation as file
 
-# weeks, months, trimesters, daysOfWeek are lists of visualization of week, month, trimester and day of week.
-weeks = ['02/01', '08/01', '15/01', '22/01', '29/01', '05/02', '12/02', '19/02', '26/02', '05/03', '12/03', '19/03', '26/03', '02/04', '09/04', '16/04', '23/04', '30/04', '07/05', '14/05', '21/05', '28/05', '04/06', '11/06', '18/06', '25/06', '02/07', '09/07', '16/07', '23/07', '30/07', '06/08', '13/08', '20/08', '27/08', '03/09', '10/09', '17/09', '24/09', '01/10', '08/10', '15/10', '22/10', '29/10', '05/11', '12/11', '19/11', '26/11', '03/12', '10/12', '17/12', '24/12', '31/12']
-months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
-trimesters = ['Gen-Mar', 'Apr-Giu', 'Lug-Set', 'Ott-Dic']
-daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica']
-
 # from given dataframe return a list of colors based on events phases.
 def phaseColorList(df, type):
     types = df[type].unique().tolist()
     c = []
-    colors = file.getDataFromJsonFile('utils/Utilities/phaseColors.json')
+    colors = file.getDataFromJsonFile('utils/utilities/phaseColors.json')
+    dateTag = getTagName("dateTag")
+    phaseTag = getTagName("phaseTag")
     for t in types:
-        df_count = df[df[type] == t].groupby(['fase'], as_index = False).count()
-        max = df_count['data'].max()
-        phase = df_count[df_count['data'] == max]['fase'].tolist()[0]
+        df_count = df[df[type] == t].groupby([phaseTag], as_index = False).count()
+        max = df_count[dateTag].max()
+        phase = df_count[df_count[dateTag] == max][phaseTag].tolist()[0]
         c.append(colors.get(str(phase)))
     return c
 
@@ -75,10 +71,12 @@ def getYearNumber(date):
 
 # get given week from weeks.
 def getWeek(weekNumber):
+    weeks = file.getDataFromJsonFile('utils/utilities/weeks.json')
     return weeks[weekNumber - 1]
 
 # get given month from months.
 def getMonth(monthNumber):
+    months = file.getDataFromJsonFile('utils/utilities/months.json')
     return months[monthNumber - 1]
 
 # get given month from months and given year.
@@ -90,6 +88,7 @@ def getMonthYear(date):
 
 # get given trimester from trimesters.
 def getTrimester(trimesterNumber):
+    trimesters = file.getDataFromJsonFile('utils/utilities/trimesters.json')
     return trimesters[trimesterNumber - 1]
 
 # get given trimester from trimesters and given year.
@@ -100,18 +99,14 @@ def getTrimesterYear(date):
     y = date.year
     return trimester + " " + str(y)
 
-# get given day of week from daysOfWeek.
-def getDayOfWeek(dowNumber):
-    return daysOfWeek[dowNumber - 1]
-
 # get given process state from processStates text file.
 def getProcessState(state):
-    processState = list(file.getDataFromTextFile('utils/Utilities/processStates.txt'))
+    processState = list(file.getDataFromTextFile('utils/utilities/processStates.txt'))
     return processState[state]
 
 # get all process states from processStates text file.
 def getAllProcessState():
-    processState = file.getDataFromTextFile('utils/Utilities/processStates.txt')
+    processState = file.getDataFromTextFile('utils/utilities/processStates.txt')
     return processState
 
 # transform list into string by "," join.
@@ -163,12 +158,14 @@ def fromAlphanumericStringToInt(string, filename):
         else:
             return number
 
+# get tagName from tag.
 def getTagName(tag):
-    tags = file.getDataFromJsonFile('utils/Utilities/tags.json')
+    tags = file.getDataFromJsonFile('utils/utilities/tags.json')
     tagName = tags.get(tag)
     return tagName
 
+# get placeholderName from placeholder.
 def getPlaceholderName(placeholder):
-    placeholders = file.getDataFromJsonFile('utils/Utilities/placeholder.json')
+    placeholders = file.getDataFromJsonFile('utils/utilities/placeholder.json')
     placeholderName = placeholders.get(placeholder)
     return placeholderName

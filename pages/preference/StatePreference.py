@@ -17,9 +17,16 @@ durationTag = utilities.getTagName('durationTag')
 
 # return initial layout of page.
 def pageLayout():
-    phaseTag = utilities.getTagName('phaseTag')
-    tagTag = utilities.getTagName('tagTag')
     codeStateTag = utilities.getTagName('codeStateTag')
+    count = utilities.getPlaceholderName('count')
+    description = utilities.getPlaceholderName('description')
+    duration = utilities.getPlaceholderName('duration')
+    phase = utilities.getPlaceholderName('phase')
+    phaseDB = utilities.getPlaceholderName('phaseDB')
+    phaseTag = utilities.getTagName('phaseTag')
+    state = utilities.getPlaceholderName('state')
+    tag = utilities.getPlaceholderName('tag')
+    tagTag = utilities.getTagName('tagTag')
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
@@ -28,13 +35,13 @@ def pageLayout():
         ds.html.Button("REFRESH", id = 'refresh-button-s'),
         ds.dash_table.DataTable(
             df.to_dict('records'), columns = [
-                {'name': 'stato', 'id': codeStateTag, 'editable': False}, 
-                {'name': 'descrizione', 'id': descriptionTag, 'editable': False}, 
-                {'name': 'etichetta', 'id': tagTag, 'editable': True}, 
-                {'name': 'fase_db', 'id': phaseDBTag, 'editable': False}, 
-                {'name': 'fase', 'id': phaseTag, 'editable': True}, 
-                {'name': 'conteggio', 'id': countTag, 'editable': False},  
-                {'name': 'durata [gg]', 'id': durationTag, 'editable': False}],
+                {'name': state, 'id': codeStateTag, 'editable': False}, 
+                {'name': description, 'id': descriptionTag, 'editable': False}, 
+                {'name': tag, 'id': tagTag, 'editable': True}, 
+                {'name': phaseDB, 'id': phaseDBTag, 'editable': False}, 
+                {'name': phase, 'id': phaseTag, 'editable': True}, 
+                {'name': count, 'id': countTag, 'editable': False},  
+                {'name': duration, 'id': durationTag, 'editable': False}],
             filter_action = "native",
             sort_action = "native",
             id = "statetable"
