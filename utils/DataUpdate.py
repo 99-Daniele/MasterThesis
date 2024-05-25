@@ -21,13 +21,15 @@ def refreshData():
     maxDate = getter.getMaxDate()
     endPhase = getter.getEndPhase()
     end = True
-    updateEventsDataframe(events)
+    updateEventsDataframe(events, endPhase)
     processEvents = getProcessEvents(events, endPhase, end)
-    [eventsSequences, phasesSequences, statesSequences] = updateTypeDurationDataframe(processEvents, courtHearingsEventsType)
+    [eventsSequences, phasesSequences, statesSequences] = updateTypeDurationDataframe(processEvents, courtHearingsEventsType, endPhase)
     updateProcessDurationDataframe(processEvents, eventsSequences, phasesSequences, statesSequences)
 
 # group events by process.
 def getProcessEvents(events, endPhase, ending):
+    if len(events) == 0:
+        raise Exception("\nThere isn't any event in database.")
     allProcessEvents = []
     processId = events[0][1]
     processJudge = events[0][5]
@@ -64,7 +66,7 @@ def getProcessEvents(events, endPhase, ending):
 
 # update events dataframe.
 def updateEventsDataframe(events, endPhase):
-    updateAllEventsDataframe(events)
+    updateAllEventsDataframe(events, endPhase)
     updateImportantEventsDataframe(events, endPhase)
     updateCourtHearingEventsDataframe(events, endPhase)
     updateStateEventsDataframe(events, endPhase)
@@ -163,11 +165,12 @@ def calcTypeDuration(processEvents, courtHearingsEventsType, endPhase):
     phasesDuration = []
     statesDuration = []
     courtHearingsDuration = []
-    eventsSequences = []
-    phasesSequences = []
-    statesSequences = []
+    eventsSequences = {}
+    phasesSequences = {}
+    statesSequences = {}
     with alive_bar(int(len(processEvents))) as bar:
         for i in range(int(len(processEvents))):
+            processId = processEvents[i][0]
             [processEventsDuration, eventsSequence] = getEventInfo(processEvents[i], endPhase)
             [processPhasesDuration, phasesSequence] = getPhaseInfo(processEvents[i], endPhase)
             [processStateDuration, statesSequence] = getStateInfo(processEvents[i], endPhase)
@@ -175,10 +178,10 @@ def calcTypeDuration(processEvents, courtHearingsEventsType, endPhase):
             eventsDuration.extend(processEventsDuration)
             phasesDuration.extend(processPhasesDuration)
             statesDuration.extend(processStateDuration)
-            courtHearingsDuration.extend(courtHearingDuration)
-            eventsSequences.extend([eventsSequence])
-            phasesSequences.extend([phasesSequence])
-            statesSequences.extend([statesSequence])
+            courtHearingsDuration.extend(courtHearingDuration) 
+            eventsSequences.update({processId: eventsSequence})
+            phasesSequences.update({processId: phasesSequence})
+            statesSequences.update({processId: statesSequence})
             bar()
     return [eventsDuration, eventsSequences, phasesDuration, phasesSequences, statesDuration, statesSequences, courtHearingsDuration]
 
@@ -237,8 +240,6 @@ def getEventInfo(events, endPhase):
         eventsDuration.append([currEventId, processId, currEventCode, currEventTag, duration, currDate, currJudgeCode, currJudge, currStateCode, currStateTag, currPhase, currSubjectCode, currSubjectTag, currSection, finished, currDate, currEventId])
     if len(eventsSequence) == 0 or curr[3] != eventsSequence[-1]:
         eventsSequence.append(curr[3])
-    if len(eventsDuration) == 1:
-        eventsDuration = [eventsDuration]
     return [eventsDuration, eventsSequence]
 
 # return phases duration.
@@ -299,8 +300,6 @@ def getPhaseInfo(events, endPhase):
         phasesDuration.append([currEventId, processId, currEventCode, currEventTag, duration, currDate, currJudgeCode, currJudge, currStateCode, currStateTag, currPhase, currSubjectCode, currSubjectTag, currSection, finished, nextDate, nextEventId])
     if len(phasesSequence) == 0 or curr[9] != phasesSequence[-1]:
         phasesSequence.append(curr[9])
-    if len(phasesDuration) == 1:
-        phasesDuration = [phasesDuration]
     return [phasesDuration, phasesSequence]
 
 # return states duration.
@@ -362,8 +361,6 @@ def getStateInfo(events, endPhase):
         statesDuration.append([currEventId, processId, currEventCode, currEventTag, duration, currDate, currJudgeCode, currJudge, currStateCode, currStateTag, currPhase, currSubjectCode, currSubjectTag, currSection, finished, nextDate, nextEventId])
     if len(statesSequence) == 0 or curr[8] != statesSequence[-1]:
         statesSequence.append(curr[8])
-    if len(statesDuration) == 1:
-        statesDuration = [statesDuration]
     return [statesDuration, statesSequence]
 
 # return court hearing duration.
@@ -374,7 +371,7 @@ def getCourtHearingDuration(events, courtHearingTypes):
     section = events[3]
     finished = events[4]
     if len(events) == 5:
-        return [[]]
+        return []
     events = events[5:]
     courtHearingsDuration = []
     courtHearing = False
@@ -428,8 +425,6 @@ def getCourtHearingDuration(events, courtHearingTypes):
         nextDateDt = dt.datetime.strptime(nextDate, '%Y-%m-%d %H:%M:%S')
         duration = (nextDateDt - currDateDt).days
         courtHearingsDuration.append([currEventId, processId, currEventCode, currEventTag, duration, currDate, currJudgeCode, currJudge, currStateCode, currStateTag, currPhase, currSubjectCode, currSubjectTag, currSection, finished, nextDate, nextEventId])
-    if len(courtHearingsDuration) == 1:
-        courtHearingsDuration = [courtHearingsDuration]
     return courtHearingsDuration
 
 # update process duration dataframe.
@@ -439,11 +434,12 @@ def updateProcessDurationDataframe(processEvents, eventSequence, phaseSequence, 
     cache.updateCache('processesDuration.json', processDurationDataframe)
 
 # calc types durations.
-def calcProcessDuration(processEvents, eventSequence, phaseSequence, stateSequence):
+def calcProcessDuration(processEvents, eventsSequence, phasesSequence, statesSequence):
     processesDuration = []
     with alive_bar(int(len(processEvents))) as bar:
         for i in range(int(len(processEvents))):
-            processDuration = getProcessDuration(processEvents[i], eventSequence[i], phaseSequence[i], stateSequence[i])
+            processId = processEvents[i][0]
+            processDuration = getProcessDuration(processEvents[i], eventsSequence.get(processId), phasesSequence.get(processId), statesSequence.get(processId))
             processesDuration.append(processDuration)
             bar()
     return processesDuration
@@ -497,49 +493,34 @@ def verifyDatabase(connection):
     if not connect.doesATableHaveColumns(connection, "processi", ['numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'], ['BIGINT', 'DATETIME', 'TEXT', 'VARCHAR(10)', 'VARCHAR(5)']):
         raise Exception("\n'processi' table does not have all requested columns. The requested columns are: 'numProcesso'(BIGINT), 'dataInizio'(DATETIME), 'giudice'(TEXT), 'materia'(VARCHAR(10)), 'sezione'(VARCHAR(5))")
     if not connect.doesATableExist(connection, "eventinome"):
-        connect.createTable(connection, 'eventinome', ['codice', 'etichetta', 'abbreviazione', 'fase'], ['VARCHAR(10)', 'TEXT', 'TEXT', 'VARCHAR(5)'], [0], [])
+        connect.createTable(connection, 'eventinome', ['codice', 'etichetta', 'fase'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(5)'], [0], [])
         connect.insertIntoDatabase(connection, 'eventinome', eventsName)
     else:
-        if not connect.doesATableHaveColumns(connection, "eventinome", ['codice', 'etichetta', 'abbreviazione', 'fase'], ['VARCHAR(10)', 'TEXT', 'TEXT', 'VARCHAR(5)']):
-            raise Exception("\n'eventinome' table does not have all requested columns. The requested columns are: 'codice'(VARCHAR(10)), 'etichetta'(TEXT), 'abbreviazione'(TEXT), 'fase'(VARCHAR(5))")
-        eventsNameInfo = compareData(eventsName, connection, "SELECT * FROM eventinome ORDER BY codice")
-        connect.updateTable(connection, 'eventinome', eventsNameInfo, 'codice')
+        if not connect.doesATableHaveColumns(connection, "eventinome", ['codice', 'etichetta', 'fase'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(5)']):
+            raise Exception("\n'eventinome' table does not have all requested columns. The requested columns are: 'codice'(VARCHAR(10)), 'abbreviazione'(TEXT), 'fase'(VARCHAR(5))")
+        connect.clearTable(connection, "eventinome")
+        connect.insertIntoDatabase(connection, 'eventinome', eventsName)
     if not connect.doesATableExist(connection, "materienome"):
         connect.createTable(connection, 'materienome', ['codice', 'descrizione', 'rituale', 'etichetta'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(4)', 'TEXT'], [0], [])
         connect.insertIntoDatabase(connection, 'materienome', subjectsName)
     else:
         if not connect.doesATableHaveColumns(connection, "materienome", ['codice', 'descrizione', 'rituale', 'etichetta'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(4)', 'TEXT']):
             raise Exception("\n'materienome' table does not have all requested columns. The requested columns are: 'codice'(VARCHAR(10)), 'descrizione'(TEXT), 'rituale'(VARCHAR(4)), 'etichetta'(TEXT)")
-        subjectsNameInfo = compareData(subjectsName, connection, "SELECT * FROM materienome ORDER BY codice")
-        connect.updateTable(connection, 'materienome', subjectsNameInfo, 'codice')
+        connect.clearTable(connection, "materienome")
+        connect.insertIntoDatabase(connection, 'materienome', subjectsName)
     if not connect.doesATableExist(connection, "statinome"):
         connect.createTable(connection, 'statinome', ['stato', 'etichetta', 'fase'], ['VARCHAR(5)', 'TEXT', 'VARCHAR(5)'], [0], [])
         connect.insertIntoDatabase(connection, 'statinome', statesName)
     else:
         if not connect.doesATableHaveColumns(connection, "statinome", ['stato', 'etichetta', 'fase'], ['VARCHAR(5)', 'TEXT', 'VARCHAR(5)']):
             raise Exception("\n'statinome' table does not have all requested columns. The requested columns are: 'stato'(VARCHAR(5)), 'etichetta'(TEXT), 'fase'(VARCHAR(5))")
-        statesNameInfo = compareData(statesName, connection, "SELECT * FROM statinome ORDER BY stato")
-        connect.updateTable(connection, 'statinome', statesNameInfo, 'stato') 
+        connect.clearTable(connection, "statinome")
+        connect.insertIntoDatabase(connection, 'statinome', statesName)
     if not connect.doesATableExist(connection, "giudicinome"):
-        connect.createTable(connection, 'giudicinome', ['giudice', 'alias'], ['VARCHAR(100)', 'TEXT'], [0], [])
+        connect.createTable(connection, 'giudicinome', ['giudice', 'alias'], ['VARCHAR(50)', 'TEXT'], [0], [])
         connect.insertIntoDatabase(connection, 'giudicinome', judgesName)
     else:
-        if not connect.doesATableHaveColumns(connection, "giudicinome", ['giudice', 'alias'], ['VARCHAR(100)', 'TEXT']):
-            raise Exception("\n'giudicinome' table does not have all requested columns. The requested columns are: 'giudice'(VARCHAR(100)), 'alias'(TEXT)")
-        judgesNameInfo = compareData(judgesName, connection, "SELECT * FROM giudicinome ORDER BY giudice")
-        connect.updateTable(connection, 'giudicinome', judgesNameInfo, 'giudice')  
-
-# compare data with database data and return info about what has to be eliminated from or added to database.
-def compareData(data, connection, query):
-    databaseData = connect.getDataFromDatabase(connection, query)
-    i = 0
-    j = 0
-    dataInfo = [[], []]
-    data.sort(key = lambda a: a[0])
-    databaseData.sort(key = lambda a: a[0])
-    while i < len(data) and j < len(databaseData):
-        dataInfo[0].append(data[i])
-        dataInfo[1].append(data[i][0])
-        i += 1
-        j += 1
-    return dataInfo
+        if not connect.doesATableHaveColumns(connection, "giudicinome", ['giudice', 'alias'], ['VARCHAR(50)', 'TEXT']):
+            raise Exception("\n'giudicinome' table does not have all requested columns. The requested columns are: 'giudice'(VARCHAR(50)), 'alias'(TEXT)")
+        connect.clearTable(connection, "giudicinome")
+        connect.insertIntoDatabase(connection, 'giudicinome', judgesName)  

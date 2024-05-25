@@ -10,11 +10,12 @@ import utils.FileOperation as file
 connection = connect.getDatabaseConnection()
 
 # queries to obtain data from database.
-minDateQuery = "SELECT DATE_FORMAT(MIN(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
-maxDateQuery = "SELECT DATE_FORMAT(MAX(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 endPhaseQuery = "SELECT fase FROM tribunali2020.statinome WHERE stato = 'DF'"
 eventsQuery = "SELECT e.numEvento AS numEvento, e.numProcesso AS numProcesso, en.codice AS codiceEvento, en.etichetta AS evento, gn.giudice AS giudice, gn.alias AS alias, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S') AS dataEvento, sn.stato AS codiceStato, sn.etichetta AS stato, sn.fase AS faseStato, mn.codice AS codiceMateria, mn.descrizione AS materiaProcesso, p.sezione AS sezioneProcesso FROM eventi AS e, processi AS p, eventinome AS en, statinome AS sn, giudicinome AS gn, materienome AS mn WHERE e.numProcesso = p.numProcesso AND e.codice = en.codice AND e.statofinale = sn.stato AND e.giudice = gn.giudice AND p.materia = mn.codice ORDER BY numProcesso, data, numEvento"
 importantSubjectsQuery = "SELECT descrizione FROM materienome WHERE LENGTH(codice) = 6 AND codice LIKE '1%' AND rituale = '4O'"
+minDateQuery = "SELECT DATE_FORMAT(MIN(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
+maxDateQuery = "SELECT DATE_FORMAT(MAX(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
+stateNamesQuery = "SELECT sn.stato AS codice, ts.CDESCR AS descrizione, sn.etichetta AS etichetta, ts.FKFASEPROCESSO AS fase_db, sn.fase AS fase FROM statinome AS sn, tipostato AS ts WHERE sn.stato = ts.CCODST"
 
 # importantEvents are taken from text file. This are type of events that are the most important. Thay can be changed or removed directly from importantEvents.txt file.
 try:
@@ -67,104 +68,90 @@ def getImportantSubjects():
     subjects = [s for subject in subjects for s in subject]
     return subjects
 
-# get dataframe of events from cache.
-# if is not present in cache, get it from database and add to cache.
-def getEventsDataframe(filename):
-    eventsDataframe = cache.getData(filename)
-    if eventsDataframe is None:
-        update.refreshData()
-        eventsDataframe = cache.getData(filename)
-    return eventsDataframe
-
-# get dataframe of processes duration from cache.
-# if is not present in cache, get it from database and add to cache.
-def getProcessDurationDataframe(filename):
-    processDurationDataframe = cache.getData(filename)
-    if processDurationDataframe is None:
-        update.refreshData()
-        processDurationDataframe = cache.getData(filename)
-    return processDurationDataframe
-
-# get dataframe of states duration from cache.
-# if is not present in cache, get it from database and add to cache.
-def getStateDurationDataframe(filename):
-    stateDurationDataframe = cache.getData(filename)
-    if stateDurationDataframe is None:
-        update.refreshData()
-        stateDurationDataframe = cache.getData(filename)
-    return stateDurationDataframe
-
-# get dataframe of phases duration from cache.
-# if is not present in cache, get it from database and add to cache.
-def getPhaseDurationDataframe(filename):
-    phaseDurationDataframe = cache.getData(filename)
-    if phaseDurationDataframe is None:
-        update.refreshData()
-        phaseDurationDataframe = cache.getData(filename)
-    return phaseDurationDataframe
-
-# get dataframe of events duration from cache.
-# if is not present in cache, get it from database and add to cache.
-def getEventDurationDataframe(filename):
-    eventDurationDataframe = cache.getData(filename)
-    if eventDurationDataframe is None:
-        update.refreshData()
-        eventDurationDataframe = cache.getData(filename)
-    return eventDurationDataframe
-
-# get dataframe of court hearings duration from cache.
-# if is not present in cache, get it from database and add to cache.
-def getCourtHearingsDurationDataframe(filename):
-    courtHearingsDurationDataframe = cache.getData(filename)
-    if courtHearingsDurationDataframe is None:
-        update.refreshData()
-        courtHearingsDurationDataframe = cache.getData(filename)
-    return courtHearingsDurationDataframe
-
 # get all events from cache file.
 def getAllEvents():
-    return getEventsDataframe('allEvents.json')
+    allEventsDataframe = cache.getData('allEvents.json')
+    if allEventsDataframe is None:
+        update.refreshData()
+        allEventsDataframe = cache.getData('allEvents.json')
+    return allEventsDataframe
 
 # get important events from cache file.
 def getImportantEvents():
-    return getEventsDataframe('importantEvents.json')
+    importantEventsDataframe = cache.getData('importantEvents.json')
+    if importantEventsDataframe is None:
+        update.refreshData()
+        importantEventsDataframe = cache.getData('importantEvents.json')
+    return importantEventsDataframe
 
 # get phases events from cache file.
 def getPhaseEvents():
-    return getEventsDataframe('phaseEvents.json')
+    phaseEventsDataframe = cache.getData('phaseEvents.json')
+    if phaseEventsDataframe is None:
+        update.refreshData()
+        phaseEventsDataframe = cache.getData('phaseEvents.json')
+    return phaseEventsDataframe
 
 # get states events from cache file.
 def getStateEvents():
-    return getEventsDataframe('stateEvents.json')
+    stateEventsDataframe = cache.getData('stateEvents.json')
+    if stateEventsDataframe is None:
+        update.refreshData()
+        stateEventsDataframe = cache.getData('stateEvents.json')
+    return stateEventsDataframe
 
 # get court hearings events from cache file.
 def getCourtHearingsEvents():
-    return getEventsDataframe('courtHearingEvents.json')
+    courtHearingsEventsDataframe = cache.getData('courtHearingEvents.json')
+    if courtHearingsEventsDataframe is None:
+        update.refreshData()
+        courtHearingsEventsDataframe = cache.getData('courtHearingEvents.json')
+    return courtHearingsEventsDataframe
 
 # get processes events from cache file.
 def getProcessesDuration():
-    return getProcessDurationDataframe('processesDuration.json')
+    processDurationDataframe = cache.getData('processesDuration.json')
+    if processDurationDataframe is None:
+        update.refreshData()
+        processDurationDataframe = cache.getData('processesDuration.json')
+    return processDurationDataframe
 
 # get states duration from cache file.
 def getStatesDuration():
-    return getStateDurationDataframe('statesDuration.json')
+    stateDurationDataframe = cache.getData('statesDuration.json')
+    if stateDurationDataframe is None:
+        update.refreshData()
+        stateDurationDataframe = cache.getData('statesDuration.json')
+    return stateDurationDataframe
 
 # get phases duration from cache file.
 def getPhasesDuration():
-    return getPhaseDurationDataframe('phasesDuration.json')
+    phaseDurationDataframe = cache.getData('phasesDuration.json')
+    if phaseDurationDataframe is None:
+        update.refreshData()
+        phaseDurationDataframe = cache.getData('phasesDuration.json')
+    return phaseDurationDataframe
 
 # get events duration from cache file.
 def getEventsDuration():
-    return getEventDurationDataframe('eventsDuration.json')
+    eventDurationDataframe = cache.getData('eventsDuration.json')
+    if eventDurationDataframe is None:
+        update.refreshData()
+        eventDurationDataframe = cache.getData('eventsDuration.json')
+    return eventDurationDataframe
 
 # get court hearings duration from cache file.
 def getCourtHearingsDuration():
-    return getCourtHearingsDurationDataframe('courtHearingsDuration.json')
+    courtHearingsDurationDataframe = cache.getData('courtHearingsDuration.json')
+    if courtHearingsDurationDataframe is None:
+        update.refreshData()
+        courtHearingsDurationDataframe = cache.getData('courtHearingsDuration.json')
+    return courtHearingsDurationDataframe
 
 # get states name dataframe.
 def getStateNamesDataframe():
-    stateDurationDataframe = getStateDurationDataframe('statesDuration.json')
+    stateDurationDataframe = getStatesDuration()
     stateNames = connect.getDataFromDatabase(connection, stateNamesQuery)
     stateNamesDataframe = frame.createStateNameDataframe(stateNames, 'codicestato', 'descrizione', 'etichetta', 'fase_db', 'fase')
-    df2 = frame.createStateNameDataframeWithInfo(stateDurationDataframe, stateNamesDataframe, 'codicestato', 'durata', 'conteggio')
-    return df2
+    df = frame.createStateNameDataframeWithInfo(stateDurationDataframe, stateNamesDataframe, 'codicestato', 'durata', 'conteggio')
+    return df

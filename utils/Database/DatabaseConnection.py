@@ -105,6 +105,7 @@ def createTable(connection, tableName, columnNames, columnTypes, primaryKeys, no
             query = query + ", "
     query = query + "));"
     executeQuery(connection, query)
+    connection.commit()
 
 # create a new table in user database executing given query.
 # in case chosen table already exist, its dropped.
@@ -112,6 +113,7 @@ def createTableFromQuery(connection, table, query):
     if doesATableExist(connection, table):
         dropTable(connection, table)
     executeQuery(connection, query)
+    connection.commit()
 
 # create a new view in user database executing given query.
 # in case chosen view already exist, its dropped.
@@ -119,6 +121,7 @@ def createViewFromQuery(connection, view, query):
     if doesAViewExist(connection, view):
         dropView(connection, view)
     executeQuery(connection, query)
+    connection.commit()
 
 # drop table from user database.
 # in case chosen table doesn't exists an exception is raised.
@@ -127,6 +130,7 @@ def dropTable(connection, table):
         raise Exception("\nYou can't drop this table since it doesn't exist!!")
     query = "DROP TABLE " + table
     executeQuery(connection, query)
+    connection.commit()
 
 # drop view from user database.
 # in case chosen table doesn't exists an exception is raised.
@@ -135,26 +139,6 @@ def dropView(connection, view):
         raise Exception("\nYou can't drop this view since it doesn't exist!!")
     query = "DROP VIEW " + view
     executeQuery(connection, query)
-
-# update chosen table based on given dataInfo and conditions: firstly are removed unneeded rows and then add needed rows.
-# in case chosen table doesn't exists an exception is raised.
-def updateTable(connection, table, dataInfo, condition):
-    if not doesATableExist(connection, table):
-        raise Exception("\nYou can't update this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
-    removeFromDatabase(connection, table, dataInfo[1], condition)
-    connection.commit()
-    insertIntoDatabase(connection, table, dataInfo[0])
-    connection.commit()
-
-# update chosen table based on given dataInfo and conditions: firstly are removed unneeded rows and then add needed rows.
-# in case chosen table doesn't exists an exception is raised.
-# this method is when the data to be removed needs an additional 'order' parameter condition.
-def updateTableWithOrder(connection, table, dataInfo, condition):
-    if not doesATableExist(connection, table):
-        raise Exception("\nYou can't update this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
-    removeFromDatabaseWithOrder(connection, table, dataInfo[1], condition)
-    connection.commit()
-    insertIntoDatabase(connection, table, dataInfo[0])
     connection.commit()
 
 # clear table from user database.
@@ -164,6 +148,7 @@ def clearTable(connection, table):
         raise Exception("\nYou can't clear this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
     query = "DELETE FROM {}".format(table)
     executeQuery(connection, query)
+    connection.commit()
 
 # insert into database given tuples into given table.
 # in case chosen table doesn't exists an exception is raised.
@@ -178,31 +163,7 @@ def insertIntoDatabase(connection, table, tuples):
                 query = ("INSERT INTO {} VALUES" + filler).format(table)
                 executeQueryWithValues(connection, query, t)
                 bar()
-
-# remove from database given table if condition holds.
-# in case chosen table doesn't exists an exception is raised.
-def removeFromDatabase(connection, table, ids, condition):
-    if not doesATableExist(connection, table):
-        raise Exception("\nYou can't delete from this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
-    with alive_bar(int(len(ids))) as bar:
-        for id in ids:
-            if not isinstance(id, str):
-                id = str(id)
-            query = ("DELETE FROM {} WHERE " + condition + " = '" + id + "'").format(table)
-            executeQuery(connection, query)
-            bar()
-
-# remove from database given table if condition holds.
-# in case chosen table doesn't exists an exception is raised.
-# this method is when the data to be removed needs an additional 'order' parameter condition.
-def removeFromDatabaseWithOrder(connection, table, conditions, condition):
-    if not doesATableExist(connection, table):
-        raise Exception("\nYou can't delete from this table since it doesn't exist!! Please use function 'createTable()' in order to create it.")
-    with alive_bar(int(len(conditions))) as bar:
-        for c in conditions:
-            query = ("DELETE FROM {} WHERE " + condition + " = " + str(c[0]) + " AND ordine = " + str(c[1])).format(table)
-            executeQuery(connection, query)
-            bar()
+    connection.commit()
 
 # create filler based on tuples length. This is needed for inserting tuples.
 def createFiller(length):
