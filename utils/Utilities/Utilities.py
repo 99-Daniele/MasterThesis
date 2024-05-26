@@ -72,12 +72,12 @@ def getYearNumber(date):
 # get given week from weeks.
 def getWeek(weekNumber):
     weeks = file.getDataFromJsonFile('utils/utilities/weeks.json')
-    return weeks[weekNumber - 1]
+    return weeks.get(str(weekNumber))
 
 # get given month from months.
 def getMonth(monthNumber):
     months = file.getDataFromJsonFile('utils/utilities/months.json')
-    return months[monthNumber - 1]
+    return months.get(str(monthNumber))
 
 # get given month from months and given year.
 def getMonthYear(date):
@@ -89,7 +89,7 @@ def getMonthYear(date):
 # get given trimester from trimesters.
 def getTrimester(trimesterNumber):
     trimesters = file.getDataFromJsonFile('utils/utilities/trimesters.json')
-    return trimesters[trimesterNumber - 1]
+    return trimesters.get(str(trimesterNumber))
 
 # get given trimester from trimesters and given year.
 def getTrimesterYear(date):
@@ -101,13 +101,8 @@ def getTrimesterYear(date):
 
 # get given process state from processStates text file.
 def getProcessState(state):
-    processState = list(file.getDataFromTextFile('utils/utilities/processStates.txt'))
-    return processState[state]
-
-# get all process states from processStates text file.
-def getAllProcessState():
-    processState = file.getDataFromTextFile('utils/utilities/processStates.txt')
-    return processState
+    processStates = file.getDataFromJsonFile('utils/utilities/processStates.json')
+    return processStates.get(str(state))
 
 # transform list into string by "," join.
 def fromListToString(list):

@@ -33,9 +33,9 @@ def pageLayout():
     maxYear = dt.datetime.strptime(df[dateTag].max(), '%Y-%m-%d %H:%M:%S').year
     maxDateStart = dt.date(maxYear - 1, 1, 1)
     maxDateEnd = dt.date(maxYear, 1, 1)
-    sections = frame.getGroupBy(df, sectionTag, countTag)
-    subjects = frame.getGroupBy(df, subjectTag, countTag)
-    judges = frame.getGroupBy(df, judgeTag, countTag)
+    sections = frame.getGroupBy(df, sectionTag)
+    subjects = frame.getGroupBy(df, subjectTag)
+    judges = frame.getGroupBy(df, judgeTag)
     fig = px.scatter(df, x = dateTag, y = numProcessTag, color = eventTag, labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = 1400, height = 1200)
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),

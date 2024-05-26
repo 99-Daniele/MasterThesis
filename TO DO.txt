@@ -1,9 +1,10 @@
-- verifica nome e fasi stati ed eventi  
-- processi/fasi/stati durata 0?
+- verifica nome e fasi stati ed eventi 
 - precisazione conclusioni o decisione?
 
 - filtro quando un evento particolare avviene? (fase, stato)
 - nomi in inglese
+- filtro durata
+- colore stati fasi
 
 - verifica valore predetto
 - valore predetto sulla base di giudice, materia, sezione, data, carico processi giudice in quel momento

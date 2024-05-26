@@ -28,12 +28,13 @@ def createEventsDataFrame(events, endPhase):
     numEventTag = utilities.getTagName('numEventTag')
     numProcessTag = utilities.getTagName('numProcessTag')
     phaseTag = utilities.getTagName('phaseTag')
+    processDateTag = utilities.getTagName('processDateTag')
     sectionTag = utilities.getTagName('sectionTag')
     stateTag = utilities.getTagName('stateTag')
     stateCodeTag = utilities.getTagName('codeStateTag')
     subjectTag = utilities.getTagName('subjectTag')
     subjectCodeTag = utilities.getTagName('codeSubjectTag')
-    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, eventTag, judgeCodeTag, judgeTag, dateTag, stateCodeTag, stateTag, phaseTag, subjectCodeTag, subjectTag, sectionTag])
+    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, eventTag, judgeCodeTag, judgeTag, dateTag, processDateTag, stateCodeTag, stateTag, phaseTag, subjectCodeTag, subjectTag, sectionTag])
     dfNotEnd = df[df[phaseTag] != endPhase].reset_index(drop = True)
     dfEnd = df[df[phaseTag] == endPhase].reset_index(drop = True)
     dfEnd = dfEnd.groupby(numProcessTag, as_index = False).first().reset_index(drop = True)
@@ -84,13 +85,7 @@ def createTypeDurationsDataFrame(events):
     subjectTag = utilities.getTagName('subjectTag')
     subjectCodeTag = utilities.getTagName('codeSubjectTag')
     df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, eventTag, durationTag, dateTag, judgeCodeTag, judgeTag, stateCodeTag, stateTag, phaseTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
-    filteredDf = df.copy()
-    if importantProcessStates != None:
-        filteredDf = filteredDf[filteredDf[finishedTag].isin(importantProcessStates)]
-    if importantSections != None:
-        filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
-    filteredDf = filteredDf.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
-    return [df, filteredDf]
+    return df
 
 # from state names list create state names dataframe.
 def createStateNameDataframe(stateNames):
@@ -107,16 +102,16 @@ def createStateNameDataframe(stateNames):
 def createStateNameDataframeWithInfo(statesDuration, stateNames):
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
-    stateTag = utilities.getTagName('stateTag')
-    statesDuration = statesDuration.groupby([stateTag]) \
+    codeStateTag = utilities.getTagName('codeStateTag')
+    statesDuration = statesDuration.groupby([codeStateTag]) \
         .agg({statesDuration.columns[2]: 'size', durationTag: 'mean'}) \
         .rename(columns = {statesDuration.columns[2]:countTag}) \
         .reset_index()
     statesDuration[durationTag] = statesDuration[durationTag].astype(float).apply('{:,.2f}'.format)
-    stateNames[stateTag] = stateNames[stateTag].astype(str)
-    result = stateNames.join(statesDuration.set_index(stateTag), on = stateTag)
+    stateNames[codeStateTag] = stateNames[codeStateTag].astype(str)
+    result = stateNames.join(statesDuration.set_index(codeStateTag), on = codeStateTag)
     result = result.fillna(0)
-    result = result.sort_values([stateTag])
+    result = result.sort_values([codeStateTag])
     return result
 
 # return avg and tot dataframe.
@@ -143,10 +138,8 @@ def getAvgTotDataframeByDate(df1, avgChoice):
 
 # return data group by chosen data type.
 def getAvgStdDataFrameByDate(df, dataType, avgChoice):
-    countTag = utilities.getTagName('countTag')
     dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
-    quantileTag = utilities.getTagName('quantileTag')
     month = utilities.getPlaceholderName("month")
     monthYear = utilities.getPlaceholderName("monthYear")
     trimester = utilities.getPlaceholderName("trimester")
@@ -156,37 +149,37 @@ def getAvgStdDataFrameByDate(df, dataType, avgChoice):
     df1 = df[[dateTag, durationTag]].copy()
     if dataType == week:
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getWeekNumber(x))
-        [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice, dateTag, durationTag, countTag, quantileTag)
+        [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getWeek(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getWeek(x))
         return [df1, df2]
     elif dataType == month:
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getMonthNumber(x))
-        [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice, dateTag, durationTag, countTag, quantileTag)
+        [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getMonth(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getMonth(x))
         return [df1, df2]
     elif dataType == monthYear:
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getMonthYearDate(x))
-        [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice, dateTag, durationTag, countTag, quantileTag)
+        [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getMonthYear(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getMonthYear(x))
         return [df1, df2]
     elif dataType == trimester:
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getTrimesterDate(x))
-        [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice, dateTag, durationTag, countTag, quantileTag)
+        [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getTrimester(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getTrimester(x))
         return [df1, df2]
     elif dataType == trimesterYear:
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getTrimesterYearDate(x))
-        [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice, dateTag, durationTag, countTag, quantileTag)
+        [df1, df2] = getAvgTotDataframeByDate(df1, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getTrimesterYear(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getTrimesterYear(x))
         return [df1, df2]
     elif dataType == year:
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getYearNumber(x))
-        return getAvgTotDataframeByDate(df1, avgChoice, dateTag, durationTag, countTag, quantileTag)
+        return getAvgTotDataframeByDate(df1, avgChoice)
 
 # return avg and tot dataframe.
 def getAvgTotDataframe(df, order_dict, avgChoice):
@@ -202,9 +195,14 @@ def getAvgTotDataframe(df, order_dict, avgChoice):
     df1[countTag] = df.groupby([dateTag, filterTag]).size().tolist()
     df1['sort_column'] = df1[filterTag].map(order_dict)
     df1 = df1.sort_values(['sort_column', dateTag], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
-    df2 = df1.groupby([dateTag]) \
-        .agg({countTag: 'sum', durationTag:avgChoice}) \
-        .reset_index()
+    if avgChoice == avgTag:
+        df2 = df1.groupby([dateTag]) \
+            .agg({countTag: 'sum', durationTag:'mean'}) \
+            .reset_index()
+    else:
+        df2 = df1.groupby([dateTag]) \
+            .agg({countTag: 'sum', durationTag:'median'}) \
+            .reset_index()
     df2 = df2.sort_values([dateTag]).reset_index(drop = True)
     return [df1, df2]
 
@@ -222,7 +220,7 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
     df5 = df.copy()
     types = typesChoice.copy()
     if eventChoice != None and eventChoice in types:
-        df5 = getEventDataFrame(df5, eventChoice, eventTag, eventsTag)
+        df5 = getEventDataFrame(df5, eventChoice)
         index = types.index(eventChoice)
         types[index] = eventTag
     if avgChoice == avgTag:
@@ -243,7 +241,7 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
     while i < len(types):
         df3[filterTag] = df3[filterTag].astype(str) + " - " + df4[types[i]].astype(str)
         i = i + 1
-    df3 = keepOnlyImportant(df3, 0.25, countTag)
+    df3 = keepOnlyImportant(df3, 0.25)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
     order_dict = df3.set_index(filterTag)[order].to_dict()
     order_list = df3[filterTag].tolist()
@@ -262,37 +260,37 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
     year = utilities.getPlaceholderName("year")
     if datetype == week:
         df_temp[dateTag] = df_temp[dateTag].map(lambda x: utilities.getWeekNumber(x))
-        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice, dateTag, durationTag, countTag, filterTag)
+        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getWeek(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getWeek(x))
         return [df1, df2, df3]
     elif datetype == month:
         df_temp[dateTag] = df_temp[dateTag].map(lambda x: utilities.getMonthNumber(x))
-        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice, dateTag, durationTag, countTag, filterTag)
+        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getMonth(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getMonth(x))
         return [df1, df2, df3]
     elif datetype == monthYear:
         df_temp[dateTag] = df_temp[dateTag].map(lambda x: utilities.getMonthYearDate(x))
-        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice, dateTag, durationTag, countTag, filterTag)
+        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getMonthYear(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getMonthYear(x))
         return [df1, df2, df3]
     elif datetype == trimester:
         df_temp[dateTag] = df_temp[dateTag].map(lambda x: utilities.getTrimesterDate(x))
-        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice, dateTag, durationTag, countTag, filterTag)
+        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getTrimester(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getTrimester(x))
         return [df1, df2, df3]
     elif datetype == trimesterYear:
         df_temp[dateTag] = df_temp[dateTag].map(lambda x: utilities.getTrimesterYearDate(x))
-        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice, dateTag, durationTag, countTag, filterTag)
+        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getTrimesterYear(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getTrimesterYear(x))
         return [df1, df2, df3]
     elif datetype == year:
         df_temp[dateTag] = df_temp[dateTag].map(lambda x: utilities.getYearNumber(x))
-        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice, dateTag, durationTag, countTag, filterTag)
+        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
         return [df1, df2, df3]
         
 # return data group by chosen type.
@@ -323,7 +321,7 @@ def getAvgStdDataFrameByTypeChoice(df, type):
     typeDuration.append(durationTag)
     df1 = df[typeDuration].copy()
     df1[durationTag] = df1[durationTag].astype(int)
-    df1 = keepOnlyRelevant(df1, 0.05, type[0], countTag)
+    df1 = keepOnlyRelevant(df1, 0.05, type[0])
     df2 = df1.groupby(type, as_index = False).mean()
     df2[countTag] = df1.groupby(type).size().tolist()
     df2[quantileTag] = df1.groupby(type, as_index = False).quantile(0.75)[durationTag]

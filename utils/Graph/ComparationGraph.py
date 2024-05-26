@@ -161,7 +161,6 @@ def updateProcessDataframeFromSelection(choice, df_temp, df_data, startDate, end
 # this is done because if user wants to compare on chosen parameter, data must be updated without any filter on chosen parameter.
 # this method is for all comparation graphs except process ones since they use different parameters.
 def updateTypeDataframeFromSelection(choice, df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, importantSubjects):
-    countTag = utilities.getTagName("countTag")
     dateTag = utilities.getTagName("dateTag")
     finishedTag = utilities.getTagName("finishedTag")
     judgeTag = utilities.getTagName("judgeTag")
@@ -171,24 +170,24 @@ def updateTypeDataframeFromSelection(choice, df_temp, df_data, startDate, endDat
         df_temp_1 = updateTypeData(df_temp, dateTag, sectionTag, subjectTag, judgeTag, finishedTag, startDate, endDate, None, subjects, judges, finished)
     else:
         df_temp_1 = df_data
-    sections = frame.getGroupBy(df_temp_1, sectionTag, countTag)
+    sections = frame.getGroupBy(df_temp_1, sectionTag)
     if choice != None and 'subject-dropdown' in choice:
         df_temp_2 = updateTypeData(df_temp, dateTag, sectionTag, subjectTag, judgeTag, finishedTag, startDate, endDate, sections, None, judges, finished)
     else:
         df_temp_2 = df_data
-    subjects = frame.getGroupBy(df_temp_2, subjectTag, countTag)
+    subjects = frame.getGroupBy(df_temp_2, subjectTag)
     if importantSubjects != None:
         subjects = list(set(subjects) & set(importantSubjects))
     if choice != None and 'judge-dropdown' in choice:
         df_temp_3 = updateTypeData(df_temp, dateTag, sectionTag, subjectTag, judgeTag, finishedTag, startDate, endDate, sections, subjects, None, finished)
     else:
         df_temp_3 = df_data
-    judges = frame.getGroupBy(df_temp_3, judgeTag, countTag)
+    judges = frame.getGroupBy(df_temp_3, judgeTag)
     if choice != None and 'finished-dropdown' in choice:
         df_temp_4 = updateTypeData(df_temp, dateTag, sectionTag, subjectTag, judgeTag, finishedTag, startDate, endDate, sections, subjects, judges, None)
     else:
         df_temp_4 = df_data
-    finished = frame.getGroupBy(df_temp_4, finishedTag, countTag)
+    finished = frame.getGroupBy(df_temp_4, finishedTag)
     return [sections, subjects, judges, finished]
 
 # return all needed parameters in order to change graph after any user choice.

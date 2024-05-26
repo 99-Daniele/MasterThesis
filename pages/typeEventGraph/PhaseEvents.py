@@ -23,7 +23,7 @@ def pageLayout():
     phase = utilities.getPlaceholderName('phase')
     text = utilities.getPlaceholderName('text')
     df_temp = df.sort_values(by = [phaseTag]).reset_index(drop = True)
-    types = frame.getGroupBy(df_temp, phaseTag, countTag)
+    types = frame.getGroupBy(df_temp, phaseTag)
     df_temp = pd.DataFrame({'A' : (), 'B': ()})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([

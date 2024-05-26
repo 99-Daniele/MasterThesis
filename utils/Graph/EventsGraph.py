@@ -20,7 +20,7 @@ def updateTypes(df):
 # update types based on user selections.
 def updateTypesBySelection(df, startDate, endDate, sections, subjects, judges):
     judgeTag = utilities.getTagName('judgeTag')
-    processDateTag = utilities.getTagName('dateTag')
+    processDateTag = utilities.getTagName('processDateTag')
     sectionTag = utilities.getTagName('sectionTag')
     subjectTag = utilities.getTagName('subjectTag')
     df_temp = df.copy()

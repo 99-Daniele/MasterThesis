@@ -42,14 +42,14 @@ def pageLayout():
     withOut = utilities.getPlaceholderName('without')
     year = utilities.getPlaceholderName('year') 
     importantSubjects = getter.getImportantSubjects()
-    subjects = frame.getGroupBy(df, subjectTag, countTag)
+    subjects = frame.getGroupBy(df, subjectTag)
     if importantSubjects != None:
         subjects = list(set(subjects) & set(importantSubjects))
-    sections = frame.getGroupBy(df, sectionTag, countTag)
-    judges = frame.getGroupBy(df, judgeTag, countTag)
-    finished = frame.getGroupBy(df, finishedTag, countTag)
-    sequences = frame.getGroupBy(df, sequenceTag, countTag)
-    phaseSequences = frame.getGroupBy(df, phaseSequenceTag, countTag)
+    sections = frame.getGroupBy(df, sectionTag)
+    judges = frame.getGroupBy(df, judgeTag)
+    finished = frame.getGroupBy(df, finishedTag)
+    sequences = frame.getGroupBy(df, sequenceTag)
+    phaseSequences = frame.getGroupBy(df, phaseSequenceTag)
     events = frame.getGroupByFromString(df, eventSequenceTag)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
@@ -59,7 +59,7 @@ def pageLayout():
         ds.dcc.Link('Grafici confronto', href='/comparationgraph'),
         ds.html.H2("CONFRONTO DURATA MEDIA PROCESSI"),        
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-pr', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.RadioItems([week, month, monthYear, trimester, trimesterYear, year], value = month, id = 'date-radioitem-pr', inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.RadioItems([week, month, monthYear, trimester, trimesterYear, year], value = month, id = 'date-radioitem-pr', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.DatePickerRange(
             id = 'event-dateranger-pr',
             start_date = df[dateTag].min(),
