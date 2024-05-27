@@ -10,7 +10,7 @@ import utils.graph.ComparationGraph as comparation
 import utils.utilities.Utilities as utilities
 
 # get dataframe with all phases duration.
-df = getter.getPhasesDuration()
+df = getter.getPhasesDurationFiltered()
 phaseTag = utilities.getTagName('phaseTag') 
 
 # return initial layout of page.

@@ -13,6 +13,8 @@ import utils.utilities.Utilities as utilities
 # refresh current database data. 
 # calcs event, phases, states, process, courtHearing durations, comprare with current database data and in case update them.
 def refreshData():
+    import time
+    start = time.time()
     connection = connect.getDatabaseConnection()
     verifyDatabase(connection)
     events = getter.getEvents()
@@ -25,6 +27,7 @@ def refreshData():
     processEvents = getProcessEvents(events, endPhase, end)
     [eventsSequences, phasesSequences, statesSequences] = updateTypeDurationDataframe(processEvents, courtHearingsEventsType, endPhase)
     updateProcessDurationDataframe(processEvents, eventsSequences, phasesSequences, statesSequences)
+    print(time.time() - start)
 
 # group events by process.
 def getProcessEvents(events, endPhase, ending):
@@ -148,14 +151,18 @@ def updatePhaseEventsDataframe(events, endPhase):
 # update types duration dataframe.
 def updateTypeDurationDataframe(processEvents, courtHearingsEventsType, endPhase):
     [eventsDuration, eventsSequences, phasesDuration, phasesSequences, statesDuration, statesSequences, courtHearingsDuration] = calcTypeDuration(processEvents, courtHearingsEventsType, endPhase)
-    eventsDurationDataframe = frame.createTypeDurationsDataFrame(eventsDuration)
-    phasesDurationDataframe = frame.createTypeDurationsDataFrame(phasesDuration)
-    statesDurationDataframe = frame.createTypeDurationsDataFrame(statesDuration)
-    courtHearingsDurationDataframe = frame.createTypeDurationsDataFrame(courtHearingsDuration)
+    [eventsDurationDataframe, eventsDurationDataframeFiltered] = frame.createTypeDurationsDataFrame(eventsDuration)
+    [phasesDurationDataframe, phasesDurationDataframeFiltered] = frame.createTypeDurationsDataFrame(phasesDuration)
+    [statesDurationDataframe, statesDurationDataframeFiltered] = frame.createTypeDurationsDataFrame(statesDuration)
+    [courtHearingsDurationDataframe, courtHearingsDurationDataframeFiltered] = frame.createTypeDurationsDataFrame(courtHearingsDuration)
     cache.updateCache('eventsDuration.json', eventsDurationDataframe)
+    cache.updateCache('eventsDurationFiltered.json', eventsDurationDataframeFiltered)
     cache.updateCache('phasesDuration.json', phasesDurationDataframe)
+    cache.updateCache('phasesDurationFiltered.json', phasesDurationDataframeFiltered)
     cache.updateCache('statesDuration.json', statesDurationDataframe)
+    cache.updateCache('statesDurationFiltered.json', statesDurationDataframeFiltered)
     cache.updateCache('courtHearingsDuration.json', courtHearingsDurationDataframe)
+    cache.updateCache('courtHearingsDurationFiltered.json', courtHearingsDurationDataframeFiltered)
     return [eventsSequences, phasesSequences, statesSequences]
 
 # calc types durations.
@@ -222,7 +229,7 @@ def getEventInfo(events, endPhase):
             eventsSequence.append(currEventTag)
     curr = events[-1]
     currDateDt = dt.datetime.strptime(curr[6], '%Y-%m-%d %H:%M:%S')
-    if curr[9] == endPhase:
+    if curr[10] == endPhase:
         currEventId = curr[0]
         currEventCode = curr[2]
         currEventTag = curr[3]
@@ -259,15 +266,15 @@ def getPhaseInfo(events, endPhase):
         curr = events[i]
         next = events[i + 1]
         if curr[10] != next[10]:
-            endPhase = curr
+            lastPhase = curr
             currEventId = startPhase[0]
-            nextEventId = endPhase[0]
+            nextEventId = lastPhase[0]
             currEventCode = startPhase[2]
             currEventTag = startPhase[3]
             currJudgeCode = startPhase[4]
             currJudge = startPhase[5]
             currDate = startPhase[6]
-            nextDate = endPhase[6]
+            nextDate = lastPhase[6]
             currStateCode = startPhase[8]
             currStateTag = startPhase[9]
             currPhase = startPhase[10]
@@ -431,8 +438,9 @@ def getCourtHearingDuration(events, courtHearingTypes):
 # update process duration dataframe.
 def updateProcessDurationDataframe(processEvents, eventSequence, phaseSequence, stateSequence):
     processDuration = calcProcessDuration(processEvents, eventSequence, phaseSequence, stateSequence)
-    processDurationDataframe = frame.createProcessDurationsDataFrame(processDuration)
+    [processDurationDataframe, processDurationDataframeFiltered] = frame.createProcessDurationsDataFrame(processDuration)
     cache.updateCache('processesDuration.json', processDurationDataframe)
+    cache.updateCache('processesDurationFiltered.json', processDurationDataframeFiltered)
 
 # calc types durations.
 def calcProcessDuration(processEvents, eventsSequence, phasesSequence, statesSequence):
@@ -470,10 +478,12 @@ def getProcessDuration(events, eventSequence, phaseSequence, stateSequence):
 def verifyDatabase(connection):
     try:
         eventsName = file.getDataFromTextFile('preferences/eventsName.txt')
+        eventsName = list(eventsName[0])
     except:
         raise Exception("\n'eventsName.txt' file is not present or is called differently than 'eventsName.txt")
     try:
         subjectsName = file.getDataFromTextFile('preferences/subjectsName.txt')
+        subjectsName = list(subjectsName[0])
     except:
         raise Exception("\n'subjectsName.txt' file is not present or is called differently than 'subjectsName.txt")
     try:
@@ -483,6 +493,7 @@ def verifyDatabase(connection):
         raise Exception("\n'statesName.txt' file is not present or is called differently than 'statesName.txt")
     try:
         judgesName = file.getDataFromTextFile('preferences/judgesName.txt')
+        judgesName = list(judgesName[0])
     except:
         raise Exception("\n'judgesName.txt' file is not present or is called differently than 'judgesName.txt")
     if not connect.doesATableExist(connection, "eventi"):
@@ -494,11 +505,11 @@ def verifyDatabase(connection):
     if not connect.doesATableHaveColumns(connection, "processi", ['numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'], ['BIGINT', 'DATETIME', 'TEXT', 'VARCHAR(10)', 'VARCHAR(5)']):
         raise Exception("\n'processi' table does not have all requested columns. The requested columns are: 'numProcesso'(BIGINT), 'dataInizio'(DATETIME), 'giudice'(TEXT), 'materia'(VARCHAR(10)), 'sezione'(VARCHAR(5))")
     if not connect.doesATableExist(connection, "eventinome"):
-        connect.createTable(connection, 'eventinome', ['codice', 'etichetta', 'fase'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(5)'], [0], [])
+        connect.createTable(connection, 'eventinome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
         connect.insertIntoDatabase(connection, 'eventinome', eventsName)
     else:
-        if not connect.doesATableHaveColumns(connection, "eventinome", ['codice', 'etichetta', 'fase'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(5)']):
-            raise Exception("\n'eventinome' table does not have all requested columns. The requested columns are: 'codice'(VARCHAR(10)), 'abbreviazione'(TEXT), 'fase'(VARCHAR(5))")
+        if not connect.doesATableHaveColumns(connection, "eventinome", ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT']):
+            raise Exception("\n'eventinome' table does not have all requested columns. The requested columns are: 'codice'(VARCHAR(10)), 'abbreviazione'(TEXT)")
         connect.clearTable(connection, "eventinome")
         connect.insertIntoDatabase(connection, 'eventinome', eventsName)
     if not connect.doesATableExist(connection, "materienome"):

@@ -4,7 +4,6 @@ import dash as ds
 import plotly.express as px
 
 import utils.Dataframe as frame
-import utils.Getters as getter
 import utils.utilities.Utilities as utilities
 
 # hide page components if user select it.

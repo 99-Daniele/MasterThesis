@@ -14,9 +14,7 @@ def phaseColorList(df, type):
     dateTag = getTagName("dateTag")
     phaseTag = getTagName("phaseTag")
     for t in types:
-        df_count = df[df[type] == t].groupby([phaseTag], as_index = False).count()
-        max = df_count[dateTag].max()
-        phase = df_count[df_count[dateTag] == max][phaseTag].tolist()[0]
+        phase = df[df[type] == t][phaseTag].tolist()[0]
         c.append(colors.get(str(phase)))
     return c
 

@@ -22,6 +22,7 @@
     "phaseSequenceTag": "fasi",
     "processDateTag": "dataInizioProcesso",
     "quantileTag": "quantile",
+    "ritualTag": "rituale",
     "sectionTag": "sezione", 
     "sequenceTag": "sequenza",
     "stateTag": "stato",

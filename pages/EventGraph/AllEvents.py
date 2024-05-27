@@ -21,7 +21,6 @@ eventTag = utilities.getTagName('eventTag')
 
 # return initial layout of page.
 def pageLayout():
-    countTag = utilities.getTagName('countTag') 
     dateTag = utilities.getTagName('dateTag') 
     judge = utilities.getPlaceholderName('judge') 
     judgeTag = utilities.getTagName('judgeTag') 

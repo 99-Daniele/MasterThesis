@@ -5,10 +5,9 @@ import pandas as pd
 import textwrap
 
 import utils.FileOperation as file
-import utils.Getters as getter
 import utils.utilities.Utilities as utilities
 
-# importantProcessStates and importantSections are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
+# importantProcessStates, importantSections and importantSubjects are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
 try:
     importantProcessStates = list(file.getDataFromTextFile('preferences/importantProcessStates.txt'))
 except:
@@ -17,7 +16,10 @@ try:
     importantSections = list(file.getDataFromTextFile('preferences/importantSections.txt'))
 except:
     importantSections = None
-importantSubjects = getter.getImportantSubjects()
+try:
+    importantSubjects = list(file.getDataFromTextFile('preferences/importantSubjects.txt'))
+except:
+    importantSubjects = None
 
 # from events list create events dataframe.
 def createEventsDataFrame(events, endPhase):
@@ -59,14 +61,16 @@ def createProcessDurationsDataFrame(process):
     stateSequenceTag = utilities.getTagName('sequenceTag')
     subjectCodeTag = utilities.getTagName('codeSubjectTag')
     df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectCodeTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, endDateTag, endIdTag])
+    filteredDf = df.copy()
     if importantProcessStates != None:
-        df = df[df[finishedTag].isin(importantProcessStates)]
+        filteredDf = filteredDf[filteredDf[finishedTag].isin(importantProcessStates)]
     if importantSections != None:
-        df = df[df[sectionTag].isin(importantSections)]
+        filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
     if importantSubjects != None:
-        df = df[df[subjectCodeTag].isin(importantSubjects)]
+        filteredDf = filteredDf[filteredDf[subjectCodeTag].isin(importantSubjects)]
     df = df.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
-    return df
+    filteredDf = filteredDf.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
+    return [df, filteredDf]
 
 # from events list create type duration dataframe.
 def createTypeDurationsDataFrame(events):
@@ -88,11 +92,12 @@ def createTypeDurationsDataFrame(events):
     subjectTag = utilities.getTagName('subjectTag')
     subjectCodeTag = utilities.getTagName('codeSubjectTag')    
     df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, eventTag, durationTag, dateTag, judgeCodeTag, judgeTag, stateCodeTag, stateTag, phaseTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
+    filteredDf = df.copy()
     if importantSections != None:
-        df = df[df[sectionTag].isin(importantSections)]
+        filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
     if importantSubjects != None:
-        df = df[df[subjectCodeTag].isin(importantSubjects)]
-    return df
+        filteredDf = filteredDf[filteredDf[subjectCodeTag].isin(importantSubjects)]
+    return [df, filteredDf]
 
 # from state names list create state names dataframe.
 def createStateNameDataframe(stateNames):
@@ -115,7 +120,7 @@ def createStateNameDataframeWithInfo(statesDuration, stateNames):
         .rename(columns = {statesDuration.columns[2]:countTag}) \
         .reset_index()
     statesDuration[durationTag] = statesDuration[durationTag].astype(float).apply('{:,.2f}'.format)
-    stateNames[codeStateTag] = stateNames[codeStateTag].astype(str)
+    statesDuration[codeStateTag] = statesDuration[codeStateTag].astype(str)
     result = stateNames.join(statesDuration.set_index(codeStateTag), on = codeStateTag)
     result = result.fillna(0)
     result = result.sort_values([codeStateTag])
@@ -123,28 +128,78 @@ def createStateNameDataframeWithInfo(statesDuration, stateNames):
 
 # from event names list create event names dataframe.
 def createEventNameDataframe(eventNames):
-    eventTag = utilities.getTagName('eventTag')
+    codeEventTag = utilities.getTagName('codeEventTag')
     descrTag = utilities.getTagName('descriptionTag')
     phaseTag = utilities.getTagName('phaseTag')
     tagTag = utilities.getTagName('tagTag')
-    df = pd.DataFrame(eventNames, columns = [eventTag, descrTag, tagTag, phaseTag])
-    df[eventTag] = df[eventTag].astype(str)
+    df = pd.DataFrame(eventNames, columns = [codeEventTag, descrTag, tagTag, phaseTag])
+    df[codeEventTag] = df[codeEventTag].astype(str)
     return df
 
 # from event names list create event names dataframe with info.
 def createEventNameDataframeWithInfo(eventsDuration, eventNames):
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
-    eventTag = utilities.getTagName('eventTag')
-    eventsDuration = eventsDuration.groupby([eventTag]) \
+    codeEventTag = utilities.getTagName('codeEventTag')
+    eventsDuration = eventsDuration.groupby([codeEventTag]) \
         .agg({eventsDuration.columns[2]: 'size', durationTag: 'mean'}) \
         .rename(columns = {eventsDuration.columns[2]:countTag}) \
         .reset_index()
     eventsDuration[durationTag] = eventsDuration[durationTag].astype(float).apply('{:,.2f}'.format)
-    eventNames[eventTag] = eventNames[eventTag].astype(str)
-    result = eventNames.join(eventsDuration.set_index(eventTag), on = eventTag)
+    eventsDuration[codeEventTag] = eventsDuration[codeEventTag].astype(str)
+    result = eventNames.join(eventsDuration.set_index(codeEventTag), on = codeEventTag)
     result = result.fillna(0)
-    result = result.sort_values([eventTag])
+    result = result.sort_values([codeEventTag])
+    return result
+
+# from judge names list create judge names dataframe.
+def createJudgeNameDataframe(judgeNames):
+    codeJudgeTag = utilities.getTagName('codeJudgeTag')
+    judgeTag = utilities.getTagName('judgeTag')
+    df = pd.DataFrame(judgeNames, columns = [codeJudgeTag, judgeTag])
+    df[codeJudgeTag] = df[codeJudgeTag].astype(str)
+    return df
+
+# from judge names list create judges names dataframe with info.
+def createJudgeNameDataframeWithInfo(processDuration, judgeNames):
+    countTag = utilities.getTagName('countTag')
+    durationTag = utilities.getTagName('durationTag')
+    judgeTag = utilities.getTagName('judgeTag')
+    processDuration = processDuration.groupby([judgeTag]) \
+        .agg({processDuration.columns[2]: 'size', durationTag: 'mean'}) \
+        .rename(columns = {processDuration.columns[2]:countTag}) \
+        .reset_index()
+    processDuration[durationTag] = processDuration[durationTag].astype(float).apply('{:,.2f}'.format)
+    processDuration[judgeTag] = processDuration[judgeTag].astype(str)
+    result = judgeNames.join(processDuration.set_index(judgeTag), on = judgeTag)
+    result = result.fillna(0)
+    result = result.sort_values([judgeTag])
+    return result
+
+# from subject names list create subjects names dataframe.
+def createSubjectNameDataframe(judgeNames):
+    codeSubjectTag = utilities.getTagName('codeSubjectTag')
+    descriptionTag = utilities.getTagName('descriptionTag')
+    ritualTag = utilities.getTagName('ritualTag')
+    subjectTag = utilities.getTagName('subjectTag')
+    df = pd.DataFrame(judgeNames, columns = [codeSubjectTag, descriptionTag, ritualTag, subjectTag])
+    df[codeSubjectTag] = df[codeSubjectTag].astype(str)
+    return df
+
+# from subject names list create subjects names dataframe with info.
+def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
+    countTag = utilities.getTagName('countTag')
+    durationTag = utilities.getTagName('durationTag')
+    codeSubjectTag = utilities.getTagName('codeSubjectTag')
+    processDuration = processDuration.groupby([codeSubjectTag]) \
+        .agg({processDuration.columns[2]: 'size', durationTag: 'mean'}) \
+        .rename(columns = {processDuration.columns[2]:countTag}) \
+        .reset_index()
+    processDuration[durationTag] = processDuration[durationTag].astype(float).apply('{:,.2f}'.format)
+    processDuration[codeSubjectTag] = processDuration[codeSubjectTag].astype(int)
+    processDuration[codeSubjectTag] = processDuration[codeSubjectTag].astype(str)
+    result = subjectNames.join(processDuration.set_index(codeSubjectTag), on = codeSubjectTag)
+    result = result.sort_values([codeSubjectTag])
     return result
 
 # return avg and tot dataframe.
@@ -346,7 +401,8 @@ def getAvgStdDataFrameByType(df, type, avgChoice):
     return [df1, df2]
 
 # return data group by chosen type.
-def getAvgStdDataFrameByTypeChoice(df, type):
+def getAvgStdDataFrameByTypeChoice(df, type, avgChoice):
+    avgTag = utilities.getTagName('avgTag')
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
     quantileTag = utilities.getTagName('quantileTag')
@@ -354,8 +410,11 @@ def getAvgStdDataFrameByTypeChoice(df, type):
     typeDuration.append(durationTag)
     df1 = df[typeDuration].copy()
     df1[durationTag] = df1[durationTag].astype(int)
-    df1 = keepOnlyRelevant(df1, 0.05, type[0])
-    df2 = df1.groupby(type, as_index = False).mean()
+    df1 = keepOnlyRelevant(df1, 0.001, type[0])
+    if avgChoice == avgTag:
+        df2 = df1.groupby(type, as_index = False).mean()
+    else:
+        df2 = df1.groupby(type, as_index = False).median()
     df2[countTag] = df1.groupby(type).size().tolist()
     df2[quantileTag] = df1.groupby(type, as_index = False).quantile(0.75)[durationTag]
     df1 = df1.sort_values(type).reset_index(drop = True)
@@ -500,3 +559,33 @@ def addTotCountToName(df, countTag):
     totCount = df[countTag].sum()
     newName = all + " (" + str(totCount) + ")"
     return newName
+
+# return index of dataframe selected rows.
+def getSelectedRows(df, selection, tag):
+    df_temp = df.copy()
+    df_temp = df_temp[df_temp[tag].isin(selection)]
+    selectedRows = list(df_temp.index)
+    return selectedRows
+
+# return dataframe rows from given index.
+def getRowsFromIndex(df, index):
+    df_temp = df.copy()
+    df_temp = df_temp.iloc[index]
+    return df_temp
+
+def selectFollowingRows(df, tag, tagChoice):
+    numEventTag = utilities.getTagName('numEventTag')
+    numProcessTag = utilities.getTagName('numProcessTag')
+    df_tag = df.copy()
+    df_tag = df[df[tag] == tagChoice]
+    df_final = df.iloc[:0,:].copy()
+    for i, row in df_tag.iterrows():
+        numEvent = row[numEventTag]
+        numProcess = row[numProcessTag]
+        df_temp = df.copy()
+        df_temp = df[df[numEventTag] > numEvent]
+        df_temp = df_temp[df_temp[numProcessTag] == numProcess]
+        df_final = pd.concat([df_final, df_temp.head(1)], ignore_index = True)
+        print(numEvent)
+    print(df_final)
+    exit()

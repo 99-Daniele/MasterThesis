@@ -1,69 +1,53 @@
-# this page contains links to preferences pages.
+# this page allows user to change judge names.
 
 import dash as ds
-import pandas as pd
 
-import utils.DataUpdate as update
-import utils.FileOperation as file
 import utils.Getters as getter
+import utils.graph.TypeEventsPreference as typeEvents
 import utils.utilities.Utilities as utilities
 
-# get dataframe with state names. 
-df = getter.getStateNamesDataframe()
-descriptionTag = utilities.getTagName('descriptionTag')
-phaseDBTag = utilities.getTagName('phaseDBTag')
+# get dataframe with judge names. 
+df = getter.getJudgeNamesDataframe()
 countTag = utilities.getTagName('countTag')
 durationTag = utilities.getTagName('durationTag')
 
 # return initial layout of page.
 def pageLayout():
-    codeStateTag = utilities.getTagName('codeStateTag')
+    codeJudgeTag = utilities.getTagName('codeJudgeTag')
     count = utilities.getPlaceholderName('count')
-    description = utilities.getPlaceholderName('description')
     duration = utilities.getPlaceholderName('duration')
-    phase = utilities.getPlaceholderName('phase')
-    phaseDB = utilities.getPlaceholderName('phaseDB')
-    phaseTag = utilities.getTagName('phaseTag')
-    state = utilities.getPlaceholderName('state')
-    tag = utilities.getPlaceholderName('tag')
-    tagTag = utilities.getTagName('tagTag')
+    judgeTag = utilities.getTagName('judgeTag')
     layout = ds.html.Div([
+        ds.dcc.ConfirmDialog(
+            id = 'update-j',
+            message = 'Judge names table correctly updated',
+        ),
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
         ds.dcc.Link('Parametri', href='/preference'),
-        ds.html.H2('PARAMETRI STATI'),
-        ds.html.Button("REFRESH", id = 'refresh-button-s'),
+        ds.html.H2('PARAMETRI GIUDICE'),
+        ds.html.Button("REFRESH", id = 'refresh-button-j'),
         ds.dash_table.DataTable(
             df.to_dict('records'), columns = [
-                {'name': state, 'id': codeStateTag, 'editable': False}, 
-                {'name': description, 'id': descriptionTag, 'editable': False}, 
-                {'name': tag, 'id': tagTag, 'editable': True}, 
-                {'name': phaseDB, 'id': phaseDBTag, 'editable': False}, 
-                {'name': phase, 'id': phaseTag, 'editable': True}, 
+                {'name': codeJudgeTag, 'id': codeJudgeTag, 'editable': False},
+                {'name': judgeTag, 'id': judgeTag, 'editable': True}, 
                 {'name': count, 'id': countTag, 'editable': False},  
                 {'name': duration, 'id': durationTag, 'editable': False}],
             filter_action = "native",
             sort_action = "native",
-            id = "statetable"
+            id = "judgetable"
         )
     ])
     return layout
 
 # callback with input and output.
 @ds.callback(
-    ds.Output('statetable', 'data'),
-    ds.Input('refresh-button-s', 'n_clicks'),
-    ds.State('statetable', 'data')
+    [ds.Output('judgetable', 'data'),
+     ds.Output('update-j', 'displayed')],
+    ds.Input('refresh-button-j', 'n_clicks'),
+    ds.State('judgetable', 'data')
 )
 
 # return updated data based on user choice.
 def update_dateframe(button, data):
-    dbData = df.to_dict('records')
-    pairs = zip(data, dbData)
-    if any(x != y for x, y in pairs):
-        newDataDf = pd.DataFrame(data)
-        newDataDf = newDataDf.drop([countTag, descriptionTag, phaseDBTag, durationTag], axis = 1)
-        strData = utilities.fromListToString(list(newDataDf.itertuples(index = False, name = None)))
-        file.writeOnTextFile('preferences/statesName.txt', strData)
-        update.refreshData()
-    return data
+    return typeEvents.updateDatabase(data, df, [countTag, durationTag], 'preferences/judgesName.txt')

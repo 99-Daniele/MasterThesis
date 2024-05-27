@@ -10,7 +10,7 @@ import utils.graph.ComparationGraph as comparation
 import utils.utilities.Utilities as utilities
 
 # get dataframe with all events duration.
-df = getter.getEventsDuration()
+df = getter.getEventsDurationFiltered()
 eventTag = utilities.getTagName('eventTag')
 
 # return initial layout of page.

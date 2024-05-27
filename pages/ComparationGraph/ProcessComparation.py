@@ -10,7 +10,7 @@ import utils.graph.ComparationGraph as comparation
 import utils.utilities.Utilities as utilities
 
 # get dataframe with all processes duration.
-df = getter.getProcessesDuration()
+df = getter.getProcessesDurationFiltered()
 
 # return initial layout of page.
 def pageLayout():

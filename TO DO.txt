@@ -5,6 +5,7 @@
 - nomi in inglese
 - filtro durata
 - colore stati fasi
+- selezione stati, eventi importanti
 
 - verifica valore predetto
 - valore predetto sulla base di giudice, materia, sezione, data, carico processi giudice in quel momento
