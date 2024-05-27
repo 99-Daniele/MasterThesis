@@ -121,6 +121,32 @@ def createStateNameDataframeWithInfo(statesDuration, stateNames):
     result = result.sort_values([codeStateTag])
     return result
 
+# from event names list create event names dataframe.
+def createEventNameDataframe(eventNames):
+    eventTag = utilities.getTagName('eventTag')
+    descrTag = utilities.getTagName('descriptionTag')
+    phaseTag = utilities.getTagName('phaseTag')
+    tagTag = utilities.getTagName('tagTag')
+    df = pd.DataFrame(eventNames, columns = [eventTag, descrTag, tagTag, phaseTag])
+    df[eventTag] = df[eventTag].astype(str)
+    return df
+
+# from event names list create event names dataframe with info.
+def createEventNameDataframeWithInfo(eventsDuration, eventNames):
+    countTag = utilities.getTagName('countTag')
+    durationTag = utilities.getTagName('durationTag')
+    eventTag = utilities.getTagName('eventTag')
+    eventsDuration = eventsDuration.groupby([eventTag]) \
+        .agg({eventsDuration.columns[2]: 'size', durationTag: 'mean'}) \
+        .rename(columns = {eventsDuration.columns[2]:countTag}) \
+        .reset_index()
+    eventsDuration[durationTag] = eventsDuration[durationTag].astype(float).apply('{:,.2f}'.format)
+    eventNames[eventTag] = eventNames[eventTag].astype(str)
+    result = eventNames.join(eventsDuration.set_index(eventTag), on = eventTag)
+    result = result.fillna(0)
+    result = result.sort_values([eventTag])
+    return result
+
 # return avg and tot dataframe.
 def getAvgTotDataframeByDate(df1, avgChoice):
     avgTag = utilities.getTagName('avgTag')

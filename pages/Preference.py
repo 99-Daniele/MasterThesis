@@ -11,6 +11,8 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Eventi', href = '/preference/eventpreference'),
         ds.html.Br(),
+        ds.dcc.Link('Giudici', href = '/preference/judgepreference'),
+        ds.html.Br(),
         ds.dcc.Link('Udienze', href = '/preference/courthearingpreference'),
         ds.html.Br(),
         ds.dcc.Link('Materie', href = '/preference/subjectgpreference')

@@ -1,4 +1,4 @@
-# this page allows user to change state parameters.
+# this page contains links to preferences pages.
 
 import dash as ds
 import pandas as pd

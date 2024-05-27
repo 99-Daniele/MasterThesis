@@ -128,6 +128,42 @@ def displayStateNames():
     ])
     app.run_server(debug = True)
 
+# display court hearing names.
+def displayCourtHearingNames():
+    import pages.preference.CourtHearingPreference as courtHearingPreferencePage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = courtHearingPreferencePage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
+# display event names.
+def displayEventNames():
+    import pages.preference.EventPreference as eventPreferencePage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = eventPreferencePage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
+# display judge names.
+def displayJudgeNames():
+    import pages.preference.JudgePreference as judgePreferencePage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = judgePreferencePage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
+# display subject names.
+def displaySubjectNames():
+    import pages.preference.SubjectPreference as subjectPreferencePage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = subjectPreferencePage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
 # start app to allow user select graph to be displayed.
 def startApp():
     import App as app
@@ -140,4 +176,4 @@ def refreshData():
 
 # action performed by main.
 if __name__ == '__main__':
-    displayEventComparation()
+    displayCourtHearingNames()

@@ -17,7 +17,11 @@ def start():
     import pages.eventGraph.ImportantEvents as importantEventsPage
     import pages.eventGraph.PhaseEvents as phaseEventsPage
     import pages.eventGraph.StateEvents as stateEventsPage
+    import pages.preference.CourtHearingPreference as courtHearingPreferencePage
+    import pages.preference.EventPreference as eventPreferencePage
+    import pages.preference.JudgePreference as judgePreferencePage
     import pages.preference.StatePreference as statePreferencePage
+    import pages.preference.SubjectPreference as subjectPreferencePage
     import pages.typeEventGraph.EventSequence as sequenceEventPage
     import pages.typeEventGraph.PhaseEvents as eventsPhasePage
     import pages.typeEventGraph.PhaseSequence as sequencePhasePage
@@ -59,8 +63,16 @@ def start():
                 return phaseEventsPage.pageLayout()
             case '/eventgraph/stateevents':
                 return stateEventsPage.pageLayout()
+            case '/preference/courthearingpreference':
+                return courtHearingPreferencePage.pageLayout()
+            case '/preference/eventpreference':
+                return eventsPhasePage.pageLayout()
+            case '/preference/judgepreference':
+                return judgePreferencePage.pageLayout()
             case '/preference/statepreference':
                 return statePreferencePage.pageLayout()
+            case '/preference/subjectpreference':
+                return subjectPreferencePage.pageLayout()
             case '/typeevent/stateevent':
                 return eventsStatePage.pageLayout()
             case '/typeevent/phaseevent':

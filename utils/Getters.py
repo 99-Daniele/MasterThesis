@@ -11,6 +11,7 @@ connection = connect.getDatabaseConnection()
 
 # queries to obtain data from database.
 endPhaseQuery = "SELECT fase FROM tribunali2020.statinome WHERE stato = 'DF'"
+eventsNamesQuery = "SELECT en.codice AS codice, te.CDESCR AS descrizione, en.etichetta AS etichetta, en.fase AS fase FROM eventinome AS en, tipoeventi AS te WHERE en.codice = te.CCDOEV"
 eventsQuery = "SELECT e.numEvento AS numEvento, e.numProcesso AS numProcesso, en.codice AS codiceEvento, en.etichetta AS evento, gn.giudice AS giudice, gn.alias AS alias, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S') AS dataEvento, DATE_FORMAT(p.dataInizio,'%Y-%m-%d %H:%i:%S') AS dataInizioProcesso, sn.stato AS codiceStato, sn.etichetta AS stato, sn.fase AS faseStato, mn.codice AS codiceMateria, mn.descrizione AS materiaProcesso, p.sezione AS sezioneProcesso FROM eventi AS e, processi AS p, eventinome AS en, statinome AS sn, giudicinome AS gn, materienome AS mn WHERE e.numProcesso = p.numProcesso AND e.codice = en.codice AND e.statofinale = sn.stato AND e.giudice = gn.giudice AND p.materia = mn.codice ORDER BY numProcesso, data, numEvento"
 importantSubjectsQuery = "SELECT codice FROM materienome WHERE LENGTH(codice) = 6 AND codice LIKE '1%' AND rituale = '4O'"
 minDateQuery = "SELECT DATE_FORMAT(MIN(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
@@ -137,3 +138,16 @@ def getStateNamesDataframe():
     stateNamesDataframe = frame.createStateNameDataframe(stateNames)
     df = frame.createStateNameDataframeWithInfo(stateDurationDataframe, stateNamesDataframe)
     return df
+
+# get events name dataframe.
+def getEventNamesDataframe():
+    eventDurationDataframe = getEventsDuration()
+    eventNames = connect.getDataFromDatabase(connection, eventsNamesQuery)
+    eventNamesDataframe = frame.createEventNameDataframe(eventNames)
+    df = frame.createEventNameDataframeWithInfo(eventDurationDataframe, eventNamesDataframe)
+    return df
+
+# get dataframe from text file
+def getDataframeFromTextFile(filename):
+    data = file.getDataFromTextFile(filename)
+    print(data)
