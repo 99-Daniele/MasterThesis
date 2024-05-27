@@ -17,6 +17,7 @@ try:
     importantSections = list(file.getDataFromTextFile('preferences/importantSections.txt'))
 except:
     importantSections = None
+importantSubjects = getter.getImportantSubjects()
 
 # from events list create events dataframe.
 def createEventsDataFrame(events, endPhase):
@@ -56,12 +57,14 @@ def createProcessDurationsDataFrame(process):
     phaseSequenceTag = utilities.getTagName('phaseSequenceTag')
     sectionTag = utilities.getTagName('sectionTag')
     stateSequenceTag = utilities.getTagName('sequenceTag')
-    subjectTag = utilities.getTagName('subjectTag')
-    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, endDateTag, endIdTag])
+    subjectCodeTag = utilities.getTagName('codeSubjectTag')
+    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectCodeTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, endDateTag, endIdTag])
     if importantProcessStates != None:
         df = df[df[finishedTag].isin(importantProcessStates)]
     if importantSections != None:
         df = df[df[sectionTag].isin(importantSections)]
+    if importantSubjects != None:
+        df = df[df[subjectCodeTag].isin(importantSubjects)]
     df = df.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
     return df
 
@@ -83,8 +86,12 @@ def createTypeDurationsDataFrame(events):
     stateTag = utilities.getTagName('stateTag')
     stateCodeTag = utilities.getTagName('codeStateTag')
     subjectTag = utilities.getTagName('subjectTag')
-    subjectCodeTag = utilities.getTagName('codeSubjectTag')
+    subjectCodeTag = utilities.getTagName('codeSubjectTag')    
     df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, eventTag, durationTag, dateTag, judgeCodeTag, judgeTag, stateCodeTag, stateTag, phaseTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
+    if importantSections != None:
+        df = df[df[sectionTag].isin(importantSections)]
+    if importantSubjects != None:
+        df = df[df[subjectCodeTag].isin(importantSubjects)]
     return df
 
 # from state names list create state names dataframe.

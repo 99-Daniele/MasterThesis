@@ -32,7 +32,7 @@ def getProcessEvents(events, endPhase, ending):
         raise Exception("\nThere isn't any event in database.")
     allProcessEvents = []
     processId = events[0][1]
-    processJudge = events[0][4]
+    processJudge = events[0][5]
     processSubject = events[0][11]
     processSection = events[0][13]
     processEvents = [processId, processJudge, processSubject, processSection, utilities.getProcessState('unfinished')]
@@ -45,9 +45,10 @@ def getProcessEvents(events, endPhase, ending):
                 allProcessEvents.append(processEvents)
                 if events[i][1] == processId:
                     while i < len(events) - 1 and events[i][1] == processId:
+                        bar()
                         i += 1
                 processId = events[i][1]
-                processJudge = events[i][4]
+                processJudge = events[i][5]
                 processSubject = events[i][11]
                 processSection = events[i][13]
                 processEvents = [processId, processJudge, processSubject, processSection, utilities.getProcessState('unfinished')]
@@ -60,8 +61,8 @@ def getProcessEvents(events, endPhase, ending):
                 if events[i][10] == endPhase and not continuative: 
                     processEvents[4] = utilities.getProcessState('finished')
                     end = True
-                if events[i][4] != processJudge:
-                    processJudge = events[i][4]
+                if events[i][5] != processJudge:
+                    processJudge = events[i][5]
                     processEvents[1] = processJudge
                 processEvents.append(events[i])
             bar()

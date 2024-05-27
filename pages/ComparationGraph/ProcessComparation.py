@@ -33,7 +33,7 @@ def pageLayout():
     sequence = utilities.getPlaceholderName('sequence')
     sequenceTag = utilities.getTagName('sequenceTag')
     subject = utilities.getPlaceholderName('subject')  
-    subjectTag = utilities.getTagName('subjectTag') 
+    subjectTag = utilities.getTagName('codeSubjectTag') 
     text = utilities.getPlaceholderName('text') 
     trimester = utilities.getPlaceholderName('trimester') 
     trimesterYear = utilities.getPlaceholderName('trimesterYear')
@@ -41,10 +41,7 @@ def pageLayout():
     withTag = utilities.getPlaceholderName('with')
     withOut = utilities.getPlaceholderName('without')
     year = utilities.getPlaceholderName('year') 
-    importantSubjects = getter.getImportantSubjects()
     subjects = frame.getGroupBy(df, subjectTag)
-    if importantSubjects != None:
-        subjects = list(set(subjects) & set(importantSubjects))
     sections = frame.getGroupBy(df, sectionTag)
     judges = frame.getGroupBy(df, judgeTag)
     finished = frame.getGroupBy(df, finishedTag)
@@ -71,10 +68,10 @@ def pageLayout():
         ),
         ds.html.Button("RESET", id = "reset-button-pr"),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-pr', placeholder = section, style = {'width': 400}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-pr', placeholder = subject, style = {'width': 400}, optionHeight = 80),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-pr', placeholder = subject, style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-pr', placeholder = judge, style = {'width': 400}),
         ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-pr', placeholder = process, style = {'width': 400}),
-        ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-pr', placeholder = sequence, style = {'width': 400}),
+        ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-pr', placeholder = sequence, style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-pr', placeholder = phaseSequence, style = {'width': 400}),
         ds.html.Div(children = [
             ds.dcc.Dropdown(events, multi = False, searchable = False, id = 'events-dropdown-pr', placeholder = eventSequence, style = {'width': 400}),
