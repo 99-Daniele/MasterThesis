@@ -17,10 +17,10 @@ try:
     mustStates = file.getDataFromTextFile('preferences/mustStates.txt')
 except:
     mustStates = None
+stateTag = utilities.getTagName("stateTag")
 
 # return initial layout of page.
 def pageLayout():
-    countTag = utilities.getTagName('countTag') 
     dateTag = utilities.getTagName('dateTag') 
     eventTag = utilities.getTagName('eventTag') 
     judge = utilities.getPlaceholderName('judge') 
@@ -78,4 +78,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
-    return event.eventUpdate(df, startDate, endDate, 'stato', mustStates, minDate, maxDate, sections, subjects, judges)
+    return event.eventUpdate(df, startDate, endDate, stateTag, mustStates, minDate, maxDate, sections, subjects, judges)

@@ -17,10 +17,11 @@ try:
     mustEvents = file.getDataFromTextFile('preferences/mustEvents.txt')
 except:
     mustEvents = None
+eventTag = utilities.getTagName('eventTag')
+df = frame.eventPhase(df)
 
 # return initial layout of page.
 def pageLayout():
-    countTag = utilities.getTagName('countTag') 
     dateTag = utilities.getTagName('dateTag') 
     eventTag = utilities.getTagName('eventTag') 
     judge = utilities.getPlaceholderName('judge') 
@@ -78,4 +79,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
-    return event.eventUpdate(df, startDate, endDate, 'evento', mustEvents, minDate, maxDate, sections, subjects, judges)
+    return event.eventUpdate(df, startDate, endDate, eventTag, mustEvents, minDate, maxDate, sections, subjects, judges)

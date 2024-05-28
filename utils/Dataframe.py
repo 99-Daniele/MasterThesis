@@ -573,6 +573,20 @@ def getRowsFromIndex(df, index):
     df_temp = df_temp.iloc[index]
     return df_temp
 
+# change phase based on eventsName.txt file
+def eventPhase(df):
+    codeEventTag = utilities.getTagName('codeEventTag')
+    phaseTag = utilities.getTagName('phaseTag')
+    tagTag = utilities.getTagName('tagTag')
+    df_temp = df.copy()
+    df_temp = df_temp.drop(phaseTag, axis = 1)
+    events = file.getDataFromTextFile('preferences/eventsName.txt')[0]
+    df_events = pd.DataFrame(events, columns = [codeEventTag, tagTag, phaseTag])
+    df_events = df_events.drop(tagTag, axis = 1)
+    result = df_temp.join(df_events.set_index(codeEventTag), on = codeEventTag)
+    result = result.dropna()
+    return result
+
 def selectFollowingRows(df, tag, tagChoice):
     numEventTag = utilities.getTagName('numEventTag')
     numProcessTag = utilities.getTagName('numProcessTag')

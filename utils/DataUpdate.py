@@ -505,11 +505,11 @@ def verifyDatabase(connection):
     if not connect.doesATableHaveColumns(connection, "processi", ['numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'], ['BIGINT', 'DATETIME', 'TEXT', 'VARCHAR(10)', 'VARCHAR(5)']):
         raise Exception("\n'processi' table does not have all requested columns. The requested columns are: 'numProcesso'(BIGINT), 'dataInizio'(DATETIME), 'giudice'(TEXT), 'materia'(VARCHAR(10)), 'sezione'(VARCHAR(5))")
     if not connect.doesATableExist(connection, "eventinome"):
-        connect.createTable(connection, 'eventinome', ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT'], [0], [])
+        connect.createTable(connection, 'eventinome', ['codice', 'etichetta', 'fase'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(5)'], [0], [])
         connect.insertIntoDatabase(connection, 'eventinome', eventsName)
     else:
-        if not connect.doesATableHaveColumns(connection, "eventinome", ['codice', 'etichetta'], ['VARCHAR(10)', 'TEXT']):
-            raise Exception("\n'eventinome' table does not have all requested columns. The requested columns are: 'codice'(VARCHAR(10)), 'abbreviazione'(TEXT)")
+        if not connect.doesATableHaveColumns(connection, "eventinome", ['codice', 'etichetta', 'fase'], ['VARCHAR(10)', 'TEXT', 'VARCHAR(5)']):
+            raise Exception("\n'eventinome' table does not have all requested columns. The requested columns are: 'codice'(VARCHAR(10)), 'abbreviazione'(TEXT), 'fase'(VARCHAR(5))")
         connect.clearTable(connection, "eventinome")
         connect.insertIntoDatabase(connection, 'eventinome', eventsName)
     if not connect.doesATableExist(connection, "materienome"):

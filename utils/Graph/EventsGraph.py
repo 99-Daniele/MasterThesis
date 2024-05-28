@@ -48,16 +48,12 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
         startDate = minDate
         endDate = maxDate
     dateTag = utilities.getTagName('dateTag')
-    phaseTag = utilities.getTagName('phaseTag')
     numProcessTag = utilities.getTagName('numProcessTag')
+    phaseTag = utilities.getTagName('phaseTag') 
     df_temp = updateTypes(df_temp, startDate, endDate, sections, subjects, judges)
+    df_temp = df_temp.sort_values(by = phaseTag).reset_index(drop = True)
     [sections, subjects, judges] = updateTypesBySelection(df, startDate, endDate, sections, subjects, judges)
-    df_phase = df_temp.groupby(type, as_index = False)[phaseTag].max()
-    df_phase = df_phase.sort_values(by = [phaseTag, type])
-    order_dict = df_phase.set_index(type).to_dict()[phaseTag]
-    df_temp['sort_column'] = df_temp[type].map(order_dict)
-    df_temp = df_temp.sort_values(['sort_column'], ascending = [False]).drop(columns = 'sort_column').reset_index(drop = True)
-    fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_sequence = utilities.phaseColorList(df_phase, type), labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = utilities.getWidth(1))
+    fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_sequence = utilities.phaseColorList(df_temp, type), labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = utilities.getWidth(1))
     fig.update_layout(
         legend = dict(
             yanchor = "top",

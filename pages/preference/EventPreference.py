@@ -20,6 +20,7 @@ def pageLayout():
     duration = utilities.getPlaceholderName('duration')
     event = utilities.getPlaceholderName('event')
     phase = utilities.getPlaceholderName('phase')
+    phaseTag = utilities.getTagName('phaseTag')
     tag = utilities.getPlaceholderName('tag')
     tagTag = utilities.getTagName('tagTag')
     layout = ds.html.Div([
@@ -36,7 +37,8 @@ def pageLayout():
             df.to_dict('records'), columns = [
                 {'name': event, 'id': codeEventTag, 'editable': False}, 
                 {'name': description, 'id': descriptionTag, 'editable': False}, 
-                {'name': tag, 'id': tagTag, 'editable': True}, 
+                {'name': tag, 'id': tagTag, 'editable': True},  
+                {'name': phase, 'id': phaseTag, 'editable': True}, 
                 {'name': count, 'id': countTag, 'editable': False},  
                 {'name': duration, 'id': durationTag, 'editable': False}],
             filter_action = "native",

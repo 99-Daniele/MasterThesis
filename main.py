@@ -75,7 +75,7 @@ def displayEventComparation():
     app.run_server(debug = True)
 
 # display state events graph.
-def displayStatesEvents():
+def displayEventsState():
     import pages.typeEventGraph.StateEvents as stateEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -84,7 +84,7 @@ def displayStatesEvents():
     app.run_server(debug = True)
 
 # display phase events graph.
-def displayPhaseEvents():
+def displayEventsPhase():
     import pages.typeEventGraph.PhaseEvents as phaseEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -176,4 +176,4 @@ def refreshData():
 
 # action performed by main.
 if __name__ == '__main__':
-    displayAllEvents()
+    displayStateEvents()

@@ -11,7 +11,6 @@ def phaseColorList(df, type):
     types = df[type].unique().tolist()
     c = []
     colors = file.getDataFromJsonFile('utils/utilities/phaseColors.json')
-    dateTag = getTagName("dateTag")
     phaseTag = getTagName("phaseTag")
     for t in types:
         phase = df[df[type] == t][phaseTag].tolist()[0]
