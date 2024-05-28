@@ -38,7 +38,7 @@ def refreshData():
     processEvents = getProcessEvents(events, stallPhase, endPhase, end)
     [eventsSequences, phasesSequences, statesSequences] = updateTypeDurationDataframe(processEvents, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
     updateProcessDurationDataframe(processEvents, eventsSequences, phasesSequences, statesSequences, dateTag, numEventTag)
-    print(time.time() - start)
+    print(str(time.time() - start) + " seconds")
 
 # update events dataframe.
 def updateEventsDataframe(events, endPhase):
@@ -501,7 +501,7 @@ def verifyDatabase(connection):
         raise Exception("\n'eventsName.txt' file is not present or is called differently than 'eventsName.txt")
     try:
         subjectsName = file.getDataFromTextFile('preferences/subjectsName.txt')
-        #subjectsName = list(subjectsName[0])
+        subjectsName = list(subjectsName[0])
     except:
         raise Exception("\n'subjectsName.txt' file is not present or is called differently than 'subjectsName.txt")
     try:

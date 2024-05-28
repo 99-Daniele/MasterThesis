@@ -12,6 +12,7 @@ import utils.utilities.Utilities as utilities
 # get dataframe with all events duration.
 df = getter.getEventsDurationFiltered()
 eventTag = utilities.getTagName('eventTag')
+df = frame.keepOnlyRelevant(df, 0.01, eventTag)
 
 # return initial layout of page.
 def pageLayout():
@@ -29,7 +30,7 @@ def pageLayout():
     section = utilities.getPlaceholderName('section') 
     sectionTag = utilities.getTagName('sectionTag')
     subject = utilities.getPlaceholderName('subject')  
-    subjectTag = utilities.getTagName('codeSubjectTag') 
+    subjectTag = utilities.getTagName('subjectTag') 
     text = utilities.getPlaceholderName('text') 
     trimester = utilities.getPlaceholderName('trimester') 
     trimesterYear = utilities.getPlaceholderName('trimesterYear')
@@ -66,7 +67,7 @@ def pageLayout():
         ),
         ds.dcc.Dropdown(typesSorted, multi = False, searchable = False, id = 'type-dropdown-e', placeholder = event, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-e', placeholder = section, style = {'display': 'none'}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-e', placeholder = subject, style = {'display': 'none'}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-e', placeholder = subject, style = {'display': 'none'}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-e', placeholder = judge, style = {'display': 'none'}),
         ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-e', placeholder = process, style = {'display': 'none'}),
         ds.dcc.Checklist([sectionTag, subjectTag, judgeTag, finishedTag], value = [], id = 'choice-checklist-e', inline = True, style = {'display': 'none'}),

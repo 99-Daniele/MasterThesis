@@ -17,9 +17,9 @@ def hideChosen(choices, tags, styles, parameters):
 # return the style of dropdown as hidden or not based on user choices: if user choices one, then corresponding dropdown will be hidden and his values will reset.
 # this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
 def hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, event):
+    judgeStyle = {'width': 400}
     sectionStyle = {'width': 400}
     subjectStyle = {'width': 400}
-    judgeStyle = {'width': 400}
     finishedStyle = {'width': 400}
     sequenceStyle = {'width': 400}
     phaseSequenceStyle = {'width': 400}
@@ -76,7 +76,7 @@ def updateProcessData(df, startDate, endDate, sections, subjects, judges, finish
     phaseSequenceTag = utilities.getTagName("phaseSequenceTag")
     sectionTag = utilities.getTagName("sectionTag")
     sequenceTag = utilities.getTagName("sequenceTag")
-    subjectTag = utilities.getTagName("codeSubjectTag")
+    subjectTag = utilities.getTagName("subjectTag")
     df_temp = df.copy()
     df_temp = frame.getDateDataFrame(df_temp, dateTag, startDate, endDate)
     df_temp = frame.getTypesDataFrame(df_temp, sectionTag, sections)
@@ -97,7 +97,7 @@ def updateTypeData(df, startDate, endDate, sections, subjects, judges, finished)
     finishedTag = utilities.getTagName("finishedTag")
     judgeTag = utilities.getTagName("judgeTag")
     sectionTag = utilities.getTagName("sectionTag")
-    subjectTag = utilities.getTagName("codeSubjectTag")
+    subjectTag = utilities.getTagName("subjectTag")
     df_temp = df.copy()
     df_temp = frame.getDateDataFrame(df_temp, dateTag, startDate, endDate)
     df_temp = frame.getTypesDataFrame(df_temp, sectionTag, sections)
@@ -116,41 +116,41 @@ def updateProcessDataframeFromSelection(choice, df_temp, df_data, startDate, end
     phaseSequenceTag = utilities.getTagName("phaseSequenceTag")
     sectionTag = utilities.getTagName("sectionTag")
     sequenceTag = utilities.getTagName("sequenceTag")
-    subjectTag = utilities.getTagName("codeSubjectTag")
-    if choice != None and 'section-dropdown' in choice:
+    subjectTag = utilities.getTagName("subjectTag")
+    if sections != None and len(sections) > 0:
         df_temp_1 = updateProcessData(df_temp, startDate, endDate, None, subjects, judges, finished, sequences, phaseSequences, event, eventRadio)
     else:
         df_temp_1 = df_data
-    sections = frame.getGroupBy(df_temp_1, sectionTag)
-    if choice != None and 'subject-dropdown' in choice:
+    if subjects != None and len(subjects) > 0:
         df_temp_2 = updateProcessData(df_temp, startDate, endDate, sections, None, judges, finished, sequences, phaseSequences, event, eventRadio)
     else:
         df_temp_2 = df_data
-    subjects = frame.getGroupBy(df_temp_2, subjectTag)
-    if choice != None and 'judge-dropdown' in choice:
+    if judges != None and len(judges) > 0:
         df_temp_3 = updateProcessData(df_temp, startDate, endDate, sections, subjects, None, finished, sequences, phaseSequences, event, eventRadio)
     else:
         df_temp_3 = df_data
-    judges = frame.getGroupBy(df_temp_3, judgeTag)
-    if choice != None and 'finished-dropdown' in choice:
+    if finished != None and len(finished) > 0:
         df_temp_4 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, None, sequences, phaseSequences, event, eventRadio)
     else:
         df_temp_4 = df_data
-    finished = frame.getGroupBy(df_temp_4, finishedTag)
-    if choice != None and 'sequence-dropdown' in choice:
+    if sequences != None and len(sequences) > 0:
         df_temp_5 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, None, phaseSequences, event, eventRadio)
     else:
         df_temp_5 = df_data
-    sequences = frame.getGroupBy(df_temp_5, sequenceTag)
-    if choice != None and 'phaseSequence-dropdown' in choice:
+    if phaseSequences != None and len(phaseSequences) > 0:
         df_temp_6 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, None, event, eventRadio)
     else:
         df_temp_6 = df_data
-    phaseSequences = frame.getGroupBy(df_temp_6, phaseSequenceTag)
-    if choice != None and ('events-dropdown' in choice or 'events-radioitem' in choice):
+    if event != None and len(event) > 0:
         df_temp_7 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, None, None)
     else:
         df_temp_7 = df_data
+    sections = frame.getGroupBy(df_temp_1, sectionTag)
+    subjects = frame.getGroupBy(df_temp_2, subjectTag)
+    judges = frame.getGroupBy(df_temp_3, judgeTag)
+    finished = frame.getGroupBy(df_temp_4, finishedTag)
+    sequences = frame.getGroupBy(df_temp_5, sequenceTag)
+    phaseSequences = frame.getGroupBy(df_temp_6, phaseSequenceTag)
     event = frame.getGroupByFromString(df_temp_7, eventsTag)
     return [sections, subjects, judges, finished, sequences, phaseSequences, event]
 
@@ -161,26 +161,26 @@ def updateTypeDataframeFromSelection(choice, df_temp, df_data, startDate, endDat
     finishedTag = utilities.getTagName("finishedTag")
     judgeTag = utilities.getTagName("judgeTag")
     sectionTag = utilities.getTagName("sectionTag")
-    subjectTag = utilities.getTagName("codeSubjectTag")
-    if choice != None and 'section-dropdown' in choice:
+    subjectTag = utilities.getTagName("subjectTag")
+    if sections != None and len(sections) > 0:
         df_temp_1 = updateTypeData(df_temp, startDate, endDate, None, subjects, judges, finished)
     else:
         df_temp_1 = df_data
-    sections = frame.getGroupBy(df_temp_1, sectionTag)
-    if choice != None and 'subject-dropdown' in choice:
+    if subjects != None and len(subjects) > 0:
         df_temp_2 = updateTypeData(df_temp, startDate, endDate, sections, None, judges, finished)
     else:
         df_temp_2 = df_data
-    subjects = frame.getGroupBy(df_temp_2, subjectTag)
-    if choice != None and 'judge-dropdown' in choice:
+    if judges != None and len(judges) > 0:
         df_temp_3 = updateTypeData(df_temp, startDate, endDate, sections, subjects, None, finished)
     else:
         df_temp_3 = df_data
-    judges = frame.getGroupBy(df_temp_3, judgeTag)
-    if choice != None and 'finished-dropdown' in choice:
+    if finished != None and len(finished) > 0:
         df_temp_4 = updateTypeData(df_temp, startDate, endDate, sections, subjects, judges, None)
     else:
         df_temp_4 = df_data
+    sections = frame.getGroupBy(df_temp_1, sectionTag)
+    subjects = frame.getGroupBy(df_temp_2, subjectTag)
+    judges = frame.getGroupBy(df_temp_3, judgeTag)
     finished = frame.getGroupBy(df_temp_4, finishedTag)
     return [sections, subjects, judges, finished]
 
@@ -274,7 +274,7 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
     df_temp = df.copy()
     if typeChoice == None:
         title = 'DURATA MEDIA ' + type[0:-1].upper() + 'I DEL PROCESSO'
-        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, [type], avgChoice)        
+        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, [type], avgChoice)     
         xticks = frame.getUniques(allData, type)
         [dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle] = hideAll()
         [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_temp, startDate, endDate, sections, subjects, judges, finished)

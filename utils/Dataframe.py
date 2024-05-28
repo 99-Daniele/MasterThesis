@@ -100,7 +100,7 @@ def createTypeDurationsDataFrame(events):
     if importantSections != None:
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
     if importantSubjects != None:
-        filteredDf = filteredDf[filteredDf[subjectCodeTag].isin(importantSubjects)]
+        filteredDf = filteredDf[filteredDf[subjectTag].isin(importantSubjects)]
     df = df.dropna()
     filteredDf = filteredDf.dropna()
     return [df, filteredDf]
@@ -197,8 +197,6 @@ def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
     codeSubjectTag = utilities.getTagName('codeSubjectTag')
-    print(processDuration[codeSubjectTag])
-    exit()
     processDuration = processDuration.groupby([codeSubjectTag]) \
         .agg({processDuration.columns[2]: 'size', durationTag: 'mean'}) \
         .rename(columns = {processDuration.columns[2]:countTag}) \
@@ -207,6 +205,7 @@ def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
     processDuration[codeSubjectTag] = processDuration[codeSubjectTag].astype(int)
     processDuration[codeSubjectTag] = processDuration[codeSubjectTag].astype(str)
     result = subjectNames.join(processDuration.set_index(codeSubjectTag), on = codeSubjectTag)
+    result = result.fillna(0)
     result = result.sort_values([codeSubjectTag])
     return result
 

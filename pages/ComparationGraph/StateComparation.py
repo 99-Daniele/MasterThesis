@@ -31,7 +31,7 @@ def pageLayout():
     sequenceTag = utilities.getTagName('sequenceTag')
     state = utilities.getPlaceholderName('state')
     subject = utilities.getPlaceholderName('subject')  
-    subjectTag = utilities.getTagName('codeSubjectTag') 
+    subjectTag = utilities.getTagName('subjectTag') 
     text = utilities.getPlaceholderName('text') 
     trimester = utilities.getPlaceholderName('trimester') 
     trimesterYear = utilities.getPlaceholderName('trimesterYear')
@@ -68,7 +68,7 @@ def pageLayout():
         ),
         ds.dcc.Dropdown(typesSorted, multi = False, searchable = False, id = 'type-dropdown-s', placeholder = state, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-s', placeholder = section, style = {'display': 'none'}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-s', placeholder = subject, style = {'display': 'none'}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-s', placeholder = subject, style = {'display': 'none'}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-s', placeholder = judge, style = {'display': 'none'}),
         ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-s', placeholder = process, style = {'display': 'none'}),
         ds.dcc.Checklist([sectionTag, subjectTag, judgeTag, finishedTag], value = [], id = "choice-checklist-s", inline = True, inputStyle = {'margin-left': "20px"}),
