@@ -33,7 +33,7 @@ def pageLayout():
     sequence = utilities.getPlaceholderName('sequence')
     sequenceTag = utilities.getTagName('sequenceTag')
     subject = utilities.getPlaceholderName('subject')  
-    subjectTag = utilities.getTagName('codeSubjectTag') 
+    subjectTag = utilities.getTagName('subjectTag') 
     text = utilities.getPlaceholderName('text') 
     trimester = utilities.getPlaceholderName('trimester') 
     trimesterYear = utilities.getPlaceholderName('trimesterYear')

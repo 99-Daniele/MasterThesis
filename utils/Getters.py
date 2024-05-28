@@ -5,6 +5,7 @@ import utils.database.DatabaseConnection as connect
 import utils.DataUpdate as update
 import utils.Dataframe as frame
 import utils.FileOperation as file
+import utils.utilities.Utilities as utilities
 
 # connection is user database connection.
 connection = connect.getDatabaseConnection()
@@ -12,10 +13,11 @@ connection = connect.getDatabaseConnection()
 # queries to obtain data from database.
 endPhaseQuery = "SELECT fase FROM tribunali2020.statinome WHERE stato = 'DF'"
 eventsNamesQuery = "SELECT en.codice AS codice, te.CDESCR AS descrizione, en.etichetta AS etichetta, en.fase AS fase FROM eventinome AS en, tipoeventi AS te WHERE en.codice = te.CCDOEV"
-eventsQuery = "SELECT e.numEvento AS numEvento, e.numProcesso AS numProcesso, en.codice AS codiceEvento, en.etichetta AS evento, gn.giudice AS giudice, gn.alias AS alias, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S') AS dataEvento, DATE_FORMAT((SELECT MIN(data) FROM eventi AS ev WHERE e.numProcesso = ev.numProcesso), '%Y-%m-%d %H:%i:%S') AS dataInizioProcesso, sn.stato AS codiceStato, sn.etichetta AS stato, sn.fase AS faseStato, mn.codice AS codiceMateria, mn.descrizione AS materiaProcesso, p.sezione AS sezioneProcesso FROM eventi AS e, processi AS p, eventinome AS en, statinome AS sn, giudicinome AS gn, materienome AS mn WHERE e.numProcesso = p.numProcesso AND e.codice = en.codice AND e.statofinale = sn.stato AND e.giudice = gn.giudice AND p.materia = mn.codice ORDER BY numProcesso, data, numEvento"
+eventsQuery = "SELECT e.numEvento AS numEvento, e.numProcesso AS numProcesso, en.codice AS codiceEvento, en.etichetta AS evento, gn.giudice AS giudice, gn.alias AS alias, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S') AS dataEvento, DATE_FORMAT((SELECT MIN(data) FROM eventi AS ev WHERE e.numProcesso = ev.numProcesso), '%Y-%m-%d %H:%i:%S') AS dataInizioProcesso, sn.stato AS codiceStato, sn.etichetta AS stato, sn.fase AS faseStato, mn.codice AS codiceMateria, mn.descrizione AS descrizioneMateria, mn.etichetta AS etichettaMateria, p.sezione AS sezioneProcesso FROM eventi AS e, processi AS p, eventinome AS en, statinome AS sn, giudicinome AS gn, materienome AS mn WHERE e.numProcesso = p.numProcesso AND e.codice = en.codice AND e.statofinale = sn.stato AND e.giudice = gn.giudice AND p.materia = mn.codice ORDER BY numProcesso, data, numEvento"
 judgeNamesQuery = "SELECT * FROM giudicinome ORDER BY alias"
 minDateQuery = "SELECT DATE_FORMAT(MIN(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 maxDateQuery = "SELECT DATE_FORMAT(MAX(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
+stallPhaseQuery = "SELECT fase FROM tribunali2020.statinome WHERE etichetta = 'STALLO'"
 stateNamesQuery = "SELECT sn.stato AS codice, ts.CDESCR AS descrizione, sn.etichetta AS etichetta, ts.FKFASEPROCESSO AS fase_db, sn.fase AS fase FROM statinome AS sn, tipostato AS ts WHERE sn.stato = ts.CCODST"
 subjectNamesQuery = "SELECT * FROM materienome ORDER BY codice"
 
@@ -40,10 +42,32 @@ def getEndPhase():
     endPhase = connect.getDataFromDatabase(connection, endPhaseQuery)
     return endPhase[0][0]
 
+# get stall phase from all events of user database.
+def getStallPhase():
+    stallPhase = connect.getDataFromDatabase(connection, stallPhaseQuery)
+    return stallPhase[0][0]
+
 # get all events.
 def getEvents():
+    codeEventTag = utilities.getTagName("codeEventTag")
+    codeJudgeTag = utilities.getTagName("codeJudgeTag")
+    codeStateTag = utilities.getTagName("codeStateTag")
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    dateTag = utilities.getTagName("dateTag")
+    descriptionSubjectTag = utilities.getTagName("descriptionSubjectTag")
+    judgeTag = utilities.getTagName("judgeTag")
+    eventTag = utilities.getTagName("eventTag")
+    numEventTag = utilities.getTagName("numEventTag")
+    numProcessTag = utilities.getTagName("numProcessTag")
+    phaseTag = utilities.getTagName("phaseTag")
+    processDateTag = utilities.getTagName("processDateTag")
+    sectionTag = utilities.getTagName("sectionTag")
+    stateTag = utilities.getTagName("stateTag")
+    tagSubjecTag = utilities.getTagName("tagSubjectTag")
     events = connect.getDataFromDatabase(connection, eventsQuery)
-    return events
+    keys = [numEventTag, numProcessTag, codeEventTag, eventTag, codeJudgeTag, judgeTag, dateTag, processDateTag, codeStateTag, stateTag, phaseTag, codeSubjectTag, descriptionSubjectTag, tagSubjecTag, sectionTag]
+    dictEvents = utilities.fromListOfTuplesToListOfDicts(events, keys)
+    return dictEvents
 
 # get all events from cache file.
 def getAllEvents():

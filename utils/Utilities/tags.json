@@ -8,6 +8,7 @@
     "dateTag": "data", 
     "durationTag": "durata",
     "descriptionTag": "descrizione", 
+    "descriptionSubjectTag": "descrizioneMateria",
     "endDateTag": "dataFine",
     "endIdTag": "eventoFine",
     "eventTag": "evento",
@@ -27,5 +28,6 @@
     "sequenceTag": "sequenza",
     "stateTag": "stato",
     "subjectTag": "materia",
-    "tagTag": "etichetta"
+    "tagTag": "etichetta",
+    "tagSubjectTag": "etichettaMateria"
 }

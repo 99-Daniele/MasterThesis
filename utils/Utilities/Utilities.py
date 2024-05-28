@@ -111,6 +111,11 @@ def fromStringToList(string):
     list = string.split(",")
     return list
 
+# transform list of tuples to list of dicts with given keys.
+def fromListOfTuplesToListOfDicts(list, keys):
+    newList = [dict(zip(keys, values)) for values in list]
+    return newList
+
 # find substring between from given string two characters.
 def findSubstringBetweenChars(string, startChar, endChar):
     startIndex = string.find(startChar)

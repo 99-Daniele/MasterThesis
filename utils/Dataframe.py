@@ -43,6 +43,7 @@ def createEventsDataFrame(events, endPhase):
     dfEnd = dfEnd.groupby(numProcessTag, as_index = False).first().reset_index(drop = True)
     df = pd.concat([dfNotEnd, dfEnd])
     df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
+    df = df.dropna()
     return df
 
 # from processes list create process duration dataframe.
@@ -59,17 +60,20 @@ def createProcessDurationsDataFrame(process):
     phaseSequenceTag = utilities.getTagName('phaseSequenceTag')
     sectionTag = utilities.getTagName('sectionTag')
     stateSequenceTag = utilities.getTagName('sequenceTag')
+    subjectTag = utilities.getTagName('subjectTag')
     subjectCodeTag = utilities.getTagName('codeSubjectTag')
-    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectCodeTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, endDateTag, endIdTag])
+    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, endDateTag, endIdTag])
     filteredDf = df.copy()
     if importantProcessStates != None:
         filteredDf = filteredDf[filteredDf[finishedTag].isin(importantProcessStates)]
     if importantSections != None:
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
     if importantSubjects != None:
-        filteredDf = filteredDf[filteredDf[subjectCodeTag].isin(importantSubjects)]
+        filteredDf = filteredDf[filteredDf[subjectTag].isin(importantSubjects)]
     df = df.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
     filteredDf = filteredDf.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
+    df = df.dropna()
+    filteredDf = filteredDf.dropna()
     return [df, filteredDf]
 
 # from events list create type duration dataframe.
@@ -97,6 +101,8 @@ def createTypeDurationsDataFrame(events):
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
     if importantSubjects != None:
         filteredDf = filteredDf[filteredDf[subjectCodeTag].isin(importantSubjects)]
+    df = df.dropna()
+    filteredDf = filteredDf.dropna()
     return [df, filteredDf]
 
 # from state names list create state names dataframe.
@@ -177,12 +183,12 @@ def createJudgeNameDataframeWithInfo(processDuration, judgeNames):
     return result
 
 # from subject names list create subjects names dataframe.
-def createSubjectNameDataframe(judgeNames):
+def createSubjectNameDataframe(subjectNames):
     codeSubjectTag = utilities.getTagName('codeSubjectTag')
     descriptionTag = utilities.getTagName('descriptionTag')
     ritualTag = utilities.getTagName('ritualTag')
     subjectTag = utilities.getTagName('subjectTag')
-    df = pd.DataFrame(judgeNames, columns = [codeSubjectTag, descriptionTag, ritualTag, subjectTag])
+    df = pd.DataFrame(subjectNames, columns = [codeSubjectTag, descriptionTag, ritualTag, subjectTag])
     df[codeSubjectTag] = df[codeSubjectTag].astype(str)
     return df
 
@@ -191,6 +197,8 @@ def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
     codeSubjectTag = utilities.getTagName('codeSubjectTag')
+    print(processDuration[codeSubjectTag])
+    exit()
     processDuration = processDuration.groupby([codeSubjectTag]) \
         .agg({processDuration.columns[2]: 'size', durationTag: 'mean'}) \
         .rename(columns = {processDuration.columns[2]:countTag}) \
