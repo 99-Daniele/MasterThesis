@@ -13,7 +13,7 @@ connection = connect.getDatabaseConnection()
 # queries to obtain data from database.
 endPhaseQuery = "SELECT fase FROM tribunali2020.statinome WHERE stato = 'DF'"
 eventsNamesQuery = "SELECT en.codice AS codice, te.CDESCR AS descrizione, en.etichetta AS etichetta, en.fase AS fase FROM eventinome AS en, tipoeventi AS te WHERE en.codice = te.CCDOEV"
-eventsQuery = "SELECT e.numEvento AS numEvento, e.numProcesso AS numProcesso, en.codice AS codiceEvento, en.etichetta AS evento, gn.giudice AS giudice, gn.alias AS alias, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S') AS dataEvento, DATE_FORMAT((SELECT MIN(data) FROM eventi AS ev WHERE e.numProcesso = ev.numProcesso), '%Y-%m-%d %H:%i:%S') AS dataInizioProcesso, sn.stato AS codiceStato, sn.etichetta AS stato, sn.fase AS faseStato, mn.codice AS codiceMateria, mn.descrizione AS descrizioneMateria, mn.etichetta AS etichettaMateria, p.sezione AS sezioneProcesso FROM eventi AS e, processi AS p, eventinome AS en, statinome AS sn, giudicinome AS gn, materienome AS mn WHERE e.numProcesso = p.numProcesso AND e.codice = en.codice AND e.statofinale = sn.stato AND e.giudice = gn.giudice AND p.materia = mn.codice ORDER BY numProcesso, data, numEvento"
+eventsQuery = "SELECT e.numEvento AS numEvento, e.numProcesso AS numProcesso, en.codice AS codiceEvento, en.etichetta AS evento, gn.giudice AS giudice, gn.alias AS alias, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S') AS dataEvento, DATE_FORMAT((SELECT MIN(data) FROM eventi AS ev WHERE e.numProcesso = ev.numProcesso), '%Y-%m-%d %H:%i:%S') AS dataInizioProcesso, sn.stato AS codiceStato, sn.etichetta AS stato, sn.fase AS faseStato, mn.codice AS codiceMateria, CONCAT(mn.descrizione, ' - ', mn.etichetta) AS materia, p.sezione AS sezioneProcesso FROM eventi AS e, processi AS p, eventinome AS en, statinome AS sn, giudicinome AS gn, materienome AS mn WHERE e.numProcesso = p.numProcesso AND e.codice = en.codice AND e.statofinale = sn.stato AND e.giudice = gn.giudice AND p.materia = mn.codice ORDER BY numProcesso, data, numEvento"
 judgeNamesQuery = "SELECT * FROM giudicinome ORDER BY alias"
 minDateQuery = "SELECT DATE_FORMAT(MIN(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 maxDateQuery = "SELECT DATE_FORMAT(MAX(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
@@ -54,7 +54,6 @@ def getEvents():
     codeStateTag = utilities.getTagName("codeStateTag")
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     dateTag = utilities.getTagName("dateTag")
-    descriptionSubjectTag = utilities.getTagName("descriptionSubjectTag")
     judgeTag = utilities.getTagName("judgeTag")
     eventTag = utilities.getTagName("eventTag")
     numEventTag = utilities.getTagName("numEventTag")
@@ -63,9 +62,9 @@ def getEvents():
     processDateTag = utilities.getTagName("processDateTag")
     sectionTag = utilities.getTagName("sectionTag")
     stateTag = utilities.getTagName("stateTag")
-    tagSubjecTag = utilities.getTagName("tagSubjectTag")
+    subjectTag = utilities.getTagName("subjectTag")
     events = connect.getDataFromDatabase(connection, eventsQuery)
-    keys = [numEventTag, numProcessTag, codeEventTag, eventTag, codeJudgeTag, judgeTag, dateTag, processDateTag, codeStateTag, stateTag, phaseTag, codeSubjectTag, descriptionSubjectTag, tagSubjecTag, sectionTag]
+    keys = [numEventTag, numProcessTag, codeEventTag, eventTag, codeJudgeTag, judgeTag, dateTag, processDateTag, codeStateTag, stateTag, phaseTag, codeSubjectTag, subjectTag, sectionTag]
     dictEvents = utilities.fromListOfTuplesToListOfDicts(events, keys)
     return dictEvents
 

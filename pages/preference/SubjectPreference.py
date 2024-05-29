@@ -18,7 +18,7 @@ def pageLayout():
     descriptionTag = utilities.getTagName('descriptionTag')
     duration = utilities.getPlaceholderName('duration')
     ritualTag = utilities.getTagName('ritualTag')
-    subjectTag = utilities.getTagName('subjectTag')
+    tagSubjecTag = utilities.getTagName('tagSubjecTag')
     layout = ds.html.Div([
         ds.dcc.ConfirmDialog(
             id = 'update-su',
@@ -34,7 +34,7 @@ def pageLayout():
                 {'name': codeSubjectTag, 'id': codeSubjectTag, 'editable': False},
                 {'name': descriptionTag, 'id': descriptionTag, 'editable': False},
                 {'name': ritualTag, 'id': ritualTag, 'editable': False},
-                {'name': subjectTag, 'id': subjectTag, 'editable': True}, 
+                {'name': tagSubjecTag, 'id': tagSubjecTag, 'editable': True}, 
                 {'name': count, 'id': countTag, 'editable': False},  
                 {'name': duration, 'id': durationTag, 'editable': False}],
             filter_action = "native",

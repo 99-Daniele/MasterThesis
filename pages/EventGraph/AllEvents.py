@@ -18,7 +18,6 @@ try:
 except:
     importantEvents = None
 eventTag = utilities.getTagName('eventTag')
-df = frame.eventPhase(df)
 
 # return initial layout of page.
 def pageLayout():

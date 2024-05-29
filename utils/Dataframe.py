@@ -42,8 +42,8 @@ def createEventsDataFrame(events, endPhase):
     dfEnd = df[df[phaseTag] == endPhase].reset_index(drop = True)
     dfEnd = dfEnd.groupby(numProcessTag, as_index = False).first().reset_index(drop = True)
     df = pd.concat([dfNotEnd, dfEnd])
-    df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     df = df.dropna()
+    df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     return df
 
 # from processes list create process duration dataframe.
@@ -187,8 +187,8 @@ def createSubjectNameDataframe(subjectNames):
     codeSubjectTag = utilities.getTagName('codeSubjectTag')
     descriptionTag = utilities.getTagName('descriptionTag')
     ritualTag = utilities.getTagName('ritualTag')
-    subjectTag = utilities.getTagName('subjectTag')
-    df = pd.DataFrame(subjectNames, columns = [codeSubjectTag, descriptionTag, ritualTag, subjectTag])
+    tagSubjecTag = utilities.getTagName('tagSubjecTag')
+    df = pd.DataFrame(subjectNames, columns = [codeSubjectTag, descriptionTag, ritualTag, tagSubjecTag])
     df[codeSubjectTag] = df[codeSubjectTag].astype(str)
     return df
 

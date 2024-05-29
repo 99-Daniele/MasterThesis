@@ -16,8 +16,11 @@ def refreshData():
     import time
     start = time.time()
     connection = connect.getDatabaseConnection()
-    verifyDatabase(connection)
+    #verifyDatabase(connection)
+    start2 = time.time()
     events = getter.getEvents()
+    print(time.time() - start2)
+    exit()
     courtHearingsEventsType = list(file.getDataFromTextFile('preferences/courtHearingsEvents.txt'))
     minDate = getter.getMinDate()
     maxDate = getter.getMaxDate()
@@ -26,75 +29,60 @@ def refreshData():
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     codeStateTag = utilities.getTagName("codeStateTag")
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
     dateTag = utilities.getTagName("dateTag")
     judgeTag = utilities.getTagName("judgeTag")
     eventTag = utilities.getTagName("eventTag")
     numEventTag = utilities.getTagName("numEventTag")
+    numProcessTag = utilities.getTagName("numProcessTag")
     phaseTag = utilities.getTagName("phaseTag")
     sectionTag = utilities.getTagName("sectionTag")
     stateTag = utilities.getTagName("stateTag")
+    subjectTag = utilities.getTagName("subjectTag")
     end = True
-    updateEventsDataframe(events, endPhase)
-    processEvents = getProcessEvents(events, stallPhase, endPhase, end)
+    updateEventsDataframe(events, endPhase, dateTag, eventTag, numEventTag, numProcessTag, phaseTag, stateTag)
+    exit()
+    processEvents = getProcessEvents(events, stallPhase, endPhase, end, codeSubjectTag, judgeTag, numProcessTag, phaseTag, sectionTag, subjectTag)
     [eventsSequences, phasesSequences, statesSequences] = updateTypeDurationDataframe(processEvents, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
     updateProcessDurationDataframe(processEvents, eventsSequences, phasesSequences, statesSequences, dateTag, numEventTag)
     print(str(time.time() - start) + " seconds")
 
 # update events dataframe.
-def updateEventsDataframe(events, endPhase):
+def updateEventsDataframe(events, endPhase, dateTag, eventTag, numEventTag, numProcessTag, phaseTag, stateTag):
     updateAllEventsDataframe(events, endPhase)
-    updateImportantEventsDataframe(events, endPhase)
-    updateCourtHearingEventsDataframe(events, endPhase)
-    updateStateEventsDataframe(events, endPhase)
-    updatePhaseEventsDataframe(events, endPhase)
+    updateImportantEventsDataframe(events, endPhase, eventTag)
+    updateCourtHearingEventsDataframe(events, endPhase, eventTag)
+    updateStateEventsDataframe(events, endPhase, dateTag, numEventTag, numProcessTag, stateTag)
+    updatePhaseEventsDataframe(events, endPhase, dateTag, numEventTag, numProcessTag, phaseTag)
 
 # update all events dataframe.
 def updateAllEventsDataframe(events, endPhase):
-    dateTag = utilities.getTagName("dateTag")
-    numEventTag = utilities.getTagName("numEventTag")
-    numProcessTag = utilities.getTagName("numProcessTag")
     allEventsDataframe = frame.createEventsDataFrame(events, endPhase)
-    allEventsDataframe = allEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     cache.updateCache('allEvents.json', allEventsDataframe)
 
 # update important events dataframe.
-def updateImportantEventsDataframe(events, endPhase):
-    dateTag = utilities.getTagName("dateTag")
-    eventTag = utilities.getTagName("eventTag")
-    numEventTag = utilities.getTagName("numEventTag")
-    numProcessTag = utilities.getTagName("numProcessTag")
+def updateImportantEventsDataframe(events, endPhase, eventTag):
     importantEventsDataframe = frame.createEventsDataFrame(events, endPhase)
     try:
         importantEvents = list(file.getDataFromTextFile('preferences/importantEvents.txt'))
         importantEventsDataframe = importantEventsDataframe[importantEventsDataframe[eventTag].isin(importantEvents)]
     except:
         pass
-    importantEventsDataframe = importantEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     cache.updateCache('importantEvents.json', importantEventsDataframe)
 
 # update important events dataframe.
-def updateCourtHearingEventsDataframe(events, endPhase):
-    dateTag = utilities.getTagName("dateTag")
-    eventTag = utilities.getTagName("eventTag")
-    numEventTag = utilities.getTagName("numEventTag")
-    numProcessTag = utilities.getTagName("numProcessTag")
+def updateCourtHearingEventsDataframe(events, endPhase, eventTag):
     courtHearingEventsDataframe = frame.createEventsDataFrame(events, endPhase)
     try:
         courtHearingsEvents = list(file.getDataFromTextFile('preferences/courtHearingsEvents.txt'))
         courtHearingEventsDataframe = courtHearingEventsDataframe[courtHearingEventsDataframe[eventTag].isin(courtHearingsEvents)]
     except:
         pass
-    courtHearingEventsDataframe = courtHearingEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     cache.updateCache('courtHearingEvents.json', courtHearingEventsDataframe)
 
 # update state events dataframe.
-def updateStateEventsDataframe(events, endPhase):
-    dateTag = utilities.getTagName("dateTag")
-    numEventTag = utilities.getTagName("numEventTag")
-    numProcessTag = utilities.getTagName("numProcessTag")
-    stateTag = utilities.getTagName("stateTag")
+def updateStateEventsDataframe(events, endPhase, dateTag, numEventTag, numProcessTag, stateTag):
     stateEventsDataframe = frame.createEventsDataFrame(events, endPhase)
-    stateEventsDataframe = stateEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     stateEventsDataframe = stateEventsDataframe.groupby([numProcessTag, stateTag], as_index = False).first()
     try:
         importantStates = list(file.getDataFromTextFile('preferences/importantStates.txt'))
@@ -105,35 +93,21 @@ def updateStateEventsDataframe(events, endPhase):
     cache.updateCache('stateEvents.json', stateEventsDataframe)
 
 # update phase events dataframe.
-def updatePhaseEventsDataframe(events, endPhase):
-    dateTag = utilities.getTagName("dateTag")
-    numEventTag = utilities.getTagName("numEventTag")
-    numProcessTag = utilities.getTagName("numProcessTag")
-    phaseTag = utilities.getTagName("phaseTag")
+def updatePhaseEventsDataframe(events, endPhase, dateTag, numEventTag, numProcessTag, phaseTag):
     phaseEventsDataframe = frame.createEventsDataFrame(events, endPhase)
-    phaseEventsDataframe = phaseEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     phaseEventsDataframe = phaseEventsDataframe.groupby([numProcessTag, phaseTag], as_index = False).first()
     phaseEventsDataframe = phaseEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     cache.updateCache('phaseEvents.json', phaseEventsDataframe)
 
 # group events by process.
-def getProcessEvents(events, stallPhase, endPhase, ending):
-    codeSubjectTag = utilities.getTagName("codeSubjectTag")
-    descriptionSubjectTag = utilities.getTagName("descriptionSubjectTag")
-    judgeTag = utilities.getTagName("judgeTag")
-    numProcessTag = utilities.getTagName("numProcessTag")
-    phaseTag = utilities.getTagName("phaseTag")
-    sectionTag = utilities.getTagName("sectionTag")
-    tagSubjecTag = utilities.getTagName("tagSubjectTag")
+def getProcessEvents(events, stallPhase, endPhase, ending, codeSubjectTag, judgeTag, numProcessTag, phaseTag, sectionTag, subjectTag):
     if len(events) == 0:
         raise Exception("\nThere isn't any event in database.")
     allProcessEvents = []
     processId = events[0][numProcessTag]
     processJudge = events[0][judgeTag]
     processCodeSubject = events[0][codeSubjectTag]
-    processSubjectDescription = events[0][descriptionSubjectTag]
-    processSubjectTag = events[0][tagSubjecTag]
-    processSubject = processSubjectDescription + " - " + processSubjectTag
+    processSubject = events[0][subjectTag]
     processSection = events[0][sectionTag]
     processEvents = [processId, processJudge, processCodeSubject, processSubject, processSection, utilities.getProcessState('unfinished')]
     end = False
@@ -150,9 +124,7 @@ def getProcessEvents(events, stallPhase, endPhase, ending):
                 processId = events[i][numProcessTag]
                 processJudge = events[i][judgeTag]
                 processCodeSubject = events[i][codeSubjectTag]
-                processSubjectDescription = events[i][descriptionSubjectTag]
-                processSubjectTag = events[i][tagSubjecTag]
-                processSubject = processSubjectDescription + " - " + processSubjectTag
+                processSubject = events[0][subjectTag]
                 processSection = events[i][sectionTag]
                 processEvents = [processId, processJudge, processCodeSubject, processSubject, processSection, utilities.getProcessState('unfinished')]
                 end = False
@@ -207,7 +179,7 @@ def calcTypeDuration(processEvents, courtHearingsEventsType, endPhase, codeEvent
             [processEventsDuration, eventsSequence] = getEventInfo(processEvents[i], endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
             [processPhasesDuration, phasesSequence] = getPhaseInfo(processEvents[i], endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
             [processStateDuration, statesSequence] = getStateInfo(processEvents[i], endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
-            courtHearingDuration = getCourtHearingDuration(processEvents[i], courtHearingsEventsType)
+            courtHearingDuration = getCourtHearingDuration(processEvents[i], courtHearingsEventsType, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
             eventsDuration.extend(processEventsDuration)
             phasesDuration.extend(processPhasesDuration)
             statesDuration.extend(processStateDuration)
@@ -384,23 +356,13 @@ def getStateInfo(events, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dat
     return [statesDuration, statesSequence]
 
 # return court hearing duration.
-def getCourtHearingDuration(events, courtHearingTypes):
+def getCourtHearingDuration(events, courtHearingTypes, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag):
     processId = events[0]
     subjectCode = events[2]
     subjectTag = events[3]
     finished = events[5]
     if len(events) == 6:
         return []
-    codeEventTag = utilities.getTagName("codeEventTag")
-    codeJudgeTag = utilities.getTagName("codeJudgeTag")
-    codeStateTag = utilities.getTagName("codeStateTag")
-    dateTag = utilities.getTagName("dateTag")
-    judgeTag = utilities.getTagName("judgeTag")
-    eventTag = utilities.getTagName("eventTag")
-    numEventTag = utilities.getTagName("numEventTag")
-    phaseTag = utilities.getTagName("phaseTag")
-    sectionTag = utilities.getTagName("sectionTag")
-    stateTag = utilities.getTagName("stateTag")
     events = events[6:]
     courtHearingsDuration = []
     courtHearing = False
