@@ -4,6 +4,7 @@ import datetime as dt
 import pandas as pd
 from win32api import GetSystemMetrics
 
+import utils.Dataframe as frame
 import utils.FileOperation as file
 
 # from given dataframe return a list of colors based on events phases.
@@ -16,6 +17,18 @@ def phaseColorList(df, type):
         phase = df[df[type] == t][phaseTag].tolist()[0]
         c.append(colors.get(str(phase)))
     return c
+
+# change phase dataframe from gievn file.
+def changePhaseDataframe(df, filename, tags, tagJoin, joinDrop):
+    df_phase, done = file.getDataframeFromTextFile(filename, tags)
+    if done:
+        phaseTag = getTagName("phaseTag")
+        df_temp = df.copy()
+        newDf = frame.joinDataframe(df_temp, df_phase, tagJoin, phaseTag, joinDrop)
+        newDf = newDf.dropna()
+        return newDf
+    else:
+        return df
 
 # return week datetime from given date. 
 def getWeekNumber(date):

@@ -127,7 +127,7 @@ def createStateNameDataframeWithInfo(statesDuration, stateNames):
         .reset_index()
     statesDuration[durationTag] = statesDuration[durationTag].astype(float).apply('{:,.2f}'.format)
     statesDuration[codeStateTag] = statesDuration[codeStateTag].astype(str)
-    result = stateNames.join(statesDuration.set_index(codeStateTag), on = codeStateTag)
+    result = joinDataframe(stateNames, statesDuration, codeStateTag, None, None)
     result = result.fillna(0)
     result = result.sort_values([codeStateTag])
     return result
@@ -153,7 +153,7 @@ def createEventNameDataframeWithInfo(eventsDuration, eventNames):
         .reset_index()
     eventsDuration[durationTag] = eventsDuration[durationTag].astype(float).apply('{:,.2f}'.format)
     eventsDuration[codeEventTag] = eventsDuration[codeEventTag].astype(str)
-    result = eventNames.join(eventsDuration.set_index(codeEventTag), on = codeEventTag)
+    result = joinDataframe(eventNames, eventsDuration, codeEventTag, None, None)
     result = result.fillna(0)
     result = result.sort_values([codeEventTag])
     return result
@@ -177,7 +177,7 @@ def createJudgeNameDataframeWithInfo(processDuration, judgeNames):
         .reset_index()
     processDuration[durationTag] = processDuration[durationTag].astype(float).apply('{:,.2f}'.format)
     processDuration[judgeTag] = processDuration[judgeTag].astype(str)
-    result = judgeNames.join(processDuration.set_index(judgeTag), on = judgeTag)
+    result = joinDataframe(judgeNames, processDuration, judgeTag, None, None)
     result = result.fillna(0)
     result = result.sort_values([judgeTag])
     return result
@@ -204,7 +204,7 @@ def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
     processDuration[durationTag] = processDuration[durationTag].astype(float).apply('{:,.2f}'.format)
     processDuration[codeSubjectTag] = processDuration[codeSubjectTag].astype(int)
     processDuration[codeSubjectTag] = processDuration[codeSubjectTag].astype(str)
-    result = subjectNames.join(processDuration.set_index(codeSubjectTag), on = codeSubjectTag)
+    result = joinDataframe(subjectNames, processDuration, codeSubjectTag, None, None)
     result = result.fillna(0)
     result = result.sort_values([codeSubjectTag])
     return result
@@ -578,19 +578,16 @@ def getRowsFromIndex(df, index):
     df_temp = df_temp.iloc[index]
     return df_temp
 
-# change phase based on eventsName.txt file
-def eventPhase(df):
-    codeEventTag = utilities.getTagName('codeEventTag')
-    phaseTag = utilities.getTagName('phaseTag')
-    tagTag = utilities.getTagName('tagTag')
-    df_temp = df.copy()
-    df_temp = df_temp.drop(phaseTag, axis = 1)
-    events = file.getDataFromTextFile('preferences/eventsName.txt')[0]
-    df_events = pd.DataFrame(events, columns = [codeEventTag, tagTag, phaseTag])
-    df_events = df_events.drop(tagTag, axis = 1)
-    result = df_temp.join(df_events.set_index(codeEventTag), on = codeEventTag)
-    result = result.dropna()
-    return result
+# return joins of dataframe
+def joinDataframe(df1, df2, tagJoin, dropJoin1, dropJoin2):
+    df_temp_1 = df1.copy()
+    df_temp_2 = df2.copy()
+    if dropJoin1 != None:
+        df_temp_1 = df_temp_1.drop(dropJoin1, axis = 1)
+    if dropJoin2 != None:
+        df_temp_2 = df_temp_2.drop(dropJoin2, axis = 1)
+    newDf = df_temp_1.join(df_temp_2.set_index(tagJoin), on = tagJoin)
+    return newDf
 
 def selectFollowingRows(df, tag, tagChoice):
     numEventTag = utilities.getTagName('numEventTag')

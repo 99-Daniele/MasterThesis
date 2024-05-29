@@ -16,11 +16,8 @@ def refreshData():
     import time
     start = time.time()
     connection = connect.getDatabaseConnection()
-    #verifyDatabase(connection)
-    start2 = time.time()
+    verifyDatabase(connection)
     events = getter.getEvents()
-    print(time.time() - start2)
-    exit()
     courtHearingsEventsType = list(file.getDataFromTextFile('preferences/courtHearingsEvents.txt'))
     minDate = getter.getMinDate()
     maxDate = getter.getMaxDate()
@@ -40,34 +37,35 @@ def refreshData():
     stateTag = utilities.getTagName("stateTag")
     subjectTag = utilities.getTagName("subjectTag")
     end = True
-    updateEventsDataframe(events, endPhase, dateTag, eventTag, numEventTag, numProcessTag, phaseTag, stateTag)
-    exit()
+    updateEventsDataframe(events, endPhase, codeEventTag, dateTag, eventTag, numEventTag, numProcessTag, phaseTag, stateTag)
     processEvents = getProcessEvents(events, stallPhase, endPhase, end, codeSubjectTag, judgeTag, numProcessTag, phaseTag, sectionTag, subjectTag)
     [eventsSequences, phasesSequences, statesSequences] = updateTypeDurationDataframe(processEvents, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
     updateProcessDurationDataframe(processEvents, eventsSequences, phasesSequences, statesSequences, dateTag, numEventTag)
     print(str(time.time() - start) + " seconds")
 
 # update events dataframe.
-def updateEventsDataframe(events, endPhase, dateTag, eventTag, numEventTag, numProcessTag, phaseTag, stateTag):
-    updateAllEventsDataframe(events, endPhase)
-    updateImportantEventsDataframe(events, endPhase, eventTag)
+def updateEventsDataframe(events, endPhase, codeEventTag, dateTag, eventTag, numEventTag, numProcessTag, phaseTag, stateTag):
+    updateAllEventsDataframe(events, endPhase, codeEventTag, eventTag, phaseTag)
+    updateImportantEventsDataframe(events, endPhase, codeEventTag, eventTag, phaseTag)
     updateCourtHearingEventsDataframe(events, endPhase, eventTag)
     updateStateEventsDataframe(events, endPhase, dateTag, numEventTag, numProcessTag, stateTag)
     updatePhaseEventsDataframe(events, endPhase, dateTag, numEventTag, numProcessTag, phaseTag)
 
 # update all events dataframe.
-def updateAllEventsDataframe(events, endPhase):
+def updateAllEventsDataframe(events, endPhase, codeEventTag, eventTag, phaseTag):
     allEventsDataframe = frame.createEventsDataFrame(events, endPhase)
+    allEventsDataframe = utilities.changePhaseDataframe(allEventsDataframe, 'preferences/eventsName.txt', [codeEventTag, eventTag, phaseTag], codeEventTag, eventTag)
     cache.updateCache('allEvents.json', allEventsDataframe)
 
 # update important events dataframe.
-def updateImportantEventsDataframe(events, endPhase, eventTag):
+def updateImportantEventsDataframe(events, endPhase, codeEventTag, eventTag, phaseTag):
     importantEventsDataframe = frame.createEventsDataFrame(events, endPhase)
     try:
         importantEvents = list(file.getDataFromTextFile('preferences/importantEvents.txt'))
         importantEventsDataframe = importantEventsDataframe[importantEventsDataframe[eventTag].isin(importantEvents)]
     except:
         pass
+    importantEventsDataframe = utilities.changePhaseDataframe(importantEventsDataframe, 'preferences/eventsName.txt', [codeEventTag, eventTag, phaseTag], codeEventTag, eventTag)
     cache.updateCache('importantEvents.json', importantEventsDataframe)
 
 # update important events dataframe.
