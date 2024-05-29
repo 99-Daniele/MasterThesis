@@ -17,6 +17,7 @@ def refreshData():
     start = time.time()
     connection = connect.getDatabaseConnection()
     verifyDatabase(connection)
+    exit()
     events = getter.getEvents()
     courtHearingsEventsType = list(file.getDataFromTextFile('preferences/courtHearingsEvents.txt'))
     minDate = getter.getMinDate()
@@ -54,7 +55,7 @@ def updateEventsDataframe(events, endPhase, codeEventTag, dateTag, eventTag, num
 # update all events dataframe.
 def updateAllEventsDataframe(events, endPhase, codeEventTag, eventTag, phaseTag):
     allEventsDataframe = frame.createEventsDataFrame(events, endPhase)
-    allEventsDataframe = utilities.changePhaseDataframe(allEventsDataframe, 'preferences/eventsName.txt', [codeEventTag, eventTag, phaseTag], codeEventTag, eventTag)
+    #allEventsDataframe = utilities.changePhaseDataframe(allEventsDataframe, 'preferences/eventsName.txt', [codeEventTag, eventTag, phaseTag], codeEventTag, eventTag)
     cache.updateCache('allEvents.json', allEventsDataframe)
 
 # update important events dataframe.
@@ -65,7 +66,7 @@ def updateImportantEventsDataframe(events, endPhase, codeEventTag, eventTag, pha
         importantEventsDataframe = importantEventsDataframe[importantEventsDataframe[eventTag].isin(importantEvents)]
     except:
         pass
-    importantEventsDataframe = utilities.changePhaseDataframe(importantEventsDataframe, 'preferences/eventsName.txt', [codeEventTag, eventTag, phaseTag], codeEventTag, eventTag)
+    #importantEventsDataframe = utilities.changePhaseDataframe(importantEventsDataframe, 'preferences/eventsName.txt', [codeEventTag, eventTag, phaseTag], codeEventTag, eventTag)
     cache.updateCache('importantEvents.json', importantEventsDataframe)
 
 # update important events dataframe.
@@ -257,15 +258,15 @@ def getPhaseInfo(events, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dat
         curr = events[i]
         next = events[i + 1]
         if curr[phaseTag] != next[phaseTag]:
-            lastPhase = curr
+            nextPhase = next
             currEventId = startPhase[numEventTag]
-            nextEventId = lastPhase[numEventTag]
+            nextEventId = nextPhase[numEventTag]
             currEventCode = startPhase[codeEventTag]
             currEventTag = startPhase[eventTag]
             currJudgeCode = startPhase[codeJudgeTag]
             currJudge = startPhase[judgeTag]
             currDate = startPhase[dateTag]
-            nextDate = lastPhase[dateTag]
+            nextDate = nextPhase[dateTag]
             currStateCode = startPhase[codeStateTag]
             currStateTag = startPhase[stateTag]
             currPhase = startPhase[phaseTag]
@@ -313,15 +314,15 @@ def getStateInfo(events, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dat
         curr = events[i]
         next = events[i + 1]
         if curr[codeStateTag] != next[codeStateTag]:
-            endState = curr
+            nextState = next
             currEventId = startState[numEventTag]
-            nextEventId = endState[numEventTag]
+            nextEventId = nextState[numEventTag]
             currEventCode = startState[codeEventTag]
             currEventTag = startState[eventTag]
             currJudgeCode = startState[codeJudgeTag]
             currJudge = startState[judgeTag]
             currDate = startState[dateTag]
-            nextDate = endState[dateTag]
+            nextDate = nextState[dateTag]
             currStateCode = startState[codeStateTag]
             currStateTag = startState[stateTag]
             currPhase = startState[phaseTag]
@@ -457,21 +458,25 @@ def verifyDatabase(connection):
     try:
         eventsName = file.getDataFromTextFile('preferences/eventsName.txt')
         eventsName = list(eventsName[0])
+        eventsName = [tuple(f.values()) for f in eventsName]
     except:
         raise Exception("\n'eventsName.txt' file is not present or is called differently than 'eventsName.txt")
     try:
         subjectsName = file.getDataFromTextFile('preferences/subjectsName.txt')
         subjectsName = list(subjectsName[0])
+        subjectsName = [tuple(f.values()) for f in subjectsName]
     except:
         raise Exception("\n'subjectsName.txt' file is not present or is called differently than 'subjectsName.txt")
     try:
         statesName = file.getDataFromTextFile('preferences/statesName.txt')
         statesName = list(statesName[0])
+        statesName = [tuple(f.values()) for f in statesName]
     except:
         raise Exception("\n'statesName.txt' file is not present or is called differently than 'statesName.txt")
     try:
         judgesName = file.getDataFromTextFile('preferences/judgesName.txt')
         judgesName = list(judgesName[0])
+        judgesName = [tuple(f.values()) for f in judgesName]
     except:
         raise Exception("\n'judgesName.txt' file is not present or is called differently than 'judgesName.txt")
     if not connect.doesATableExist(connection, "eventi"):

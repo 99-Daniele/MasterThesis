@@ -51,8 +51,8 @@ def createProcessDurationsDataFrame(process):
     dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
     eventSequenceTag = utilities.getTagName('eventSequenceTag')
-    endDateTag = utilities.getTagName('endDateTag')
-    endIdTag = utilities.getTagName('endIdTag')
+    nextDateTag = utilities.getTagName('nextDateTag')
+    nextIdTag = utilities.getTagName('nextIdTag')
     finishedTag = utilities.getTagName('finishedTag')
     judgeTag = utilities.getTagName('judgeTag')
     numEventTag = utilities.getTagName('numEventTag')
@@ -62,7 +62,7 @@ def createProcessDurationsDataFrame(process):
     stateSequenceTag = utilities.getTagName('sequenceTag')
     subjectTag = utilities.getTagName('subjectTag')
     subjectCodeTag = utilities.getTagName('codeSubjectTag')
-    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, endDateTag, endIdTag])
+    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, nextDateTag, nextIdTag])
     filteredDf = df.copy()
     if importantProcessStates != None:
         filteredDf = filteredDf[filteredDf[finishedTag].isin(importantProcessStates)]
@@ -85,8 +85,8 @@ def createTypeDurationsDataFrame(events):
     finishedTag = utilities.getTagName('finishedTag')
     judgeTag = utilities.getTagName('judgeTag')
     judgeCodeTag = utilities.getTagName('codeJudgeTag')
-    nextDateTag = utilities.getTagName('endDateTag')
-    nextIdTag = utilities.getTagName('endIdTag')
+    nextDateTag = utilities.getTagName('nextDateTag')
+    nextIdTag = utilities.getTagName('nextIdTag')
     numEventTag = utilities.getTagName('numEventTag')
     numProcessTag = utilities.getTagName('numProcessTag')
     phaseTag = utilities.getTagName('phaseTag')
@@ -129,7 +129,7 @@ def createStateNameDataframeWithInfo(statesDuration, stateNames):
     statesDuration[codeStateTag] = statesDuration[codeStateTag].astype(str)
     result = joinDataframe(stateNames, statesDuration, codeStateTag, None, None)
     result = result.fillna(0)
-    result = result.sort_values([codeStateTag])
+    result = result.sort_values([codeStateTag]).reset_index(drop = True)
     return result
 
 # from event names list create event names dataframe.
@@ -155,7 +155,7 @@ def createEventNameDataframeWithInfo(eventsDuration, eventNames):
     eventsDuration[codeEventTag] = eventsDuration[codeEventTag].astype(str)
     result = joinDataframe(eventNames, eventsDuration, codeEventTag, None, None)
     result = result.fillna(0)
-    result = result.sort_values([codeEventTag])
+    result = result.sort_values([codeEventTag]).reset_index(drop = True)
     return result
 
 # from judge names list create judge names dataframe.
@@ -179,7 +179,7 @@ def createJudgeNameDataframeWithInfo(processDuration, judgeNames):
     processDuration[judgeTag] = processDuration[judgeTag].astype(str)
     result = joinDataframe(judgeNames, processDuration, judgeTag, None, None)
     result = result.fillna(0)
-    result = result.sort_values([judgeTag])
+    result = result.sort_values([judgeTag]).reset_index(drop = True)
     return result
 
 # from subject names list create subjects names dataframe.
@@ -206,7 +206,7 @@ def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
     processDuration[codeSubjectTag] = processDuration[codeSubjectTag].astype(str)
     result = joinDataframe(subjectNames, processDuration, codeSubjectTag, None, None)
     result = result.fillna(0)
-    result = result.sort_values([codeSubjectTag])
+    result = result.sort_values([codeSubjectTag]).reset_index(drop = True)
     return result
 
 # return avg and tot dataframe.
@@ -216,7 +216,7 @@ def getAvgTotDataframeByDate(df1, avgChoice):
     dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
     quantileTag = utilities.getTagName('quantileTag')
-    df1 = df1.sort_values([dateTag])
+    df1 = df1.sort_values([dateTag]).reset_index(drop = True)
     df_q = df1.groupby([dateTag], as_index = False).quantile(0.75)
     df3 = df1.iloc[:0,:].copy()
     for i, row in df_q.iterrows():
@@ -422,8 +422,8 @@ def getAvgStdDataFrameByTypeChoice(df, typeChoice, avgChoice):
         df2 = df1.groupby([typeChoice, phaseTag], as_index = False).median()
     df2[countTag] = df1.groupby([typeChoice, phaseTag]).size().tolist()
     df2[quantileTag] = df1.groupby([typeChoice, phaseTag], as_index = False).quantile(0.75)[durationTag]
-    df1 = df1.sort_values(typeChoice).reset_index(drop = True)
-    df2 = df2.sort_values(typeChoice).reset_index(drop = True)
+    df1 = df1.sort_values([phaseTag, typeChoice]).reset_index(drop = True)
+    df2 = df2.sort_values([phaseTag, typeChoice]).reset_index(drop = True)
     return [df1, df2]
 
 # return dataframe with rows which type is present a relevant number of times.
@@ -442,7 +442,7 @@ def keepOnlyImportant(df, perc):
     df_temp = df.copy()
     totCount = df_temp[countTag].sum()
     threshold = totCount * perc
-    df_temp = df_temp.sort_values([countTag], ascending = False)
+    df_temp = df_temp.sort_values([countTag], ascending = False).reset_index(drop = True)
     i = 0
     sum = 0
     if df_temp[countTag].items() == None:
@@ -519,7 +519,7 @@ def getEventDataFrame(df, event):
 def getAllYears(df):
     dateTag = utilities.getTagName('dateTag')
     df_temp = df[dateTag].copy()
-    df_temp = df_temp.map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year).sort_values()
+    df_temp = df_temp.map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year).sort_values().reset_index(drop = True)
     years = df_temp.unique()
     return years
 
@@ -590,18 +590,14 @@ def joinDataframe(df1, df2, tagJoin, dropJoin1, dropJoin2):
     return newDf
 
 def selectFollowingRows(df, tag, tagChoice):
+    nextIdTag = utilities.getTagName("nextIdTag")
     numEventTag = utilities.getTagName('numEventTag')
     numProcessTag = utilities.getTagName('numProcessTag')
-    df_tag = df.copy()
-    df_tag = df[df[tag] == tagChoice]
-    df_final = df.iloc[:0,:].copy()
-    for i, row in df_tag.iterrows():
-        numEvent = row[numEventTag]
-        numProcess = row[numProcessTag]
-        df_temp = df.copy()
-        df_temp = df[df[numEventTag] > numEvent]
-        df_temp = df_temp[df_temp[numProcessTag] == numProcess]
-        df_final = pd.concat([df_final, df_temp.head(1)], ignore_index = True)
-        print(numEvent)
-    print(df_final)
-    exit()
+    df = df.sort_values(by = [numProcessTag, numEventTag]).reset_index(drop = True)
+    df_tag = df[df[tag] == tagChoice].copy()
+    df_tag = df_tag[df_tag[numEventTag] != df_tag[nextIdTag]]
+    df_tag = df_tag[[nextIdTag, tag]].reset_index(drop = True)
+    df_tag = df_tag.rename(columns = {nextIdTag:numEventTag})
+    newDf = joinDataframe(df_tag, df, numEventTag, tag, None)
+    newDf = newDf.dropna()
+    return newDf

@@ -65,7 +65,7 @@ def typeEventUpdate(df, type, typeChoice, tagChoice, first, avg, text, sections,
     [sections, subjects, judges, finished] = updateTypeDataBySelection(df_temp, df_data, sections, subjects, judges, finished)
     [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df_data, tagChoice, avg)      
     xticks = frame.getUniques(allData, tagChoice)
-    fig = px.box(allData, x = tagChoice, y = durationTag, color = phaseTag, color_discrete_sequence = utilities.phaseColorList(df_data, phaseTag), labels = {durationTag:'Durata evento', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+    fig = px.box(allData, x = tagChoice, y = durationTag, color = phaseTag, color_discrete_sequence = utilities.phaseColorList(allData, phaseTag), labels = {durationTag:'Durata evento', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
     fig.add_traces(
         px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = 'black').data
     )
@@ -84,17 +84,15 @@ def typeEventUpdate(df, type, typeChoice, tagChoice, first, avg, text, sections,
 def typeSequenceUpdate(df, type, typeChoice, tagChoice, avg, text, sections, subjects, judges, finished):
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
-    numProcessTag = utilities.getTagName('numProcessTag')
+    phaseTag = utilities.getTagName('phaseTag')
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
     df_temp = df.copy()
     df_temp = updateTypeData(df_temp, sections, subjects, judges, finished)
-    df_temp = frame.selectFollowingRows(df_temp, tagChoice, typeChoice)   
-    print(df_temp)
-    exit()
-    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df_temp, [tagChoice], avg)      
+    df_temp = frame.selectFollowingRows(df_temp, tagChoice, typeChoice)
+    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df_temp, tagChoice, avg)      
     xticks = frame.getUniques(allData, tagChoice)
-    fig = px.box(allData, x = tagChoice, y = durationTag, color_discrete_sequence = ['#91BBF3'], labels = {durationTag:'Durata evento', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+    fig = px.box(allData, x = tagChoice, y = durationTag, color = 'fase', labels = {durationTag:'Durata evento', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
     fig.add_traces(
         px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = 'black').data
     )
@@ -105,7 +103,7 @@ def typeSequenceUpdate(df, type, typeChoice, tagChoice, avg, text, sections, sub
     else:fig.add_traces(
             px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
         )
-    fig.update_layout(xaxis_tickvals = xticks)
+    fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False)
     fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
     return [fig]
         

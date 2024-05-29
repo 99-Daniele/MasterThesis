@@ -30,6 +30,11 @@ def updateFile(data, df, dropColumnTag, filename):
     return data, False
 
 def updateDatabase(data, df, dropColumnTag, filename):
+    data = [{k: v for k, v in d.items() if k not in dropColumnTag} for d in data]
+    strData = utilities.fromListToString(data)
+    file.writeOnTextFile(filename, strData)
+    print(data)
+    exit()
     if ds.ctx.triggered_id != None and 'refresh-button' in ds.ctx.triggered_id:
         dbData = df.to_dict('records')
         pairs = zip(data, dbData)
