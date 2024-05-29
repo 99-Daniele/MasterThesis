@@ -43,7 +43,7 @@ def updateTypesBySelection(df, df_data, startDate, endDate, sections, subjects, 
     return [sections, subjects, judges]
 
 # return all needed parameters in order to change graph after any user choice.
-def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sections, subjects, judges):
+def eventUpdate(df, filename, startDate, endDate, type, mustEvents, minDate, maxDate, sections, subjects, judges):
     df_temp = df.copy()
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         startDate = minDate
@@ -54,7 +54,8 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
     df_temp = updateDataframe(df_temp, startDate, endDate, sections, subjects, judges)
     df_temp = df_temp.sort_values(by = phaseTag).reset_index(drop = True)
     [sections, subjects, judges] = updateTypesBySelection(df, df_temp, startDate, endDate, sections, subjects, judges)
-    fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_sequence = utilities.phaseColorList(df_temp, type), labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = utilities.getWidth(1))
+    colorMap = utilities.phaseColorMap(type, filename)
+    fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_map = colorMap, labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = utilities.getWidth(1))
     fig.update_layout(
         legend = dict(
             yanchor = "top",

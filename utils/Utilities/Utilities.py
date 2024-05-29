@@ -7,16 +7,16 @@ from win32api import GetSystemMetrics
 import utils.Dataframe as frame
 import utils.FileOperation as file
 
-# from given dataframe return a list of colors based on events phases.
-def phaseColorList(df, type):
-    types = df[type].unique().tolist()
-    c = []
+# create map to decide color based on event or state phase.
+def phaseColorMap(tag, filename):
     colors = file.getDataFromJsonFile('utils/utilities/phaseColors.json')
     phaseTag = getTagName("phaseTag")
-    for t in types:
-        phase = df[df[type] == t][phaseTag].tolist()[0]
-        c.append(colors.get(str(phase)))
-    return c
+    mapList = file.getDataFromTextFile(filename)
+    mapList = list(mapList[0])
+    map = {}
+    for m in mapList:
+        map.update({m[tag]: colors.get(str(m[phaseTag]))})
+    return map
 
 # change phase dataframe from gievn file.
 def changePhaseDataframe(df, filename, tags, tagJoin, joinDrop):

@@ -22,9 +22,8 @@ def pageLayout():
     phase = utilities.getPlaceholderName('phase')
     phaseDB = utilities.getPlaceholderName('phaseDB')
     phaseTag = utilities.getTagName('phaseTag')
-    state = utilities.getPlaceholderName('state')
+    stateTag = utilities.getTagName('stateTag')
     tag = utilities.getPlaceholderName('tag')
-    tagTag = utilities.getTagName('tagTag')
     layout = ds.html.Div([
         ds.dcc.ConfirmDialog(
             id = 'update-s',
@@ -37,9 +36,9 @@ def pageLayout():
         ds.html.Button("REFRESH", id = 'refresh-button-s'),
         ds.dash_table.DataTable(
             df.to_dict('records'), columns = [
-                {'name': state, 'id': codeStateTag, 'editable': False}, 
+                {'name': codeStateTag, 'id': codeStateTag, 'editable': False}, 
                 {'name': description, 'id': descriptionTag, 'editable': False}, 
-                {'name': tag, 'id': tagTag, 'editable': True}, 
+                {'name': stateTag, 'id': stateTag, 'editable': True}, 
                 {'name': phaseDB, 'id': phaseDBTag, 'editable': False}, 
                 {'name': phase, 'id': phaseTag, 'editable': True}, 
                 {'name': count, 'id': countTag, 'editable': False},  

@@ -12,12 +12,11 @@ import utils.utilities.Utilities as utilities
 # get dataframe with all events duration.
 df = getter.getStatesDuration()
 codeStateTag = utilities.getTagName('codeStateTag')
+df = frame.keepOnlyRelevant(df, 0.005, codeStateTag)
 
 # return initial layout of page.
 def pageLayout():
-    all = utilities.getPlaceholderName('all')
     avgTag = utilities.getTagName('avgTag')
-    first = utilities.getPlaceholderName('first')
     median = utilities.getPlaceholderName('median')
     phase = utilities.getPlaceholderName('phase')
     text = utilities.getPlaceholderName('text')
@@ -68,4 +67,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(state, avg, text, section, subject, judge, finished):
-    return typeEvent.typeSequenceUpdate(df, codeStateTag, state, codeStateTag, avg, text, section, subject, judge, finished)
+    return typeEvent.typeSequenceUpdate(df, 'preferences/statesName.txt', state, codeStateTag, avg, text, section, subject, judge, finished)

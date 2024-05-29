@@ -17,7 +17,6 @@ def refreshData():
     start = time.time()
     connection = connect.getDatabaseConnection()
     verifyDatabase(connection)
-    exit()
     events = getter.getEvents()
     courtHearingsEventsType = list(file.getDataFromTextFile('preferences/courtHearingsEvents.txt'))
     minDate = getter.getMinDate()

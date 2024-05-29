@@ -45,7 +45,7 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici tipo eventi', href='/typeevent'),
         ds.html.H2('EVENTI FASE'),
-        ds.dcc.Dropdown(types, value = types[2], multi = False, searchable = True, clearable = False, id = 'type-dropdown-phe', placeholder = phase, style = {'width': 400}),
+        ds.dcc.Dropdown(types, value = "2", multi = False, searchable = True, clearable = False, id = 'type-dropdown-phe', placeholder = phase, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-phe', placeholder = section, style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-phe', placeholder = subject, style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-phe', placeholder = judge, style = {'width': 400}),
@@ -80,6 +80,8 @@ def pageLayout():
 def updateOutput(state, display, tagChoice, avg, text, section, subject, judge, finished):
     if tagChoice == codeEventTag:
         df = getter.getEventsDuration()
-    elif tagChoice == codeStateTag:
+        filename = 'preferences/eventsName.txt'
+    else:
         df = getter.getStatesDuration()
-    return typeEvent.typeEventUpdate(df, phaseTag, state, tagChoice, display, avg, text, section, subject, judge, finished)
+        filename = 'preferences/statesName.txt'
+    return typeEvent.typeEventUpdate(df, filename, phaseTag, state, tagChoice, display, avg, text, section, subject, judge, finished)

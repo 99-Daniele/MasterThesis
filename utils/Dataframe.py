@@ -110,9 +110,9 @@ def createStateNameDataframe(stateNames):
     dbPhaseTag = utilities.getTagName('phaseDBTag')
     descrTag = utilities.getTagName('descriptionTag')
     phaseTag = utilities.getTagName('phaseTag')
+    stateTag = utilities.getTagName('stateTag')
     stateCodeTag = utilities.getTagName('codeStateTag')
-    tagTag = utilities.getTagName('tagTag')
-    df = pd.DataFrame(stateNames, columns = [stateCodeTag, descrTag, tagTag, dbPhaseTag, phaseTag])
+    df = pd.DataFrame(stateNames, columns = [stateCodeTag, descrTag, stateTag, dbPhaseTag, phaseTag])
     df[stateCodeTag] = df[stateCodeTag].astype(str)
     return df
 
@@ -136,9 +136,9 @@ def createStateNameDataframeWithInfo(statesDuration, stateNames):
 def createEventNameDataframe(eventNames):
     codeEventTag = utilities.getTagName('codeEventTag')
     descrTag = utilities.getTagName('descriptionTag')
+    eventTag = utilities.getTagName('eventTag')
     phaseTag = utilities.getTagName('phaseTag')
-    tagTag = utilities.getTagName('tagTag')
-    df = pd.DataFrame(eventNames, columns = [codeEventTag, descrTag, tagTag, phaseTag])
+    df = pd.DataFrame(eventNames, columns = [codeEventTag, descrTag, eventTag, phaseTag])
     df[codeEventTag] = df[codeEventTag].astype(str)
     return df
 
@@ -413,17 +413,23 @@ def getAvgStdDataFrameByTypeChoice(df, typeChoice, avgChoice):
     durationTag = utilities.getTagName('durationTag')
     phaseTag = utilities.getTagName('phaseTag')
     quantileTag = utilities.getTagName('quantileTag')
-    df1 = df[[typeChoice, durationTag, phaseTag]].copy()
+    if typeChoice != phaseTag:
+        tagsChoice = [typeChoice, durationTag, phaseTag]
+        tagsGroup = [phaseTag, typeChoice]
+    else:
+        tagsChoice = [phaseTag, durationTag]
+        tagsGroup = phaseTag
+    df1 = df[tagsChoice].copy()
     df1[durationTag] = df1[durationTag].astype(int)
     df1 = keepOnlyRelevant(df1, 0.01, typeChoice).reset_index(drop = True)
     if avgChoice == avgTag:
-        df2 = df1.groupby([typeChoice, phaseTag], as_index = False).mean()
+        df2 = df1.groupby(tagsGroup, as_index = False).mean()
     else:
-        df2 = df1.groupby([typeChoice, phaseTag], as_index = False).median()
-    df2[countTag] = df1.groupby([typeChoice, phaseTag]).size().tolist()
-    df2[quantileTag] = df1.groupby([typeChoice, phaseTag], as_index = False).quantile(0.75)[durationTag]
-    df1 = df1.sort_values([phaseTag, typeChoice]).reset_index(drop = True)
-    df2 = df2.sort_values([phaseTag, typeChoice]).reset_index(drop = True)
+        df2 = df1.groupby(tagsGroup, as_index = False).median()
+    df2[countTag] = df1.groupby(tagsGroup).size().tolist()
+    df2[quantileTag] = df1.groupby(tagsGroup, as_index = False).quantile(0.75)[durationTag]
+    df1 = df1.sort_values(tagsGroup).reset_index(drop = True)
+    df2 = df2.sort_values(tagsGroup).reset_index(drop = True)
     return [df1, df2]
 
 # return dataframe with rows which type is present a relevant number of times.
@@ -589,6 +595,7 @@ def joinDataframe(df1, df2, tagJoin, dropJoin1, dropJoin2):
     newDf = df_temp_1.join(df_temp_2.set_index(tagJoin), on = tagJoin)
     return newDf
 
+# select following rows of chosen event.
 def selectFollowingRows(df, tag, tagChoice):
     nextIdTag = utilities.getTagName("nextIdTag")
     numEventTag = utilities.getTagName('numEventTag')

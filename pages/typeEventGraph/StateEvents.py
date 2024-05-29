@@ -13,7 +13,7 @@ import utils.utilities.Utilities as utilities
 df = getter.getEventsDuration()
 codeEventTag = utilities.getTagName('codeEventTag')
 codeStateTag = utilities.getTagName('codeStateTag')
-df = frame.keepOnlyRelevant(df, 0.01, codeStateTag)
+df = frame.keepOnlyRelevant(df, 0.005, codeStateTag)
 
 # return initial layout of page.
 def pageLayout():
@@ -76,4 +76,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(state, display, avg, text, section, subject, judge, finished):
-    return typeEvent.typeEventUpdate(df, codeStateTag, state, codeEventTag, display, avg, text, section, subject, judge, finished)
+    return typeEvent.typeEventUpdate(df, 'preferences/eventsName.txt', codeStateTag, state, codeEventTag, display, avg, text, section, subject, judge, finished)
