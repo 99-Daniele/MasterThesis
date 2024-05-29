@@ -1,15 +1,10 @@
 - precisazione conclusioni o decisione?
 
-- filtro quando un evento particolare avviene? (fase, stato)
+- sistemare preferences --> aggiungere nuova fase
 - nomi in inglese
 - filtro durata
-- colore stati fasi
 - selezione stati, eventi importanti
 - velocizzare database
-
-- verifica valore predetto
-- valore predetto sulla base di giudice, materia, sezione, data, carico processi giudice in quel momento
-- valore predetto di un processo finito --> errore medio
 
 - analisi limitata a inizio 2022
 - grafico eventi con primo evento per ogni fase --> buchi?
@@ -19,10 +14,14 @@
 - evento 'rinvio precisazione conclusioni' --> cos'è? materie, giudici, tipi di processo? 
 - grafici durata fasi/stati/eventi non importante --> metterlo solo se necessario
 
+- verifica valore predetto
+- valore predetto sulla base di giudice, materia, sezione, data, carico processi giudice in quel momento
+- valore predetto di un processo finito --> errore medio
+
 - disponibile per accesso esterno --> descrizione readme
 - migliorare grafico --> piu carino da vedere
 - dimensione grafici
-- df_temp e df
+- df_temp e df copy()
 - df1, df2, df_data nomi migliori
 
 

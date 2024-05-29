@@ -77,6 +77,7 @@ def updateProcessData(df, startDate, endDate, sections, subjects, judges, finish
     sectionTag = utilities.getTagName("sectionTag")
     sequenceTag = utilities.getTagName("sequenceTag")
     subjectTag = utilities.getTagName("subjectTag")
+    withOut = utilities.getPlaceholderName("without")
     df_temp = df.copy()
     df_temp = frame.getDateDataFrame(df_temp, dateTag, startDate, endDate)
     df_temp = frame.getTypesDataFrame(df_temp, sectionTag, sections)
@@ -87,7 +88,10 @@ def updateProcessData(df, startDate, endDate, sections, subjects, judges, finish
     df_temp = frame.getTypesDataFrame(df_temp, phaseSequenceTag, phaseSequences)
     if eventChoice != None:
         df_temp = frame.getEventDataFrame(df_temp, eventChoice)
-        return df_temp[df_temp[eventTag] == eventRadio + " " + eventChoice]
+        if eventRadio == withOut:
+            return df_temp[df_temp[eventTag] == withOut + " " + eventChoice]
+        else:
+            return df_temp[df_temp[eventTag] != withOut + " " + eventChoice]
     return df_temp
 
 # update data base on user choices on different parameters.

@@ -51,6 +51,7 @@ def createProcessDurationsDataFrame(process):
     dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
     eventSequenceTag = utilities.getTagName('eventSequenceTag')
+    eventPhaseSequenceTag = utilities.getTagName("eventPhaseSequenceTag")
     nextDateTag = utilities.getTagName('nextDateTag')
     nextIdTag = utilities.getTagName('nextIdTag')
     finishedTag = utilities.getTagName('finishedTag')
@@ -62,7 +63,7 @@ def createProcessDurationsDataFrame(process):
     stateSequenceTag = utilities.getTagName('sequenceTag')
     subjectTag = utilities.getTagName('subjectTag')
     subjectCodeTag = utilities.getTagName('codeSubjectTag')
-    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, nextDateTag, nextIdTag])
+    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, eventPhaseSequenceTag, nextDateTag, nextIdTag])
     filteredDf = df.copy()
     if importantProcessStates != None:
         filteredDf = filteredDf[filteredDf[finishedTag].isin(importantProcessStates)]
@@ -503,15 +504,21 @@ def getEventDataFrame(df, event):
         return df
     eventTag = utilities.getTagName('eventTag')
     eventsTag = utilities.getTagName('eventSequenceTag')
-    withTag = utilities.getPlaceholderName("with")
+    eventPhaseSequenceTag = utilities.getTagName("eventPhaseSequenceTag")
+    phaseTag = utilities.getPlaceholderName("phase")
     withOut = utilities.getPlaceholderName("without")
     df_temp = df.copy()
     df_temp[eventTag] = df_temp[eventsTag]
     for i, row in df_temp.iterrows():
-        if event in utilities.fromStringToList(row[eventsTag]):
-            df_temp.at[i, eventTag] = withTag + " " + event
-        else:
-            df_temp.at[i, eventTag] = withOut + " " + event
+        eventSequence = utilities.fromStringToList(row[eventsTag])
+        eventPhaseSequence = utilities.fromStringToList(row[eventPhaseSequenceTag])
+        try:
+            eventIndex = eventSequence.index(event)
+            phase = eventPhaseSequence[eventIndex]
+            eventString = event + " " + phaseTag.upper() + " " + str(phase)
+        except:
+            eventString = withOut + " " + event
+        df_temp.at[i, eventTag] = eventString
     return df_temp
 
 # return unique years in given dataframe dates.

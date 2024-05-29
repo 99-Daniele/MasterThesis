@@ -11,6 +11,7 @@
     "descriptionSubjectTag": "descrizioneMateria",
     "eventTag": "evento",
     "eventSequenceTag": "eventi",
+    "eventPhaseSequenceTag": "eventiFasi",
     "filterTag": "filtro",
     "finishedTag": "finito", 
     "judgeTag": "giudice", 

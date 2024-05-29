@@ -30,6 +30,7 @@ def refreshData():
     dateTag = utilities.getTagName("dateTag")
     judgeTag = utilities.getTagName("judgeTag")
     eventTag = utilities.getTagName("eventTag")
+    eventPhaseSequenceTag = utilities.getTagName("eventPhaseSequenceTag")
     numEventTag = utilities.getTagName("numEventTag")
     numProcessTag = utilities.getTagName("numProcessTag")
     phaseTag = utilities.getTagName("phaseTag")
@@ -39,8 +40,8 @@ def refreshData():
     end = True
     updateEventsDataframe(events, endPhase, codeEventTag, dateTag, eventTag, numEventTag, numProcessTag, phaseTag, stateTag)
     processEvents = getProcessEvents(events, stallPhase, endPhase, end, codeSubjectTag, judgeTag, numProcessTag, phaseTag, sectionTag, subjectTag)
-    [eventsSequences, phasesSequences, statesSequences] = updateTypeDurationDataframe(processEvents, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
-    updateProcessDurationDataframe(processEvents, eventsSequences, phasesSequences, statesSequences, dateTag, numEventTag)
+    [eventsSequences, eventPhaseSequences, phasesSequences, statesSequences] = updateTypeDurationDataframe(processEvents, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, eventPhaseSequenceTag, numEventTag, phaseTag, sectionTag, stateTag)
+    updateProcessDurationDataframe(processEvents, eventsSequences, eventPhaseSequences, phasesSequences, statesSequences, dateTag, numEventTag)
     print(str(time.time() - start) + " seconds")
 
 # update events dataframe.
@@ -146,8 +147,8 @@ def getProcessEvents(events, stallPhase, endPhase, ending, codeSubjectTag, judge
     return allProcessEvents
 
 # update types duration dataframe.
-def updateTypeDurationDataframe(processEvents, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag):
-    [eventsDuration, eventsSequences, phasesDuration, phasesSequences, statesDuration, statesSequences, courtHearingsDuration] = calcTypeDuration(processEvents, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
+def updateTypeDurationDataframe(processEvents, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, eventPhaseSequenceTag, numEventTag, phaseTag, sectionTag, stateTag):
+    [eventsDuration, eventsSequences, eventPhaseSequences, phasesDuration, phasesSequences, statesDuration, statesSequences, courtHearingsDuration] = calcTypeDuration(processEvents, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, eventPhaseSequenceTag, numEventTag, phaseTag, sectionTag, stateTag)
     [eventsDurationDataframe, eventsDurationDataframeFiltered] = frame.createTypeDurationsDataFrame(eventsDuration)
     [phasesDurationDataframe, phasesDurationDataframeFiltered] = frame.createTypeDurationsDataFrame(phasesDuration)
     [statesDurationDataframe, statesDurationDataframeFiltered] = frame.createTypeDurationsDataFrame(statesDuration)
@@ -160,21 +161,22 @@ def updateTypeDurationDataframe(processEvents, courtHearingsEventsType, endPhase
     cache.updateCache('statesDurationFiltered.json', statesDurationDataframeFiltered)
     cache.updateCache('courtHearingsDuration.json', courtHearingsDurationDataframe)
     cache.updateCache('courtHearingsDurationFiltered.json', courtHearingsDurationDataframeFiltered)
-    return [eventsSequences, phasesSequences, statesSequences]
+    return [eventsSequences, eventPhaseSequences, phasesSequences, statesSequences]
 
 # calc types durations.
-def calcTypeDuration(processEvents, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag):
+def calcTypeDuration(processEvents, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, eventPhaseSequenceTag, numEventTag, phaseTag, sectionTag, stateTag):
     eventsDuration = []
     phasesDuration = []
     statesDuration = []
     courtHearingsDuration = []
     eventsSequences = {}
+    eventPhaseSequences = {}
     phasesSequences = {}
     statesSequences = {}
     with alive_bar(int(len(processEvents))) as bar:
         for i in range(int(len(processEvents))):
             processId = processEvents[i][0]
-            [processEventsDuration, eventsSequence] = getEventInfo(processEvents[i], endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
+            [processEventsDuration, eventsSequence, eventPhaseSequence] = getEventInfo(processEvents[i], endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, eventPhaseSequenceTag, numEventTag, phaseTag, sectionTag, stateTag)
             [processPhasesDuration, phasesSequence] = getPhaseInfo(processEvents[i], endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
             [processStateDuration, statesSequence] = getStateInfo(processEvents[i], endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
             courtHearingDuration = getCourtHearingDuration(processEvents[i], courtHearingsEventsType, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag)
@@ -183,22 +185,24 @@ def calcTypeDuration(processEvents, courtHearingsEventsType, endPhase, codeEvent
             statesDuration.extend(processStateDuration)
             courtHearingsDuration.extend(courtHearingDuration) 
             eventsSequences.update({processId: eventsSequence})
+            eventPhaseSequences.update({processId: eventPhaseSequence})
             phasesSequences.update({processId: phasesSequence})
             statesSequences.update({processId: statesSequence})
             bar()
-    return [eventsDuration, eventsSequences, phasesDuration, phasesSequences, statesDuration, statesSequences, courtHearingsDuration]
+    return [eventsDuration, eventsSequences, eventPhaseSequences, phasesDuration, phasesSequences, statesDuration, statesSequences, courtHearingsDuration]
 
 # return events duration.
-def getEventInfo(events, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag):
+def getEventInfo(events, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, eventPhaseSequenceTag, numEventTag, phaseTag, sectionTag, stateTag):
     processId = events[0]
     subjectCode = events[2]
     subjectTag = events[3]
     finished = events[5]
     if len(events) == 6:
-        return [[], []]
+        return [[], [], []]
     events = events[6:]
     eventsDuration = []
     eventsSequence = []
+    eventsPhaseSequence = []
     for i in range(len(events) - 1):
         curr = events[i]
         next = events[i + 1]
@@ -222,6 +226,7 @@ def getEventInfo(events, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dat
             eventsDuration.append([currEventId, processId, currEventCode, currEventTag, duration, currDate, currJudgeCode, currJudge, currStateCode, currStateTag, currPhase, subjectCode, subjectTag, currSection, finished, nextDate, nextEventId])
             if currEventTag != nextEventTag:
                 eventsSequence.append(currEventTag)
+                eventsPhaseSequence.append(currPhase)
     curr = events[-1]
     currDateDt = dt.datetime.strptime(curr[dateTag], '%Y-%m-%d %H:%M:%S')
     if curr[phaseTag] == endPhase:
@@ -240,7 +245,8 @@ def getEventInfo(events, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dat
         eventsDuration.append([currEventId, processId, currEventCode, currEventTag, duration, currDate, currJudgeCode, currJudge, currStateCode, currStateTag, currPhase, subjectCode, subjectTag, currSection, finished, currDate, currEventId])
     if len(eventsSequence) == 0 or curr[eventTag] != eventsSequence[-1]:
         eventsSequence.append(curr[eventTag])
-    return [eventsDuration, eventsSequence]
+        eventsPhaseSequence.append(curr[phaseTag])
+    return [eventsDuration, eventsSequence, eventsPhaseSequence]
 
 # return phases duration.
 def getPhaseInfo(events, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, judgeTag, eventTag, numEventTag, phaseTag, sectionTag, stateTag):
@@ -414,25 +420,25 @@ def getCourtHearingDuration(events, courtHearingTypes, codeEventTag, codeJudgeTa
     return courtHearingsDuration
 
 # update process duration dataframe.
-def updateProcessDurationDataframe(processEvents, eventSequence, phaseSequence, stateSequence, dateTag, numEventTag):
-    processDuration = calcProcessDuration(processEvents, eventSequence, phaseSequence, stateSequence, dateTag, numEventTag)
+def updateProcessDurationDataframe(processEvents, eventSequence, eventPhaseSequences, phaseSequence, stateSequence, dateTag, numEventTag):
+    processDuration = calcProcessDuration(processEvents, eventSequence, eventPhaseSequences, phaseSequence, stateSequence, dateTag, numEventTag)
     [processDurationDataframe, processDurationDataframeFiltered] = frame.createProcessDurationsDataFrame(processDuration)
     cache.updateCache('processesDuration.json', processDurationDataframe)
     cache.updateCache('processesDurationFiltered.json', processDurationDataframeFiltered)
 
 # calc types durations.
-def calcProcessDuration(processEvents, eventsSequence, phasesSequence, statesSequence, dateTag, numEventTag):
+def calcProcessDuration(processEvents, eventsSequence, eventPhaseSequences, phasesSequence, statesSequence, dateTag, numEventTag):
     processesDuration = []
     with alive_bar(int(len(processEvents))) as bar:
         for i in range(int(len(processEvents))):
             processId = processEvents[i][0]
-            processDuration = getProcessDuration(processEvents[i], eventsSequence.get(processId), phasesSequence.get(processId), statesSequence.get(processId), dateTag, numEventTag)
+            processDuration = getProcessDuration(processEvents[i], eventsSequence.get(processId), eventPhaseSequences.get(processId), phasesSequence.get(processId), statesSequence.get(processId), dateTag, numEventTag)
             processesDuration.append(processDuration)
             bar()
     return processesDuration
 
 # return events duration.
-def getProcessDuration(events, eventSequence, phaseSequence, stateSequence, dateTag, numEventTag):
+def getProcessDuration(events, eventSequence, eventPhaseSequence, phaseSequence, stateSequence, dateTag, numEventTag):
     processId = events[0]
     judge = events[1]
     subjectCode = events[2]
@@ -451,7 +457,7 @@ def getProcessDuration(events, eventSequence, phaseSequence, stateSequence, date
     currDateDt = dt.datetime.strptime(currDate, '%Y-%m-%d %H:%M:%S')
     nextDateDt = dt.datetime.strptime(nextDate, '%Y-%m-%d %H:%M:%S')
     duration = (nextDateDt - currDateDt).days
-    return (processId, duration, currDate, currEventId, judge, subjectCode, subjectTag, section, finished, utilities.fromListToString(stateSequence), utilities.fromListToString(phaseSequence), utilities.fromListToString(eventSequence), nextDate, nextEventId)
+    return (processId, duration, currDate, currEventId, judge, subjectCode, subjectTag, section, finished, utilities.fromListToString(stateSequence), utilities.fromListToString(phaseSequence), utilities.fromListToString(eventSequence), utilities.fromListToString(eventPhaseSequence), nextDate, nextEventId)
 
 # verify if user database has all needed tables and views with all needed columns.
 def verifyDatabase(connection):
