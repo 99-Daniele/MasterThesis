@@ -308,7 +308,6 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
     dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
     eventTag = utilities.getTagName('eventTag')
-    eventsTag = utilities.getTagName('eventSequenceTag')
     filterTag = utilities.getTagName('filterTag')
     if typesChoice == None or len(typesChoice) == 0:
         return None
@@ -408,24 +407,23 @@ def getAvgStdDataFrameByType(df, type, avgChoice):
     return [df1, df2]
 
 # return data group by chosen type.
-def getAvgStdDataFrameByTypeChoice(df, type, avgChoice):
+def getAvgStdDataFrameByTypeChoice(df, typeChoice, avgChoice):
     avgTag = utilities.getTagName('avgTag')
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
+    phaseTag = utilities.getTagName('phaseTag')
     quantileTag = utilities.getTagName('quantileTag')
-    typeDuration = type.copy()
-    typeDuration.append(durationTag)
-    df1 = df[typeDuration].copy()
+    df1 = df[[typeChoice, durationTag, phaseTag]].copy()
     df1[durationTag] = df1[durationTag].astype(int)
-    df1 = keepOnlyRelevant(df1, 0.001, type[0])
+    df1 = keepOnlyRelevant(df1, 0.01, typeChoice).reset_index(drop = True)
     if avgChoice == avgTag:
-        df2 = df1.groupby(type, as_index = False).mean()
+        df2 = df1.groupby([typeChoice, phaseTag], as_index = False).mean()
     else:
-        df2 = df1.groupby(type, as_index = False).median()
-    df2[countTag] = df1.groupby(type).size().tolist()
-    df2[quantileTag] = df1.groupby(type, as_index = False).quantile(0.75)[durationTag]
-    df1 = df1.sort_values(type).reset_index(drop = True)
-    df2 = df2.sort_values(type).reset_index(drop = True)
+        df2 = df1.groupby([typeChoice, phaseTag], as_index = False).median()
+    df2[countTag] = df1.groupby([typeChoice, phaseTag]).size().tolist()
+    df2[quantileTag] = df1.groupby([typeChoice, phaseTag], as_index = False).quantile(0.75)[durationTag]
+    df1 = df1.sort_values(typeChoice).reset_index(drop = True)
+    df2 = df2.sort_values(typeChoice).reset_index(drop = True)
     return [df1, df2]
 
 # return dataframe with rows which type is present a relevant number of times.

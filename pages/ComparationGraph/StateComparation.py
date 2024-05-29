@@ -12,6 +12,7 @@ import utils.utilities.Utilities as utilities
 # get dataframe with all phases duration.
 df = getter.getStatesDurationFiltered()
 stateTag = utilities.getTagName('stateTag') 
+df = frame.keepOnlyRelevant(df, 0.01, stateTag)
 
 # return initial layout of page.
 def pageLayout():
@@ -24,11 +25,9 @@ def pageLayout():
     median = utilities.getPlaceholderName('median') 
     month = utilities.getPlaceholderName('month')
     monthYear = utilities.getPlaceholderName('monthYear') 
-    phaseSequenceTag = utilities.getTagName('phaseSequenceTag')
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     sectionTag = utilities.getTagName('sectionTag')
-    sequenceTag = utilities.getTagName('sequenceTag')
     state = utilities.getPlaceholderName('state')
     subject = utilities.getPlaceholderName('subject')  
     subjectTag = utilities.getTagName('subjectTag') 

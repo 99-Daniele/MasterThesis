@@ -274,7 +274,7 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
     df_temp = df.copy()
     if typeChoice == None:
         title = 'DURATA MEDIA ' + type[0:-1].upper() + 'I DEL PROCESSO'
-        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, [type], avgChoice)     
+        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, [type], avgChoice)  
         xticks = frame.getUniques(allData, type)
         [dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle] = hideAll()
         [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_temp, startDate, endDate, sections, subjects, judges, finished)
@@ -290,6 +290,7 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
             fig.add_traces(
                 px.line(avgData, x = type, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
             )
+        fig.update_traces(showlegend = False)
         fig.update_layout(xaxis_tickvals = xticks)
         fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
         return fig, startDate, endDate, dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, title

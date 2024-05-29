@@ -21,11 +21,6 @@ def updateFile(data, df, dropColumnTag, filename):
     if ds.ctx.triggered_id != None and 'refresh-button' in ds.ctx.triggered_id:
         dbData = df.to_dict('records')
         pairs = zip(data, dbData)
-        for x, y in pairs:
-            if x != y:
-                print(x)
-                print(y)
-                exit()
         if any(x != y for x, y in pairs):
             newDataDf = pd.DataFrame(data)
             newDataDf = newDataDf.drop(dropColumnTag, axis = 1)

@@ -25,6 +25,17 @@ def getDataFromTextFile(filename):
     except (FileNotFoundError):
         raise Exception("\n" + filename + " does not exists!")
 
+# get dataframe from text file.
+# in case file not existing, return None.
+def getDataframeFromTextFile(filename, tags):
+    try:
+        data = getDataFromTextFile(filename)
+        data = list(data[0])
+        dataframe = pd.DataFrame(data, columns = tags)
+        return dataframe, True
+    except:
+        return None, False
+
 # get data from json file.
 # in case file not existing, return empty dictionary.
 def getDataFromJsonFile(filename):
