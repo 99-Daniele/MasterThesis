@@ -122,7 +122,7 @@ def getProcessEvents(events, stallPhase, endPhase, ending, codeSubjectTag, judge
                 processId = events[i][numProcessTag]
                 processJudge = events[i][judgeTag]
                 processCodeSubject = events[i][codeSubjectTag]
-                processSubject = events[0][subjectTag]
+                processSubject = events[i][subjectTag]
                 processSection = events[i][sectionTag]
                 processEvents = [processId, processJudge, processCodeSubject, processSubject, processSection, utilities.getProcessState('unfinished')]
                 end = False
