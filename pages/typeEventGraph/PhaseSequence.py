@@ -42,27 +42,31 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici tipo eventi', href='/typeevent'),
         ds.html.H2('SEQUENZA FASI'),
-        ds.dcc.Dropdown(types, value = "2", multi = False, searchable = True, clearable = False, id = 'type-dropdown-phq', placeholder = phase, style = {'width': 400}),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-phq', placeholder = section, style = {'width': 400}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-phq', placeholder = subject, style = {'width': 400}),
-        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-phq', placeholder = judge, style = {'width': 400}),
-        ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-phq', placeholder = process, style = {'width': 400}),
-        ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-phq', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.Checklist([text], value = [text], id = 'text-checklist-phq'),
-        ds.dcc.Graph(id = 'typeevent-graph-phq', figure = fig)
+        ds.dcc.Dropdown(types, value = "2", multi = False, searchable = True, clearable = False, id = 'type-dropdown-phsq', placeholder = phase, style = {'width': 400}),
+        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-phsq', placeholder = section, style = {'width': 400}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-phsq', placeholder = subject, style = {'width': 400}),
+        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-phsq', placeholder = judge, style = {'width': 400}),
+        ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-phsq', placeholder = process, style = {'width': 400}),
+        ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-phsq', inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.Checklist([text], value = [text], id = 'text-checklist-phsq'),
+        ds.dcc.Graph(id = 'typeevent-graph-phsq', figure = fig)
     ])
     return layout
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('typeevent-graph-phq', 'figure')],
-    [ds.Input('type-dropdown-phq', 'value'),
-        ds.Input('avg-radioitem-phq', 'value'),
-        ds.Input('text-checklist-phq', 'value'),
-        ds.Input('section-dropdown-phq', 'value'),
-        ds.Input('subject-dropdown-phq', 'value'),
-        ds.Input('judge-dropdown-phq', 'value'),
-        ds.Input('finished-dropdown-phq', 'value')]
+    [ds.Output('typeevent-graph-phsq', 'figure'),
+        ds.Output('section-dropdown-phsq', 'options'),
+        ds.Output('subject-dropdown-phsq', 'options'),
+        ds.Output('judge-dropdown-phsq', 'options'),
+        ds.Output('finished-dropdown-phsq', 'options')],
+    [ds.Input('type-dropdown-phsq', 'value'),
+        ds.Input('avg-radioitem-phsq', 'value'),
+        ds.Input('text-checklist-phsq', 'value'),
+        ds.Input('section-dropdown-phsq', 'value'),
+        ds.Input('subject-dropdown-phsq', 'value'),
+        ds.Input('judge-dropdown-phsq', 'value'),
+        ds.Input('finished-dropdown-phsq', 'value')]
 )
 
 # return updated data based on user choice.

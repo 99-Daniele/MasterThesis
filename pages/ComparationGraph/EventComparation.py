@@ -115,4 +115,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, choices, order, text):
-    return comparation.typeComparationUpdate(df, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, eventTag, sections, subjects, judges, finished, choices, order, text)
+    return comparation.typeComparationUpdate(df, 'preferences/eventsName.txt', typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, eventTag, sections, subjects, judges, finished, choices, order, text)

@@ -54,7 +54,7 @@ def updateEventsDataframe(events, endPhase, codeEventTag, dateTag, eventTag, num
 # update all events dataframe.
 def updateAllEventsDataframe(events, endPhase, codeEventTag, eventTag, phaseTag):
     allEventsDataframe = frame.createEventsDataFrame(events, endPhase)
-    #allEventsDataframe = utilities.changePhaseDataframe(allEventsDataframe, 'preferences/eventsName.txt', [codeEventTag, eventTag, phaseTag], codeEventTag, eventTag)
+    allEventsDataframe = utilities.changePhaseDataframe(allEventsDataframe, 'preferences/eventsName.txt', [codeEventTag, eventTag, phaseTag], codeEventTag, eventTag)
     cache.updateCache('allEvents.json', allEventsDataframe)
 
 # update important events dataframe.
@@ -65,7 +65,7 @@ def updateImportantEventsDataframe(events, endPhase, codeEventTag, eventTag, pha
         importantEventsDataframe = importantEventsDataframe[importantEventsDataframe[eventTag].isin(importantEvents)]
     except:
         pass
-    #importantEventsDataframe = utilities.changePhaseDataframe(importantEventsDataframe, 'preferences/eventsName.txt', [codeEventTag, eventTag, phaseTag], codeEventTag, eventTag)
+    importantEventsDataframe = utilities.changePhaseDataframe(importantEventsDataframe, 'preferences/eventsName.txt', [codeEventTag, eventTag, phaseTag], codeEventTag, eventTag)
     cache.updateCache('importantEvents.json', importantEventsDataframe)
 
 # update important events dataframe.
@@ -202,25 +202,26 @@ def getEventInfo(events, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dat
     for i in range(len(events) - 1):
         curr = events[i]
         next = events[i + 1]
-        currEventId = curr[numEventTag]
-        nextEventId = next[numEventTag]
-        currEventCode = curr[codeEventTag]
-        currEventTag = curr[eventTag]
-        nextEventTag = next[eventTag]
-        currJudgeCode = curr[codeJudgeTag]
-        currJudge = curr[judgeTag]
-        currDate = curr[dateTag]
-        nextDate = next[dateTag]
-        currStateCode = curr[codeStateTag]
-        currStateTag = curr[stateTag]
-        currPhase = curr[phaseTag]
-        currSection = curr[sectionTag]
-        currDateDt = dt.datetime.strptime(currDate, '%Y-%m-%d %H:%M:%S')
-        nextDateDt = dt.datetime.strptime(nextDate, '%Y-%m-%d %H:%M:%S')
-        duration = (nextDateDt - currDateDt).days
-        eventsDuration.append([currEventId, processId, currEventCode, currEventTag, duration, currDate, currJudgeCode, currJudge, currStateCode, currStateTag, currPhase, subjectCode, subjectTag, currSection, finished, nextDate, nextEventId])
-        if currEventTag != nextEventTag:
-            eventsSequence.append(currEventTag)
+        if curr[codeEventTag] != next[codeEventTag]:
+            currEventId = curr[numEventTag]
+            nextEventId = next[numEventTag]
+            currEventCode = curr[codeEventTag]
+            currEventTag = curr[eventTag]
+            nextEventTag = next[eventTag]
+            currJudgeCode = curr[codeJudgeTag]
+            currJudge = curr[judgeTag]
+            currDate = curr[dateTag]
+            nextDate = next[dateTag]
+            currStateCode = curr[codeStateTag]
+            currStateTag = curr[stateTag]
+            currPhase = curr[phaseTag]
+            currSection = curr[sectionTag]
+            currDateDt = dt.datetime.strptime(currDate, '%Y-%m-%d %H:%M:%S')
+            nextDateDt = dt.datetime.strptime(nextDate, '%Y-%m-%d %H:%M:%S')
+            duration = (nextDateDt - currDateDt).days
+            eventsDuration.append([currEventId, processId, currEventCode, currEventTag, duration, currDate, currJudgeCode, currJudge, currStateCode, currStateTag, currPhase, subjectCode, subjectTag, currSection, finished, nextDate, nextEventId])
+            if currEventTag != nextEventTag:
+                eventsSequence.append(currEventTag)
     curr = events[-1]
     currDateDt = dt.datetime.strptime(curr[dateTag], '%Y-%m-%d %H:%M:%S')
     if curr[phaseTag] == endPhase:

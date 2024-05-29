@@ -10,9 +10,9 @@ import utils.graph.TypeEventsGraph as typeEvent
 import utils.utilities.Utilities as utilities
 
 # get dataframe with all events duration.
-df = getter.getStatesDuration()
-codeStateTag = utilities.getTagName('codeStateTag')
-df = frame.keepOnlyRelevant(df, 0.005, codeStateTag)
+df = getter.getEventsDuration()
+codeEventTag = utilities.getTagName('codeEventTag')
+df = frame.keepOnlyRelevant(df, 0.005, codeEventTag)
 
 # return initial layout of page.
 def pageLayout():
@@ -24,7 +24,7 @@ def pageLayout():
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     subject = utilities.getPlaceholderName('subject')  
-    types = frame.getGroupBy(df, codeStateTag)
+    types = frame.getGroupBy(df, codeEventTag)
     finishedTag = utilities.getTagName('finishedTag') 
     judgeTag = utilities.getTagName('judgeTag') 
     median = utilities.getPlaceholderName('median') 
@@ -41,30 +41,34 @@ def pageLayout():
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
         ds.dcc.Link('Grafici tipo eventi', href='/typeevent'),
-        ds.html.H2('SEQUENZA STATI'),
-        ds.dcc.Dropdown(types, value = "UT", multi = False, searchable = True, clearable = False, id = 'type-dropdown-ssq', placeholder = phase, style = {'width': 400}),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-ssq', placeholder = section, style = {'width': 400}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-ssq', placeholder = subject, style = {'width': 400}),
-        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-ssq', placeholder = judge, style = {'width': 400}),
-        ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-ssq', placeholder = process, style = {'width': 400}),
-        ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-ssq', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.Checklist([text], value = [text], id = 'text-checklist-ssq'),
-        ds.dcc.Graph(id = 'typeevent-graph-ssq', figure = fig)
+        ds.html.H2('SEQUENZA EVENTI'),
+        ds.dcc.Dropdown(types, value = "9F", multi = False, searchable = True, clearable = False, id = 'type-dropdown-esq', placeholder = phase, style = {'width': 400}),
+        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-esq', placeholder = section, style = {'width': 400}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-esq', placeholder = subject, style = {'width': 400}),
+        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-esq', placeholder = judge, style = {'width': 400}),
+        ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-esq', placeholder = process, style = {'width': 400}),
+        ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-esq', inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.Checklist([text], value = [text], id = 'text-checklist-esq'),
+        ds.dcc.Graph(id = 'typeevent-graph-esq', figure = fig)
     ])
     return layout
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('typeevent-graph-ssq', 'figure')],
-    [ds.Input('type-dropdown-ssq', 'value'),
-        ds.Input('avg-radioitem-ssq', 'value'),
-        ds.Input('text-checklist-ssq', 'value'),
-        ds.Input('section-dropdown-ssq', 'value'),
-        ds.Input('subject-dropdown-ssq', 'value'),
-        ds.Input('judge-dropdown-ssq', 'value'),
-        ds.Input('finished-dropdown-ssq', 'value')]
+    [ds.Output('typeevent-graph-esq', 'figure'),
+        ds.Output('section-dropdown-esq', 'options'),
+        ds.Output('subject-dropdown-esq', 'options'),
+        ds.Output('judge-dropdown-esq', 'options'),
+        ds.Output('finished-dropdown-esq', 'options')],
+    [ds.Input('type-dropdown-esq', 'value'),
+        ds.Input('avg-radioitem-esq', 'value'),
+        ds.Input('text-checklist-esq', 'value'),
+        ds.Input('section-dropdown-esq', 'value'),
+        ds.Input('subject-dropdown-esq', 'value'),
+        ds.Input('judge-dropdown-esq', 'value'),
+        ds.Input('finished-dropdown-esq', 'value')]
 )
 
 # return updated data based on user choice.
-def updateOutput(state, avg, text, section, subject, judge, finished):
-    return typeEvent.typeSequenceUpdate(df, 'preferences/statesName.txt', state, codeStateTag, avg, text, section, subject, judge, finished)
+def updateOutput(event, avg, text, section, subject, judge, finished):
+    return typeEvent.typeSequenceUpdate(df, 'preferences/eventsName.txt', event, codeEventTag, avg, text, section, subject, judge, finished)

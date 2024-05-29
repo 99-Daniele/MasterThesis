@@ -257,7 +257,7 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
 
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for all comparation graphs except process ones.
-def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate, minDate, maxDate, type, sections, subjects, judges, finished, choices, order, text):
+def typeComparationUpdate(df, filename, typeChoice, avgChoice, dateType, startDate, endDate, minDate, maxDate, type, sections, subjects, judges, finished, choices, order, text):
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         startDate = minDate
         endDate = maxDate
@@ -274,11 +274,12 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
     df_temp = df.copy()
     if typeChoice == None:
         title = 'DURATA MEDIA ' + type[0:-1].upper() + 'I DEL PROCESSO'
-        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, [type], avgChoice)  
+        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, type, avgChoice)  
         xticks = frame.getUniques(allData, type)
         [dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle] = hideAll()
         [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(df_temp, df_temp, startDate, endDate, sections, subjects, judges, finished)
-        fig = px.box(allData, x = type, y = durationTag, color_discrete_sequence = ['#91BBF3'], labels = {durationTag:'Durata ' + type[0:-1] + 'i del processo [giorni]', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+        colorMap = utilities.phaseColorMap(type, filename)
+        fig = px.box(allData, x = type, y = durationTag, color = type, color_discrete_map = colorMap, labels = {durationTag:'Durata ' + type[0:-1] + 'i del processo [giorni]', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
         fig.add_traces(
             px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = 'black').data
         )
@@ -290,8 +291,7 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
             fig.add_traces(
                 px.line(avgData, x = type, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
             )
-        fig.update_traces(showlegend = False)
-        fig.update_layout(xaxis_tickvals = xticks)
+        fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False)
         fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
         return fig, startDate, endDate, dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, title
     else:

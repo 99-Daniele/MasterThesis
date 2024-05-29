@@ -388,22 +388,21 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
         return [df1, df2, df3]
         
 # return data group by chosen type.
-def getAvgStdDataFrameByType(df, type, avgChoice):
+def getAvgStdDataFrameByType(df, typeChoice, avgChoice):
     avgTag = utilities.getTagName('avgTag')
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
     quantileTag = utilities.getTagName('quantileTag')
-    typeDuration = type.copy()
-    typeDuration.append(durationTag)
+    typeDuration = [typeChoice, durationTag]
     df1 = df[typeDuration].copy()
     if avgChoice == avgTag:
-        df2 = df1.groupby(type, as_index = False).mean()
+        df2 = df1.groupby(typeChoice, as_index = False).mean()
     else:
-        df2 = df1.groupby(type, as_index = False).median()
-    df2[countTag] = df1.groupby(type).size().tolist()
-    df2[quantileTag] = df1.groupby(type, as_index = False).quantile(0.75)[durationTag]
-    df1 = df1.sort_values(type).reset_index(drop = True)
-    df2 = df2.sort_values(type).reset_index(drop = True)
+        df2 = df1.groupby(typeChoice, as_index = False).median()
+    df2[countTag] = df1.groupby(typeChoice).size().tolist()
+    df2[quantileTag] = df1.groupby(typeChoice, as_index = False).quantile(0.75)[durationTag]
+    df1 = df1.sort_values(typeChoice).reset_index(drop = True)
+    df2 = df2.sort_values(typeChoice).reset_index(drop = True)
     return [df1, df2]
 
 # return data group by chosen type.
@@ -411,25 +410,19 @@ def getAvgStdDataFrameByTypeChoice(df, typeChoice, avgChoice):
     avgTag = utilities.getTagName('avgTag')
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
-    phaseTag = utilities.getTagName('phaseTag')
-    quantileTag = utilities.getTagName('quantileTag')
-    if typeChoice != phaseTag:
-        tagsChoice = [typeChoice, durationTag, phaseTag]
-        tagsGroup = [phaseTag, typeChoice]
-    else:
-        tagsChoice = [phaseTag, durationTag]
-        tagsGroup = phaseTag
-    df1 = df[tagsChoice].copy()
+    quantileTag = utilities.getTagName('quantileTag')    
+    typeDuration = [typeChoice, durationTag]
+    df1 = df[typeDuration].copy()
     df1[durationTag] = df1[durationTag].astype(int)
-    df1 = keepOnlyRelevant(df1, 0.01, typeChoice).reset_index(drop = True)
+    df1 = keepOnlyRelevant(df1, 0.005, typeChoice).reset_index(drop = True)
     if avgChoice == avgTag:
-        df2 = df1.groupby(tagsGroup, as_index = False).mean()
+        df2 = df1.groupby(typeChoice, as_index = False).mean()
     else:
-        df2 = df1.groupby(tagsGroup, as_index = False).median()
-    df2[countTag] = df1.groupby(tagsGroup).size().tolist()
-    df2[quantileTag] = df1.groupby(tagsGroup, as_index = False).quantile(0.75)[durationTag]
-    df1 = df1.sort_values(tagsGroup).reset_index(drop = True)
-    df2 = df2.sort_values(tagsGroup).reset_index(drop = True)
+        df2 = df1.groupby(typeChoice, as_index = False).median()
+    df2[countTag] = df1.groupby(typeChoice).size().tolist()
+    df2[quantileTag] = df1.groupby(typeChoice, as_index = False).quantile(0.75)[durationTag]
+    df1 = df1.sort_values(typeChoice).reset_index(drop = True)
+    df2 = df2.sort_values(typeChoice).reset_index(drop = True)
     return [df1, df2]
 
 # return dataframe with rows which type is present a relevant number of times.

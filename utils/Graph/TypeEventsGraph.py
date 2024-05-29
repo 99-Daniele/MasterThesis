@@ -88,9 +88,10 @@ def typeSequenceUpdate(df, filename, typeChoice, tagChoice, avg, text, sections,
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
     df_temp = df.copy()
-    df_temp = updateTypeData(df_temp, sections, subjects, judges, finished)
-    df_temp = frame.selectFollowingRows(df_temp, tagChoice, typeChoice)
-    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df_temp, tagChoice, avg)
+    df_temp = frame.selectFollowingRows(df_temp, tagChoice, typeChoice)  
+    df_data = updateTypeData(df_temp, sections, subjects, judges, finished)  
+    [sections, subjects, judges, finished] = updateTypeDataBySelection(df_temp, df_data, sections, subjects, judges, finished)
+    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df_data, tagChoice, avg)
     xticks = frame.getUniques(allData, tagChoice)
     colorMap = utilities.phaseColorMap(tagChoice, filename)
     fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Durata', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
@@ -101,10 +102,11 @@ def typeSequenceUpdate(df, filename, typeChoice, tagChoice, avg, text, sections,
         fig.add_traces(
             px.line(avgData, x = tagChoice, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 12)).data
         )
-    else:fig.add_traces(
+    else:
+        fig.add_traces(
             px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 12)).data
         )
     fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False)
     fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
-    return [fig]
+    return [fig, sections, subjects, judges, finished]
         

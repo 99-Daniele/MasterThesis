@@ -55,7 +55,11 @@ def pageLayout():
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('typeevent-graph-ssq', 'figure')],
+    [ds.Output('typeevent-graph-ssq', 'figure'),
+        ds.Output('section-dropdown-ssq', 'options'),
+        ds.Output('subject-dropdown-ssq', 'options'),
+        ds.Output('judge-dropdown-ssq', 'options'),
+        ds.Output('finished-dropdown-ssq', 'options')],
     [ds.Input('type-dropdown-ssq', 'value'),
         ds.Input('avg-radioitem-ssq', 'value'),
         ds.Input('text-checklist-ssq', 'value'),
