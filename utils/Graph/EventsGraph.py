@@ -6,40 +6,41 @@ import plotly.express as px
 import utils.Dataframe as frame
 import utils.utilities.Utilities as utilities
 
-# update types based on current dataframe.
-def updateTypesBySelection(df, startDate, endDate, sections, subjects, judges):
+# update dataframe based on user selections.
+def updateDataframe(df, startDate, endDate, sections, subjects, judges):
     judgeTag = utilities.getTagName('judgeTag')
     processDateTag = utilities.getTagName('processDateTag')
     sectionTag = utilities.getTagName('sectionTag')
     subjectTag = utilities.getTagName('subjectTag')
     df_temp = df.copy()
     df_temp = frame.getDateDataFrame(df_temp, processDateTag, startDate, endDate)
-    df_temp_1 = frame.getTypesDataFrame(df_temp, subjectTag, subjects)
-    df_temp_1 = frame.getTypesDataFrame(df_temp_1, judgeTag, judges)
-    df_temp_2 = frame.getTypesDataFrame(df_temp, sectionTag, sections)
-    df_temp_2 = frame.getTypesDataFrame(df_temp_2, judgeTag, judges)
-    df_temp_3 = frame.getTypesDataFrame(df_temp, subjectTag, subjects)
-    df_temp_3 = frame.getTypesDataFrame(df_temp_3, sectionTag, sections)
+    df_temp = frame.getTypesDataFrame(df_temp, sectionTag, sections)
+    df_temp = frame.getTypesDataFrame(df_temp, subjectTag, subjects)
+    df_temp = frame.getTypesDataFrame(df_temp, judgeTag, judges)
+    return df_temp
+
+# update types based on current dataframe.
+def updateTypesBySelection(df, df_data, startDate, endDate, sections, subjects, judges):
+    judgeTag = utilities.getTagName('judgeTag')
+    sectionTag = utilities.getTagName('sectionTag')
+    subjectTag = utilities.getTagName('subjectTag')
+    df_temp = df.copy()
+    if sections != None and len(sections) > 0:
+        df_temp_1 = updateDataframe(df_temp, startDate, endDate, None, subjects, judges)
+    else:
+        df_temp_1 = df_data
+    if subjects != None and len(subjects) > 0:
+        df_temp_2 = updateDataframe(df_temp, startDate, endDate, sections, None, judges)
+    else:
+        df_temp_2 = df_data
+    if judges != None and len(judges) > 0:
+        df_temp_3 = updateDataframe(df_temp, startDate, endDate, sections, subjects, None)
+    else:
+        df_temp_3 = df_data
     sections = frame.getGroupBy(df_temp_1, sectionTag)
     subjects = frame.getGroupBy(df_temp_2, subjectTag)
     judges = frame.getGroupBy(df_temp_3, judgeTag)
     return [sections, subjects, judges]
-
-# update types based on user selections.
-def updateTypes(df, startDate, endDate, sections, subjects, judges):
-    judgeTag = utilities.getTagName('judgeTag')
-    processDateTag = utilities.getTagName('processDateTag')
-    sectionTag = utilities.getTagName('sectionTag')
-    subjectTag = utilities.getTagName('subjectTag')
-    df_temp = df.copy()
-    df_temp = frame.getDateDataFrame(df_temp, processDateTag, startDate, endDate)
-    if sections != None and len(sections) > 0:
-        df_temp = frame.getTypesDataFrame(df_temp, sectionTag, sections)
-    if subjects != None and len(subjects) > 0:
-        df_temp = frame.getTypesDataFrame(df_temp, subjectTag, subjects)
-    if judges != None and len(judges) > 0:
-        df_temp = frame.getTypesDataFrame(df_temp, judgeTag, judges)
-    return df_temp
 
 # return all needed parameters in order to change graph after any user choice.
 def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sections, subjects, judges):
@@ -50,9 +51,9 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
     dateTag = utilities.getTagName('dateTag')
     numProcessTag = utilities.getTagName('numProcessTag')
     phaseTag = utilities.getTagName('phaseTag') 
-    df_temp = updateTypes(df_temp, startDate, endDate, sections, subjects, judges)
+    df_temp = updateDataframe(df_temp, startDate, endDate, sections, subjects, judges)
     df_temp = df_temp.sort_values(by = phaseTag).reset_index(drop = True)
-    [sections, subjects, judges] = updateTypesBySelection(df, startDate, endDate, sections, subjects, judges)
+    [sections, subjects, judges] = updateTypesBySelection(df, df_temp, startDate, endDate, sections, subjects, judges)
     fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_sequence = utilities.phaseColorList(df_temp, type), labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = utilities.getWidth(1))
     fig.update_layout(
         legend = dict(

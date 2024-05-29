@@ -32,7 +32,7 @@ def pageLayout():
     judgeTag = utilities.getTagName('judgeTag') 
     median = utilities.getPlaceholderName('median') 
     sectionTag = utilities.getTagName('sectionTag')
-    subjectTag = utilities.getTagName('codeSubjectTag') 
+    subjectTag = utilities.getTagName('subjectTag') 
     sections = frame.getGroupBy(df, sectionTag)
     subjects = frame.getGroupBy(df, subjectTag)
     judges = frame.getGroupBy(df, judgeTag)
@@ -47,7 +47,7 @@ def pageLayout():
         ds.html.H2('EVENTI STATO'),
         ds.dcc.Dropdown(types, value = "UT", multi = False, searchable = True, clearable = False, id = 'type-dropdown-se', placeholder = phase, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-se', placeholder = section, style = {'width': 400}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-se', placeholder = subject, style = {'width': 400}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-se', placeholder = subject, style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-se', placeholder = judge, style = {'width': 400}),
         ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-se', placeholder = process, style = {'width': 400}),
         ds.dcc.RadioItems([first, all], value = all, id = 'display-radioitem-se', inline = True, inputStyle = {'margin-left': "20px"}),
@@ -59,7 +59,11 @@ def pageLayout():
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('typeevent-graph-se', 'figure')],
+    [ds.Output('typeevent-graph-se', 'figure'),
+        ds.Output('section-dropdown-se', 'options'),
+        ds.Output('subject-dropdown-se', 'options'),
+        ds.Output('judge-dropdown-se', 'options'),
+        ds.Output('finished-dropdown-se', 'options')],
     [ds.Input('type-dropdown-se', 'value'),
         ds.Input('display-radioitem-se', 'value'),
         ds.Input('avg-radioitem-se', 'value'),

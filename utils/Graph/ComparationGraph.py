@@ -109,7 +109,7 @@ def updateTypeData(df, startDate, endDate, sections, subjects, judges, finished)
 # update data base on user choices on different parameters. In order to do that is use 'updateProcessData' method with chosen parameter as None. 
 # this is done because if user wants to compare on chosen parameter, data must be updated without any filter on chosen parameter.
 # this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
-def updateProcessDataframeFromSelection(choice, df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio):
+def updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio):
     eventsTag = utilities.getTagName("eventSequenceTag")
     finishedTag = utilities.getTagName("finishedTag")
     judgeTag = utilities.getTagName("judgeTag")
@@ -157,7 +157,7 @@ def updateProcessDataframeFromSelection(choice, df_temp, df_data, startDate, end
 # update data base on user choices on different parameters. In order to do that is use 'updateProcessData' method with chosen parameter as None. 
 # this is done because if user wants to compare on chosen parameter, data must be updated without any filter on chosen parameter.
 # this method is for all comparation graphs except process ones since they use different parameters.
-def updateTypeDataframeFromSelection(choice, df_temp, df_data, startDate, endDate, sections, subjects, judges, finished):
+def updateTypeDataframeFromSelection(df_temp, df_data, startDate, endDate, sections, subjects, judges, finished):
     finishedTag = utilities.getTagName("finishedTag")
     judgeTag = utilities.getTagName("judgeTag")
     sectionTag = utilities.getTagName("sectionTag")
@@ -209,14 +209,14 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
     df_temp = df.copy()
     [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event] = hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice)
     df_data = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio)
-    [sections, subjects, judges, finished, sequences, phaseSequences, event] = updateProcessDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio)
+    [sections, subjects, judges, finished, sequences, phaseSequences, event] = updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio)
     if choices == None or len(choices) == 0:
         orderRadioStyle = {'display': 'none'}
         [allData, avgData] = frame.getAvgStdDataFrameByDate(df_data, dateType, avgChoice)
         xticks = frame.getUniques(avgData, dateTag)
         fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = ['#91BBF3'], labels = {durationTag:'Durata del processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
         fig.add_traces(
-            px.line(avgData, x = dateTag, y = durationTag, markers = True).update_traces(line_color = 'red').data
+            px.line(avgData, x = dateTag, y = durationTag, markers = True).update_traces(line_color = 'black').data
         )
         if text == [textTag]:
             fig.add_traces(
@@ -277,10 +277,10 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
         [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, [type], avgChoice)  
         xticks = frame.getUniques(allData, type)
         [dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle] = hideAll()
-        [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_temp, startDate, endDate, sections, subjects, judges, finished)
+        [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(df_temp, df_temp, startDate, endDate, sections, subjects, judges, finished)
         fig = px.box(allData, x = type, y = durationTag, color_discrete_sequence = ['#91BBF3'], labels = {durationTag:'Durata ' + type[0:-1] + 'i del processo [giorni]', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
         fig.add_traces(
-            px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = 'red').data
+            px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = 'black').data
         )
         if text == [textTag]:
             fig.add_traces(
@@ -300,14 +300,14 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
         [[sectionStyle, subjectStyle, judgeStyle, finishedStyle], [sections, subjects, judges, finished]] = hideChosen(choices, [sectionTag, subjectTag, judgeTag, finishedTag], [sectionStyle, subjectStyle, judgeStyle, finishedStyle], [sections, subjects, judges, finished])
         df_temp = frame.getTypesDataFrame(df_temp, type, [typeChoice])
         df_data = updateTypeData(df_temp, startDate, endDate, sections, subjects, judges, finished)
-        [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(ds.ctx.triggered_id, df_temp, df_data, startDate, endDate, sections, subjects, judges, finished)
+        [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(df_temp, df_data, startDate, endDate, sections, subjects, judges, finished)
         if choices == None or len(choices) == 0:
             orderRadioStyle = {'display': 'none'}
             [allData, avgData] = frame.getAvgStdDataFrameByDate(df_data, dateType, avgChoice)
             xticks = frame.getUniques(avgData, dateTag)
             fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = ['#91BBF3'], labels = {durationTag:'Durata ' + type + " " + str(typeChoice) + ' [giorni]', dateTag:'Data inizio ' + type + " " + str(typeChoice)}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
             fig.add_traces(
-                px.line(avgData, x = dateTag, y = durationTag, markers = True).update_traces(line_color = 'red').data
+                px.line(avgData, x = dateTag, y = durationTag, markers = True).update_traces(line_color = 'black').data
             )
             if text == [textTag]:
                 fig.add_traces(
