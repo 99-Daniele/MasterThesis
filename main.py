@@ -3,7 +3,7 @@
 import dash as ds
 
 # display all events.
-def displayAllEvents():
+def displayAllEventsScatter():
     import pages.eventGraph.AllEvents as allEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -12,7 +12,7 @@ def displayAllEvents():
     app.run_server(debug = True)
 
 # display important events.
-def displayImportantEvents():
+def displayImportantEventsScatter():
     import pages.eventGraph.ImportantEvents as importantEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -21,7 +21,7 @@ def displayImportantEvents():
     app.run_server(debug = True)
 
 # display phase events.
-def displayPhaseEvents():
+def displayPhaseEventsScatter():
     import pages.eventGraph.PhaseEvents as phaseEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -30,7 +30,7 @@ def displayPhaseEvents():
     app.run_server(debug = True)
 
 # display state events.
-def displayStateEvents():
+def displayStateEventsScatter():
     import pages.eventGraph.StateEvents as stateEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -75,7 +75,7 @@ def displayEventComparation():
     app.run_server(debug = True)
 
 # display state events graph.
-def displayEventsState():
+def displayStatesEvents():
     import pages.typeEventGraph.StateEvents as stateEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -84,7 +84,7 @@ def displayEventsState():
     app.run_server(debug = True)
 
 # display phase events graph.
-def displayEventsPhase():
+def displayPhasesEvents():
     import pages.typeEventGraph.PhaseEvents as phaseEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -170,10 +170,15 @@ def startApp():
     app.start()
 
 # refresh database and cache data.
+def restartData():
+    import utils.DataUpdate as update
+    update.restartData()
+
+# refresh database and cache data.
 def refreshData():
     import utils.DataUpdate as update
     update.refreshData()
 
 # action performed by main.
 if __name__ == '__main__':
-    displayProcessComparation()
+    startApp()

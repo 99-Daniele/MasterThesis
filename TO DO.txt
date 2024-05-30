@@ -4,7 +4,6 @@
 - nomi in inglese
 - filtro durata
 - selezione stati, eventi importanti
-- velocizzare database
 
 - analisi limitata a inizio 2022
 - grafico eventi con primo evento per ogni fase --> buchi?

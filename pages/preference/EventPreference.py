@@ -56,4 +56,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def update_dateframe(button, data):
-    return typeEvents.updateDatabase(data, df, [countTag, descriptionTag, durationTag], 'preferences/eventsName.txt')
+    return typeEvents.updateDatabase(data, df, [countTag, descriptionTag, durationTag], 'preferences/eventsName.json')

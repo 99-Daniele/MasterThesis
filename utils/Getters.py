@@ -11,13 +11,13 @@ import utils.utilities.Utilities as utilities
 connection = connect.getDatabaseConnection()
 
 # queries to obtain data from database.
-endPhaseQuery = "SELECT fase FROM tribunali2020.statinome WHERE stato = 'DF'"
+endPhaseQuery = "SELECT FKFASEPROCESSO FROM tipostato WHERE CCODST = 'DF'"
 eventsNamesQuery = "SELECT en.codice AS codice, te.CDESCR AS descrizione, en.etichetta AS etichetta, en.fase AS fase FROM eventinome AS en, tipoeventi AS te WHERE en.codice = te.CCDOEV"
-eventsQuery = "SELECT e.numEvento AS numEvento, e.numProcesso AS numProcesso, en.codice AS codiceEvento, en.etichetta AS evento, gn.giudice AS giudice, gn.alias AS alias, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S') AS dataEvento, DATE_FORMAT((SELECT MIN(data) FROM eventi AS ev WHERE e.numProcesso = ev.numProcesso), '%Y-%m-%d %H:%i:%S') AS dataInizioProcesso, sn.stato AS codiceStato, sn.etichetta AS stato, sn.fase AS faseStato, mn.codice AS codiceMateria, CONCAT(mn.descrizione, ' - ', mn.etichetta) AS materia, p.sezione AS sezioneProcesso FROM eventi AS e, processi AS p, eventinome AS en, statinome AS sn, giudicinome AS gn, materienome AS mn WHERE e.numProcesso = p.numProcesso AND e.codice = en.codice AND e.statofinale = sn.stato AND e.giudice = gn.giudice AND p.materia = mn.codice ORDER BY numProcesso, data, numEvento"
+eventsQuery = "SELECT e.numEvento AS numEvento, e.numProcesso AS numProcesso, e.codice AS codiceEvento, p.giudice AS giudice, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S') AS dataEvento, DATE_FORMAT((SELECT MIN(data) FROM eventi AS ev WHERE e.numProcesso = ev.numProcesso), '%Y-%m-%d %H:%i:%S') AS dataInizioProcesso, e.statofinale AS codiceStato, s.FKFASEPROCESSO AS faseStato, p.materia AS codiceMateria, p.sezione AS sezioneProcesso FROM eventi AS e, processi AS p, tipostato AS s WHERE e.numProcesso = p.numProcesso AND e.statofinale = s.CCODST ORDER BY e.numProcesso, e.data, e.numEvento"
 judgeNamesQuery = "SELECT * FROM giudicinome ORDER BY alias"
 minDateQuery = "SELECT DATE_FORMAT(MIN(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 maxDateQuery = "SELECT DATE_FORMAT(MAX(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
-stallPhaseQuery = "SELECT fase FROM tribunali2020.statinome WHERE etichetta = 'STALLO'"
+stallStatesQuery = "SELECT CCODST FROM tipostato WHERE FKFASEPROCESSO IS NULL"
 stateNamesQuery = "SELECT sn.stato AS codice, ts.CDESCR AS descrizione, sn.etichetta AS etichetta, ts.FKFASEPROCESSO AS fase_db, sn.fase AS fase FROM statinome AS sn, tipostato AS ts WHERE sn.stato = ts.CCODST"
 subjectNamesQuery = "SELECT * FROM materienome ORDER BY codice"
 
@@ -43,150 +43,146 @@ def getEndPhase():
     return endPhase[0][0]
 
 # get stall phase from all events of user database.
-def getStallPhase():
-    stallPhase = connect.getDataFromDatabase(connection, stallPhaseQuery)
-    return stallPhase[0][0]
+def getStallStates():
+    stallStateTuples = connect.getDataFromDatabase(connection, stallStatesQuery)
+    stallStates = utilities.fromListOfTuplesToList(stallStateTuples)
+    return stallStates
 
 # get all events.
 def getEvents():
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
+    codePhaseTag = utilities.getTagName("codePhaseTag")
     codeStateTag = utilities.getTagName("codeStateTag")
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     dateTag = utilities.getTagName("dateTag")
-    judgeTag = utilities.getTagName("judgeTag")
-    eventTag = utilities.getTagName("eventTag")
     numEventTag = utilities.getTagName("numEventTag")
     numProcessTag = utilities.getTagName("numProcessTag")
-    phaseTag = utilities.getTagName("phaseTag")
     processDateTag = utilities.getTagName("processDateTag")
     sectionTag = utilities.getTagName("sectionTag")
-    stateTag = utilities.getTagName("stateTag")
-    subjectTag = utilities.getTagName("subjectTag")
     events = connect.getDataFromDatabase(connection, eventsQuery)
-    keys = [numEventTag, numProcessTag, codeEventTag, eventTag, codeJudgeTag, judgeTag, dateTag, processDateTag, codeStateTag, stateTag, phaseTag, codeSubjectTag, subjectTag, sectionTag]
+    keys = [numEventTag, numProcessTag, codeEventTag, codeJudgeTag, dateTag, processDateTag, codeStateTag, codePhaseTag, codeSubjectTag, sectionTag]
     dictEvents = utilities.fromListOfTuplesToListOfDicts(events, keys)
     return dictEvents
 
 # get all events from cache file.
 def getAllEvents():
-    allEventsDataframe = cache.getData('allEvents.json')
+    allEventsDataframe = cache.getDataframe('allEvents.json')
     if allEventsDataframe is None:
         update.refreshData()
-        allEventsDataframe = cache.getData('allEvents.json')
-    
+        allEventsDataframe = cache.getDataframe('allEvents.json')
     return allEventsDataframe
 
 # get important events from cache file.
 def getImportantEvents():
-    importantEventsDataframe = cache.getData('importantEvents.json')
+    importantEventsDataframe = cache.getDataframe('importantEvents.json')
     if importantEventsDataframe is None:
         update.refreshData()
-        importantEventsDataframe = cache.getData('importantEvents.json')
+        importantEventsDataframe = cache.getDataframe('importantEvents.json')
     return importantEventsDataframe
 
 # get phases events from cache file.
 def getPhaseEvents():
-    phaseEventsDataframe = cache.getData('phaseEvents.json')
+    phaseEventsDataframe = cache.getDataframe('phaseEvents.json')
     if phaseEventsDataframe is None:
         update.refreshData()
-        phaseEventsDataframe = cache.getData('phaseEvents.json')
+        phaseEventsDataframe = cache.getDataframe('phaseEvents.json')
     return phaseEventsDataframe
 
 # get states events from cache file.
 def getStateEvents():
-    stateEventsDataframe = cache.getData('stateEvents.json')
+    stateEventsDataframe = cache.getDataframe('stateEvents.json')
     if stateEventsDataframe is None:
         update.refreshData()
-        stateEventsDataframe = cache.getData('stateEvents.json')
+        stateEventsDataframe = cache.getDataframe('stateEvents.json')
     return stateEventsDataframe
 
 # get court hearings events from cache file.
 def getCourtHearingsEvents():
-    courtHearingsEventsDataframe = cache.getData('courtHearingEvents.json')
+    courtHearingsEventsDataframe = cache.getDataframe('courtHearingEvents.json')
     if courtHearingsEventsDataframe is None:
         update.refreshData()
-        courtHearingsEventsDataframe = cache.getData('courtHearingEvents.json')
+        courtHearingsEventsDataframe = cache.getDataframe('courtHearingEvents.json')
     return courtHearingsEventsDataframe
 
 # get processes events from cache file.
 def getProcessesDuration():
-    processDurationDataframe = cache.getData('processesDuration.json')
+    processDurationDataframe = cache.getDataframe('processesDuration.json')
     if processDurationDataframe is None:
         update.refreshData()
-        processDurationDataframe = cache.getData('processesDuration.json')
+        processDurationDataframe = cache.getDataframe('processesDuration.json')
     return processDurationDataframe
 
 # get processes events from cache file filtered by important process types, sections and subjects.
 def getProcessesDurationFiltered():
-    processDurationDataframeFiltered = cache.getData('processesDurationFiltered.json')
+    processDurationDataframeFiltered = cache.getDataframe('processesDurationFiltered.json')
     if processDurationDataframeFiltered is None:
         update.refreshData()
-        processDurationDataframeFiltered = cache.getData('processesDurationFiltered.json')
+        processDurationDataframeFiltered = cache.getDataframe('processesDurationFiltered.json')
     return processDurationDataframeFiltered
 
 # get states duration from cache file.
 def getStatesDuration():
-    stateDurationDataframe = cache.getData('statesDuration.json')
+    stateDurationDataframe = cache.getDataframe('statesDuration.json')
     if stateDurationDataframe is None:
         update.refreshData()
-        stateDurationDataframe = cache.getData('statesDuration.json')
+        stateDurationDataframe = cache.getDataframe('statesDuration.json')
     return stateDurationDataframe
 
 # get states duration from cache file filtered by important process types, sections and subjects.
 def getStatesDurationFiltered():
-    stateDurationDataframeFiltered = cache.getData('statesDurationFiltered.json')
+    stateDurationDataframeFiltered = cache.getDataframe('statesDurationFiltered.json')
     if stateDurationDataframeFiltered is None:
         update.refreshData()
-        stateDurationDataframeFiltered = cache.getData('statesDurationFiltered.json')
+        stateDurationDataframeFiltered = cache.getDataframe('statesDurationFiltered.json')
     return stateDurationDataframeFiltered
 
 # get phases duration from cache file.
 def getPhasesDuration():
-    phaseDurationDataframe = cache.getData('phasesDuration.json')
+    phaseDurationDataframe = cache.getDataframe('phasesDuration.json')
     if phaseDurationDataframe is None:
         update.refreshData()
-        phaseDurationDataframe = cache.getData('phasesDuration.json')
+        phaseDurationDataframe = cache.getDataframe('phasesDuration.json')
     return phaseDurationDataframe
 
 # get phases duration from cache file filtered by important process types, sections and subjects.
 def getPhasesDurationFiltered():
-    phaseDurationDataframeFiltered = cache.getData('phasesDurationFiltered.json')
+    phaseDurationDataframeFiltered = cache.getDataframe('phasesDurationFiltered.json')
     if phaseDurationDataframeFiltered is None:
         update.refreshData()
-        phaseDurationDataframeFiltered = cache.getData('phasesDurationFiltered.json')
+        phaseDurationDataframeFiltered = cache.getDataframe('phasesDurationFiltered.json')
     return phaseDurationDataframeFiltered
 
 # get events duration from cache file.
 def getEventsDuration():
-    eventDurationDataframe = cache.getData('eventsDuration.json')
+    eventDurationDataframe = cache.getDataframe('eventsDuration.json')
     if eventDurationDataframe is None:
         update.refreshData()
-        eventDurationDataframe = cache.getData('eventsDuration.json')
+        eventDurationDataframe = cache.getDataframe('eventsDuration.json')
     return eventDurationDataframe
 
 # get events duration from cache file filtered by important process types, sections and subjects.
 def getEventsDurationFiltered():
-    eventDurationDataframeFiltered = cache.getData('eventsDurationFiltered.json')
+    eventDurationDataframeFiltered = cache.getDataframe('eventsDurationFiltered.json')
     if eventDurationDataframeFiltered is None:
         update.refreshData()
-        eventDurationDataframeFiltered = cache.getData('eventsDurationFiltered.json')
+        eventDurationDataframeFiltered = cache.getDataframe('eventsDurationFiltered.json')
     return eventDurationDataframeFiltered
 
 # get court hearings duration from cache file.
 def getCourtHearingsDuration():
-    courtHearingsDurationDataframe = cache.getData('courtHearingsDuration.json')
+    courtHearingsDurationDataframe = cache.getDataframe('courtHearingsDuration.json')
     if courtHearingsDurationDataframe is None:
         update.refreshData()
-        courtHearingsDurationDataframe = cache.getData('courtHearingsDuration.json')
+        courtHearingsDurationDataframe = cache.getDataframe('courtHearingsDuration.json')
     return courtHearingsDurationDataframe
 
 # get court hearings duration from cache file filtered by important process types, sections and subjects.
 def getCourtHearingsDurationFiltered():
-    courtHearingsDurationFiltered = cache.getData('courtHearingsDurationFiltered.json')
+    courtHearingsDurationFiltered = cache.getDataframe('courtHearingsDurationFiltered.json')
     if courtHearingsDurationFiltered is None:
         update.refreshData()
-        courtHearingsDurationFiltered = cache.getData('courtHearingsDurationFiltered.json')
+        courtHearingsDurationFiltered = cache.getDataframe('courtHearingsDurationFiltered.json')
     return courtHearingsDurationFiltered
 
 # get states name dataframe.

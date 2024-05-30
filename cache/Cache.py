@@ -18,5 +18,11 @@ def updateCache(filename, databaseData):
 # return cached data from chosen file.
 def getData(filename):
     filename = "cache/" + filename
+    data = file.getDataFromJsonFile(filename)
+    return data
+
+# return cached dataframe from chosen file.
+def getDataframe(filename):
+    filename = "cache/" + filename
     data = file.getDataframeFromJsonFile(filename)
     return data

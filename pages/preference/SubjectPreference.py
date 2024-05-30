@@ -18,7 +18,7 @@ def pageLayout():
     descriptionTag = utilities.getTagName('descriptionTag')
     duration = utilities.getPlaceholderName('duration')
     ritualTag = utilities.getTagName('ritualTag')
-    tagSubjecTag = utilities.getTagName('tagSubjecTag')
+    tagTag = utilities.getTagName('tagTag')
     layout = ds.html.Div([
         ds.dcc.ConfirmDialog(
             id = 'update-su',
@@ -34,7 +34,7 @@ def pageLayout():
                 {'name': codeSubjectTag, 'id': codeSubjectTag, 'editable': False},
                 {'name': descriptionTag, 'id': descriptionTag, 'editable': False},
                 {'name': ritualTag, 'id': ritualTag, 'editable': False},
-                {'name': tagSubjecTag, 'id': tagSubjecTag, 'editable': True}, 
+                {'name': tagTag, 'id': tagTag, 'editable': True}, 
                 {'name': count, 'id': countTag, 'editable': False},  
                 {'name': duration, 'id': durationTag, 'editable': False}],
             filter_action = "native",
@@ -54,4 +54,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def update_dateframe(button, data):
-    return typeEvents.updateFile(data, df, [countTag, durationTag], 'preferences/subjectsName.txt')
+    return typeEvents.updateFile(data, df, [countTag, durationTag], 'preferences/subjectsName.json')

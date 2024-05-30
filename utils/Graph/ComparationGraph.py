@@ -30,8 +30,8 @@ def hideProcessChosen(choices, sections, subjects, judges, finished, sequences, 
     phaseSequenceTag = utilities.getTagName('phaseSequenceTag')
     sectionTag = utilities.getTagName('sectionTag')
     subjectTag = utilities.getTagName('subjectTag')
-    sequenceTag = utilities.getTagName('sequenceTag')
-    [[sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle], [sections, subjects, judges, finished, sequences, phaseSequences]] = hideChosen(choices, [sectionTag, subjectTag, judgeTag, finishedTag, sequenceTag, phaseSequenceTag], [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle], [sections, subjects, judges, finished, sequences, phaseSequences])
+    stateSequenceTag = utilities.getTagName('stateSequenceTag')
+    [[sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle], [sections, subjects, judges, finished, sequences, phaseSequences]] = hideChosen(choices, [sectionTag, subjectTag, judgeTag, finishedTag, stateSequenceTag, phaseSequenceTag], [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle], [sections, subjects, judges, finished, sequences, phaseSequences])
     if event == None:
         eventRadioStyle = {'display': 'none'}
     elif event in choices:
@@ -75,7 +75,7 @@ def updateProcessData(df, startDate, endDate, sections, subjects, judges, finish
     judgeTag = utilities.getTagName("judgeTag")
     phaseSequenceTag = utilities.getTagName("phaseSequenceTag")
     sectionTag = utilities.getTagName("sectionTag")
-    sequenceTag = utilities.getTagName("sequenceTag")
+    stateSequenceTag = utilities.getTagName("stateSequenceTag")
     subjectTag = utilities.getTagName("subjectTag")
     withOut = utilities.getPlaceholderName("without")
     df_temp = df.copy()
@@ -84,7 +84,7 @@ def updateProcessData(df, startDate, endDate, sections, subjects, judges, finish
     df_temp = frame.getTypesDataFrame(df_temp, subjectTag, subjects)
     df_temp = frame.getTypesDataFrame(df_temp, judgeTag, judges)
     df_temp = frame.getTypesDataFrame(df_temp, finishedTag, finished)
-    df_temp = frame.getTypesDataFrame(df_temp, sequenceTag, sequences)
+    df_temp = frame.getTypesDataFrame(df_temp, stateSequenceTag, sequences)
     df_temp = frame.getTypesDataFrame(df_temp, phaseSequenceTag, phaseSequences)
     if eventChoice != None:
         df_temp = frame.getEventDataFrame(df_temp, eventChoice)
@@ -119,7 +119,7 @@ def updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, se
     judgeTag = utilities.getTagName("judgeTag")
     phaseSequenceTag = utilities.getTagName("phaseSequenceTag")
     sectionTag = utilities.getTagName("sectionTag")
-    sequenceTag = utilities.getTagName("sequenceTag")
+    stateSequenceTag = utilities.getTagName("stateSequenceTag")
     subjectTag = utilities.getTagName("subjectTag")
     if sections != None and len(sections) > 0:
         df_temp_1 = updateProcessData(df_temp, startDate, endDate, None, subjects, judges, finished, sequences, phaseSequences, event, eventRadio)
@@ -153,7 +153,7 @@ def updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, se
     subjects = frame.getGroupBy(df_temp_2, subjectTag)
     judges = frame.getGroupBy(df_temp_3, judgeTag)
     finished = frame.getGroupBy(df_temp_4, finishedTag)
-    sequences = frame.getGroupBy(df_temp_5, sequenceTag)
+    sequences = frame.getGroupBy(df_temp_5, stateSequenceTag)
     phaseSequences = frame.getGroupBy(df_temp_6, phaseSequenceTag)
     event = frame.getGroupByFromString(df_temp_7, eventsTag)
     return [sections, subjects, judges, finished, sequences, phaseSequences, event]

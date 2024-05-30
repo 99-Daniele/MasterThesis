@@ -31,7 +31,7 @@ def pageLayout():
     section = utilities.getPlaceholderName('section') 
     sectionTag = utilities.getTagName('sectionTag')
     sequence = utilities.getPlaceholderName('sequence')
-    sequenceTag = utilities.getTagName('sequenceTag')
+    stateSequenceTag = utilities.getTagName('stateSequenceTag')
     subject = utilities.getPlaceholderName('subject')  
     subjectTag = utilities.getTagName('subjectTag') 
     text = utilities.getPlaceholderName('text') 
@@ -45,7 +45,7 @@ def pageLayout():
     sections = frame.getGroupBy(df, sectionTag)
     judges = frame.getGroupBy(df, judgeTag)
     finished = frame.getGroupBy(df, finishedTag)
-    sequences = frame.getGroupBy(df, sequenceTag)
+    sequences = frame.getGroupBy(df, stateSequenceTag)
     phaseSequences = frame.getGroupBy(df, phaseSequenceTag)
     events = frame.getGroupByFromString(df, eventSequenceTag)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
@@ -79,7 +79,7 @@ def pageLayout():
             ],
             style = {'display': 'inline-flex'}
         ),
-        ds.dcc.Checklist([sectionTag, subjectTag, judgeTag, finishedTag, sequenceTag, phaseSequenceTag], value = [], id = "choice-checklist-pr", inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.Checklist([sectionTag, subjectTag, judgeTag, finishedTag, stateSequenceTag, phaseSequenceTag], value = [], id = "choice-checklist-pr", inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = "order-radioitem-pr", inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Checklist([text], value = [text], id = "text-checklist-pr"),
         ds.dcc.Graph(id = 'comparation-graph-pr', figure = fig)

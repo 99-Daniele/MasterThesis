@@ -129,6 +129,11 @@ def fromListOfTuplesToListOfDicts(list, keys):
     newList = [dict(zip(keys, values)) for values in list]
     return newList
 
+# transform list of tuples to list.
+def fromListOfTuplesToList(list):
+    newList = [item for t in list for item in t]
+    return newList
+
 # find substring between from given string two characters.
 def findSubstringBetweenChars(string, startChar, endChar):
     startIndex = string.find(startChar)

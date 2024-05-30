@@ -21,23 +21,14 @@ try:
 except:
     importantSubjects = None
 
+# from events list create basic events dataframe. Later he will be integrated with subject, state, phase chosen by user.
+def createBasicEventsDataFrame(events, dateTag, eventCodeTag, judgeCodeTag, numEventTag, numProcessTag, codePhaseTag, processDateTag, sectionTag, stateCodeTag, subjectCodeTag):
+    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, judgeCodeTag, dateTag, processDateTag, stateCodeTag, codePhaseTag, subjectCodeTag, sectionTag])
+    df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
+    return df
+
 # from events list create events dataframe.
-def createEventsDataFrame(events, endPhase):
-    dateTag = utilities.getTagName('dateTag')
-    eventTag = utilities.getTagName('eventTag')
-    eventCodeTag = utilities.getTagName('codeEventTag')
-    judgeTag = utilities.getTagName('judgeTag')
-    judgeCodeTag = utilities.getTagName('codeJudgeTag')
-    numEventTag = utilities.getTagName('numEventTag')
-    numProcessTag = utilities.getTagName('numProcessTag')
-    phaseTag = utilities.getTagName('phaseTag')
-    processDateTag = utilities.getTagName('processDateTag')
-    sectionTag = utilities.getTagName('sectionTag')
-    stateTag = utilities.getTagName('stateTag')
-    stateCodeTag = utilities.getTagName('codeStateTag')
-    subjectTag = utilities.getTagName('subjectTag')
-    subjectCodeTag = utilities.getTagName('codeSubjectTag')
-    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, eventTag, judgeCodeTag, judgeTag, dateTag, processDateTag, stateCodeTag, stateTag, phaseTag, subjectCodeTag, subjectTag, sectionTag])
+def createEventsDataFrame(df, endPhase, dateTag, numEventTag, numProcessTag, phaseTag):
     dfNotEnd = df[df[phaseTag] != endPhase].reset_index(drop = True)
     dfEnd = df[df[phaseTag] == endPhase].reset_index(drop = True)
     dfEnd = dfEnd.groupby(numProcessTag, as_index = False).first().reset_index(drop = True)
@@ -47,22 +38,7 @@ def createEventsDataFrame(events, endPhase):
     return df
 
 # from processes list create process duration dataframe.
-def createProcessDurationsDataFrame(process):
-    dateTag = utilities.getTagName('dateTag')
-    durationTag = utilities.getTagName('durationTag')
-    eventSequenceTag = utilities.getTagName('eventSequenceTag')
-    eventPhaseSequenceTag = utilities.getTagName("eventPhaseSequenceTag")
-    nextDateTag = utilities.getTagName('nextDateTag')
-    nextIdTag = utilities.getTagName('nextIdTag')
-    finishedTag = utilities.getTagName('finishedTag')
-    judgeTag = utilities.getTagName('judgeTag')
-    numEventTag = utilities.getTagName('numEventTag')
-    numProcessTag = utilities.getTagName('numProcessTag')
-    phaseSequenceTag = utilities.getTagName('phaseSequenceTag')
-    sectionTag = utilities.getTagName('sectionTag')
-    stateSequenceTag = utilities.getTagName('sequenceTag')
-    subjectTag = utilities.getTagName('subjectTag')
-    subjectCodeTag = utilities.getTagName('codeSubjectTag')
+def createProcessDurationsDataFrame(process, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, judgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag, subjectCodeTag):
     df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, eventPhaseSequenceTag, nextDateTag, nextIdTag])
     filteredDf = df.copy()
     if importantProcessStates != None:
@@ -78,24 +54,7 @@ def createProcessDurationsDataFrame(process):
     return [df, filteredDf]
 
 # from events list create type duration dataframe.
-def createTypeDurationsDataFrame(events):
-    dateTag = utilities.getTagName('dateTag')
-    durationTag = utilities.getTagName('durationTag')
-    eventTag = utilities.getTagName('eventTag')
-    eventCodeTag = utilities.getTagName('codeEventTag')
-    finishedTag = utilities.getTagName('finishedTag')
-    judgeTag = utilities.getTagName('judgeTag')
-    judgeCodeTag = utilities.getTagName('codeJudgeTag')
-    nextDateTag = utilities.getTagName('nextDateTag')
-    nextIdTag = utilities.getTagName('nextIdTag')
-    numEventTag = utilities.getTagName('numEventTag')
-    numProcessTag = utilities.getTagName('numProcessTag')
-    phaseTag = utilities.getTagName('phaseTag')
-    sectionTag = utilities.getTagName('sectionTag')
-    stateTag = utilities.getTagName('stateTag')
-    stateCodeTag = utilities.getTagName('codeStateTag')
-    subjectTag = utilities.getTagName('subjectTag')
-    subjectCodeTag = utilities.getTagName('codeSubjectTag')    
+def createTypeDurationsDataFrame(events, dateTag, durationTag, eventTag, eventCodeTag, finishedTag, judgeTag, judgeCodeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, stateCodeTag, subjectTag, subjectCodeTag):
     df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, eventTag, durationTag, dateTag, judgeCodeTag, judgeTag, stateCodeTag, stateTag, phaseTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
     filteredDf = df.copy()
     if importantSections != None:
@@ -188,8 +147,8 @@ def createSubjectNameDataframe(subjectNames):
     codeSubjectTag = utilities.getTagName('codeSubjectTag')
     descriptionTag = utilities.getTagName('descriptionTag')
     ritualTag = utilities.getTagName('ritualTag')
-    tagSubjecTag = utilities.getTagName('tagSubjecTag')
-    df = pd.DataFrame(subjectNames, columns = [codeSubjectTag, descriptionTag, ritualTag, tagSubjecTag])
+    tagTag = utilities.getTagName('tagTag')
+    df = pd.DataFrame(subjectNames, columns = [codeSubjectTag, descriptionTag, ritualTag, tagTag])
     df[codeSubjectTag] = df[codeSubjectTag].astype(str)
     return df
 
