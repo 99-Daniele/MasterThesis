@@ -13,6 +13,8 @@ import utils.utilities.Utilities as utilities
 df = getter.getEventsDuration()
 codeEventTag = utilities.getTagName('codeEventTag')
 df = frame.keepOnlyRelevant(df, 0.005, codeEventTag)
+eventTag = utilities.getTagName('eventTag')
+eventTagChoice = eventTag
 
 # return initial layout of page.
 def pageLayout():
@@ -24,7 +26,7 @@ def pageLayout():
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     subject = utilities.getPlaceholderName('subject')  
-    types = frame.getGroupBy(df, codeEventTag)
+    types = frame.getGroupBy(df, eventTagChoice)
     finishedTag = utilities.getTagName('finishedTag') 
     judgeTag = utilities.getTagName('judgeTag') 
     median = utilities.getPlaceholderName('median') 
@@ -42,7 +44,7 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici tipo eventi', href='/typeevent'),
         ds.html.H2('SEQUENZA EVENTI'),
-        ds.dcc.Dropdown(types, value = "9F", multi = False, searchable = True, clearable = False, id = 'type-dropdown-esq', placeholder = phase, style = {'width': 400}),
+        ds.dcc.Dropdown(types, value = types[0], multi = False, searchable = True, clearable = False, id = 'type-dropdown-esq', placeholder = phase, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-esq', placeholder = section, style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-esq', placeholder = subject, style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-esq', placeholder = judge, style = {'width': 400}),
@@ -71,4 +73,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(event, avg, text, section, subject, judge, finished):
-    return typeEvent.typeSequenceUpdate(df, 'preferences/eventsName.json', event, codeEventTag, avg, text, section, subject, judge, finished)
+    return typeEvent.typeSequenceUpdate(df, 'preferences/eventsName.json', False, event, eventTagChoice, avg, text, section, subject, judge, finished)

@@ -13,7 +13,11 @@ import utils.utilities.Utilities as utilities
 df = getter.getEventsDuration()
 codeEventTag = utilities.getTagName('codeEventTag')
 codeStateTag = utilities.getTagName('codeStateTag')
+eventTag = utilities.getTagName('eventTag')
+stateTag = utilities.getTagName('stateTag')
 phaseTag = utilities.getTagName('phaseTag')
+eventTagChoice = eventTag
+stateTagChoice = stateTag
 
 # return initial layout of page.
 def pageLayout():
@@ -51,7 +55,7 @@ def pageLayout():
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-phe', placeholder = judge, style = {'width': 400}),
         ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-phe', placeholder = process, style = {'width': 400}),
         ds.dcc.RadioItems([first, all], value = all, id = 'display-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.RadioItems([codeEventTag, codeStateTag], value = codeEventTag, id = 'choice-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.RadioItems([eventTagChoice, stateTagChoice], value = eventTagChoice, id = 'choice-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Checklist([text], value = [text], id = 'text-checklist-phe'),
         ds.dcc.Graph(id = 'typeevent-graph-phe', figure = fig)
@@ -78,10 +82,10 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(state, display, tagChoice, avg, text, section, subject, judge, finished):
-    if tagChoice == codeEventTag:
+    if tagChoice == eventTagChoice:
         df = getter.getEventsDuration()
         filename = 'preferences/eventsName.json'
     else:
         df = getter.getStatesDuration()
         filename = 'preferences/statesName.json'
-    return typeEvent.typeEventUpdate(df, filename, phaseTag, state, tagChoice, display, avg, text, section, subject, judge, finished)
+    return typeEvent.typeEventUpdate(df, filename, False, phaseTag, state, tagChoice, display, avg, text, section, subject, judge, finished)

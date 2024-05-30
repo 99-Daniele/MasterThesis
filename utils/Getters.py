@@ -1,5 +1,7 @@
 # this file handles data getters.
 
+import pandas as pd
+
 import cache.Cache as cache
 import utils.database.DatabaseConnection as connect
 import utils.DataUpdate as update
@@ -52,7 +54,7 @@ def getStallStates():
 def getEvents():
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
-    codePhaseTag = utilities.getTagName("codePhaseTag")
+    phaseDBTag = utilities.getTagName("phaseDBTag")
     codeStateTag = utilities.getTagName("codeStateTag")
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     dateTag = utilities.getTagName("dateTag")
@@ -61,7 +63,7 @@ def getEvents():
     processDateTag = utilities.getTagName("processDateTag")
     sectionTag = utilities.getTagName("sectionTag")
     events = connect.getDataFromDatabase(connection, eventsQuery)
-    keys = [numEventTag, numProcessTag, codeEventTag, codeJudgeTag, dateTag, processDateTag, codeStateTag, codePhaseTag, codeSubjectTag, sectionTag]
+    keys = [numEventTag, numProcessTag, codeEventTag, codeJudgeTag, dateTag, processDateTag, codeStateTag, phaseDBTag, codeSubjectTag, sectionTag]
     dictEvents = utilities.fromListOfTuplesToListOfDicts(events, keys)
     return dictEvents
 
@@ -187,10 +189,11 @@ def getCourtHearingsDurationFiltered():
 
 # get states name dataframe.
 def getStateNamesDataframe():
-    stateDurationDataframe = getStatesDuration()
-    stateNames = connect.getDataFromDatabase(connection, stateNamesQuery)
-    stateNamesDataframe = frame.createStateNameDataframe(stateNames)
-    df = frame.createStateNameDataframeWithInfo(stateDurationDataframe, stateNamesDataframe)
+    codeStateTag = utilities.getTagName("codeStateTag")
+    stateDurationDataframe = getStatesDuration()    
+    statesName = file.getDataFromJsonFile('preferences/statesName.json')
+    statesNameDataframe = pd.DataFrame.from_dict(statesName, orient = 'index').reset_index().rename(columns = {'index': codeStateTag})
+    df = frame.createStateNameDataframeWithInfo(stateDurationDataframe, statesNameDataframe)
     return df
 
 # get events name dataframe.

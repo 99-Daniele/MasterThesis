@@ -22,8 +22,8 @@ except:
     importantSubjects = None
 
 # from events list create basic events dataframe. Later he will be integrated with subject, state, phase chosen by user.
-def createBasicEventsDataFrame(events, dateTag, eventCodeTag, judgeCodeTag, numEventTag, numProcessTag, codePhaseTag, processDateTag, sectionTag, stateCodeTag, subjectCodeTag):
-    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, judgeCodeTag, dateTag, processDateTag, stateCodeTag, codePhaseTag, subjectCodeTag, sectionTag])
+def createBasicEventsDataFrame(events, dateTag, eventCodeTag, judgeCodeTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateCodeTag, subjectCodeTag):
+    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, judgeCodeTag, dateTag, processDateTag, stateCodeTag, phaseDBTag, subjectCodeTag, sectionTag])
     df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     return df
 
@@ -64,17 +64,6 @@ def createTypeDurationsDataFrame(events, dateTag, durationTag, eventTag, eventCo
     df = df.dropna()
     filteredDf = filteredDf.dropna()
     return [df, filteredDf]
-
-# from state names list create state names dataframe.
-def createStateNameDataframe(stateNames):
-    dbPhaseTag = utilities.getTagName('phaseDBTag')
-    descrTag = utilities.getTagName('descriptionTag')
-    phaseTag = utilities.getTagName('phaseTag')
-    stateTag = utilities.getTagName('stateTag')
-    stateCodeTag = utilities.getTagName('codeStateTag')
-    df = pd.DataFrame(stateNames, columns = [stateCodeTag, descrTag, stateTag, dbPhaseTag, phaseTag])
-    df[stateCodeTag] = df[stateCodeTag].astype(str)
-    return df
 
 # from state names list create state names dataframe with info.
 def createStateNameDataframeWithInfo(statesDuration, stateNames):
@@ -305,7 +294,7 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
     while i < len(types):
         df3[filterTag] = df3[filterTag].astype(str) + " - " + df4[types[i]].astype(str)
         i = i + 1
-    df3 = keepOnlyImportant(df3, 0.25)
+    #df3 = keepOnlyImportant(df3, 0.9)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
     order_dict = df3.set_index(filterTag)[order].to_dict()
     order_list = df3[filterTag].tolist()

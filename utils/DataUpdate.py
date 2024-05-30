@@ -21,7 +21,7 @@ def restartData():
     stallStates = getter.getStallStates()
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
-    codePhaseTag = utilities.getTagName("codePhaseTag")
+    phaseDBTag = utilities.getTagName("phaseDBTag")
     codeStateTag = utilities.getTagName("codeStateTag")
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     dateTag = utilities.getTagName("dateTag")
@@ -35,8 +35,8 @@ def restartData():
     sectionTag = utilities.getTagName("sectionTag")
     stateSequenceTag = utilities.getTagName("stateSequenceTag")
     events = getter.getEvents()
-    processesEvents, processesInfo = getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, codePhaseTag, codeStateTag, codeSubjectTag, eventsTag, eventSequenceTag, finishedTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag)
-    eventDatagrame = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, numEventTag, numProcessTag, codePhaseTag, processDateTag, sectionTag, codeStateTag, codeSubjectTag)
+    processesEvents, processesInfo = getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, phaseDBTag, codeStateTag, codeSubjectTag, eventsTag, eventSequenceTag, finishedTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag)
+    eventDatagrame = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, codeStateTag, codeSubjectTag)
     cache.updateCache('events.json', eventDatagrame)
     file.writeOnJsonFile('cache/processesEvents.json', processesEvents)
     refreshData()
@@ -72,6 +72,7 @@ def refreshData():
     numEventTag = utilities.getTagName("numEventTag")
     numProcessTag = utilities.getTagName("numProcessTag")
     phaseTag = utilities.getTagName("phaseTag")
+    phaseDbTag = utilities.getTagName("phaseDBTag")
     phaseSequenceTag = utilities.getTagName("phaseSequenceTag")
     ritualTag = utilities.getTagName("ritualTag")
     sectionTag = utilities.getTagName("sectionTag")
@@ -92,11 +93,11 @@ def refreshData():
     subjectsNameDataframe[codeSubjectTag] = subjectsNameDataframe[codeSubjectTag].astype('Int64')
     processesDuration = updateTypeDurationDataframe(processEvents, eventsName, judgesName, statesName, subjectsName, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, eventTag, eventsTag, eventPhaseSequenceTag, finishedTag, judgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag)
     updateProcessDurationDataframe(processesDuration, codeSubjectTag, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, judgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag)
-    updateEventsDataframe(eventsDataframe, eventsNameDataframe, judgesNameDataframe, statesNameDataframe, subjectsNameDataframe, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, descriptionTag, eventTag, numEventTag, numProcessTag, phaseTag, ritualTag, stateTag, tagTag)
+    updateEventsDataframe(eventsDataframe, eventsNameDataframe, judgesNameDataframe, statesNameDataframe, subjectsNameDataframe, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, descriptionTag, eventTag, numEventTag, numProcessTag, phaseTag, phaseDbTag, ritualTag, stateTag, tagTag)
     print(str(time.time() - start) + " seconds")
 
 # group events by process.
-def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, codePhaseTag, codeStateTag, codeSubjectTag, eventsTag, eventSequenceTag, finishedTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag):
+def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, phaseDBTag, codeStateTag, codeSubjectTag, eventsTag, eventSequenceTag, finishedTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag):
     if len(events) == 0:
         raise Exception("\nThere isn't any event in database.")
     allProcessEvents = []
@@ -138,7 +139,7 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
                 if events[i][codeSubjectTag] in stallStates and not continuative:
                     processFinished = utilities.getProcessState('continuatived')
                     continuative = True
-                if events[i][codePhaseTag] == endPhase and not continuative: 
+                if events[i][phaseDBTag] == endPhase and not continuative: 
                     processFinished = utilities.getProcessState('finished')
                     processEvents[finishedTag] = processFinished
                     end = True
@@ -150,7 +151,7 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
                     processEvents[sectionTag] = processSection
                 processEvents[eventsTag].append(events[i])
                 processEventSequence.append(events[i][codeEventTag])
-                processPhaseSequence.append(events[i][codePhaseTag])
+                processPhaseSequence.append(events[i][phaseDBTag])
                 processStateSequence.append(events[i][codeStateTag])
             bar()
             i += 1
@@ -160,12 +161,12 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
     return allProcessEvents, processesInfo
 
 # update events dataframe.
-def updateEventsDataframe(eventsDataframe, eventsName, judgesName, statesName, subjectsName, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, descriptionTag, eventTag, numEventTag, numProcessTag, phaseTag, ritualTag, stateTag, tagTag):
+def updateEventsDataframe(eventsDataframe, eventsName, judgesName, statesName, subjectsName, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, descriptionTag, eventTag, numEventTag, numProcessTag, phaseTag, phaseDbTag, ritualTag, stateTag, tagTag):
     eventsDataframeComplete = frame.joinDataframe(eventsDataframe, judgesName, codeJudgeTag, None, None)
     eventsDataframeComplete = frame.joinDataframe(eventsDataframeComplete, subjectsName, codeSubjectTag, None, [descriptionTag, ritualTag, tagTag])
     eventsDataframeComplete = frame.joinDataframe(eventsDataframeComplete, eventsName, codeEventTag, None, None)
-    eventsDataframeCompleteEventPhase = frame.joinDataframe(eventsDataframeComplete, statesName, codeStateTag, None, phaseTag)
-    eventsDataframeCompleteStatePhase = frame.joinDataframe(eventsDataframeComplete, statesName, codeStateTag, phaseTag, None)
+    eventsDataframeCompleteEventPhase = frame.joinDataframe(eventsDataframeComplete, statesName, codeStateTag, None, [phaseTag, phaseDbTag])
+    eventsDataframeCompleteStatePhase = frame.joinDataframe(eventsDataframeComplete, statesName, codeStateTag, phaseTag, phaseDbTag)
     updateAllEventsDataframe(eventsDataframeCompleteEventPhase, endPhase, dateTag, numEventTag, numProcessTag, phaseTag)
     updateImportantEventsDataframe(eventsDataframeCompleteEventPhase, endPhase, dateTag, eventTag, numEventTag, numProcessTag, phaseTag)
     updateCourtHearingEventsDataframe(eventsDataframeCompleteEventPhase, endPhase, dateTag, numEventTag, numProcessTag, phaseTag, stateTag)
@@ -305,8 +306,8 @@ def getEventInfo(processEvents, eventsName, judgesName, statesName, subjectsName
             duration = (nextDateDt - currDateDt).days
             eventsDuration.append([currEventId, processId, currEventCode, currEventTag, duration, currDate, currJudgeCode, currJudge, currStateCode, currStateTag, currPhase, processSubjectCode, processSubject, currSection, processFinished, nextDate, nextEventId])
             if currEventTag != nextEventTag:
-                eventsSequence.append(currEventTag)
                 eventsPhaseSequence.append(currPhase)
+                eventsSequence.append(currEventTag)
     curr = events[-1]
     currDateDt = dt.datetime.strptime(curr[dateTag], '%Y-%m-%d %H:%M:%S')
     currEventCode = curr[codeEventTag]
@@ -318,15 +319,15 @@ def getEventInfo(processEvents, eventsName, judgesName, statesName, subjectsName
         currJudgeCode = curr[codeJudgeTag]
         currJudge = judgesName.get(currJudgeCode)[judgeTag]
         currDate = curr[dateTag]
-        nextDate = next[dateTag]
+        nextDate = curr[dateTag]
         currStateTag = statesName.get(currStateCode)[stateTag]
         currSection = curr[sectionTag]
         duration = 0
         eventsDuration.append([currEventId, processId, currEventCode, currEventTag, duration, currDate, currJudgeCode, currJudge, currStateCode, currStateTag, currPhase, processSubjectCode, processSubject, currSection, processFinished, currDate, currEventId])
     if len(eventsSequence) == 0 or currEventTag != eventsSequence[-1]:
-        eventsSequence.append(currEventTag)
         currStatePhase = statesName.get(currStateCode)[phaseTag]
         eventsPhaseSequence.append(currStatePhase)
+        eventsSequence.append(currEventTag)
     return [eventsDuration, eventsSequence, eventsPhaseSequence, processDuration, startDate, startEventId, endDate, endEventId]
 
 # return phases duration.
@@ -366,8 +367,18 @@ def getPhaseInfo(processEvents, eventsName, judgesName, statesName, subjectsName
             nextDateDt = dt.datetime.strptime(nextDate, '%Y-%m-%d %H:%M:%S')
             duration = (nextDateDt - startDateDt).days
             phasesDuration.append([startEventId, processId, startEventCode, startEventTag, duration, startDate, startJudgeCode, startJudge, startStateCode, startStateTag, startPhase, processSubjectCode, processSubject, startSection, processFinished, nextDate, nextEventId])
-            if startPhase != '-':
+            if startPhase == '-':
+                pass
+            elif len(phasesSequence) == 0:
                 phasesSequence.append(startPhase)
+            elif phasesSequence[-1] == "RESTART":
+                 if startPhase != '-' and int(startPhase) > int(phasesSequence[-2]):
+                    phasesSequence.append(startPhase)
+            else:
+                if startPhase != '-' and int(startPhase) > int(phasesSequence[-1]):
+                    phasesSequence.append(startPhase)
+                elif startPhase != '-' and int(startPhase) < int(phasesSequence[-1]):
+                    phasesSequence.append("RESTART")
             startPhaseEvent = next
     curr = events[-1]
     currStateCode = curr[codeStateTag]
@@ -407,7 +418,7 @@ def getStateInfo(processEvents, eventsName, judgesName, statesName, subjectsName
         curr = events[i]
         next = events[i + 1]
         currStateCode = curr[codeStateTag]
-        nextStateCode = curr[codeStateTag]
+        nextStateCode = next[codeStateTag]
         currStateTag = statesName.get(currStateCode)[stateTag]
         nextStateTag = statesName.get(nextStateCode)[stateTag]
         currPhase = statesName.get(currStateCode)[phaseTag]
@@ -429,7 +440,7 @@ def getStateInfo(processEvents, eventsName, judgesName, statesName, subjectsName
             nextDateDt = dt.datetime.strptime(nextDate, '%Y-%m-%d %H:%M:%S')
             duration = (nextDateDt - startDateDt).days
             statesDuration.append([startEventId, processId, startEventCode, startEventTag, duration, startDate, startJudgeCode, startJudge, startStateCode, startStateTag, startPhase, processSubjectCode, processSubject, startSection, processFinished, nextDate, nextEventId])
-            if currStateTag != nextStateTag and currPhase != '-':
+            if currStateTag not in statesSequence and currPhase != '-':
                 statesSequence.append(currStateTag)
             startStateEvent = next
     curr = events[-1]
@@ -451,7 +462,7 @@ def getStateInfo(processEvents, eventsName, judgesName, statesName, subjectsName
         startSection = startStateEvent[sectionTag]
         duration = 0
         statesDuration.append([startEventId, processId, startEventCode, startEventTag, duration, startDate, startJudgeCode, startJudge, startStateCode, startStateTag, startPhase, processSubjectCode, processSubject, startSection, processFinished, nextDate, nextEventId])
-    if len(statesSequence) == 0 or currStateTag != statesSequence[-1]:
+    if len(statesSequence) == 0 or currStateTag not in statesSequence:
         statesSequence.append(currStateTag)
     return [statesDuration, statesSequence]
 

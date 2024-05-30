@@ -8,13 +8,13 @@ def pageLayout():
         ds.dcc.Link('Home', href = '/'),
         ds.html.H2('Parametri'),
         ds.dcc.Link('Stati', href = '/preference/statepreference'),
-        ds.html.Br(),
-        ds.dcc.Link('Eventi', href = '/preference/eventpreference'),
-        ds.html.Br(),
-        ds.dcc.Link('Giudici', href = '/preference/judgepreference'),
-        ds.html.Br(),
-        ds.dcc.Link('Udienze', href = '/preference/courthearingpreference'),
-        ds.html.Br(),
-        ds.dcc.Link('Materie', href = '/preference/subjectgpreference')
+        #ds.html.Br(),
+        #ds.dcc.Link('Eventi', href = '/preference/eventpreference'),
+        #ds.html.Br(),
+        #ds.dcc.Link('Giudici', href = '/preference/judgepreference'),
+        #ds.html.Br(),
+        #ds.dcc.Link('Udienze', href = '/preference/courthearingpreference'),
+        #ds.html.Br(),
+        #ds.dcc.Link('Materie', href = '/preference/subjectgpreference')
     ])
     return layout

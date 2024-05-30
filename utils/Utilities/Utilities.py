@@ -8,15 +8,18 @@ import utils.Dataframe as frame
 import utils.FileOperation as file
 
 # create map to decide color based on event or state phase.
-def phaseColorMap(tag, filename):
+def phaseColorMap(tag, filename, isKey):
     colors = file.getDataFromJsonFile('utils/utilities/phaseColors.json')
     phaseTag = getTagName("phaseTag")
     mapList = file.getDataFromTextFile(filename)
     mapList = mapList[0]
     map = {}
-    for t in mapList.values():
-        key = t[tag]
-        phase = t[phaseTag]
+    for t in mapList.keys():
+        if isKey:
+            key = str(t)
+        else:
+            key = str(mapList.get(t)[tag])
+        phase = mapList.get(t)[phaseTag]
         map.update({key: colors.get(str(phase))})
     return map
 

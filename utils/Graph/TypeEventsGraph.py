@@ -49,7 +49,7 @@ def updateTypeDataBySelection(df, df_data, sections, subjects, judges, finished)
     return [sections, subjects, judges, finished]
 
 # update type events based on user choice.
-def typeEventUpdate(df, filename, type, typeChoice, tagChoice, first, avg, text, sections, subjects, judges, finished):
+def typeEventUpdate(df, filename, isKey, type, typeChoice, tagChoice, first, avg, text, sections, subjects, judges, finished):
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
     firstTag = utilities.getPlaceholderName("first")
@@ -64,7 +64,7 @@ def typeEventUpdate(df, filename, type, typeChoice, tagChoice, first, avg, text,
     [sections, subjects, judges, finished] = updateTypeDataBySelection(df_temp, df_data, sections, subjects, judges, finished)
     [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df_data, tagChoice, avg)   
     xticks = frame.getUniques(allData, tagChoice)
-    colorMap = utilities.phaseColorMap(tagChoice, filename)
+    colorMap = utilities.phaseColorMap(tagChoice, filename, isKey)
     fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Durata', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
     fig.add_traces(
         px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = 'black').data
@@ -82,18 +82,18 @@ def typeEventUpdate(df, filename, type, typeChoice, tagChoice, first, avg, text,
     return [fig, sections, subjects, judges, finished]
 
 # update type events based on user choice.
-def typeSequenceUpdate(df, filename, typeChoice, tagChoice, avg, text, sections, subjects, judges, finished):
+def typeSequenceUpdate(df, filename, isKey, typeChoice, tagChoice, avg, text, sections, subjects, judges, finished):
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
     df_temp = df.copy()
-    df_temp = frame.selectFollowingRows(df_temp, tagChoice, typeChoice)  
-    df_data = updateTypeData(df_temp, sections, subjects, judges, finished)  
+    df_temp = frame.selectFollowingRows(df_temp, tagChoice, typeChoice)   
+    df_data = updateTypeData(df_temp, sections, subjects, judges, finished) 
     [sections, subjects, judges, finished] = updateTypeDataBySelection(df_temp, df_data, sections, subjects, judges, finished)
     [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df_data, tagChoice, avg)
     xticks = frame.getUniques(allData, tagChoice)
-    colorMap = utilities.phaseColorMap(tagChoice, filename)
+    colorMap = utilities.phaseColorMap(tagChoice, filename, isKey)
     fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Durata', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
     fig.add_traces(
         px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = 'black').data

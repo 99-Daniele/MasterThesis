@@ -328,7 +328,7 @@ def typeComparationUpdate(df, filename, typeChoice, avgChoice, dateType, startDa
         xticks = frame.getUniques(allData, type)
         [dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle] = hideAll()
         [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(df_temp, df_temp, startDate, endDate, sections, subjects, judges, finished)
-        colorMap = utilities.phaseColorMap(type, filename)
+        colorMap = utilities.phaseColorMap(type, filename, False)
         fig = px.box(allData, x = type, y = durationTag, color = type, color_discrete_map = colorMap, labels = {durationTag:'Durata ' + type[0:-1] + 'i del processo [giorni]', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
         fig.add_traces(
             px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = 'black').data

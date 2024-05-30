@@ -13,7 +13,11 @@ import utils.utilities.Utilities as utilities
 df = getter.getEventsDuration()
 codeEventTag = utilities.getTagName('codeEventTag')
 codeStateTag = utilities.getTagName('codeStateTag')
-df = frame.keepOnlyRelevant(df, 0.005, codeStateTag)
+eventTag = utilities.getTagName('eventTag')
+stateTag = utilities.getTagName('stateTag')
+eventTagChoice = eventTag
+stateTagChoice = stateTag
+df = frame.keepOnlyRelevant(df, 0.005, stateTagChoice)
 
 # return initial layout of page.
 def pageLayout():
@@ -21,13 +25,13 @@ def pageLayout():
     avgTag = utilities.getTagName('avgTag')
     first = utilities.getPlaceholderName('first')
     median = utilities.getPlaceholderName('median')
-    phase = utilities.getPlaceholderName('phase')
+    state = utilities.getPlaceholderName('state')
     text = utilities.getPlaceholderName('text')
     judge = utilities.getPlaceholderName('judge') 
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     subject = utilities.getPlaceholderName('subject')  
-    types = frame.getGroupBy(df, codeStateTag)
+    types = frame.getGroupBy(df, stateTagChoice)
     finishedTag = utilities.getTagName('finishedTag') 
     judgeTag = utilities.getTagName('judgeTag') 
     median = utilities.getPlaceholderName('median') 
@@ -45,7 +49,7 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici tipo eventi', href='/typeevent'),
         ds.html.H2('EVENTI STATO'),
-        ds.dcc.Dropdown(types, value = "UT", multi = False, searchable = True, clearable = False, id = 'type-dropdown-se', placeholder = phase, style = {'width': 400}),
+        ds.dcc.Dropdown(types, value = types[0], multi = False, searchable = True, clearable = False, id = 'type-dropdown-se', placeholder = state, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-se', placeholder = section, style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-se', placeholder = subject, style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-se', placeholder = judge, style = {'width': 400}),
@@ -76,4 +80,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(state, display, avg, text, section, subject, judge, finished):
-    return typeEvent.typeEventUpdate(df, 'preferences/eventsName.json', codeStateTag, state, codeEventTag, display, avg, text, section, subject, judge, finished)
+    return typeEvent.typeEventUpdate(df, 'preferences/eventsName.json', False, stateTagChoice, state, eventTagChoice, display, avg, text, section, subject, judge, finished)

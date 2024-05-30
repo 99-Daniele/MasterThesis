@@ -11,7 +11,6 @@ import utils.utilities.Utilities as utilities
 
 # get dataframe with all events duration.
 df = getter.getPhasesDuration()
-codeStateTag = utilities.getTagName('codeStateTag')
 phaseTag = utilities.getTagName('phaseTag')
 
 # return initial layout of page.
@@ -71,4 +70,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(phase, avg, text, section, subject, judge, finished):
-    return typeEvent.typeSequenceUpdate(df, 'preferences/statesName.json', phase, phaseTag, avg, text, section, subject, judge, finished)
+    return typeEvent.typeSequenceUpdate(df, 'preferences/statesName.json', False, phase, phaseTag, avg, text, section, subject, judge, finished)

@@ -120,7 +120,7 @@ def displayEventSequence():
     app.run_server(debug = True)
 
 # display state names.
-def displayStateNames():
+def displayStatePreferences():
     import pages.preference.StatePreference as statePreferencePage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -129,7 +129,7 @@ def displayStateNames():
     app.run_server(debug = True)
 
 # display court hearing names.
-def displayCourtHearingNames():
+def displayCourtHearingPreferences():
     import pages.preference.CourtHearingPreference as courtHearingPreferencePage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -138,7 +138,7 @@ def displayCourtHearingNames():
     app.run_server(debug = True)
 
 # display event names.
-def displayEventNames():
+def displayEventPreferences():
     import pages.preference.EventPreference as eventPreferencePage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -147,7 +147,7 @@ def displayEventNames():
     app.run_server(debug = True)
 
 # display judge names.
-def displayJudgeNames():
+def displayJudgePreferences():
     import pages.preference.JudgePreference as judgePreferencePage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -156,7 +156,7 @@ def displayJudgeNames():
     app.run_server(debug = True)
 
 # display subject names.
-def displaySubjectNames():
+def displaySubjectPreferences():
     import pages.preference.SubjectPreference as subjectPreferencePage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
