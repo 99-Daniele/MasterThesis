@@ -78,4 +78,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
-    return event.eventUpdate(df, 'preferences/eventsName.txt', startDate, endDate, eventTag, mustEvents, minDate, maxDate, sections, subjects, judges)
+    return event.eventUpdate(df, 'preferences/eventsName.json', startDate, endDate, eventTag, mustEvents, minDate, maxDate, sections, subjects, judges)

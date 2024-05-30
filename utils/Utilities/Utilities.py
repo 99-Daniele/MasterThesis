@@ -12,10 +12,12 @@ def phaseColorMap(tag, filename):
     colors = file.getDataFromJsonFile('utils/utilities/phaseColors.json')
     phaseTag = getTagName("phaseTag")
     mapList = file.getDataFromTextFile(filename)
-    mapList = list(mapList[0])
+    mapList = mapList[0]
     map = {}
-    for m in mapList:
-        map.update({m[tag]: colors.get(str(m[phaseTag]))})
+    for t in mapList.values():
+        key = t[tag]
+        phase = t[phaseTag]
+        map.update({key: colors.get(str(phase))})
     return map
 
 # change phase dataframe from gievn file.

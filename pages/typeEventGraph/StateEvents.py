@@ -76,4 +76,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(state, display, avg, text, section, subject, judge, finished):
-    return typeEvent.typeEventUpdate(df, 'preferences/eventsName.txt', codeStateTag, state, codeEventTag, display, avg, text, section, subject, judge, finished)
+    return typeEvent.typeEventUpdate(df, 'preferences/eventsName.json', codeStateTag, state, codeEventTag, display, avg, text, section, subject, judge, finished)

@@ -80,8 +80,8 @@ def pageLayout():
 def updateOutput(state, display, tagChoice, avg, text, section, subject, judge, finished):
     if tagChoice == codeEventTag:
         df = getter.getEventsDuration()
-        filename = 'preferences/eventsName.txt'
+        filename = 'preferences/eventsName.json'
     else:
         df = getter.getStatesDuration()
-        filename = 'preferences/statesName.txt'
+        filename = 'preferences/statesName.json'
     return typeEvent.typeEventUpdate(df, filename, phaseTag, state, tagChoice, display, avg, text, section, subject, judge, finished)

@@ -168,8 +168,8 @@ def updateEventsDataframe(eventsDataframe, eventsName, judgesName, statesName, s
     eventsDataframeCompleteStatePhase = frame.joinDataframe(eventsDataframeComplete, statesName, codeStateTag, phaseTag, None)
     updateAllEventsDataframe(eventsDataframeCompleteEventPhase, endPhase, dateTag, numEventTag, numProcessTag, phaseTag)
     updateImportantEventsDataframe(eventsDataframeCompleteEventPhase, endPhase, dateTag, eventTag, numEventTag, numProcessTag, phaseTag)
-    updateCourtHearingEventsDataframe(eventsDataframeCompleteEventPhase, endPhase, dateTag, eventTag, numEventTag, numProcessTag, phaseTag)
-    updateStateEventsDataframe(eventsDataframeCompleteStatePhase, endPhase, dateTag, stateTag, numEventTag, numProcessTag, phaseTag)
+    updateCourtHearingEventsDataframe(eventsDataframeCompleteEventPhase, endPhase, dateTag, numEventTag, numProcessTag, phaseTag, stateTag)
+    updateStateEventsDataframe(eventsDataframeCompleteStatePhase, endPhase, dateTag, stateTag, numEventTag, numProcessTag, stateTag)
     updatePhaseEventsDataframe(eventsDataframeCompleteStatePhase, endPhase, dateTag, numEventTag, numProcessTag, phaseTag)
 
 # update all events dataframe.
