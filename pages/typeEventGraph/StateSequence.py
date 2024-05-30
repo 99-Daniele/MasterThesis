@@ -15,6 +15,7 @@ codeStateTag = utilities.getTagName('codeStateTag')
 df = frame.keepOnlyRelevant(df, 0.005, codeStateTag)
 stateTag = utilities.getTagName('stateTag')
 stateTagChoice = stateTag
+isKey = False
 
 # return initial layout of page.
 def pageLayout():
@@ -73,4 +74,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(state, avg, text, section, subject, judge, finished):
-    return typeEvent.typeSequenceUpdate(df, 'preferences/statesName.json', False, state, stateTagChoice, avg, text, section, subject, judge, finished)
+    return typeEvent.typeSequenceUpdate(df, 'preferences/statesName.json', isKey, state, stateTagChoice, avg, text, section, subject, judge, finished)

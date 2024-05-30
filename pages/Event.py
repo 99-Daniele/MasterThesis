@@ -13,6 +13,8 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Eventi fasi', href = '/eventgraph/phaseevents'),
         ds.html.Br(),
-        ds.dcc.Link('Eventi stati', href = '/eventgraph/stateevents')
+        ds.dcc.Link('Eventi stati', href = '/eventgraph/stateevents'),
+        ds.html.Br(),
+        ds.dcc.Link('Eventi udienze', href = '/eventgraph/courthearingevents')
     ])
     return layout

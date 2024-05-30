@@ -198,31 +198,27 @@ def getStateNamesDataframe():
 
 # get events name dataframe.
 def getEventNamesDataframe():
+    codeEventTag = utilities.getTagName("codeEventTag")
     eventDurationDataframe = getEventsDuration()
-    eventNames = connect.getDataFromDatabase(connection, eventsNamesQuery)
-    df = frame.createEventNameDataframe(eventNames)
-    return df
-
-# get events name dataframe with info.
-def getEventNamesDataframeWithInfo():
-    eventDurationDataframe = getEventsDuration()
-    eventNames = connect.getDataFromDatabase(connection, eventsNamesQuery)
-    eventNamesDataframe = frame.createEventNameDataframe(eventNames)
+    eventsName = file.getDataFromJsonFile('preferences/eventsName.json')
+    eventNamesDataframe = pd.DataFrame.from_dict(eventsName, orient = 'index').reset_index().rename(columns = {'index': codeEventTag})
     df = frame.createEventNameDataframeWithInfo(eventDurationDataframe, eventNamesDataframe)
     return df
 
 # get judge name dataframe.
 def getJudgeNamesDataframe():
+    codeJudgeTag = utilities.getTagName("codeJudgeTag")
     processDurationDataframe = getProcessesDuration()
-    judgeNames = connect.getDataFromDatabase(connection, judgeNamesQuery)
-    judgeNamesDataframe = frame.createJudgeNameDataframe(judgeNames)
-    df = frame.createJudgeNameDataframeWithInfo(processDurationDataframe, judgeNamesDataframe)
+    judgesName = file.getDataFromJsonFile('preferences/judgesName.json')
+    judgesNameDataframe = pd.DataFrame.from_dict(judgesName, orient = 'index').reset_index().rename(columns = {'index': codeJudgeTag})
+    df = frame.createJudgeNameDataframeWithInfo(processDurationDataframe, judgesNameDataframe)
     return df
 
 # get subject name dataframe.
 def getSubjectNamesDataframe():
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
     processDurationDataframe = getProcessesDuration()
-    subjectNames = connect.getDataFromDatabase(connection, subjectNamesQuery)
-    subjectNamesDataframe = frame.createSubjectNameDataframe(subjectNames)
-    df = frame.createSubjectNameDataframeWithInfo(processDurationDataframe, subjectNamesDataframe)
+    subjectsName = file.getDataFromJsonFile('preferences/subjectsName.json')
+    subjectsNameDataframe = pd.DataFrame.from_dict(subjectsName, orient = 'index').reset_index().rename(columns = {'index': codeSubjectTag})
+    df = frame.createSubjectNameDataframeWithInfo(processDurationDataframe, subjectsNameDataframe)
     return df

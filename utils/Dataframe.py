@@ -81,16 +81,6 @@ def createStateNameDataframeWithInfo(statesDuration, stateNames):
     result = result.sort_values([codeStateTag]).reset_index(drop = True)
     return result
 
-# from event names list create event names dataframe.
-def createEventNameDataframe(eventNames):
-    codeEventTag = utilities.getTagName('codeEventTag')
-    descrTag = utilities.getTagName('descriptionTag')
-    eventTag = utilities.getTagName('eventTag')
-    phaseTag = utilities.getTagName('phaseTag')
-    df = pd.DataFrame(eventNames, columns = [codeEventTag, descrTag, eventTag, phaseTag])
-    df[codeEventTag] = df[codeEventTag].astype(str)
-    return df
-
 # from event names list create event names dataframe with info.
 def createEventNameDataframeWithInfo(eventsDuration, eventNames):
     countTag = utilities.getTagName('countTag')
@@ -107,14 +97,6 @@ def createEventNameDataframeWithInfo(eventsDuration, eventNames):
     result = result.sort_values([codeEventTag]).reset_index(drop = True)
     return result
 
-# from judge names list create judge names dataframe.
-def createJudgeNameDataframe(judgeNames):
-    codeJudgeTag = utilities.getTagName('codeJudgeTag')
-    judgeTag = utilities.getTagName('judgeTag')
-    df = pd.DataFrame(judgeNames, columns = [codeJudgeTag, judgeTag])
-    df[codeJudgeTag] = df[codeJudgeTag].astype(str)
-    return df
-
 # from judge names list create judges names dataframe with info.
 def createJudgeNameDataframeWithInfo(processDuration, judgeNames):
     countTag = utilities.getTagName('countTag')
@@ -130,16 +112,6 @@ def createJudgeNameDataframeWithInfo(processDuration, judgeNames):
     result = result.fillna(0)
     result = result.sort_values([judgeTag]).reset_index(drop = True)
     return result
-
-# from subject names list create subjects names dataframe.
-def createSubjectNameDataframe(subjectNames):
-    codeSubjectTag = utilities.getTagName('codeSubjectTag')
-    descriptionTag = utilities.getTagName('descriptionTag')
-    ritualTag = utilities.getTagName('ritualTag')
-    tagTag = utilities.getTagName('tagTag')
-    df = pd.DataFrame(subjectNames, columns = [codeSubjectTag, descriptionTag, ritualTag, tagTag])
-    df[codeSubjectTag] = df[codeSubjectTag].astype(str)
-    return df
 
 # from subject names list create subjects names dataframe with info.
 def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
@@ -294,7 +266,7 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
     while i < len(types):
         df3[filterTag] = df3[filterTag].astype(str) + " - " + df4[types[i]].astype(str)
         i = i + 1
-    #df3 = keepOnlyImportant(df3, 0.9)
+    #df3 = keepOnlyImportant(df3, 0.75, 10)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
     order_dict = df3.set_index(filterTag)[order].to_dict()
     order_list = df3[filterTag].tolist()
@@ -395,7 +367,7 @@ def keepOnlyRelevant(df, perc, tag):
     return df[df[tag].isin(relevant)]
 
 # reduce dataframe to a number of rows such that they cover at least given percentage.
-def keepOnlyImportant(df, perc):
+def keepOnlyImportant(df, perc, minNumber):
     countTag = utilities.getTagName('countTag')
     df_temp = df.copy()
     totCount = df_temp[countTag].sum()
@@ -405,7 +377,7 @@ def keepOnlyImportant(df, perc):
     sum = 0
     if df_temp[countTag].items() == None:
         return df
-    while (i < 15 or sum < threshold) and i < len(list(df_temp[countTag].items())):
+    while (i < minNumber or sum < threshold) and i < len(list(df_temp[countTag].items())):
         sum = sum + list(df_temp[countTag].items())[i][1]
         i = i + 1
     while i < len(list(df_temp[countTag].items())):

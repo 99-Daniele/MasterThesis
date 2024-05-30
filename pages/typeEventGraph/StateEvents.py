@@ -17,6 +17,7 @@ eventTag = utilities.getTagName('eventTag')
 stateTag = utilities.getTagName('stateTag')
 eventTagChoice = eventTag
 stateTagChoice = stateTag
+isKey = False
 df = frame.keepOnlyRelevant(df, 0.005, stateTagChoice)
 
 # return initial layout of page.
@@ -80,4 +81,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(state, display, avg, text, section, subject, judge, finished):
-    return typeEvent.typeEventUpdate(df, 'preferences/eventsName.json', False, stateTagChoice, state, eventTagChoice, display, avg, text, section, subject, judge, finished)
+    return typeEvent.typeEventUpdate(df, 'preferences/eventsName.json', isKey, stateTagChoice, state, eventTagChoice, display, avg, text, section, subject, judge, finished)

@@ -14,6 +14,7 @@ def start():
     import pages.comparationGraph.ProcessComparation as processComparationPage
     import pages.comparationGraph.StateComparation as stateComparationPage
     import pages.eventGraph.AllEventsScatter as allEventsPage
+    import pages.eventGraph.CourtHearingEventsScatter as courtHearingEventsPage
     import pages.eventGraph.ImportantEventsScatter as importantEventsPage
     import pages.eventGraph.PhaseEventsScatter as phaseEventsPage
     import pages.eventGraph.StateEventsScatter as stateEventsPage
@@ -57,6 +58,8 @@ def start():
                 return stateComparationPage.pageLayout()
             case '/eventgraph/allevents':
                 return allEventsPage.pageLayout()
+            case '/eventgraph/courthearingevents':
+                return courtHearingEventsPage.pageLayout()
             case '/eventgraph/importantevents':
                 return importantEventsPage.pageLayout()
             case '/eventgraph/phaseevents':

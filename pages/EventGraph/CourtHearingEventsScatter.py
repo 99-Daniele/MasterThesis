@@ -1,4 +1,4 @@
-# this page shows important events.
+# this page shows court hearing events.
 
 import dash as ds
 import datetime as dt
@@ -12,11 +12,11 @@ import utils.utilities.Utilities as utilities
 
 # get dataframe with important events. 
 # get must events from text file.
-df = getter.getImportantEvents()
+df = getter.getCourtHearingsEvents()
 try:
-    mustEvents = file.getDataFromTextFile('preferences/mustEvents.txt')
+    courtHearingEvents = file.getDataFromTextFile('preferences/courtHearingsEvents.txt')
 except:
-    mustEvents = None
+    courtHearingEvents = None
 eventTag = utilities.getTagName('eventTag')
 
 # return initial layout of page.
@@ -41,9 +41,9 @@ def pageLayout():
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
         ds.dcc.Link('Grafici eventi', href='/eventgraph'),
-        ds.html.H2('EVENTI IMPORTANTI DEL PROCESSO'),
+        ds.html.H2('EVENTI UDIENZE DEL PROCESSO'),
         ds.dcc.DatePickerRange(
-            id = 'event-dateranger-ies',
+            id = 'event-dateranger-ches',
             start_date = maxDateStart,
             end_date = maxDateEnd,
             min_date_allowed = df[dateTag].min(),
@@ -51,31 +51,31 @@ def pageLayout():
             display_format = 'DD MM YYYY',
             style = {'width': 300}
         ),
-        ds.html.Button("RESET", id = 'reset-button-ies'),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-ies', placeholder = section, style = {'width': 400}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-ies', placeholder = subject, style = {'width': 400}, optionHeight = 80),
-        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-ies', placeholder = judge, style = {'width': 400}),
-        ds.dcc.Graph(figure = fig, id = 'events-graph-ies')
+        ds.html.Button("RESET", id = 'reset-button-ches'),
+        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-ches', placeholder = section, style = {'width': 400}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-ches', placeholder = subject, style = {'width': 400}, optionHeight = 80),
+        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-ches', placeholder = judge, style = {'width': 400}),
+        ds.dcc.Graph(figure = fig, id = 'events-graph-ches')
     ])
     return layout
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('events-graph-ies', 'figure'),
-        ds.Output('event-dateranger-ies', 'start_date'), 
-        ds.Output('event-dateranger-ies', 'end_date'),
-        ds.Output('section-dropdown-ies', 'options'),
-        ds.Output('subject-dropdown-ies', 'options'),
-        ds.Output('judge-dropdown-ies', 'options')],
-    [ds.Input('event-dateranger-ies', 'start_date'), 
-        ds.Input('event-dateranger-ies', 'end_date'), 
-        ds.Input('event-dateranger-ies', 'min_date_allowed'), 
-        ds.Input('event-dateranger-ies', 'max_date_allowed'), 
-        ds.Input('reset-button-ies', 'n_clicks'),
-        ds.Input('section-dropdown-ies', 'value'),
-        ds.Input('subject-dropdown-ies', 'value'),
-        ds.Input('judge-dropdown-ies', 'value')])
+    [ds.Output('events-graph-ches', 'figure'),
+        ds.Output('event-dateranger-ches', 'start_date'), 
+        ds.Output('event-dateranger-ches', 'end_date'),
+        ds.Output('section-dropdown-ches', 'options'),
+        ds.Output('subject-dropdown-ches', 'options'),
+        ds.Output('judge-dropdown-ches', 'options')],
+    [ds.Input('event-dateranger-ches', 'start_date'), 
+        ds.Input('event-dateranger-ches', 'end_date'), 
+        ds.Input('event-dateranger-ches', 'min_date_allowed'), 
+        ds.Input('event-dateranger-ches', 'max_date_allowed'), 
+        ds.Input('reset-button-ches', 'n_clicks'),
+        ds.Input('section-dropdown-ches', 'value'),
+        ds.Input('subject-dropdown-ches', 'value'),
+        ds.Input('judge-dropdown-ches', 'value')])
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
-    return event.eventUpdate(df, 'preferences/eventsName.json', startDate, endDate, eventTag, mustEvents, minDate, maxDate, sections, subjects, judges)
+    return event.eventUpdate(df, 'preferences/eventsName.json', startDate, endDate, eventTag, courtHearingEvents, minDate, maxDate, sections, subjects, judges)

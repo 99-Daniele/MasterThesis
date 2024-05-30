@@ -41,7 +41,7 @@ def pageLayout():
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
         ds.dcc.Link('Grafici eventi', href='/eventgraph'),
-        ds.html.H2('TUTTI GLI EVENTI DEL PROCESSO'),
+        ds.html.H2('EVENTI INIZIO STATO DEL PROCESSO'),
         ds.dcc.DatePickerRange(
             id = 'event-dateranger-ses',
             start_date = maxDateStart,

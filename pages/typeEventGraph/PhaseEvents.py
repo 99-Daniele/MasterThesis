@@ -10,7 +10,8 @@ import utils.graph.TypeEventsGraph as typeEvent
 import utils.utilities.Utilities as utilities
 
 # get dataframe with all events duration.
-df = getter.getEventsDuration()
+df = getter.getStatesDuration()
+code = utilities.getPlaceholderName('code')
 codeEventTag = utilities.getTagName('codeEventTag')
 codeStateTag = utilities.getTagName('codeStateTag')
 eventTag = utilities.getTagName('eventTag')
@@ -18,6 +19,7 @@ stateTag = utilities.getTagName('stateTag')
 phaseTag = utilities.getTagName('phaseTag')
 eventTagChoice = eventTag
 stateTagChoice = stateTag
+isKey = False
 
 # return initial layout of page.
 def pageLayout():
@@ -30,7 +32,8 @@ def pageLayout():
     judge = utilities.getPlaceholderName('judge') 
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
-    subject = utilities.getPlaceholderName('subject')  
+    subject = utilities.getPlaceholderName('subject') 
+    tag = utilities.getPlaceholderName('tag') 
     types = frame.getGroupBy(df, phaseTag)
     finishedTag = utilities.getTagName('finishedTag') 
     judgeTag = utilities.getTagName('judgeTag') 
@@ -57,6 +60,7 @@ def pageLayout():
         ds.dcc.RadioItems([first, all], value = all, id = 'display-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([eventTagChoice, stateTagChoice], value = eventTagChoice, id = 'choice-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.RadioItems([code, tag], value = tag, id = 'tag-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Checklist([text], value = [text], id = 'text-checklist-phe'),
         ds.dcc.Graph(id = 'typeevent-graph-phe', figure = fig)
     ])
@@ -73,6 +77,7 @@ def pageLayout():
         ds.Input('display-radioitem-phe', 'value'),
         ds.Input('choice-radioitem-phe', 'value'),
         ds.Input('avg-radioitem-phe', 'value'),
+        ds.Input('tag-radioitem-phe', 'value'),
         ds.Input('text-checklist-phe', 'value'),
         ds.Input('section-dropdown-phe', 'value'),
         ds.Input('subject-dropdown-phe', 'value'),
@@ -81,11 +86,11 @@ def pageLayout():
 )
 
 # return updated data based on user choice.
-def updateOutput(state, display, tagChoice, avg, text, section, subject, judge, finished):
+def updateOutput(state, display, tagChoice, avg, tag, text, section, subject, judge, finished):
     if tagChoice == eventTagChoice:
         df = getter.getEventsDuration()
         filename = 'preferences/eventsName.json'
     else:
         df = getter.getStatesDuration()
         filename = 'preferences/statesName.json'
-    return typeEvent.typeEventUpdate(df, filename, False, phaseTag, state, tagChoice, display, avg, text, section, subject, judge, finished)
+    return typeEvent.typeEventUpdate(df, filename, isKey, phaseTag, state, tagChoice, display, avg, text, section, subject, judge, finished)

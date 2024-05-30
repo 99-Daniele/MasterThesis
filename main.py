@@ -38,6 +38,15 @@ def displayStateEventsScatter():
     ])
     app.run_server(debug = True)
 
+# display court hearings events.
+def displayCourtHearingsEventsScatter():
+    import pages.eventGraph.CourtHearingEventsScatter as courtHearingEventsPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = courtHearingEventsPage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
 # display processes comparation graph.
 def displayProcessComparation():
     import pages.comparationGraph.ProcessComparation as processComparationPage
@@ -181,4 +190,4 @@ def refreshData():
 
 # action performed by main.
 if __name__ == '__main__':
-    displayProcessComparation()
+    refreshData()

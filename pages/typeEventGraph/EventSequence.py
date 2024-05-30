@@ -15,6 +15,7 @@ codeEventTag = utilities.getTagName('codeEventTag')
 df = frame.keepOnlyRelevant(df, 0.005, codeEventTag)
 eventTag = utilities.getTagName('eventTag')
 eventTagChoice = eventTag
+isKey = False
 
 # return initial layout of page.
 def pageLayout():
@@ -73,4 +74,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(event, avg, text, section, subject, judge, finished):
-    return typeEvent.typeSequenceUpdate(df, 'preferences/eventsName.json', False, event, eventTagChoice, avg, text, section, subject, judge, finished)
+    return typeEvent.typeSequenceUpdate(df, 'preferences/eventsName.json', isKey, event, eventTagChoice, avg, text, section, subject, judge, finished)

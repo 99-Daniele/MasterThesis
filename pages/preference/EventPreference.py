@@ -7,7 +7,7 @@ import utils.graph.TypeEventsPreference as typeEvents
 import utils.utilities.Utilities as utilities
 
 # get dataframe with events names. 
-df = getter.getEventNamesDataframeWithInfo()
+df = getter.getEventNamesDataframe()
 descriptionTag = utilities.getTagName('descriptionTag')
 countTag = utilities.getTagName('countTag')
 durationTag = utilities.getTagName('durationTag')
@@ -56,4 +56,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def update_dateframe(button, data):
-    return typeEvents.updateDatabase(data, df, [countTag, descriptionTag, durationTag], 'preferences/eventsName.json')
+    return typeEvents.updateDatabase(data, df, [countTag, durationTag], 'preferences/eventsName.json')
