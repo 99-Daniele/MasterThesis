@@ -13,10 +13,10 @@ def start():
     import pages.comparationGraph.PhaseComparation as phaseComparationPage
     import pages.comparationGraph.ProcessComparation as processComparationPage
     import pages.comparationGraph.StateComparation as stateComparationPage
-    import pages.eventGraph.AllEvents as allEventsPage
-    import pages.eventGraph.ImportantEvents as importantEventsPage
-    import pages.eventGraph.PhaseEvents as phaseEventsPage
-    import pages.eventGraph.StateEvents as stateEventsPage
+    import pages.eventGraph.AllEventsScatter as allEventsPage
+    import pages.eventGraph.ImportantEventsScatter as importantEventsPage
+    import pages.eventGraph.PhaseEventsScatter as phaseEventsPage
+    import pages.eventGraph.StateEventsScatter as stateEventsPage
     #import pages.preference.CourtHearingPreference as courtHearingPreferencePage
     import pages.preference.EventPreference as eventPreferencePage
     import pages.preference.JudgePreference as judgePreferencePage

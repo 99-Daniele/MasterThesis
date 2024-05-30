@@ -4,7 +4,7 @@ import dash as ds
 
 # display all events.
 def displayAllEventsScatter():
-    import pages.eventGraph.AllEvents as allEventsPage
+    import pages.eventGraph.AllEventsScatter as allEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = allEventsPage.pageLayout())
@@ -13,7 +13,7 @@ def displayAllEventsScatter():
 
 # display important events.
 def displayImportantEventsScatter():
-    import pages.eventGraph.ImportantEvents as importantEventsPage
+    import pages.eventGraph.ImportantEventsScatter as importantEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = importantEventsPage.pageLayout())
@@ -22,7 +22,7 @@ def displayImportantEventsScatter():
 
 # display phase events.
 def displayPhaseEventsScatter():
-    import pages.eventGraph.PhaseEvents as phaseEventsPage
+    import pages.eventGraph.PhaseEventsScatter as phaseEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = phaseEventsPage.pageLayout())
@@ -31,7 +31,7 @@ def displayPhaseEventsScatter():
 
 # display state events.
 def displayStateEventsScatter():
-    import pages.eventGraph.StateEvents as stateEventsPage
+    import pages.eventGraph.StateEventsScatter as stateEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = stateEventsPage.pageLayout())
