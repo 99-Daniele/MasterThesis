@@ -16,7 +16,7 @@ def hideChosen(choices, tags, styles, parameters):
 
 # return the style of dropdown as hidden or not based on user choices: if user choices one, then corresponding dropdown will be hidden and his values will reset.
 # this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
-def hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, event):
+def hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, event, state, phase):
     judgeStyle = {'width': 400}
     sectionStyle = {'width': 400}
     subjectStyle = {'width': 400}
@@ -25,6 +25,10 @@ def hideProcessChosen(choices, sections, subjects, judges, finished, sequences, 
     phaseSequenceStyle = {'width': 400}
     eventStyle = {'width': 400}
     eventRadioStyle = {'display': 'contents'}
+    stateStyle = {'width': 400}
+    stateRadioStyle = {'display': 'contents'}
+    phaseStyle = {'width': 400}
+    phaseRadioStyle = {'display': 'contents'}
     finishedTag = utilities.getTagName('finishedTag')
     judgeTag = utilities.getTagName('judgeTag')
     phaseSequenceTag = utilities.getTagName('phaseSequenceTag')
@@ -38,7 +42,19 @@ def hideProcessChosen(choices, sections, subjects, judges, finished, sequences, 
         eventStyle = {'display': 'none'}
         eventRadioStyle = {'display': 'none'}
         event = None
-    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event]
+    if state == None:
+        stateRadioStyle = {'display': 'none'}
+    elif state in choices:
+        stateStyle = {'display': 'none'}
+        stateRadioStyle = {'display': 'none'}
+        state = None
+    if phase == None:
+        phaseRadioStyle = {'display': 'none'}
+    elif phase in choices:
+        phaseStyle = {'display': 'none'}
+        phaseRadioStyle = {'display': 'none'}
+        phase = None
+    return [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, stateStyle, stateRadioStyle, phaseStyle, phaseRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, state, phase]
 
 # show all hidden object such as dropdown, radioitem, checklist.
 def showAll():
@@ -68,13 +84,15 @@ def hideAll():
 
 # update data base on user choices on different parameters.
 # this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
-def updateProcessData(df, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio):
+def updateProcessData(df, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio, stateChoice, stateRadio, phaseChoice, phaseRadio):
     dateTag = utilities.getTagName("dateTag")
     eventTag = utilities.getTagName("eventTag")
     finishedTag = utilities.getTagName("finishedTag")
     judgeTag = utilities.getTagName("judgeTag")
+    phaseTag = utilities.getTagName("phaseTag")
     phaseSequenceTag = utilities.getTagName("phaseSequenceTag")
     sectionTag = utilities.getTagName("sectionTag")
+    stateTag = utilities.getTagName("stateTag")
     stateSequenceTag = utilities.getTagName("stateSequenceTag")
     subjectTag = utilities.getTagName("subjectTag")
     withOut = utilities.getPlaceholderName("without")
@@ -92,6 +110,18 @@ def updateProcessData(df, startDate, endDate, sections, subjects, judges, finish
             return df_temp[df_temp[eventTag] == withOut + " " + eventChoice]
         else:
             return df_temp[df_temp[eventTag] != withOut + " " + eventChoice]
+    if stateChoice != None:
+        df_temp = frame.getStateDataFrame(df_temp, stateChoice)
+        if stateRadio == withOut:
+            return df_temp[df_temp[stateTag] == withOut + " " + stateChoice]
+        else:
+            return df_temp[df_temp[stateTag] != withOut + " " + stateChoice]
+    if phaseChoice != None:
+        df_temp = frame.getPhaseDataFrame(df_temp, phaseChoice)
+        if phaseRadio == withOut:
+            return df_temp[df_temp[phaseTag] == withOut + " FASE " + phaseChoice]
+        else:
+            return df_temp[df_temp[phaseTag] != withOut + " FASE " + phaseChoice]
     return df_temp
 
 # update data base on user choices on different parameters.
@@ -113,8 +143,8 @@ def updateTypeData(df, startDate, endDate, sections, subjects, judges, finished)
 # update data base on user choices on different parameters. In order to do that is use 'updateProcessData' method with chosen parameter as None. 
 # this is done because if user wants to compare on chosen parameter, data must be updated without any filter on chosen parameter.
 # this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
-def updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio):
-    eventsTag = utilities.getTagName("eventSequenceTag")
+def updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio):
+    eventSequenceTag = utilities.getTagName("eventSequenceTag")
     finishedTag = utilities.getTagName("finishedTag")
     judgeTag = utilities.getTagName("judgeTag")
     phaseSequenceTag = utilities.getTagName("phaseSequenceTag")
@@ -122,41 +152,51 @@ def updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, se
     stateSequenceTag = utilities.getTagName("stateSequenceTag")
     subjectTag = utilities.getTagName("subjectTag")
     if sections != None and len(sections) > 0:
-        df_temp_1 = updateProcessData(df_temp, startDate, endDate, None, subjects, judges, finished, sequences, phaseSequences, event, eventRadio)
+        df_temp_1 = updateProcessData(df_temp, startDate, endDate, None, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio)
     else:
         df_temp_1 = df_data
     if subjects != None and len(subjects) > 0:
-        df_temp_2 = updateProcessData(df_temp, startDate, endDate, sections, None, judges, finished, sequences, phaseSequences, event, eventRadio)
+        df_temp_2 = updateProcessData(df_temp, startDate, endDate, sections, None, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio)
     else:
         df_temp_2 = df_data
     if judges != None and len(judges) > 0:
-        df_temp_3 = updateProcessData(df_temp, startDate, endDate, sections, subjects, None, finished, sequences, phaseSequences, event, eventRadio)
+        df_temp_3 = updateProcessData(df_temp, startDate, endDate, sections, subjects, None, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio)
     else:
         df_temp_3 = df_data
     if finished != None and len(finished) > 0:
-        df_temp_4 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, None, sequences, phaseSequences, event, eventRadio)
+        df_temp_4 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, None, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio)
     else:
         df_temp_4 = df_data
     if sequences != None and len(sequences) > 0:
-        df_temp_5 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, None, phaseSequences, event, eventRadio)
+        df_temp_5 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, None, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio)
     else:
         df_temp_5 = df_data
     if phaseSequences != None and len(phaseSequences) > 0:
-        df_temp_6 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, None, event, eventRadio)
+        df_temp_6 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, None, event, eventRadio, state, stateRadio, phase, phaseRadio)
     else:
         df_temp_6 = df_data
     if event != None and len(event) > 0:
-        df_temp_7 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, None, None)
+        df_temp_7 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, None, None, state, stateRadio, phase, phaseRadio)
     else:
         df_temp_7 = df_data
+    if state != None and len(state) > 0:
+        df_temp_8 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, None, None, phase, phaseRadio)
+    else:
+        df_temp_8 = df_data
+    if phase != None and len(phase) > 0:
+        df_temp_9 = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, None, None)
+    else:
+        df_temp_9 = df_data
     sections = frame.getGroupBy(df_temp_1, sectionTag)
     subjects = frame.getGroupBy(df_temp_2, subjectTag)
     judges = frame.getGroupBy(df_temp_3, judgeTag)
     finished = frame.getGroupBy(df_temp_4, finishedTag)
     sequences = frame.getGroupBy(df_temp_5, stateSequenceTag)
     phaseSequences = frame.getGroupBy(df_temp_6, phaseSequenceTag)
-    event = frame.getGroupByFromString(df_temp_7, eventsTag)
-    return [sections, subjects, judges, finished, sequences, phaseSequences, event]
+    event = frame.getGroupByFromString(df_temp_7, eventSequenceTag)
+    state = frame.getGroupByFromString(df_temp_8, phaseSequenceTag)
+    phase = frame.getGroupByFromString(df_temp_9, stateSequenceTag)
+    return [sections, subjects, judges, finished, sequences, phaseSequences, event, state, phase]
 
 # update data base on user choices on different parameters. In order to do that is use 'updateProcessData' method with chosen parameter as None. 
 # this is done because if user wants to compare on chosen parameter, data must be updated without any filter on chosen parameter.
@@ -190,20 +230,26 @@ def updateTypeDataframeFromSelection(df_temp, df_data, startDate, endDate, secti
 
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for process comparation graph.
-def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDate, maxDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, choices, choicesOptions, order, text):
+def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDate, maxDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio, choices, choicesOptions, order, text):
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         startDate = minDate
         endDate = maxDate
+    choicesOptions = choicesOptions[:6]
     if event != None:
         eventChoice = event
-        if len(choicesOptions) == 6:
-            choicesOptions.append(event)
-        else:
-            choicesOptions[-1] = event
+        choicesOptions.append(event)
     else:
         eventChoice = None
-        if len(choicesOptions) == 7:
-            choicesOptions.pop()
+    if state != None:
+        stateChoice = state
+        choicesOptions.append(state)
+    else:
+        stateChoice = None
+    if phase != None:
+        phaseChoice = phase
+        choicesOptions.append(phase)
+    else:
+        phaseChoice = None
     countTag = utilities.getTagName('countTag')
     dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
@@ -211,9 +257,9 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
     df_temp = df.copy()
-    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event] = hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice)
-    df_data = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio)
-    [sections, subjects, judges, finished, sequences, phaseSequences, event] = updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio)
+    [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, stateStyle, stateRadioStyle, phaseStyle, phaseRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, state, phase] = hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, stateChoice, phaseChoice)
+    df_data = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio)
+    [sections, subjects, judges, finished, sequences, phaseSequences, event, state, phase] = updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio, stateChoice, stateRadio, phaseChoice, phaseRadio)
     if choices == None or len(choices) == 0:
         orderRadioStyle = {'display': 'none'}
         [allData, avgData] = frame.getAvgStdDataFrameByDate(df_data, dateType, avgChoice)
@@ -232,10 +278,10 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
             )
         fig.update_layout(xaxis_tickvals = xticks)
         fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
-        return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choicesOptions
+        return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, stateStyle, stateRadioStyle, phaseStyle, phaseRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choicesOptions
     else:
         orderRadioStyle = {'display': 'block'}
-        [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, eventChoice)
+        [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, eventChoice, stateChoice, phaseChoice)
         xticks = frame.getUniques(allData, dateTag)
         if text == [textTag]:
             fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
@@ -257,7 +303,7 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != frame.addTotCountToName(allData, countTag) else False))
         fig.update_xaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
         fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
-        return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choicesOptions
+        return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, stateStyle, stateRadioStyle, phaseStyle, phaseRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choicesOptions
 
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for all comparation graphs except process ones.
@@ -326,7 +372,7 @@ def typeComparationUpdate(df, filename, typeChoice, avgChoice, dateType, startDa
             return fig, startDate, endDate, dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, title
         else:
             orderRadioStyle = {'display': 'block'}
-            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, None)
+            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, None, None, None)
             xticks = frame.getUniques(allData, dateTag)
             if text == [textTag]:
                 fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})

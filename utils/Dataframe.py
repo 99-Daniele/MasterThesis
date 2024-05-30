@@ -262,13 +262,15 @@ def getAvgTotDataframe(df, order_dict, avgChoice):
     return [df1, df2]
 
 # return data group by chosen data type and types.
-def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoice):
+def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoice, stateChoice, phaseChoice):
     avgTag = utilities.getTagName('avgTag')
     countTag = utilities.getTagName('countTag')
     dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
     eventTag = utilities.getTagName('eventTag')
     filterTag = utilities.getTagName('filterTag')
+    phaseTag = utilities.getTagName('phaseTag')
+    stateTag = utilities.getTagName('stateTag')
     if typesChoice == None or len(typesChoice) == 0:
         return None
     df5 = df.copy()
@@ -277,6 +279,14 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
         df5 = getEventDataFrame(df5, eventChoice)
         index = types.index(eventChoice)
         types[index] = eventTag
+    if stateChoice != None and stateChoice in types:
+        df5 = getStateDataFrame(df5, stateChoice)
+        index = types.index(stateChoice)
+        types[index] = stateTag
+    if phaseChoice != None and phaseChoice in types:
+        df5 = getPhaseDataFrame(df5, phaseChoice)
+        index = types.index(phaseChoice)
+        types[index] = phaseTag
     if avgChoice == avgTag:
         df4 = df5.groupby(types) \
             .agg({df5.columns[2]:'size', durationTag: 'mean'}) \
@@ -457,19 +467,19 @@ def getDateDataFrame(df, type, startDate, endDate):
     d = d[d[type] <= endDate]
     return d
 
-#return dataframe wos where event sequence contains or not a particular event
+# return dataframe where event sequence contains or not a particular event.
 def getEventDataFrame(df, event):
     if event == None:
         return df
     eventTag = utilities.getTagName('eventTag')
-    eventsTag = utilities.getTagName('eventSequenceTag')
+    eventSequenceTag = utilities.getTagName('eventSequenceTag')
     eventPhaseSequenceTag = utilities.getTagName("eventPhaseSequenceTag")
     phaseTag = utilities.getPlaceholderName("phase")
     withOut = utilities.getPlaceholderName("without")
     df_temp = df.copy()
-    df_temp[eventTag] = df_temp[eventsTag]
+    df_temp[eventTag] = df_temp[eventSequenceTag]
     for i, row in df_temp.iterrows():
-        eventSequence = utilities.fromStringToList(row[eventsTag])
+        eventSequence = utilities.fromStringToList(row[eventSequenceTag])
         eventPhaseSequence = utilities.fromStringToList(row[eventPhaseSequenceTag])
         try:
             eventIndex = eventSequence.index(event)
@@ -478,6 +488,46 @@ def getEventDataFrame(df, event):
         except:
             eventString = withOut + " " + event
         df_temp.at[i, eventTag] = eventString
+    return df_temp
+
+# return dataframe where state sequence contains or not a particular state.
+def getStateDataFrame(df, state):
+    if state == None:
+        return df
+    stateTag = utilities.getTagName('stateTag')
+    stateSequenceTag = utilities.getTagName('stateSequenceTag')
+    withTag = utilities.getPlaceholderName("with")
+    withOut = utilities.getPlaceholderName("without")
+    df_temp = df.copy()
+    df_temp[stateTag] = df_temp[stateSequenceTag]
+    for i, row in df_temp.iterrows():
+        stateSequence = utilities.fromStringToList(row[stateSequenceTag])
+        try:
+            stateSequence.index(state)
+            stateString = withTag + " " + state
+        except:
+            stateString = withOut + " " + state
+        df_temp.at[i, stateTag] = stateString
+    return df_temp
+
+# return dataframe where phase sequence contains or not a particular phase.
+def getPhaseDataFrame(df, phase):
+    if phase == None:
+        return df
+    phaseTag = utilities.getTagName('phaseTag')
+    phaseSequenceTag = utilities.getTagName('phaseSequenceTag')
+    withTag = utilities.getPlaceholderName("with")
+    withOut = utilities.getPlaceholderName("without")
+    df_temp = df.copy()
+    df_temp[phaseTag] = df_temp[phaseSequenceTag]
+    for i, row in df_temp.iterrows():
+        phaseSequence = utilities.fromStringToList(row[phaseSequenceTag])
+        try:
+            phaseSequence.index(phase)
+            phaseString = withTag + " FASE " + phase
+        except:
+            phaseString = withOut + " FASE " + phase
+        df_temp.at[i, phaseTag] = phaseString
     return df_temp
 
 # return unique years in given dataframe dates.

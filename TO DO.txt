@@ -2,8 +2,6 @@
 
 - sistemare preferences --> aggiungere nuova fase
 - nomi in inglese
-- filtro durata
-- selezione stati, eventi importanti
 
 - analisi limitata a inizio 2022
 - grafico eventi con primo evento per ogni fase --> buchi?

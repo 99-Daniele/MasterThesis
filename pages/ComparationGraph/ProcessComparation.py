@@ -25,12 +25,14 @@ def pageLayout():
     median = utilities.getPlaceholderName('median') 
     month = utilities.getPlaceholderName('month')
     monthYear = utilities.getPlaceholderName('monthYear') 
+    phase = utilities.getPlaceholderName('phase')
     phaseSequence = utilities.getPlaceholderName('phaseSequence')
     phaseSequenceTag = utilities.getTagName('phaseSequenceTag')
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     sectionTag = utilities.getTagName('sectionTag')
     sequence = utilities.getPlaceholderName('sequence')
+    state = utilities.getPlaceholderName('state')
     stateSequenceTag = utilities.getTagName('stateSequenceTag')
     subject = utilities.getPlaceholderName('subject')  
     subjectTag = utilities.getTagName('subjectTag') 
@@ -48,6 +50,8 @@ def pageLayout():
     sequences = frame.getGroupBy(df, stateSequenceTag)
     phaseSequences = frame.getGroupBy(df, phaseSequenceTag)
     events = frame.getGroupByFromString(df, eventSequenceTag)
+    states = frame.getGroupByFromString(df, stateSequenceTag)
+    phases = frame.getGroupByFromString(df, phaseSequenceTag)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([
@@ -77,7 +81,19 @@ def pageLayout():
             ds.dcc.Dropdown(events, multi = False, searchable = True, id = 'events-dropdown-pr', placeholder = eventSequence, style = {'width': 400}),
             ds.dcc.RadioItems([withTag, withOut], value = withTag, id = "events-radioitem-pr", inline = True, style = {'display': 'none'}, inputStyle = {'margin-left': "20px"})
             ],
-            style = {'display': 'inline-flex'}
+            style = {'display': 'inline-flex', 'width': '100%'}
+        ),
+        ds.html.Div(children = [
+            ds.dcc.Dropdown(states, multi = False, searchable = True, id = 'states-dropdown-pr', placeholder = state, style = {'width': 400}),
+            ds.dcc.RadioItems([withTag, withOut], value = withTag, id = "states-radioitem-pr", inline = True, style = {'display': 'none'}, inputStyle = {'margin-left': "20px"})
+            ],
+            style = {'display': 'inline-flex', 'width': '100%'}
+        ),
+        ds.html.Div(children = [
+            ds.dcc.Dropdown(phases, multi = False, searchable = True, id = 'phases-dropdown-pr', placeholder = phase, style = {'width': 400}),
+            ds.dcc.RadioItems([withTag, withOut], value = withTag, id = "phases-radioitem-pr", inline = True, style = {'display': 'none'}, inputStyle = {'margin-left': "20px"})
+            ],
+            style = {'display': 'inline-flex', 'width': '100%'}
         ),
         ds.dcc.Checklist([sectionTag, subjectTag, judgeTag, finishedTag, stateSequenceTag, phaseSequenceTag], value = [], id = "choice-checklist-pr", inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = "order-radioitem-pr", inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
@@ -99,6 +115,10 @@ def pageLayout():
         ds.Output('phaseSequence-dropdown-pr', 'style'),
         ds.Output('events-dropdown-pr', 'style'),
         ds.Output('events-radioitem-pr', 'style'),
+        ds.Output('states-dropdown-pr', 'style'),
+        ds.Output('states-radioitem-pr', 'style'),
+        ds.Output('phases-dropdown-pr', 'style'),
+        ds.Output('phases-radioitem-pr', 'style'),
         ds.Output('order-radioitem-pr', 'style'),
         ds.Output('section-dropdown-pr', 'options'),
         ds.Output('subject-dropdown-pr', 'options'),
@@ -123,6 +143,10 @@ def pageLayout():
         ds.Input('phaseSequence-dropdown-pr', 'value'),
         ds.Input('events-dropdown-pr', 'value'),
         ds.Input('events-radioitem-pr', 'value'),
+        ds.Input('states-dropdown-pr', 'value'),
+        ds.Input('states-radioitem-pr', 'value'),
+        ds.Input('phases-dropdown-pr', 'value'),
+        ds.Input('phases-radioitem-pr', 'value'),
         ds.Input('choice-checklist-pr', 'value'),
         ds.Input('choice-checklist-pr', 'options'),
         ds.Input('order-radioitem-pr', 'value'),
@@ -130,5 +154,5 @@ def pageLayout():
     )
 
 # return updated data based on user choice.
-def updateOutput(avgChoice, dateType, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, choices, choicesOptions, order, text):
-    return comparation.processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDate, maxDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, choices, choicesOptions, order, text)
+def updateOutput(avgChoice, dateType, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio, choices, choicesOptions, order, text):
+    return comparation.processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDate, maxDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio, choices, choicesOptions, order, text)

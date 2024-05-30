@@ -310,6 +310,7 @@ def getEventInfo(processEvents, eventsName, judgesName, statesName, subjectsName
     curr = events[-1]
     currDateDt = dt.datetime.strptime(curr[dateTag], '%Y-%m-%d %H:%M:%S')
     currEventCode = curr[codeEventTag]
+    currStateCode = curr[codeStateTag]
     currPhase = eventsName.get(currEventCode)[phaseTag]
     currEventTag = eventsName.get(currEventCode)[eventTag]
     if currPhase == endPhase:
@@ -318,14 +319,14 @@ def getEventInfo(processEvents, eventsName, judgesName, statesName, subjectsName
         currJudge = judgesName.get(currJudgeCode)[judgeTag]
         currDate = curr[dateTag]
         nextDate = next[dateTag]
-        currStateCode = curr[codeStateTag]
         currStateTag = statesName.get(currStateCode)[stateTag]
         currSection = curr[sectionTag]
         duration = 0
         eventsDuration.append([currEventId, processId, currEventCode, currEventTag, duration, currDate, currJudgeCode, currJudge, currStateCode, currStateTag, currPhase, processSubjectCode, processSubject, currSection, processFinished, currDate, currEventId])
     if len(eventsSequence) == 0 or currEventTag != eventsSequence[-1]:
         eventsSequence.append(currEventTag)
-        eventsPhaseSequence.append(currPhase)
+        currStatePhase = statesName.get(currStateCode)[phaseTag]
+        eventsPhaseSequence.append(currStatePhase)
     return [eventsDuration, eventsSequence, eventsPhaseSequence, processDuration, startDate, startEventId, endDate, endEventId]
 
 # return phases duration.
