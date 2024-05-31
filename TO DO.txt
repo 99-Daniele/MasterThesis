@@ -3,6 +3,8 @@
 - selezionare codice/etichetta
 - nomi in inglese
 - nomi eventi/stati ricavati dal dataframe
+- sistemare materia
+- quanti nella legenda?
 
 - verifica valore predetto
 - valore predetto sulla base di giudice, materia, sezione, data, carico processi giudice in quel momento

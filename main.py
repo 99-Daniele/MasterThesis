@@ -173,11 +173,6 @@ def displaySubjectPreferences():
     ])
     app.run_server(debug = True)
 
-# start app to allow user select graph to be displayed.
-def startApp():
-    import App as app
-    app.start()
-
 # refresh database and cache data.
 def restartData():
     import utils.DataUpdate as update
@@ -188,6 +183,11 @@ def refreshData():
     import utils.DataUpdate as update
     update.refreshData()
 
+# start app to allow user select graph to be displayed.
+def startApp():
+    import App as app
+    app.start()
+
 # action performed by main.
 if __name__ == '__main__':
-    refreshData()
+    startApp()

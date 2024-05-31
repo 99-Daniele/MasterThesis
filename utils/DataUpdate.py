@@ -59,6 +59,7 @@ def refreshData():
     codeStateTag = utilities.getTagName("codeStateTag")
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     dateTag = utilities.getTagName("dateTag")
+    descriptionTag =  utilities.getTagName("descriptionTag")
     descriptionSubjectTag = utilities.getTagName("descriptionSubjectTag")
     durationTag = utilities.getTagName("durationTag")
     eventTag = utilities.getTagName("eventTag")
@@ -93,7 +94,7 @@ def refreshData():
     subjectsNameDataframe[codeSubjectTag] = subjectsNameDataframe[codeSubjectTag].astype('Int64')
     processesDuration = updateTypeDurationDataframe(processEvents, eventsName, judgesName, statesName, subjectsName, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, descriptionSubjectTag, durationTag, eventTag, eventsTag, eventPhaseSequenceTag, finishedTag, judgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag, tagSubjectTag)
     updateProcessDurationDataframe(processesDuration, codeSubjectTag, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, judgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag)
-    updateEventsDataframe(eventsDataframe, eventsNameDataframe, judgesNameDataframe, statesNameDataframe, subjectsNameDataframe, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, descriptionSubjectTag, eventTag, numEventTag, numProcessTag, phaseTag, phaseDbTag, ritualTag, stateTag, tagSubjectTag)
+    updateEventsDataframe(eventsDataframe, eventsNameDataframe, judgesNameDataframe, statesNameDataframe, subjectsNameDataframe, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, descriptionTag, descriptionSubjectTag, eventTag, numEventTag, numProcessTag, phaseTag, phaseDbTag, ritualTag, stateTag, tagSubjectTag)
     print(str(time.time() - start) + " seconds")
 
 # group events by process.
@@ -161,10 +162,10 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
     return allProcessEvents, processesInfo
 
 # update events dataframe.
-def updateEventsDataframe(eventsDataframe, eventsName, judgesName, statesName, subjectsName, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, descriptionSubjectTag, eventTag, numEventTag, numProcessTag, phaseTag, phaseDbTag, ritualTag, stateTag, tagSubjectTag):
+def updateEventsDataframe(eventsDataframe, eventsName, judgesName, statesName, subjectsName, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, descriptionTag, descriptionSubjectTag, eventTag, numEventTag, numProcessTag, phaseTag, phaseDbTag, ritualTag, stateTag, tagSubjectTag):
     eventsDataframeComplete = frame.joinDataframe(eventsDataframe, judgesName, codeJudgeTag, None, None)
-    eventsDataframeComplete = frame.joinDataframe(eventsDataframeComplete, subjectsName, codeSubjectTag, None, [descriptionSubjectTag, ritualTag, tagSubjectTag])
-    eventsDataframeComplete = frame.joinDataframe(eventsDataframeComplete, eventsName, codeEventTag, None, None)
+    eventsDataframeComplete = frame.joinDataframe(eventsDataframeComplete, subjectsName, codeSubjectTag, None, [ritualTag, tagSubjectTag])
+    eventsDataframeComplete = frame.joinDataframe(eventsDataframeComplete, eventsName, codeEventTag, None, descriptionTag)
     eventsDataframeCompleteEventPhase = frame.joinDataframe(eventsDataframeComplete, statesName, codeStateTag, None, [phaseTag, phaseDbTag])
     eventsDataframeCompleteStatePhase = frame.joinDataframe(eventsDataframeComplete, statesName, codeStateTag, phaseTag, phaseDbTag)
     updateAllEventsDataframe(eventsDataframeCompleteEventPhase, endPhase, dateTag, numEventTag, numProcessTag, phaseTag)
