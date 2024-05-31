@@ -9,16 +9,17 @@ import utils.utilities.Utilities as utilities
 # get dataframe with judge names. 
 df = getter.getSubjectNamesDataframe()
 countTag = utilities.getTagName('countTag')
+descriptionSubjectTag = utilities.getTagName('descriptionSubjectTag')
 durationTag = utilities.getTagName('durationTag')
+subjectTag = utilities.getTagName('subjectTag')
+tagSubjectTag = utilities.getTagName('tagSubjectTag')
 
 # return initial layout of page.
 def pageLayout():
     codeSubjectTag = utilities.getTagName('codeSubjectTag')
     count = utilities.getPlaceholderName('count')
-    descriptionSubjectTag = utilities.getTagName('descriptionSubjectTag')
     duration = utilities.getPlaceholderName('duration')
     ritualTag = utilities.getTagName('ritualTag')
-    tagSubjectTag = utilities.getTagName('tagSubjectTag')
     layout = ds.html.Div([
         ds.dcc.ConfirmDialog(
             id = 'update-su',
@@ -34,7 +35,7 @@ def pageLayout():
                 {'name': codeSubjectTag, 'id': codeSubjectTag, 'editable': False},
                 {'name': descriptionSubjectTag, 'id': descriptionSubjectTag, 'editable': False},
                 {'name': ritualTag, 'id': ritualTag, 'editable': False},
-                {'name': tagSubjectTag, 'id': tagSubjectTag, 'editable': True}, 
+                {'name': tagSubjectTag, 'id': tagSubjectTag, 'editable': True},
                 {'name': count, 'id': countTag, 'editable': False},  
                 {'name': duration, 'id': durationTag, 'editable': False}],
             filter_action = "native",
@@ -54,4 +55,9 @@ def pageLayout():
 
 # return updated data based on user choice.
 def update_dateframe(button, data):
+    for d in data:
+        descriptionSubject = d[descriptionSubjectTag]
+        tagSubject = d[tagSubjectTag]
+        subject = descriptionSubject + " - " + tagSubject
+        d.update({subjectTag: subject})
     return typeEvents.updateDatabase(data, df, [countTag, durationTag], 'preferences/subjectsName.json')

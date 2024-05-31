@@ -34,8 +34,13 @@ def restartData():
     processDateTag = utilities.getTagName("processDateTag")
     sectionTag = utilities.getTagName("sectionTag")
     stateSequenceTag = utilities.getTagName("stateSequenceTag")
+    print(1)
+    exit()
     events = getter.getEvents()
     processesEvents, processesInfo = getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, phaseDBTag, codeStateTag, codeSubjectTag, eventsTag, eventSequenceTag, finishedTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag)
+    print(processesEvents[0])
+    exit()
+
     eventDatagrame = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, codeStateTag, codeSubjectTag)
     cache.updateCache('events.json', eventDatagrame)
     file.writeOnJsonFile('cache/processesEvents.json', processesEvents)
@@ -98,20 +103,20 @@ def refreshData():
     print(str(time.time() - start) + " seconds")
 
 # group events by process.
-def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, phaseDBTag, codeStateTag, codeSubjectTag, eventsTag, eventSequenceTag, finishedTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag):
+def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, eventsTag, eventSequenceTag, finishedTag, numProcessTag, phaseDBTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag):
     if len(events) == 0:
         raise Exception("\nThere isn't any event in database.")
     allProcessEvents = []
     processesInfo = []
     processId = events[0][numProcessTag]
     processCodeJudge = events[0][codeJudgeTag]
-    processCodeSubject = events[0][codeSubjectTag]
+    processSubject = events[0][subjectTag]
     processSection = events[0][sectionTag]
     processFinished = utilities.getProcessState('unfinished')
     processEventSequence = []
     processPhaseSequence = []
     processStateSequence = []
-    processEvents = {numProcessTag: processId, codeJudgeTag: processCodeJudge, codeSubjectTag: processCodeSubject, sectionTag: processSection, finishedTag: processFinished, eventsTag: []}
+    processEvents = {numProcessTag: processId, codeJudgeTag: processCodeJudge, subjectTag: processSubject, sectionTag: processSection, finishedTag: processFinished, eventsTag: []}
     end = False
     continuative = False
     i = 0
@@ -119,25 +124,25 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
         while i < int(len(events)):
             if events[i][numProcessTag] != processId or end:
                 allProcessEvents.append(processEvents)
-                processesInfo.append({codeJudgeTag: processCodeJudge, codeSubjectTag: processCodeSubject, sectionTag: processSection, finishedTag: processFinished, eventSequenceTag: processEventSequence, phaseSequenceTag: processPhaseSequence, stateSequenceTag: processStateSequence})
+                processesInfo.append({codeJudgeTag: processCodeJudge, subjectTag: processSubject, sectionTag: processSection, finishedTag: processFinished, eventSequenceTag: processEventSequence, phaseSequenceTag: processPhaseSequence, stateSequenceTag: processStateSequence})
                 if events[i][numProcessTag] == processId:
                     while i < len(events) - 1 and events[i][numProcessTag] == processId:
                         bar()
                         i += 1
                 processId = events[i][numProcessTag]
                 processCodeJudge = events[i][codeJudgeTag]
-                processCodeSubject = events[i][codeSubjectTag]
+                processSubject = events[i][subjectTag]
                 processSection = events[i][sectionTag]
                 processFinished = utilities.getProcessState('unfinished')
                 processEventSequence = []
                 processPhaseSequence = []
                 processStateSequence = []
-                processEvents = {numProcessTag: processId, codeJudgeTag: processCodeJudge, codeSubjectTag: processCodeSubject, sectionTag: processSection, finishedTag: processFinished, eventsTag: []}
+                processEvents = {numProcessTag: processId, codeJudgeTag: processCodeJudge, subjectTag: processSubject, sectionTag: processSection, finishedTag: processFinished, eventsTag: []}
                 if i < len(events) - 1:
                     end = False
                 continuative = False
             else:
-                if events[i][codeSubjectTag] in stallStates and not continuative:
+                if events[i][codeStateTag] in stallStates and not continuative:
                     processFinished = utilities.getProcessState('continuatived')
                     continuative = True
                 if events[i][phaseDBTag] == endPhase and not continuative: 
@@ -158,7 +163,7 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
             i += 1
     if not end:
         allProcessEvents.append(processEvents)
-        processesInfo.append({codeJudgeTag: processCodeJudge, codeSubjectTag: processCodeSubject, sectionTag: processSection, finishedTag: processFinished, eventSequenceTag: processEventSequence, phaseSequenceTag: processPhaseSequence, stateSequenceTag: processStateSequence})
+        processesInfo.append({codeJudgeTag: processCodeJudge, subjectTag: processSubject, sectionTag: processSection, finishedTag: processFinished, eventSequenceTag: processEventSequence, phaseSequenceTag: processPhaseSequence, stateSequenceTag: processStateSequence})
     return allProcessEvents, processesInfo
 
 # update events dataframe.
@@ -534,3 +539,15 @@ def verifyDatabase(connection):
         raise Exception("\n'processi' table is not present or is called differently than 'processi'. Please change name or add such table because it's fundamental for the analysis")
     if not connect.doesATableHaveColumns(connection, "processi", ['numProcesso', 'dataInizio', 'giudice', 'materia', 'sezione'], ['BIGINT', 'DATETIME', 'TEXT', 'VARCHAR(10)', 'VARCHAR(5)']):
         raise Exception("\n'processi' table does not have all requested columns. The requested columns are: 'numProcesso'(BIGINT), 'dataInizio'(DATETIME), 'giudice'(TEXT), 'materia'(VARCHAR(10)), 'sezione'(VARCHAR(5))")
+    if not connect.doesATableExist(connection, "tipoeventi"):
+        raise Exception("\n'tipoeventi' table is not present or is called differently than 'tipoeventi'. Please change name or add such table because it's fundamental for the analysis")
+    if not connect.doesATableHaveColumns(connection, "tipoeventi", ['CCDOEV', 'CDESCR'], ['TEXT', 'TEXT']):
+        raise Exception("\n'tipoeventi' table does not have all requested columns. The requested columns are: 'CCDOEV'(TEXT), 'CDESCR'(TEXT)")
+    if not connect.doesATableExist(connection, "tipomaterie"):
+        raise Exception("\n'tipomaterie' table is not present or is called differently than 'tipomaterie'. Please change name or add such table because it's fundamental for the analysis")
+    if not connect.doesATableHaveColumns(connection, "tipomaterie", ['codice', 'DESCOGGETTO', 'DESCCOMPLETA', 'rituale'], ['BIGINT', 'TEXT', 'TEXT', 'TEXT']):
+        raise Exception("\n'tipomaterie' table does not have all requested columns. The requested columns are: 'codice'(BIGINT), 'DESCOGGETTO'(TEXT), 'DESCCOMPLETA'(TEXT), 'rituale'(TEXT)")
+    if not connect.doesATableExist(connection, "tipostato"):
+        raise Exception("\n'tipostato' table is not present or is called differently than 'tipostato'. Please change name or add such table because it's fundamental for the analysis")
+    if not connect.doesATableHaveColumns(connection, "tipostato", ['CCODST', 'CDESCR', 'FKFASEPROCESSO'], ['VARCHAR(2)', 'VARCHAR(80)', 'VARCHAR(3)']):
+        raise Exception("\n'tipostato' table does not have all requested columns. The requested columns are: 'CCODST'(VARCHAR(2)), 'CDESCR'(VARCHAR(80)), 'FKFASEPROCESSO'(VARCHAR(3))")

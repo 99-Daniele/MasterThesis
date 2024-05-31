@@ -15,7 +15,7 @@ connection = connect.getDatabaseConnection()
 # queries to obtain data from database.
 endPhaseQuery = "SELECT FKFASEPROCESSO FROM tipostato WHERE CCODST = 'DF'"
 eventsNamesQuery = "SELECT en.codice AS codice, te.CDESCR AS descrizione, en.etichetta AS etichetta, en.fase AS fase FROM eventinome AS en, tipoeventi AS te WHERE en.codice = te.CCDOEV"
-eventsQuery = "SELECT e.numEvento AS numEvento, e.numProcesso AS numProcesso, e.codice AS codiceEvento, p.giudice AS giudice, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S') AS dataEvento, DATE_FORMAT((SELECT MIN(data) FROM eventi AS ev WHERE e.numProcesso = ev.numProcesso), '%Y-%m-%d %H:%i:%S') AS dataInizioProcesso, e.statofinale AS codiceStato, s.FKFASEPROCESSO AS faseStato, p.materia AS codiceMateria, p.sezione AS sezioneProcesso FROM eventi AS e, processi AS p, tipostato AS s WHERE e.numProcesso = p.numProcesso AND e.statofinale = s.CCODST ORDER BY e.numProcesso, e.data, e.numEvento"
+eventsQuery = "SELECT e.numEvento AS numEvento, e.numProcesso AS numProcesso, e.codice AS codiceEvento, te.CDESCR AS evento, p.giudice AS giudice, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S') AS dataEvento, DATE_FORMAT((SELECT MIN(data) FROM eventi AS ev WHERE e.numProcesso = ev.numProcesso), '%Y-%m-%d %H:%i:%S') AS dataInizioProcesso, e.statofinale AS codiceStato, ts.CDESCR AS stato, ts.FKFASEPROCESSO AS faseStato, p.materia AS codiceMateria, tm.DESCCOMPLETA AS materia, p.sezione AS sezioneProcesso FROM eventi AS e, processi AS p, tipoeventi AS te, tipomaterie AS tm, tipostato AS ts WHERE e.numProcesso = p.numProcesso AND e.statofinale = ts.CCODST AND e.codice = te.CCDOEV AND p.materia = tm.codice ORDER BY e.numProcesso, e.data, e.numEvento"
 judgeNamesQuery = "SELECT * FROM giudicinome ORDER BY alias"
 minDateQuery = "SELECT DATE_FORMAT(MIN(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 maxDateQuery = "SELECT DATE_FORMAT(MAX(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
@@ -54,16 +54,19 @@ def getStallStates():
 def getEvents():
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
-    phaseDBTag = utilities.getTagName("phaseDBTag")
     codeStateTag = utilities.getTagName("codeStateTag")
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     dateTag = utilities.getTagName("dateTag")
+    eventTag = utilities.getTagName("eventTag")
     numEventTag = utilities.getTagName("numEventTag")
     numProcessTag = utilities.getTagName("numProcessTag")
+    phaseDBTag = utilities.getTagName("phaseDBTag")
     processDateTag = utilities.getTagName("processDateTag")
     sectionTag = utilities.getTagName("sectionTag")
+    stateTag = utilities.getTagName("stateTag")
+    subjectTag = utilities.getTagName("subjectTag")
     events = connect.getDataFromDatabase(connection, eventsQuery)
-    keys = [numEventTag, numProcessTag, codeEventTag, codeJudgeTag, dateTag, processDateTag, codeStateTag, phaseDBTag, codeSubjectTag, sectionTag]
+    keys = [numEventTag, numProcessTag, codeEventTag, eventTag, codeJudgeTag, dateTag, processDateTag, codeStateTag, stateTag, phaseDBTag, codeSubjectTag, subjectTag, sectionTag]
     dictEvents = utilities.fromListOfTuplesToListOfDicts(events, keys)
     return dictEvents
 

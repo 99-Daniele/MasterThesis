@@ -266,7 +266,7 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
     while i < len(types):
         df3[filterTag] = df3[filterTag].astype(str) + " - " + df4[types[i]].astype(str)
         i = i + 1
-    #df3 = keepOnlyImportant(df3, 0.75, 10)
+    df3 = keepOnlyImportant(df3, 0.5, 18)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
     order_dict = df3.set_index(filterTag)[order].to_dict()
     order_list = df3[filterTag].tolist()
@@ -373,19 +373,14 @@ def keepOnlyImportant(df, perc, minNumber):
     totCount = df_temp[countTag].sum()
     threshold = totCount * perc
     df_temp = df_temp.sort_values([countTag], ascending = False).reset_index(drop = True)
-    i = 0
     sum = 0
-    if df_temp[countTag].items() == None:
-        return df
-    while (i < minNumber or sum < threshold) and i < len(list(df_temp[countTag].items())):
-        sum = sum + list(df_temp[countTag].items())[i][1]
-        i = i + 1
-    while i < len(list(df_temp[countTag].items())):
-        index = list(df_temp[countTag].items())[i][0]
-        df = df.drop(index)
-        i = i + 1
-    df.reset_index(drop = True)
-    return df
+    newDf = df_temp.iloc[:0,:].copy()
+    for i, row in df_temp.iterrows():
+        sum = sum + row[countTag]
+        newDf = newDf._append(row, ignore_index = True)
+        if sum > threshold and i > minNumber:
+            break
+    return newDf
 
 # return dataframe rows where given tag is contained in given types.
 def getTypesDataFrame(df, tag, types):
