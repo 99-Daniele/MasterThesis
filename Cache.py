@@ -1,7 +1,5 @@
 # this file handles getting and updating cache.
 
-import pandas as pd
-
 import utils.FileOperation as file
 
 # convert input data into json data and then write on file.

@@ -22,8 +22,8 @@ except:
     importantSubjects = None
 
 # from events list create basic events dataframe. Later he will be integrated with subject, state, phase chosen by user.
-def createBasicEventsDataFrame(events, dateTag, eventCodeTag, judgeCodeTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateCodeTag, subjectCodeTag):
-    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, judgeCodeTag, dateTag, processDateTag, stateCodeTag, phaseDBTag, subjectCodeTag, sectionTag])
+def createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag):
+    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, codeEventTag, eventTag, codeJudgeTag, dateTag, processDateTag, codeStateTag, stateTag, phaseDBTag, codeSubjectTag, subjectTag, sectionTag])
     df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     return df
 
@@ -37,9 +37,24 @@ def createEventsDataFrame(df, endPhase, dateTag, numEventTag, numProcessTag, pha
     df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     return df
 
+# from events info list create events info dataframe.
+def createEventsInfoDataFrame(eventsInfo, codeEventTag, eventTag):
+    df = pd.DataFrame(eventsInfo, columns = [codeEventTag, eventTag])
+    return df
+
+# from states info list create states info dataframe.
+def createStatesInfoDataFrame(statesInfo, codeStateTag, stateTag, phaseTag, phaseDBTag):
+    df = pd.DataFrame(statesInfo, columns = [codeStateTag, stateTag, phaseDBTag, phaseTag])
+    return df
+
+# from events info list create events info dataframe.
+def createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, ritualTag, subjectTag):
+    df = pd.DataFrame(subjectsInfo, columns = [codeSubjectTag, subjectTag, ritualTag])
+    return df
+
 # from processes list create process duration dataframe.
-def createProcessDurationsDataFrame(process, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, judgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag, subjectCodeTag):
-    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, eventPhaseSequenceTag, nextDateTag, nextIdTag])
+def createProcessDurationsDataFrame(process, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, judgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag, codeSubjectTag):
+    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, codeSubjectTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, eventPhaseSequenceTag, nextDateTag, nextIdTag])
     filteredDf = df.copy()
     if importantProcessStates != None:
         filteredDf = filteredDf[filteredDf[finishedTag].isin(importantProcessStates)]
@@ -54,8 +69,8 @@ def createProcessDurationsDataFrame(process, dateTag, durationTag, eventSequence
     return [df, filteredDf]
 
 # from events list create type duration dataframe.
-def createTypeDurationsDataFrame(events, dateTag, durationTag, eventTag, eventCodeTag, finishedTag, judgeTag, judgeCodeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, stateCodeTag, subjectTag, subjectCodeTag):
-    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, eventCodeTag, eventTag, durationTag, dateTag, judgeCodeTag, judgeTag, stateCodeTag, stateTag, phaseTag, subjectCodeTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
+def createTypeDurationsDataFrame(events, dateTag, durationTag, eventTag, codeEventTag, finishedTag, judgeTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, codeStateTag, subjectTag, codeSubjectTag):
+    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, codeEventTag, eventTag, durationTag, dateTag, codeJudgeTag, judgeTag, codeStateTag, stateTag, phaseTag, codeSubjectTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
     filteredDf = df.copy()
     if importantSections != None:
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]

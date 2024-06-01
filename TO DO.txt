@@ -1,9 +1,8 @@
 - sistemare preferences --> aggiungere nuova fase
 - reset fasi
-- selezionare codice/etichetta
 - nomi in inglese
-- nomi eventi/stati ricavati dal dataframe
-- eventi importanti
+- selezione stati udienza/materie importanti
+
 
 - verifica valore predetto
 - valore predetto sulla base di giudice, materia, sezione, data, carico processi giudice in quel momento

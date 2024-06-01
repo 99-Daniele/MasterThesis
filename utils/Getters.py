@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-import cache.Cache as cache
+import Cache as cache
 import utils.database.DatabaseConnection as connect
 import utils.DataUpdate as update
 import utils.Dataframe as frame
@@ -14,14 +14,13 @@ connection = connect.getDatabaseConnection()
 
 # queries to obtain data from database.
 endPhaseQuery = "SELECT FKFASEPROCESSO FROM tipostato WHERE CCODST = 'DF'"
-eventsNamesQuery = "SELECT en.codice AS codice, te.CDESCR AS descrizione, en.etichetta AS etichetta, en.fase AS fase FROM eventinome AS en, tipoeventi AS te WHERE en.codice = te.CCDOEV"
-eventsQuery = "SELECT e.numEvento AS numEvento, e.numProcesso AS numProcesso, e.codice AS codiceEvento, te.CDESCR AS evento, p.giudice AS giudice, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S') AS dataEvento, DATE_FORMAT((SELECT MIN(data) FROM eventi AS ev WHERE e.numProcesso = ev.numProcesso), '%Y-%m-%d %H:%i:%S') AS dataInizioProcesso, e.statofinale AS codiceStato, ts.CDESCR AS stato, ts.FKFASEPROCESSO AS faseStato, p.materia AS codiceMateria, tm.DESCCOMPLETA AS materia, p.sezione AS sezioneProcesso FROM eventi AS e, processi AS p, tipoeventi AS te, tipomaterie AS tm, tipostato AS ts WHERE e.numProcesso = p.numProcesso AND e.statofinale = ts.CCODST AND e.codice = te.CCDOEV AND p.materia = tm.codice ORDER BY e.numProcesso, e.data, e.numEvento"
-judgeNamesQuery = "SELECT * FROM giudicinome ORDER BY alias"
+eventsQuery = "SELECT e.numEvento, e.numProcesso, e.codice, te.CDESCR, e.giudice, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S'), DATE_FORMAT((SELECT MIN(data) FROM eventi AS ev WHERE e.numProcesso = ev.numProcesso), '%Y-%m-%d %H:%i:%S'), e.statofinale, ts.CDESCR, ts.FKFASEPROCESSO, p.codiceMateria, p.materia, p.sezione FROM eventi AS e JOIN (SELECT p.numProcesso AS numProcesso, p.materia AS codiceMateria, tm.DESCCOMPLETA AS materia, p.sezione AS sezione FROM processi AS p JOIN tipomaterie AS tm ON p.materia = tm.codice) AS p ON e.numProcesso = p.numProcesso JOIN tipoeventi AS te ON e.codice = te.CCDOEV JOIN tipostato AS ts ON e.statofinale = ts.CCODST"
+eventsInfoQuery = "SELECT CCDOEV, CDESCR FROM tipoeventi"
 minDateQuery = "SELECT DATE_FORMAT(MIN(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 maxDateQuery = "SELECT DATE_FORMAT(MAX(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 stallStatesQuery = "SELECT CCODST FROM tipostato WHERE FKFASEPROCESSO IS NULL"
-stateNamesQuery = "SELECT sn.stato AS codice, ts.CDESCR AS descrizione, sn.etichetta AS etichetta, ts.FKFASEPROCESSO AS fase_db, sn.fase AS fase FROM statinome AS sn, tipostato AS ts WHERE sn.stato = ts.CCODST"
-subjectNamesQuery = "SELECT * FROM materienome ORDER BY codice"
+statesInfoQuery = "SELECT CCODST, CDESCR, FKFASEPROCESSO, FKFASEPROCESSO FROM tipostato"
+subjectsInfoQuery = "SELECT codice, DESCCOMPLETA, rituale FROM tipomaterie"
 
 # courtHearingEvents are taken from text file. This are court hearings type events. Thay can be changed or removed directly from courtHearingEvents.txt file.
 try:
@@ -69,6 +68,21 @@ def getEvents():
     keys = [numEventTag, numProcessTag, codeEventTag, eventTag, codeJudgeTag, dateTag, processDateTag, codeStateTag, stateTag, phaseDBTag, codeSubjectTag, subjectTag, sectionTag]
     dictEvents = utilities.fromListOfTuplesToListOfDicts(events, keys)
     return dictEvents
+
+# get events info.
+def getEventsInfo():
+    eventsInfo = connect.getDataFromDatabase(connection, eventsInfoQuery)
+    return eventsInfo
+
+# get states info.
+def getStatesInfo():
+    statesInfo = connect.getDataFromDatabase(connection, statesInfoQuery)
+    return statesInfo
+
+# get subjects info.
+def getSubjectsInfo():
+    subjectsInfo = connect.getDataFromDatabase(connection, subjectsInfoQuery)
+    return subjectsInfo
 
 # get all events from cache file.
 def getAllEvents():

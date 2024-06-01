@@ -1,4 +1,3 @@
-cache/*.json
-cache/translation/*.json
+cache/
 utils/database/databaseCredentials.json
 *.pyc

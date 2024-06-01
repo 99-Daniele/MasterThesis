@@ -3,7 +3,18 @@
 from io import StringIO
 import os
 import pandas as pd
+import shutil
 import ujson
+
+# create folder.
+def createFolder(directory):
+    if not os.path.isdir(directory):
+        os.mkdir(directory)
+
+# remove folder.
+def removeFolder(directory):
+    if os.path.isdir(directory):
+        shutil.rmtree(directory)
 
 # remove file.
 def removeFile(filename):
