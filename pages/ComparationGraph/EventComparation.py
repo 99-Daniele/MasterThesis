@@ -22,7 +22,7 @@ def pageLayout():
     event = utilities.getPlaceholderName('event') 
     finishedTag = utilities.getTagName('finishedTag') 
     judge = utilities.getPlaceholderName('judge') 
-    judgeTag = utilities.getTagName('judgeTag') 
+    codeJudgeTag = utilities.getTagName('judcodeJudgeTaggeTag') 
     median = utilities.getPlaceholderName('median') 
     month = utilities.getPlaceholderName('month')
     monthYear = utilities.getPlaceholderName('monthYear') 
@@ -40,7 +40,7 @@ def pageLayout():
     typesSorted = sorted(types)
     sections = frame.getGroupBy(df, sectionTag)
     subjects = frame.getGroupBy(df, subjectTag)
-    judges = frame.getGroupBy(df, judgeTag)
+    judges = frame.getGroupBy(df, codeJudgeTag)
     finished = frame.getGroupBy(df, finishedTag)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
@@ -70,7 +70,7 @@ def pageLayout():
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-e', placeholder = subject, style = {'display': 'none'}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-e', placeholder = judge, style = {'display': 'none'}),
         ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-e', placeholder = process, style = {'display': 'none'}),
-        ds.dcc.Checklist([sectionTag, subjectTag, judgeTag, finishedTag], value = [], id = 'choice-checklist-e', inline = True, style = {'display': 'none'}),
+        ds.dcc.Checklist([sectionTag, subjectTag, codeJudgeTag, finishedTag], value = [], id = 'choice-checklist-e', inline = True, style = {'display': 'none'}),
         ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = 'order-radioitem-e', inline = True, style = {'display': 'none'}),
         ds.dcc.Checklist([text], value = [text], id = 'text-checklist-e'),
         ds.dcc.Graph(id = 'comparation-graph-e', figure = fig)

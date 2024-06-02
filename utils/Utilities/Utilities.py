@@ -4,22 +4,20 @@ import datetime as dt
 import pandas as pd
 from win32api import GetSystemMetrics
 
+import Cache as cache
 import utils.Dataframe as frame
 import utils.FileOperation as file
 
-# create map to decide color based on event or state phase.
-def phaseColorMap(tag, filename, isKey):
+# create map to decide color based on state phase.
+def phaseColorMap(type):
+    statesInfoDataframe = cache.getDataframe('statesInfo.json')
+    statesInfo = statesInfoDataframe.to_dict('records')
     colors = file.getDataFromJsonFile('utils/utilities/phaseColors.json')
     phaseTag = getTagName("phaseTag")
-    mapList = file.getDataFromTextFile(filename)
-    mapList = mapList[0]
     map = {}
-    for t in mapList.keys():
-        if isKey:
-            key = str(t)
-        else:
-            key = str(mapList.get(t)[tag])
-        phase = mapList.get(t)[phaseTag]
+    for s in statesInfo:
+        key = s[type]
+        phase = s[phaseTag]
         map.update({key: colors.get(str(phase))})
     return map
 

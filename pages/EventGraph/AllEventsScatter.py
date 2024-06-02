@@ -14,16 +14,16 @@ import utils.utilities.Utilities as utilities
 # get important events from text file.
 df = getter.getAllEvents()
 try:
-    importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
+    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
 except:
-    importantEvents = None
-eventTag = utilities.getTagName('eventTag')
+    importantStates = None
+codeStateTag = utilities.getTagName('codeStateTag')
 
 # return initial layout of page.
 def pageLayout():
     dateTag = utilities.getTagName('dateTag') 
     judge = utilities.getPlaceholderName('judge') 
-    judgeTag = utilities.getTagName('judgeTag') 
+    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     numProcessTag = utilities.getTagName('numProcessTag')
     section = utilities.getPlaceholderName('section') 
     sectionTag = utilities.getTagName('sectionTag')
@@ -34,8 +34,8 @@ def pageLayout():
     maxDateEnd = dt.date(maxYear, 1, 1)
     sections = frame.getGroupBy(df, sectionTag)
     subjects = frame.getGroupBy(df, subjectTag)
-    judges = frame.getGroupBy(df, judgeTag)
-    fig = px.scatter(df, x = dateTag, y = numProcessTag, color = eventTag, labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = 1400, height = 1200)
+    judges = frame.getGroupBy(df, codeJudgeTag)
+    fig = px.scatter(df, x = dateTag, y = numProcessTag, color = codeStateTag, labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = 1400, height = 1200)
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
@@ -77,4 +77,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
-    return event.eventUpdate(df, 'preferences/eventsName.json', startDate, endDate, eventTag, importantEvents, minDate, maxDate, sections, subjects, judges)
+    return event.eventUpdate(df, startDate, endDate, codeStateTag, importantStates, minDate, maxDate, sections, subjects, judges)

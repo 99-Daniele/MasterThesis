@@ -14,28 +14,30 @@ import utils.utilities.Utilities as utilities
 # get must states from text file.
 df = getter.getStateEvents()
 try:
-    mustStates = file.getDataFromTextFile('preferences/mustStates.txt')
+    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
 except:
-    mustStates = None
-stateTag = utilities.getTagName("stateTag")
+    importantStates = None
+codeStateTag = utilities.getTagName("codeStateTag")
 
 # return initial layout of page.
 def pageLayout():
     dateTag = utilities.getTagName('dateTag') 
     eventTag = utilities.getTagName('eventTag') 
     judge = utilities.getPlaceholderName('judge') 
-    judgeTag = utilities.getTagName('judgeTag') 
+    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     numProcessTag = utilities.getTagName('numProcessTag')
     section = utilities.getPlaceholderName('section') 
     sectionTag = utilities.getTagName('sectionTag')
     subject = utilities.getPlaceholderName('subject')  
     subjectTag = utilities.getTagName('subjectTag') 
+    print(df[dateTag])
+    exit()
     maxYear = dt.datetime.strptime(df[dateTag].max(), '%Y-%m-%d %H:%M:%S').year
     maxDateStart = dt.date(maxYear - 1, 1, 1)
     maxDateEnd = dt.date(maxYear, 1, 1)
     sections = frame.getGroupBy(df, sectionTag)
     subjects = frame.getGroupBy(df, subjectTag)
-    judges = frame.getGroupBy(df, judgeTag)
+    judges = frame.getGroupBy(df, codeJudgeTag)
     fig = px.scatter(df, x = dateTag, y = numProcessTag, color = eventTag, labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = 1400, height = 1200)
     layout = ds.html.Div([
         ds.dcc.Link('Home', href='/'),
@@ -78,4 +80,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
-    return event.eventUpdate(df, 'preferences/statesName.json', startDate, endDate, stateTag, mustStates, minDate, maxDate, sections, subjects, judges)
+    return event.eventUpdate(df, startDate, endDate, codeStateTag, importantStates, minDate, maxDate, sections, subjects, judges)

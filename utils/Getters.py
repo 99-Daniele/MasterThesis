@@ -19,7 +19,7 @@ eventsInfoQuery = "SELECT CCDOEV, CDESCR FROM tipoeventi"
 minDateQuery = "SELECT DATE_FORMAT(MIN(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 maxDateQuery = "SELECT DATE_FORMAT(MAX(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 stallStatesQuery = "SELECT CCODST FROM tipostato WHERE FKFASEPROCESSO IS NULL"
-statesInfoQuery = "SELECT CCODST, CDESCR, FKFASEPROCESSO, FKFASEPROCESSO FROM tipostato"
+statesInfoQuery = "SELECT CCODST, CDESCR, FKFASEPROCESSO, IFNULL(CAST(FKFASEPROCESSO AS SIGNED), '-') FROM tipostato"
 subjectsInfoQuery = "SELECT codice, DESCCOMPLETA, rituale FROM tipomaterie"
 
 # courtHearingEvents are taken from text file. This are court hearings type events. Thay can be changed or removed directly from courtHearingEvents.txt file.
@@ -69,20 +69,40 @@ def getEvents():
     dictEvents = utilities.fromListOfTuplesToListOfDicts(events, keys)
     return dictEvents
 
+# get all events dataframe.
+def getEventsDataframe():
+    eventsDataframe = cache.getDataframe('events.json')
+    if eventsDataframe is None:
+        update.restartData()
+        eventsDataframe = cache.getDataframe('events.json')
+    return eventsDataframe
+
 # get events info.
-def getEventsInfo():
-    eventsInfo = connect.getDataFromDatabase(connection, eventsInfoQuery)
-    return eventsInfo
+def getEventsInfo(codeEventTag, eventTag):
+    eventsInfoDataframe = cache.getDataframe('eventsInfo.json')
+    if eventsInfoDataframe is None:
+        eventsInfo = connect.getDataFromDatabase(connection, eventsInfoQuery)
+        eventsInfoDataframe = frame.createEventsInfoDataFrame(eventsInfo, codeEventTag, eventTag)
+        cache.updateCache('eventsInfo.json', eventsInfoDataframe)
+    return eventsInfoDataframe
 
 # get states info.
-def getStatesInfo():
-    statesInfo = connect.getDataFromDatabase(connection, statesInfoQuery)
-    return statesInfo
+def getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag):
+    statesInfoDataframe = cache.getDataframe('statesInfo.json')
+    if statesInfoDataframe is None:
+        statesInfo = connect.getDataFromDatabase(connection, statesInfoQuery)
+        statesInfoDataframe = frame.createStatesInfoDataFrame(statesInfo, codeStateTag, phaseTag, phaseDBTag, stateTag)
+        cache.updateCache('statesInfo.json', statesInfoDataframe)
+    return statesInfoDataframe
 
 # get subjects info.
-def getSubjectsInfo():
-    subjectsInfo = connect.getDataFromDatabase(connection, subjectsInfoQuery)
-    return subjectsInfo
+def getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag):
+    subjectsInfoDataframe = cache.getDataframe('subjectsInfo.json')
+    if subjectsInfoDataframe is None:
+        subjectsInfo = connect.getDataFromDatabase(connection, subjectsInfoQuery)
+        subjectsInfoDataframe = frame.createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, ritualTag, subjectTag)
+        cache.updateCache('subjectsInfo.json', subjectsInfoDataframe)
+    return subjectsInfoDataframe
 
 # get all events from cache file.
 def getAllEvents():

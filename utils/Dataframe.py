@@ -43,8 +43,9 @@ def createEventsInfoDataFrame(eventsInfo, codeEventTag, eventTag):
     return df
 
 # from states info list create states info dataframe.
-def createStatesInfoDataFrame(statesInfo, codeStateTag, stateTag, phaseTag, phaseDBTag):
+def createStatesInfoDataFrame(statesInfo, codeStateTag, phaseTag, phaseDBTag, stateTag):
     df = pd.DataFrame(statesInfo, columns = [codeStateTag, stateTag, phaseDBTag, phaseTag])
+    df[phaseTag] = df[phaseTag].fillna("-")
     return df
 
 # from events info list create events info dataframe.
@@ -53,8 +54,8 @@ def createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, ritualTag, subject
     return df
 
 # from processes list create process duration dataframe.
-def createProcessDurationsDataFrame(process, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, judgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag, codeSubjectTag):
-    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, judgeTag, codeSubjectTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, eventPhaseSequenceTag, nextDateTag, nextIdTag])
+def createProcessDurationsDataFrame(process, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag, codeSubjectTag):
+    df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, codeJudgeTag, codeSubjectTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, eventPhaseSequenceTag, nextDateTag, nextIdTag])
     filteredDf = df.copy()
     if importantProcessStates != None:
         filteredDf = filteredDf[filteredDf[finishedTag].isin(importantProcessStates)]
@@ -69,8 +70,8 @@ def createProcessDurationsDataFrame(process, dateTag, durationTag, eventSequence
     return [df, filteredDf]
 
 # from events list create type duration dataframe.
-def createTypeDurationsDataFrame(events, dateTag, durationTag, eventTag, codeEventTag, finishedTag, judgeTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, codeStateTag, subjectTag, codeSubjectTag):
-    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, codeEventTag, eventTag, durationTag, dateTag, codeJudgeTag, judgeTag, codeStateTag, stateTag, phaseTag, codeSubjectTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
+def createTypeDurationsDataFrame(events, codeEventTag, codeJudgeTag, codeSubjectTag, dateTag, durationTag, eventTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, codeStateTag, subjectTag):
+    df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, codeEventTag, eventTag, durationTag, dateTag, codeJudgeTag, codeStateTag, stateTag, phaseTag, codeSubjectTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
     filteredDf = df.copy()
     if importantSections != None:
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
@@ -116,16 +117,16 @@ def createEventNameDataframeWithInfo(eventsDuration, eventNames):
 def createJudgeNameDataframeWithInfo(processDuration, judgeNames):
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
-    judgeTag = utilities.getTagName('judgeTag')
-    processDuration = processDuration.groupby([judgeTag]) \
+    codeJudgeTag = utilities.getTagName('codeJudgeTag')
+    processDuration = processDuration.groupby([codeJudgeTag]) \
         .agg({processDuration.columns[2]: 'size', durationTag: 'mean'}) \
         .rename(columns = {processDuration.columns[2]:countTag}) \
         .reset_index()
     processDuration[durationTag] = processDuration[durationTag].astype(float).apply('{:,.2f}'.format)
-    processDuration[judgeTag] = processDuration[judgeTag].astype(str)
-    result = joinDataframe(judgeNames, processDuration, judgeTag, None, None)
+    processDuration[codeJudgeTag] = processDuration[codeJudgeTag].astype(str)
+    result = joinDataframe(judgeNames, processDuration, codeJudgeTag, None, None)
     result = result.fillna(0)
-    result = result.sort_values([judgeTag]).reset_index(drop = True)
+    result = result.sort_values([codeJudgeTag]).reset_index(drop = True)
     return result
 
 # from subject names list create subjects names dataframe with info.
@@ -588,3 +589,8 @@ def selectFollowingRows(df, tag, tagChoice):
     newDf = joinDataframe(df_tag, df, numEventTag, tag, None)
     newDf = newDf.dropna()
     return newDf
+
+# get phase of state from dataframe.
+def getPhaseOfState(statesName, state, phaseTag):
+    phase = statesName.get(state)[phaseTag]
+    return phase

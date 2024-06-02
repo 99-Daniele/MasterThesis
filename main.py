@@ -11,15 +11,6 @@ def displayAllEventsScatter():
     ])
     app.run_server(debug = True)
 
-# display important events.
-def displayImportantEventsScatter():
-    import pages.eventGraph.ImportantEventsScatter as importantEventsPage
-    app = ds.Dash(__name__, suppress_callback_exceptions = True)
-    app.layout = ds.html.Div([
-        ds.html.Div(children = importantEventsPage.pageLayout())
-    ])
-    app.run_server(debug = True)
-
 # display phase events.
 def displayPhaseEventsScatter():
     import pages.eventGraph.PhaseEventsScatter as phaseEventsPage
@@ -188,6 +179,5 @@ def startApp():
     import App as app
     app.start()
 
-# action performed by main.
 if __name__ == '__main__':
-    restartData()
+    refreshData()

@@ -9,20 +9,20 @@ import utils.utilities.Utilities as utilities
 # update data based on user choices on different parameters.
 def updateTypeData(df, sections, subjects, judges, finished):
     finishedTag = utilities.getTagName("finishedTag")
-    judgeTag = utilities.getTagName("judgeTag")
+    codeJudgeTag = utilities.getTagName("codeJudgeTag")
     sectionTag = utilities.getTagName("sectionTag")
     subjectTag = utilities.getTagName("subjectTag")
     df_temp = df.copy()
     df_temp = frame.getTypesDataFrame(df_temp, sectionTag, sections)
     df_temp = frame.getTypesDataFrame(df_temp, subjectTag, subjects)
-    df_temp = frame.getTypesDataFrame(df_temp, judgeTag, judges)
+    df_temp = frame.getTypesDataFrame(df_temp, codeJudgeTag, judges)
     df_temp = frame.getTypesDataFrame(df_temp, finishedTag, finished)
     return df_temp
 
 # update types based on user choices on different parameters.
 def updateTypeDataBySelection(df, df_data, sections, subjects, judges, finished):
     finishedTag = utilities.getTagName("finishedTag")
-    judgeTag = utilities.getTagName("judgeTag")
+    codeJudgeTag = utilities.getTagName("codeJudgeTag")
     sectionTag = utilities.getTagName("sectionTag")
     subjectTag = utilities.getTagName("subjectTag")
     df_temp = df.copy()
@@ -44,7 +44,7 @@ def updateTypeDataBySelection(df, df_data, sections, subjects, judges, finished)
         df_temp_4 = df_data
     sections = frame.getGroupBy(df_temp_1, sectionTag)
     subjects = frame.getGroupBy(df_temp_2, subjectTag)
-    judges = frame.getGroupBy(df_temp_3, judgeTag)
+    judges = frame.getGroupBy(df_temp_3, codeJudgeTag)
     finished = frame.getGroupBy(df_temp_4, finishedTag)
     return [sections, subjects, judges, finished]
 

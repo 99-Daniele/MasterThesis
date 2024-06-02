@@ -63,19 +63,19 @@ def predictDuration(model, process):
     print(predictedDuration)
     exit()
 
-def trainModel(finishedProcesses, numProcessTag, durationTag, dateTag, judgeTag, subjectTag, sectionTag):
-    df = pd.DataFrame(finishedProcesses, columns = [numProcessTag, durationTag, dateTag, judgeTag, subjectTag, sectionTag])
+def trainModel(finishedProcesses, numProcessTag, durationTag, dateTag, codeJudgeTag, subjectTag, sectionTag):
+    df = pd.DataFrame(finishedProcesses, columns = [numProcessTag, durationTag, dateTag, codeJudgeTag, subjectTag, sectionTag])
     encJudges = LabelEncoder()
     encSubjects = LabelEncoder()
     encSections = LabelEncoder()
     df[dateTag] = df[dateTag].apply(lambda x: utilities.distanceAtToday(x.to_pydatetime()))
-    encJudges.fit(df[judgeTag].values)
+    encJudges.fit(df[codeJudgeTag].values)
     encSubjects.fit(df[subjectTag].values)
     encSections.fit(df[sectionTag].values)
-    df[judgeTag] = df[judgeTag].apply(lambda x: encJudges.transform([x])[0])
+    df[codeJudgeTag] = df[codeJudgeTag].apply(lambda x: encJudges.transform([x])[0])
     df[subjectTag] = df[subjectTag].apply(lambda x: encSubjects.transform([x])[0])
     df[sectionTag] = df[sectionTag].apply(lambda x: encSections.transform([x])[0])
-    x = df[[dateTag, judgeTag, subjectTag, sectionTag]]
+    x = df[[dateTag, codeJudgeTag, subjectTag, sectionTag]]
     y = df[[durationTag]]
     #xTrain, xTest, yTrain, yTest = train_test_split(x, y, test_size = 0.2)
     model  = DecisionTreeClassifier()

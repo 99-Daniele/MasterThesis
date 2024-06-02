@@ -21,7 +21,7 @@ def pageLayout():
     eventSequenceTag = utilities.getTagName('eventSequenceTag')
     finishedTag = utilities.getTagName('finishedTag') 
     judge = utilities.getPlaceholderName('judge') 
-    judgeTag = utilities.getTagName('judgeTag') 
+    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     median = utilities.getPlaceholderName('median') 
     month = utilities.getPlaceholderName('month')
     monthYear = utilities.getPlaceholderName('monthYear') 
@@ -45,7 +45,7 @@ def pageLayout():
     year = utilities.getPlaceholderName('year') 
     subjects = frame.getGroupBy(df, subjectTag)
     sections = frame.getGroupBy(df, sectionTag)
-    judges = frame.getGroupBy(df, judgeTag)
+    judges = frame.getGroupBy(df, codeJudgeTag)
     finished = frame.getGroupBy(df, finishedTag)
     sequences = frame.getGroupBy(df, stateSequenceTag)
     phaseSequences = frame.getGroupBy(df, phaseSequenceTag)
@@ -95,7 +95,7 @@ def pageLayout():
             ],
             style = {'display': 'inline-flex', 'width': '100%'}
         ),
-        ds.dcc.Checklist([sectionTag, subjectTag, judgeTag, finishedTag, stateSequenceTag, phaseSequenceTag], value = [], id = "choice-checklist-pr", inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.Checklist([sectionTag, subjectTag, codeJudgeTag, finishedTag, stateSequenceTag, phaseSequenceTag], value = [], id = "choice-checklist-pr", inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = "order-radioitem-pr", inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Checklist([text], value = [text], id = "text-checklist-pr"),
         ds.dcc.Graph(id = 'comparation-graph-pr', figure = fig)
