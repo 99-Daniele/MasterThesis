@@ -3,6 +3,7 @@
 import dash as ds
 import pandas as pd
 
+import Cache as cache
 import utils.Dataframe as frame
 import utils.DataUpdate as update
 import utils.FileOperation as file
@@ -17,24 +18,18 @@ def updateTextFile(data, oldSelectedRows, newSelectedRows, tag, filename):
             return data, True
     return data, False
 
-def updateDatabase(data, df, dropColumnTag, filename):
+def updateDatabase(data, dfDatabase, tag, filename):
     if ds.ctx.triggered_id != None and 'refresh-button' in ds.ctx.triggered_id:
-        dbData = df.to_dict('records')
-        pairs = zip(data, dbData)
-        if any(x != y for x, y in pairs):
-            newData = {}
-            keys = list(data[0].keys())
-            key = keys[0]
-            others = list(set(keys) - set(dropColumnTag))
-            others.remove(key)
-            for d in data:
-                element = {}
-                id = d[key]
-                for o in others:
-                    value = str(d[o])
-                    element.update({o: value})
-                newData.update({id: element})
-            file.writeOnJsonFile(filename, newData)
+        countTag = utilities.getTagName("countTag")
+        durationTag = utilities.getTagName("durationTag")
+        df_temp = dfDatabase[dfDatabase[countTag] > 0]
+        dfData = pd.DataFrame(data)
+        diff = pd.concat([df_temp, dfData]).drop_duplicates(keep = False)
+        if len(diff) > 0:
+            newDf = dfDatabase[~dfDatabase[tag].isin(dfData[tag])]
+            newDf = pd.concat([newDf, dfData])
+            newDf = newDf.drop([countTag, durationTag], axis = 1).reset_index(drop = True)
+            cache.updateCache(filename, newDf)
             update.refreshData()
             return data, True
     return data, False

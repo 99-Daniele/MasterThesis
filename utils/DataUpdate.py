@@ -88,11 +88,11 @@ def refreshData():
     try:
         courtHearingsEventsType = list(file.getDataFromTextFile('preferences/courtHearingsEvents.txt'))
     except:
-        courtHearingsEventsType = None
+        courtHearingsEventsType = []
     statesInfo = statesInfoDataframe.set_index(codeStateTag).T.to_dict('dict')
     endPhase = frame.getPhaseOfState(statesInfo, "DF", phaseTag)
-    #processesDuration = updateTypeDurationDataframe(processEvents, statesInfo, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, eventTag, eventsTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag)
-    #updateProcessDurationDataframe(processesDuration, codeSubjectTag, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag)
+    processesDuration = updateTypeDurationDataframe(processEvents, statesInfo, courtHearingsEventsType, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, eventTag, eventsTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag)
+    updateProcessDurationDataframe(processesDuration, codeSubjectTag, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag)
     updateEventsDataframe(eventsDataframe, statesInfoDataframe, courtHearingsEventsType, endPhase, codeStateTag, codeEventTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, stateTag)
     print(str(time.time() - start) + " seconds")
 

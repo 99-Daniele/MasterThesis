@@ -227,10 +227,12 @@ def getCourtHearingsDurationFiltered():
 # get states name dataframe.
 def getStateNamesDataframe():
     codeStateTag = utilities.getTagName("codeStateTag")
-    stateDurationDataframe = getStatesDuration()    
-    statesName = file.getDataFromJsonFile('preferences/statesName.json')
-    statesNameDataframe = pd.DataFrame.from_dict(statesName, orient = 'index').reset_index().rename(columns = {'index': codeStateTag})
-    df = frame.createStateNameDataframeWithInfo(stateDurationDataframe, statesNameDataframe)
+    phaseTag = utilities.getTagName("phaseTag")
+    phaseDBTag = utilities.getTagName("phaseDBTag")
+    stateTag = utilities.getTagName("codeStateTag")
+    statesNameDataframe = getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
+    stateDurationDataframe = getStatesDuration()  
+    df = frame.createStateNameDataframeWithInfo(stateDurationDataframe, statesNameDataframe) 
     return df
 
 # get events name dataframe.

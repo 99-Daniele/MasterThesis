@@ -8,22 +8,25 @@ import utils.utilities.Utilities as utilities
 
 # get dataframe with state names. 
 df = getter.getStateNamesDataframe()
-descriptionTag = utilities.getTagName('descriptionTag')
-phaseDBTag = utilities.getTagName('phaseDBTag')
+codeStateTag = utilities.getTagName('codeStateTag')
 countTag = utilities.getTagName('countTag')
-durationTag = utilities.getTagName('durationTag')
+df_temp = df[df[countTag] > 0]
 
 # return initial layout of page.
 def pageLayout():
+    code = utilities.getPlaceholderName('code')
     codeStateTag = utilities.getTagName('codeStateTag')
     count = utilities.getPlaceholderName('count')
+    descriptionTag = utilities.getTagName('descriptionTag')
+    durationTag = utilities.getTagName('durationTag')
     description = utilities.getPlaceholderName('description')
     duration = utilities.getPlaceholderName('duration')
     phase = utilities.getPlaceholderName('phase')
     phaseDB = utilities.getPlaceholderName('phaseDB')
     phaseTag = utilities.getTagName('phaseTag')
+    phaseDBTag = utilities.getTagName('phaseDBTag')
+    state = utilities.getPlaceholderName('state')
     stateTag = utilities.getTagName('stateTag')
-    tag = utilities.getPlaceholderName('tag')
     layout = ds.html.Div([
         ds.dcc.ConfirmDialog(
             id = 'update-s',
@@ -35,10 +38,10 @@ def pageLayout():
         ds.html.H2('PARAMETRI STATI'),
         ds.html.Button("REFRESH", id = 'refresh-button-s'),
         ds.dash_table.DataTable(
-            df.to_dict('records'), columns = [
-                {'name': codeStateTag, 'id': codeStateTag, 'editable': False}, 
+            df_temp.to_dict('records'), columns = [
+                {'name': code, 'id': codeStateTag, 'editable': False}, 
                 {'name': description, 'id': descriptionTag, 'editable': False}, 
-                {'name': stateTag, 'id': stateTag, 'editable': True}, 
+                {'name': state, 'id': stateTag, 'editable': True}, 
                 {'name': phaseDB, 'id': phaseDBTag, 'editable': False}, 
                 {'name': phase, 'id': phaseTag, 'editable': True}, 
                 {'name': count, 'id': countTag, 'editable': False},  
@@ -60,4 +63,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def update_dateframe(button, data):
-    return typeEvents.updateDatabase(data, df, [countTag, descriptionTag, durationTag], 'preferences/statesName.json')
+    return typeEvents.updateDatabase(data, df, codeStateTag, 'statesInfo.json')
