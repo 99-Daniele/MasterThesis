@@ -146,15 +146,6 @@ def displayEventPreferences():
     ])
     app.run_server(debug = True)
 
-# display judge names.
-def displayJudgePreferences():
-    import pages.preference.JudgePreference as judgePreferencePage
-    app = ds.Dash(__name__, suppress_callback_exceptions = True)
-    app.layout = ds.html.Div([
-        ds.html.Div(children = judgePreferencePage.pageLayout())
-    ])
-    app.run_server(debug = True)
-
 # display subject names.
 def displaySubjectPreferences():
     import pages.preference.SubjectPreference as subjectPreferencePage
@@ -180,4 +171,4 @@ def startApp():
     app.start()
 
 if __name__ == '__main__':
-    displayStatePreferences()
+    restartData()

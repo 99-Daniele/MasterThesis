@@ -8,19 +8,18 @@ import utils.utilities.Utilities as utilities
 
 # get dataframe with events names. 
 df = getter.getEventNamesDataframe()
-descriptionTag = utilities.getTagName('descriptionTag')
+codeEventTag = utilities.getTagName('codeEventTag')
 countTag = utilities.getTagName('countTag')
-durationTag = utilities.getTagName('durationTag')
+df_temp = df[df[countTag] > 0]
 
 # return initial layout of page.
 def pageLayout():
-    codeEventTag = utilities.getTagName('codeEventTag')
+    code = utilities.getPlaceholderName("code")
     count = utilities.getPlaceholderName('count')
-    description = utilities.getPlaceholderName('description')
     duration = utilities.getPlaceholderName('duration')
+    durationTag = utilities.getTagName('durationTag')
+    event = utilities.getPlaceholderName('event')
     eventTag = utilities.getTagName('eventTag')
-    phase = utilities.getPlaceholderName('phase')
-    phaseTag = utilities.getTagName('phaseTag')
     layout = ds.html.Div([
         ds.dcc.ConfirmDialog(
             id = 'update-e',
@@ -32,15 +31,14 @@ def pageLayout():
         ds.html.H2('PARAMETRI EVENTI'),
         ds.html.Button("REFRESH", id = 'refresh-button-e'),
         ds.dash_table.DataTable(
-            df.to_dict('records'), columns = [
-                {'name': codeEventTag, 'id': codeEventTag, 'editable': False}, 
-                {'name': description, 'id': descriptionTag, 'editable': False}, 
-                {'name': eventTag, 'id': eventTag, 'editable': True},  
-                {'name': phase, 'id': phaseTag, 'editable': True}, 
+            df_temp.to_dict('records'), columns = [
+                {'name': code, 'id': codeEventTag, 'editable': False}, 
+                {'name': event, 'id': eventTag, 'editable': False},  
                 {'name': count, 'id': countTag, 'editable': False},  
                 {'name': duration, 'id': durationTag, 'editable': False}],
             filter_action = "native",
             sort_action = "native",
+            style_cell = {'textAlign': 'left'},
             id = "eventtable"
         )
     ])
@@ -56,4 +54,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def update_dateframe(button, data):
-    return typeEvents.updateDatabase(data, df, [countTag, durationTag], 'preferences/eventsName.json')
+    return data, False

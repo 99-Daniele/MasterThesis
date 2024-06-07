@@ -41,13 +41,14 @@ def pageLayout():
             df_temp.to_dict('records'), columns = [
                 {'name': code, 'id': codeStateTag, 'editable': False}, 
                 {'name': description, 'id': descriptionTag, 'editable': False}, 
-                {'name': state, 'id': stateTag, 'editable': True}, 
+                {'name': state, 'id': stateTag, 'editable': False}, 
                 {'name': phaseDB, 'id': phaseDBTag, 'editable': False}, 
                 {'name': phase, 'id': phaseTag, 'editable': True}, 
                 {'name': count, 'id': countTag, 'editable': False},  
                 {'name': duration, 'id': durationTag, 'editable': False}],
             filter_action = "native",
             sort_action = "native",
+            style_cell = {'textAlign': 'left'},
             id = "statetable"
         )
     ])

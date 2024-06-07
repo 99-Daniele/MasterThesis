@@ -113,22 +113,6 @@ def createEventNameDataframeWithInfo(eventsDuration, eventNames):
     result = result.sort_values([codeEventTag]).reset_index(drop = True)
     return result
 
-# from judge names list create judges names dataframe with info.
-def createJudgeNameDataframeWithInfo(processDuration, judgeNames):
-    countTag = utilities.getTagName('countTag')
-    durationTag = utilities.getTagName('durationTag')
-    codeJudgeTag = utilities.getTagName('codeJudgeTag')
-    processDuration = processDuration.groupby([codeJudgeTag]) \
-        .agg({processDuration.columns[2]: 'size', durationTag: 'mean'}) \
-        .rename(columns = {processDuration.columns[2]:countTag}) \
-        .reset_index()
-    processDuration[durationTag] = processDuration[durationTag].astype(float).apply('{:,.2f}'.format)
-    processDuration[codeJudgeTag] = processDuration[codeJudgeTag].astype(str)
-    result = joinDataframe(judgeNames, processDuration, codeJudgeTag, None, None)
-    result = result.fillna(0)
-    result = result.sort_values([codeJudgeTag]).reset_index(drop = True)
-    return result
-
 # from subject names list create subjects names dataframe with info.
 def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
     countTag = utilities.getTagName('countTag')
@@ -139,8 +123,6 @@ def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
         .rename(columns = {processDuration.columns[2]:countTag}) \
         .reset_index()
     processDuration[durationTag] = processDuration[durationTag].astype(float).apply('{:,.2f}'.format)
-    processDuration[codeSubjectTag] = processDuration[codeSubjectTag].astype(int)
-    processDuration[codeSubjectTag] = processDuration[codeSubjectTag].astype(str)
     result = joinDataframe(subjectNames, processDuration, codeSubjectTag, None, None)
     result = result.fillna(0)
     result = result.sort_values([codeSubjectTag]).reset_index(drop = True)

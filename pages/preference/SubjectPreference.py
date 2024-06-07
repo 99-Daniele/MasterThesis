@@ -8,18 +8,19 @@ import utils.utilities.Utilities as utilities
 
 # get dataframe with judge names. 
 df = getter.getSubjectNamesDataframe()
+codeSubjectTag = utilities.getTagName('codeSubjectTag')
 countTag = utilities.getTagName('countTag')
-descriptionSubjectTag = utilities.getTagName('descriptionSubjectTag')
-durationTag = utilities.getTagName('durationTag')
-subjectTag = utilities.getTagName('subjectTag')
-tagSubjectTag = utilities.getTagName('tagSubjectTag')
+df_temp = df[df[countTag] > 0]
 
 # return initial layout of page.
 def pageLayout():
+    code = utilities.getPlaceholderName("code")
     codeSubjectTag = utilities.getTagName('codeSubjectTag')
     count = utilities.getPlaceholderName('count')
     duration = utilities.getPlaceholderName('duration')
+    durationTag = utilities.getTagName('durationTag')
     ritualTag = utilities.getTagName('ritualTag')
+    subjectTag = utilities.getTagName('subjectTag')
     layout = ds.html.Div([
         ds.dcc.ConfirmDialog(
             id = 'update-su',
@@ -31,15 +32,15 @@ def pageLayout():
         ds.html.H2('PARAMETRI MATERIA'),
         ds.html.Button("REFRESH", id = 'refresh-button-su'),
         ds.dash_table.DataTable(
-            df.to_dict('records'), columns = [
-                {'name': codeSubjectTag, 'id': codeSubjectTag, 'editable': False},
-                {'name': descriptionSubjectTag, 'id': descriptionSubjectTag, 'editable': False},
+            df_temp.to_dict('records'), columns = [
+                {'name': code, 'id': codeSubjectTag, 'editable': False},
+                {'name': subjectTag, 'id': subjectTag, 'editable': False},
                 {'name': ritualTag, 'id': ritualTag, 'editable': False},
-                {'name': tagSubjectTag, 'id': tagSubjectTag, 'editable': True},
                 {'name': count, 'id': countTag, 'editable': False},  
                 {'name': duration, 'id': durationTag, 'editable': False}],
             filter_action = "native",
             sort_action = "native",
+            style_cell = {'textAlign': 'left'},
             id = "subjecttable"
         )
     ])
@@ -55,9 +56,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def update_dateframe(button, data):
-    for d in data:
-        descriptionSubject = d[descriptionSubjectTag]
-        tagSubject = d[tagSubjectTag]
-        subject = descriptionSubject + " - " + tagSubject
-        d.update({subjectTag: subject})
-    return typeEvents.updateDatabase(data, df, [countTag, durationTag], 'preferences/subjectsName.json')
+    return data, False

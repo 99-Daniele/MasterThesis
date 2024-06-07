@@ -14,7 +14,7 @@ connection = connect.getDatabaseConnection()
 
 # queries to obtain data from database.
 endPhaseQuery = "SELECT FKFASEPROCESSO FROM tipostato WHERE CCODST = 'DF'"
-eventsQuery = "SELECT e.numEvento, e.numProcesso, e.codice, te.CDESCR, e.giudice, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S'), DATE_FORMAT((SELECT MIN(data) FROM eventi AS ev WHERE e.numProcesso = ev.numProcesso), '%Y-%m-%d %H:%i:%S'), e.statofinale, ts.CDESCR, ts.FKFASEPROCESSO, p.codiceMateria, p.materia, p.sezione FROM eventi AS e JOIN (SELECT p.numProcesso AS numProcesso, p.materia AS codiceMateria, tm.DESCCOMPLETA AS materia, p.sezione AS sezione FROM processi AS p JOIN tipomaterie AS tm ON p.materia = tm.codice) AS p ON e.numProcesso = p.numProcesso JOIN tipoeventi AS te ON e.codice = te.CCDOEV JOIN tipostato AS ts ON e.statofinale = ts.CCODST"
+eventsQuery = "SELECT e.numEvento, e.numProcesso, e.codice, te.CDESCR, e.giudice, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S'), DATE_FORMAT((SELECT MIN(data) FROM eventi AS ev WHERE e.numProcesso = ev.numProcesso), '%Y-%m-%d %H:%i:%S'), e.statofinale, ts.CDESCR, ts.FKFASEPROCESSO, p.codiceMateria, p.materia, p.sezione FROM eventi AS e JOIN (SELECT p.numProcesso AS numProcesso, p.materia AS codiceMateria, tm.DESCCOMPLETA AS materia, p.sezione AS sezione FROM processi AS p JOIN tipomaterie AS tm ON p.materia = tm.codice) AS p ON e.numProcesso = p.numProcesso JOIN tipoeventi AS te ON e.codice = te.CCDOEV JOIN tipostato AS ts ON e.statofinale = ts.CCODST  ORDER BY numProcesso, data, numEvento"
 eventsInfoQuery = "SELECT CCDOEV, CDESCR FROM tipoeventi"
 minDateQuery = "SELECT DATE_FORMAT(MIN(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 maxDateQuery = "SELECT DATE_FORMAT(MAX(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
@@ -238,26 +238,18 @@ def getStateNamesDataframe():
 # get events name dataframe.
 def getEventNamesDataframe():
     codeEventTag = utilities.getTagName("codeEventTag")
+    eventTag = utilities.getTagName("eventTag")
+    eventNamesDataframe = getEventsInfo(codeEventTag, eventTag)
     eventDurationDataframe = getEventsDuration()
-    eventsName = file.getDataFromJsonFile('preferences/eventsName.json')
-    eventNamesDataframe = pd.DataFrame.from_dict(eventsName, orient = 'index').reset_index().rename(columns = {'index': codeEventTag})
     df = frame.createEventNameDataframeWithInfo(eventDurationDataframe, eventNamesDataframe)
-    return df
-
-# get judge name dataframe.
-def getJudgeNamesDataframe():
-    codeJudgeTag = utilities.getTagName("codeJudgeTag")
-    processDurationDataframe = getProcessesDuration()
-    judgesName = file.getDataFromJsonFile('preferences/judgesName.json')
-    judgesNameDataframe = pd.DataFrame.from_dict(judgesName, orient = 'index').reset_index().rename(columns = {'index': codeJudgeTag})
-    df = frame.createJudgeNameDataframeWithInfo(processDurationDataframe, judgesNameDataframe)
     return df
 
 # get subject name dataframe.
 def getSubjectNamesDataframe():
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    ritualTag = utilities.getTagName("ritualTag")
+    subjectTag = utilities.getTagName("subjectTag")
+    subjectNamesDataframe = getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
     processDurationDataframe = getProcessesDuration()
-    subjectsName = file.getDataFromJsonFile('preferences/subjectsName.json')
-    subjectsNameDataframe = pd.DataFrame.from_dict(subjectsName, orient = 'index').reset_index().rename(columns = {'index': codeSubjectTag})
-    df = frame.createSubjectNameDataframeWithInfo(processDurationDataframe, subjectsNameDataframe)
+    df = frame.createSubjectNameDataframeWithInfo(processDurationDataframe, subjectNamesDataframe)
     return df
