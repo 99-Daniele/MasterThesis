@@ -14,23 +14,24 @@ import utils.utilities.Utilities as utilities
 
 # restart current database data in case events or process table are changed.
 def restartData():
-    #connection = connect.getDatabaseConnection()
-    #verifyDatabase(connection)
-    #file.removeFolder('cache')
-    #file.createFolder('cache')
+    connection = connect.getDatabaseConnection()
+    verifyDatabase(connection)
+    file.removeFolder('cache')
+    file.createFolder('cache')
     minDate = getter.getMinDate()
     maxDate = getter.getMaxDate()
     endPhase = getter.getEndPhase()
     stallStates = getter.getStallStates()
     events = cache.getData('events.json')
-    #events = getter.getEvents()
-    #file.writeOnJsonFile('cache/events.json', events)
+    events = getter.getEvents()
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     codeStateTag = utilities.getTagName("codeStateTag")
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    countTag = utilities.getTagName("countTag")
     dateTag = utilities.getTagName("dateTag")
     durationTag = utilities.getTagName("durationTag")
+    durationFinalTag = utilities.getTagName("durationFinalTag")
     eventDurationSequenceTag = utilities.getTagName("eventDurationSequenceTag")
     eventTag = utilities.getTagName("eventTag")
     eventsTag = utilities.getTagName("eventsTag")
@@ -49,23 +50,18 @@ def restartData():
     stateDurationSequenceTag = utilities.getTagName("stateDurationSequenceTag")
     stateSequenceTag = utilities.getTagName("stateSequenceTag")
     subjectTag = utilities.getTagName("subjectTag")
-    #getter.getEventsInfo(codeEventTag, eventTag)
-    #getter.getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
-    #getter.getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
-    #events = cache.getData('events.json')
-    #eventsDataframe = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
-    #processesEvents, processesInfo, finishedProcesses, unfinishedProcesses = getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, eventDurationSequenceTag, eventTag, eventsTag, eventSequenceTag, finishedTag, numEventTag, numProcessTag, phaseDBTag, phaseDurationSequenceTag, phaseSequenceTag, processDateTag, sectionTag, stateTag, stateDurationSequenceTag, stateSequenceTag, subjectTag)
-    #cache.updateCache('processesInfo.json', processesInfo)
-    #file.writeOnJsonFile('cache/finishedProcesses.json', finishedProcesses)
-    #file.writeOnJsonFile('cache/unfinishedProcesses.json', unfinishedProcesses)
-    processesInfo = cache.getDataframe('processesInfo.json')
-    finishedProcesses = cache.getData('finishedProcesses.json')
-    unfinishedProcesses = cache.getData('unfinishedProcesses.json')
-    #unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processesInfo, codeJudgeTag, codeSubjectTag, durationTag, eventDurationSequenceTag, eventSequenceTag, finishedTag, numProcessTag, phaseDurationSequenceTag, phaseSequenceTag, sectionTag, stateDurationSequenceTag, stateSequenceTag)
-    unfinishedProcessesDurations = prediction.predictDurations(finishedProcesses, unfinishedProcesses, codeJudgeTag, codeSubjectTag, durationTag, eventDurationSequenceTag, eventSequenceTag, finishedTag, numProcessTag, phaseDurationSequenceTag, phaseSequenceTag, sectionTag, stateDurationSequenceTag, stateSequenceTag)
+    getter.getEventsInfo(codeEventTag, eventTag)
+    getter.getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
+    getter.getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
+    eventsDataframe = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
+    processesEvents, processInfo = getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventDurationSequenceTag, eventTag, eventsTag, eventSequenceTag, finishedTag, numEventTag, numProcessTag, phaseDBTag, phaseDurationSequenceTag, phaseSequenceTag, processDateTag, sectionTag, stateTag, stateDurationSequenceTag, stateSequenceTag, subjectTag)
+    finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
+    predictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationFinalTag, finishedTag, numProcessTag, sectionTag)
+    print('Prediction Error: ', predictionError)
     exit()
-    cache.updateCache('events.json', eventsDataframe)
+    unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, finishedTag, numProcessTag, sectionTag)
     file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
+    cache.updateCache('events.json', eventsDataframe)
     file.writeOnJsonFile('cache/processesEvents.json', processesEvents)
     exit()
     refreshData()
@@ -116,37 +112,37 @@ def refreshData():
     print(str(time.time() - start) + " seconds")
 
 # group events by process.
-def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, eventDurationSequenceTag, eventTag, eventsTag, eventSequenceTag, finishedTag, numEventTag, numProcessTag, phaseDBTag, phaseDurationSequenceTag, phaseSequenceTag, processDateTag, sectionTag, stateTag, stateDurationSequenceTag, stateSequenceTag, subjectTag):
+def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventDurationSequenceTag, eventTag, eventsTag, eventSequenceTag, finishedTag, numEventTag, numProcessTag, phaseDBTag, phaseDurationSequenceTag, phaseSequenceTag, processDateTag, sectionTag, stateTag, stateDurationSequenceTag, stateSequenceTag, subjectTag):
     if len(events) == 0:
         raise Exception("\nThere isn't any event in database.")
     allProcessEvents = []
-    finishedProcesses = []
-    unFinishedProcesses = []
+    allProcessDict = []
     df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, codeEventTag, eventTag, codeJudgeTag, dateTag, processDateTag, codeStateTag, stateTag, phaseDBTag, codeSubjectTag, subjectTag, sectionTag])
     eventsColumns = frame.getGroupBy(df, codeEventTag)
-    eventsColumns = [eventTag + ": " + e for e in eventsColumns]
     statesColumns = frame.getGroupBy(df, codeStateTag)
-    statesColumns = [stateTag + ": " + s for s in statesColumns]
     phasesColumns = frame.getGroupBy(df, phaseDBTag)
+    eventsColumns = [eventTag + ": " + e for e in eventsColumns]
+    statesColumns = [stateTag + ": " + s for s in statesColumns]
     phasesColumns = [phaseDBTag + ": " + p for p in phasesColumns]
-    dfColumns = [numProcessTag, codeJudgeTag, codeSubjectTag, sectionTag, finishedTag, durationTag] + eventsColumns + statesColumns + phasesColumns
-    processesInfoDataframe = pd.DataFrame(columns = dfColumns)
-    processDict = dict.fromkeys(dfColumns)
-    processDict = {x: 0 for x in processDict}
+    dfColumns = [numProcessTag, dateTag, codeJudgeTag, codeSubjectTag, sectionTag, finishedTag, durationTag, durationFinalTag, countTag] + eventsColumns + statesColumns + phasesColumns
     processId = events[0][numProcessTag]
     processCodeJudge = events[0][codeJudgeTag]
     processSubjectCode = events[0][codeSubjectTag]
     processSubject = events[0][subjectTag]
     processSection = events[0][sectionTag]
-    processFinished = utilities.getProcessState('unfinished')
     processStartDate = events[0][dateTag]
     processStartDateDt = dt.datetime.strptime(processStartDate, '%Y-%m-%d %H:%M:%S')
+    processFinished = utilities.getProcessState('unfinished')
     processEventSequence = []
     processPhaseSequence = []
     processStateSequence = []
     eventDurationSequence = []
     phaseDurationSequence = []
     stateDurationSequence = []
+    processEventSequenceComplete = []
+    processPhaseSequenceComplete = []
+    processStateSequenceComplete = []
+    durationSequenceComplete = []
     processEvents = {numProcessTag: processId, codeJudgeTag: processCodeJudge, codeSubjectTag: processSubjectCode, subjectTag: processSubject, sectionTag: processSection, finishedTag: processFinished, eventsTag: []}
     end = False
     continuative = False
@@ -155,16 +151,35 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
         while i < int(len(events)):
             if events[i][numProcessTag] != processId or end:
                 allProcessEvents.append(processEvents)
-                processDict.update({numProcessTag: processId})
-                processDict.update({codeJudgeTag: processCodeJudge})
-                processDict.update({codeSubjectTag: processSubjectCode})
-                processDict.update({sectionTag: processSection})
-                processDict.update({finishedTag: processFinished})
-                processesInfoDataframe = processesInfoDataframe._append(processDict, ignore_index = True)
-                if processFinished == utilities.getProcessState('finished'):
-                    finishedProcesses.append({codeJudgeTag: processCodeJudge, codeSubjectTag: processSubjectCode, sectionTag: processSection, finishedTag: processFinished, eventSequenceTag: processEventSequence, phaseSequenceTag: processPhaseSequence, stateSequenceTag: processStateSequence, eventDurationSequenceTag: eventDurationSequence, phaseDurationSequenceTag: phaseDurationSequence, stateDurationSequenceTag: stateDurationSequence})
-                else:
-                    unFinishedProcesses.append({numProcessTag: processId, codeJudgeTag: processCodeJudge, codeSubjectTag: processSubjectCode, sectionTag: processSection, finishedTag: processFinished, eventSequenceTag: processEventSequence, phaseSequenceTag: processPhaseSequence, stateSequenceTag: processStateSequence, eventDurationSequenceTag: eventDurationSequence, phaseDurationSequenceTag: phaseDurationSequence, stateDurationSequenceTag: stateDurationSequence})
+                if len(durationSequenceComplete) > 0:
+                    processDict = dict.fromkeys(dfColumns)
+                    processDict = {x: 0 for x in processDict}
+                    processDict.update({numProcessTag: processId})
+                    processDict.update({dateTag: utilities.distanceAtToday(processStartDateDt)})
+                    processDict.update({codeJudgeTag: processCodeJudge})
+                    processDict.update({codeSubjectTag: processSubjectCode})
+                    processDict.update({sectionTag: processSection})
+                    processDict.update({finishedTag: processFinished})
+                    processDict.update({durationFinalTag: durationSequenceComplete[-1]})
+                    for j in range(len(processEventSequenceComplete)):
+                        codeEvent = processEventSequenceComplete[j]
+                        phase = processPhaseSequenceComplete[j]
+                        if phase == None:
+                            phase = '0.0'
+                        codeState = processStateSequenceComplete[j]
+                        duration = durationSequenceComplete[j]
+                        eventCount = processDict.get(eventTag + ": " + codeEvent)
+                        phaseCount = processDict.get(phaseDBTag + ": " + phase)
+                        stateCount = processDict.get(stateTag + ": " + codeState)
+                        processDict.update({eventTag + ": " + codeEvent: eventCount + 1})
+                        processDict.update({phaseDBTag + ": " + phase: phaseCount + 1})
+                        processDict.update({stateTag + ": " + codeState: stateCount + 1})
+                        processDict.update({countTag: j})
+                        processDict.update({durationTag: duration})
+                        if processFinished == utilities.getProcessState('finished'):
+                            allProcessDict.append(processDict.copy())
+                    if processFinished == utilities.getProcessState('unfinished'):
+                        allProcessDict.append(processDict.copy())
                 if events[i][numProcessTag] == processId:
                     while i < len(events) - 1 and events[i][numProcessTag] == processId:
                         bar()
@@ -175,14 +190,18 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
                 processSubject = events[i][subjectTag]
                 processSection = events[i][sectionTag]
                 processFinished = utilities.getProcessState('unfinished')
-                processDict = dict.fromkeys(dfColumns)
-                processDict = {x: 0 for x in processDict}
+                processStartDate = events[i][dateTag]
+                processStartDateDt = dt.datetime.strptime(processStartDate, '%Y-%m-%d %H:%M:%S')
                 processEventSequence = []
                 processPhaseSequence = []
                 processStateSequence = []
                 eventDurationSequence = []
                 phaseDurationSequence = []
                 stateDurationSequence = []
+                processEventSequenceComplete = []
+                processPhaseSequenceComplete = []
+                processStateSequenceComplete = []
+                durationSequenceComplete = []
                 processEvents = {numProcessTag: processId, codeJudgeTag: processCodeJudge, codeSubjectTag: processSubjectCode, subjectTag: processSubject, sectionTag: processSection, finishedTag: processFinished, eventsTag: []}
                 if i < len(events) - 1:
                     end = False
@@ -210,27 +229,53 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
                 if phase == None:
                     phase = '0.0'
                 codeState = events[i][codeStateTag]
+                if len(processEventSequence) == 0 or codeEvent != processEventSequence[-1]:
+                    processEventSequence.append(codeEvent)
+                    eventDurationSequence.append(duration)
+                processEventSequenceComplete.append(codeEvent)
+                if len(processPhaseSequence) == 0 or phase != processPhaseSequence[-1]:
+                    processPhaseSequence.append(phase)
+                    phaseDurationSequence.append(duration)
+                processPhaseSequenceComplete.append(phase)
+                if len(processStateSequence) == 0 or codeState != processStateSequence[-1]:
+                    processStateSequence.append(codeState)
+                    stateDurationSequence.append(duration)
+                processStateSequenceComplete.append(codeState)
+                durationSequenceComplete.append(duration)
+            bar()
+            i += 1
+    if not end:
+        allProcessEvents.append(processEvents)
+        if len(durationSequenceComplete) > 0:
+            processDict = dict.fromkeys(dfColumns)
+            processDict = {x: 0 for x in processDict}
+            processDict.update({numProcessTag: processId})
+            processDict.update({dateTag: utilities.distanceAtToday(processStartDateDt)})
+            processDict.update({codeJudgeTag: processCodeJudge})
+            processDict.update({codeSubjectTag: processSubjectCode})
+            processDict.update({sectionTag: processSection})
+            processDict.update({finishedTag: processFinished})
+            processDict.update({durationFinalTag: durationSequenceComplete[-1]})
+            for i in range(len(processEventSequenceComplete)):
+                codeEvent = processEventSequenceComplete[i]
+                phase = processPhaseSequenceComplete[i]
+                if phase == None:
+                    phase = '0.0'
+                codeState = processStateSequenceComplete[i]
+                duration = durationSequenceComplete[i]
                 eventCount = processDict.get(eventTag + ": " + codeEvent)
                 phaseCount = processDict.get(phaseDBTag + ": " + phase)
                 stateCount = processDict.get(stateTag + ": " + codeState)
                 processDict.update({eventTag + ": " + codeEvent: eventCount + 1})
                 processDict.update({phaseDBTag + ": " + phase: phaseCount + 1})
                 processDict.update({stateTag + ": " + codeState: stateCount + 1})
-                if len(processEventSequence) == 0 or codeEvent != processEventSequence[-1]:
-                    processEventSequence.append(codeEvent)
-                    eventDurationSequence.append(duration)
-                if len(processPhaseSequence) == 0 or phase != processPhaseSequence[-1]:
-                    processPhaseSequence.append(phase)
-                    phaseDurationSequence.append(duration)
-                if len(processStateSequence) == 0 or codeState != processStateSequence[-1]:
-                    processStateSequence.append(codeState)
-                    stateDurationSequence.append(duration)
-            bar()
-            i += 1
-    if not end:
-        allProcessEvents.append(processEvents)
-        unFinishedProcesses.append({numProcessTag: processId, codeJudgeTag: processCodeJudge, codeSubjectTag: processSubjectCode, sectionTag: processSection, finishedTag: processFinished, eventSequenceTag: processEventSequence, phaseSequenceTag: processPhaseSequence, stateSequenceTag: processStateSequence, eventDurationSequenceTag: eventDurationSequence, phaseDurationSequenceTag: phaseDurationSequence, stateDurationSequenceTag: stateDurationSequence})
-    return allProcessEvents, processesInfoDataframe, finishedProcesses, unFinishedProcesses
+                processDict.update({durationTag: duration})
+                if processFinished == utilities.getProcessState('finished'):
+                    allProcessDict.append(processDict.copy())
+            if processFinished == utilities.getProcessState('unfinished'):
+                allProcessDict.append(processDict.copy())
+    processInfoDataframe = pd.DataFrame.from_dict(allProcessDict)
+    return allProcessEvents, processInfoDataframe
 
 # update events dataframe.
 def updateEventsDataframe(eventsDataframe, statesNameDataframe, courtHearingsEventsType, endPhase, codeStateTag, codeEventTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, stateTag):

@@ -7,6 +7,7 @@
     "countTag": "conteggio", 
     "dateTag": "data", 
     "durationTag": "durata",
+    "durationFinalTag": "duratafinale",
     "descriptionTag": "descrizione", 
     "descriptionSubjectTag": "descrizioneMateria",
     "eventTag": "evento",

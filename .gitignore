@@ -1,2 +1,3 @@
+cache/
 utils/database/databaseCredentials.json
 *.pyc
