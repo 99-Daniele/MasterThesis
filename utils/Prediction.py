@@ -3,12 +3,9 @@ import matplotlib.pyplot as plt
 import numpy
 import pandas as pd
 import random
-from sklearn import metrics
 from sklearn.tree import DecisionTreeClassifier
-import statistics as sts
 
 import utils.Dataframe as frame
-import utils.FileOperation as file
 import utils.utilities.Utilities as utilities
 
 # return how much finished process is like to unfinished one and duration of the finished process. 
@@ -141,8 +138,13 @@ def predictDurationsWithoutLikenessTest(df, codeJudgeTag, codeSubjectTag, countT
                         error = abs(predictedDuration - duration) / duration
                         errors.extend([error])
                 bar()
-        meanError = sts.mean(errors)
-        medianError = sts.median(errors)
+        errors = sorted(errors)
+        m = int(len(errors) / 2)
+        if len(errors) % 2 != 0:
+            medianError = errors[m]
+        else:
+            medianError = (errors[m - 1] + errors[m]) / 2.0
+        meanError = sum(errors) / len(errors)
         if meanError > 0:
             newCoeff = len(errors) / meanError
             if newCoeff > bestCoeff:
