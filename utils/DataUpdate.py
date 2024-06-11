@@ -56,13 +56,13 @@ def restartData():
     getter.getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
     eventsDataframe = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
     processesEvents, processInfo = getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventDurationSequenceTag, eventTag, eventsTag, eventSequenceTag, finishedTag, numEventTag, numProcessTag, phaseDBTag, phaseDurationSequenceTag, phaseSequenceTag, processDateTag, sectionTag, stateTag, stateDurationSequenceTag, stateSequenceTag, subjectTag)
-    #finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
+    finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
     #predictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
     #print('Prediction Error: ', predictionError)
     #exit()
-    #unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
     cache.updateCache('events.json', eventsDataframe)
-    #file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
+    file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
     file.writeOnJsonFile('cache/processesEvents.json', processesEvents)
     refreshData()
 
@@ -77,6 +77,7 @@ def refreshData():
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     dateTag = utilities.getTagName("dateTag")
     durationTag = utilities.getTagName("durationTag")
+    durationPredictedTag = utilities.getTagName("durationPredictedTag")
     eventTag = utilities.getTagName("eventTag")
     eventsTag = utilities.getTagName("eventsTag")
     eventSequenceTag = utilities.getTagName("eventSequenceTag")
@@ -98,11 +99,15 @@ def refreshData():
     if processEvents is None:
         restartData()
         processEvents = cache.getData('processesEvents.json')
+    unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
+    if unfinishedProcesses is None:
+        restartData()
+        unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
     eventsDataframe = getter.getEventsDataframe()
     statesInfoDataframe = getter.getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
     statesInfo = statesInfoDataframe.set_index(codeStateTag).T.to_dict('dict')
     endPhase = frame.getPhaseOfState(statesInfo, "DF", phaseTag)
-    processesDuration = updateTypeDurationDataframe(processEvents, statesInfo, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, eventTag, eventsTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag)
+    processesDuration = updateTypeDurationDataframe(processEvents, unfinishedProcesses, statesInfo, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, durationPredictedTag, eventTag, eventsTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag)
     updateProcessDurationDataframe(processesDuration, codeSubjectTag, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag)
     updateEventsDataframe(eventsDataframe, statesInfoDataframe, endPhase, codeStateTag, codeEventTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, stateTag)
     print(str(time.time() - start) + " seconds")
@@ -164,7 +169,7 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
                             phase = '0.0'
                         codeState = processStateSequenceComplete[j]
                         duration = int(durationSequenceComplete[j])
-                        if duration < finalDuration and j >= 9:
+                        if j >= 0:
                             eventCount = processDict.get(eventTag + ": " + codeEvent)
                             phaseCount = processDict.get(phaseDBTag + ": " + phase)
                             stateCount = processDict.get(stateTag + ": " + codeState)
@@ -262,7 +267,7 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
                     phase = '0.0'
                 codeState = processStateSequenceComplete[j]
                 duration = int(durationSequenceComplete[j])
-                if duration < finalDuration and j >= 9:
+                if j >= 0:
                     eventCount = processDict.get(eventTag + ": " + codeEvent)
                     phaseCount = processDict.get(phaseDBTag + ": " + phase)
                     stateCount = processDict.get(stateTag + ": " + codeState)
@@ -308,8 +313,8 @@ def updatePhaseEventsDataframe(phaseEventsDataframe, dateTag, numEventTag, numPr
     cache.updateCache('phaseEvents.json', phaseEventsDataframe)
 
 # update types duration dataframe.
-def updateTypeDurationDataframe(processEvents, statesName, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, eventTag, eventsTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag):
-    [processesDuration, eventsDuration, phasesDuration, statesDuration] = calcTypeDuration(processEvents, statesName, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, eventTag, eventsTag, finishedTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag)
+def updateTypeDurationDataframe(processEvents, unfinishedProcesses, statesName, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, durationPredictedTag, eventTag, eventsTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag):
+    [processesDuration, eventsDuration, phasesDuration, statesDuration] = calcTypeDuration(processEvents, unfinishedProcesses, statesName, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationPredictedTag, eventTag, eventsTag, finishedTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag)
     [eventsDurationDataframe, eventsDurationDataframeFiltered] = frame.createTypeDurationsDataFrame(eventsDuration, codeEventTag, codeJudgeTag, codeSubjectTag, dateTag, durationTag, eventTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, codeStateTag, subjectTag)
     [phasesDurationDataframe, phasesDurationDataframeFiltered] = frame.createTypeDurationsDataFrame(phasesDuration, codeEventTag, codeJudgeTag, codeSubjectTag, dateTag, durationTag, eventTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, codeStateTag, subjectTag)
     [statesDurationDataframe, statesDurationDataframeFiltered] = frame.createTypeDurationsDataFrame(statesDuration, codeEventTag, codeJudgeTag, codeSubjectTag, dateTag, durationTag, eventTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, codeStateTag, subjectTag)
@@ -322,11 +327,12 @@ def updateTypeDurationDataframe(processEvents, statesName, endPhase, codeEventTa
     return processesDuration
 
 # calc types durations.
-def calcTypeDuration(processEvents, statesName, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, eventTag, eventsTag, finishedTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag):
+def calcTypeDuration(processEvents, unfinishedProcesses, statesName, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationPredictedTag, eventTag, eventsTag, finishedTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag):
     eventsDuration = []
     phasesDuration = []
     statesDuration = []
     processesDuration = []
+    print(len(unfinishedProcesses))
     with alive_bar(int(len(processEvents))) as bar:
         for i in range(int(len(processEvents))):
             processId = processEvents[i][numProcessTag]
@@ -337,11 +343,20 @@ def calcTypeDuration(processEvents, statesName, endPhase, codeEventTag, codeJudg
             processSection = processEvents[i][sectionTag]
             [processEventsDuration, eventsSequence, eventPhaseSequence, processPhasesDuration, phasesSequence, processStateDuration, statesSequence, duration, startDate, startEventId, endDate, endId] = getDurations(processEvents[i], processId, processSubjectCode, processSubject, processFinished, statesName, endPhase, codeEventTag, codeJudgeTag, codeStateTag, dateTag, eventTag, eventsTag, numEventTag, phaseTag, sectionTag, stateTag)
             if duration != None:
-                processDuration = (processId, duration, startDate, startEventId, processCodeJudge, processSubjectCode, processSubject, processSection, processFinished, utilities.fromListToString(statesSequence), utilities.fromListToString(phasesSequence), utilities.fromListToString(eventsSequence), utilities.fromListToString(eventPhaseSequence), endDate, endId)
+                if processFinished == utilities.getProcessState('unfinished'):
+                    if str(processId) in unfinishedProcesses.keys():
+                        predictedDuration = unfinishedProcesses.get(str(processId))[durationPredictedTag]
+                        startDateDt = dt.datetime.strptime(startDate, '%Y-%m-%d %H:%M:%S')
+                        endDatePredictedDt = startDateDt + dt.timedelta(days = int(predictedDuration))
+                        endDatePredicted = endDatePredictedDt.strftime("%Y-%m-%d %H:%M:%S")
+                        processDuration = (processId, predictedDuration, startDate, startEventId, processCodeJudge, processSubjectCode, processSubject, processSection, processFinished, utilities.fromListToString(statesSequence), utilities.fromListToString(phasesSequence), utilities.fromListToString(eventsSequence), utilities.fromListToString(eventPhaseSequence), endDatePredicted, endId)
+                        processesDuration.append(processDuration)
+                else:
+                    processDuration = (processId, duration, startDate, startEventId, processCodeJudge, processSubjectCode, processSubject, processSection, processFinished, utilities.fromListToString(statesSequence), utilities.fromListToString(phasesSequence), utilities.fromListToString(eventsSequence), utilities.fromListToString(eventPhaseSequence), endDate, endId)
+                    processesDuration.append(processDuration)
                 eventsDuration.extend(processEventsDuration)
                 phasesDuration.extend(processPhasesDuration)
                 statesDuration.extend(processStateDuration)
-                processesDuration.append(processDuration)
             bar()
     return [processesDuration, eventsDuration, phasesDuration, statesDuration]
 
