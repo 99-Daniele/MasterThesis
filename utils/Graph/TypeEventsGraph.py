@@ -64,7 +64,7 @@ def typeEventUpdate(df, filename, isKey, type, typeChoice, tagChoice, first, avg
     [sections, subjects, judges, finished] = updateTypeDataBySelection(df_temp, df_data, sections, subjects, judges, finished)
     [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df_data, tagChoice, avg)   
     xticks = frame.getUniques(allData, tagChoice)
-    colorMap = utilities.phaseColorMap(tagChoice, filename, isKey)
+    colorMap = utilities.phaseColorMap(type)
     fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Durata', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
     fig.add_traces(
         px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = 'black').data
@@ -93,7 +93,7 @@ def typeSequenceUpdate(df, filename, isKey, typeChoice, tagChoice, avg, text, se
     [sections, subjects, judges, finished] = updateTypeDataBySelection(df_temp, df_data, sections, subjects, judges, finished)
     [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df_data, tagChoice, avg)
     xticks = frame.getUniques(allData, tagChoice)
-    colorMap = utilities.phaseColorMap(tagChoice, filename, isKey)
+    colorMap = utilities.phaseColorMap(tagChoice)
     fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Durata', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
     fig.add_traces(
         px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = 'black').data

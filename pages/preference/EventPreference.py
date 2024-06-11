@@ -2,8 +2,8 @@
 
 import dash as ds
 
+import utils.FileOperation as file
 import utils.Getters as getter
-import utils.graph.TypeEventsPreference as typeEvents
 import utils.utilities.Utilities as utilities
 
 # get dataframe with events names. 
@@ -21,15 +21,10 @@ def pageLayout():
     event = utilities.getPlaceholderName('event')
     eventTag = utilities.getTagName('eventTag')
     layout = ds.html.Div([
-        ds.dcc.ConfirmDialog(
-            id = 'update-e',
-            message = 'Event names table correctly updated',
-        ),
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
         ds.dcc.Link('Parametri', href='/preference'),
         ds.html.H2('PARAMETRI EVENTI'),
-        ds.html.Button("REFRESH", id = 'refresh-button-e'),
         ds.dash_table.DataTable(
             df_temp.to_dict('records'), columns = [
                 {'name': code, 'id': codeEventTag, 'editable': False}, 
@@ -38,6 +33,7 @@ def pageLayout():
                 {'name': duration, 'id': durationTag, 'editable': False}],
             filter_action = "native",
             sort_action = "native",
+            row_selectable = 'multi',
             style_cell = {'textAlign': 'left'},
             id = "eventtable"
         )
@@ -46,12 +42,28 @@ def pageLayout():
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('eventtable', 'data'),
-     ds.Output('update-e', 'displayed')],
-    ds.Input('refresh-button-e', 'n_clicks'),
+    ds.Output('eventtable', 'selected_rows'),
+    ds.Input('eventtable', 'selected_rows'),
     ds.State('eventtable', 'data')
 )
 
 # return updated data based on user choice.
-def update_dateframe(button, data):
-    return data, False
+def update_dateframe(importantIndex, data):
+    oldImportantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
+    if oldImportantEvents == None:
+        oldImportantIndex = []
+    else:
+        oldImportantIndex = []
+        for i in range(len(data)):
+            d = data[i]
+            if d.get(codeEventTag) in oldImportantEvents:
+                oldImportantIndex.extend([i])
+    if ds.ctx.triggered_id == None:
+        importantIndex = oldImportantIndex
+    else:
+        if importantIndex == None:
+            importantIndex = []
+        importantEvents = [data[x].get(codeEventTag) for x in importantIndex]
+        if len(list(set(importantEvents) - set(oldImportantEvents))) > 0 or len(list(set(oldImportantEvents) - set(importantEvents))) > 0:
+            file.writeOnTextFile('preferences/importantEvents.txt', utilities.fromListToString(importantEvents))
+    return importantIndex

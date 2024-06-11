@@ -1,4 +1,3 @@
-- sistemare preferences --> aggiungere nuova fase
 - reset fasi
 - nomi in inglese
 - selezione stati udienza/materie importanti
