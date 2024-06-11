@@ -334,7 +334,10 @@ def getAvgStdDataFrameByTypeChoice(df, typeChoice, avgChoice):
     avgTag = utilities.getTagName('avgTag')
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
-    quantileTag = utilities.getTagName('quantileTag')    
+    quantileTag = utilities.getTagName('quantileTag') 
+    phaseTag = utilities.getTagName('phaseTag')
+    df = df.sort_values(by = phaseTag).reset_index(drop = True) 
+    types = getUniques(df, typeChoice)   
     typeDuration = [typeChoice, durationTag]
     df1 = df[typeDuration].copy()
     df1[durationTag] = df1[durationTag].astype(int)
@@ -345,8 +348,14 @@ def getAvgStdDataFrameByTypeChoice(df, typeChoice, avgChoice):
         df2 = df1.groupby(typeChoice, as_index = False).median()
     df2[countTag] = df1.groupby(typeChoice).size().tolist()
     df2[quantileTag] = df1.groupby(typeChoice, as_index = False).quantile(0.75)[durationTag]
-    df1 = df1.sort_values(typeChoice).reset_index(drop = True)
-    df2 = df2.sort_values(typeChoice).reset_index(drop = True)
+    df1[typeChoice] = df1[typeChoice].astype("category")
+    df1[typeChoice] = df1[typeChoice].cat.set_categories(types)
+    df1 = df1.sort_values([typeChoice]).reset_index(drop = True)
+    df1[typeChoice] = df1[typeChoice].astype(str)
+    df2[typeChoice] = df2[typeChoice].astype("category")
+    df2[typeChoice] = df2[typeChoice].cat.set_categories(types)
+    df2 = df2.sort_values([typeChoice]).reset_index(drop = True)
+    df2[typeChoice] = df2[typeChoice].astype(str)
     return [df1, df2]
 
 # return dataframe with rows which type is present a relevant number of times.

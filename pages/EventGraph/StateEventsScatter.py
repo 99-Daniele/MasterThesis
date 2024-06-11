@@ -15,7 +15,8 @@ import utils.utilities.Utilities as utilities
 df = getter.getStateEvents()
 codeStateTag = utilities.getTagName("codeStateTag")
 importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
-df = df[df[codeStateTag].isin(importantStates)]
+if importantStates != None and len(importantStates) > 0:
+    df = df[df[codeStateTag].isin(importantStates)]
 
 # return initial layout of page.
 def pageLayout():

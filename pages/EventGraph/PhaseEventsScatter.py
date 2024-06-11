@@ -14,6 +14,7 @@ import utils.utilities.Utilities as utilities
 # get must phases from text file.
 df = getter.getPhaseEvents()
 phaseTag = utilities.getTagName('phaseTag') 
+df[phaseTag] = df[phaseTag].astype(str)
 
 # return initial layout of page.
 def pageLayout():
@@ -74,5 +75,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
-    df[phaseTag] = df[phaseTag].astype(str)
     return event.eventUpdate(df, startDate, endDate, phaseTag, None, minDate, maxDate, sections, subjects, judges)

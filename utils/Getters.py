@@ -154,7 +154,9 @@ def getProcessesDurationFiltered():
         processDurationDataframeFiltered = cache.getDataframe('processesDurationFiltered.json')
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
-    processDurationDataframeFiltered = processDurationDataframeFiltered[processDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
+    if importantSubjects != None and len(importantSubjects) > 0:
+        processDurationDataframeFiltered[codeSubjectTag] = processDurationDataframeFiltered[codeSubjectTag].astype(str)
+        processDurationDataframeFiltered = processDurationDataframeFiltered[processDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     return processDurationDataframeFiltered
 
 # get states duration from cache file.
@@ -173,7 +175,9 @@ def getStatesDurationFiltered():
         stateDurationDataframeFiltered = cache.getDataframe('statesDurationFiltered.json')
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
-    stateDurationDataframeFiltered = stateDurationDataframeFiltered[stateDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
+    if importantSubjects != None and len(importantSubjects) > 0:
+        stateDurationDataframeFiltered[codeSubjectTag] = stateDurationDataframeFiltered[codeSubjectTag].astype(str)
+        stateDurationDataframeFiltered = stateDurationDataframeFiltered[stateDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     return stateDurationDataframeFiltered
 
 # get phases duration from cache file.
@@ -192,7 +196,9 @@ def getPhasesDurationFiltered():
         phaseDurationDataframeFiltered = cache.getDataframe('phasesDurationFiltered.json')
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
-    phaseDurationDataframeFiltered = phaseDurationDataframeFiltered[phaseDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
+    if importantSubjects != None and len(importantSubjects) > 0:
+        phaseDurationDataframeFiltered[codeSubjectTag] = phaseDurationDataframeFiltered[codeSubjectTag].astype(str)
+        phaseDurationDataframeFiltered = phaseDurationDataframeFiltered[phaseDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     return phaseDurationDataframeFiltered
 
 # get events duration from cache file.
@@ -211,7 +217,9 @@ def getEventsDurationFiltered():
         eventDurationDataframeFiltered = cache.getDataframe('eventsDurationFiltered.json')
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
-    eventDurationDataframeFiltered = eventDurationDataframeFiltered[eventDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
+    if importantSubjects != None and len(importantSubjects) > 0:
+        eventDurationDataframeFiltered[codeSubjectTag] = eventDurationDataframeFiltered[codeSubjectTag].astype(str)
+        eventDurationDataframeFiltered = eventDurationDataframeFiltered[eventDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     return eventDurationDataframeFiltered
 
 # get states name dataframe.

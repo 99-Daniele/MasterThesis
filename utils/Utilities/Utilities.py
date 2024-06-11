@@ -21,6 +21,16 @@ def phaseColorMap(type):
         map.update({key: colors.get(str(phase))})
     return map
 
+# get box color.
+def getBoxColor():
+    colors = file.getDataFromJsonFile('utils/utilities/graphColors.json')
+    return [colors.get('box')]
+
+# get line color.
+def getLineColor():
+    colors = file.getDataFromJsonFile('utils/utilities/graphColors.json')
+    return colors.get('line')
+
 # change phase dataframe from gievn file.
 def changePhaseDataframe(df, filename, tags, tagJoin, joinDrop):
     df_phase, done = file.getDataframeFromTextFile(filename, tags)

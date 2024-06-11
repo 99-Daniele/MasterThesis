@@ -76,7 +76,7 @@ def pageLayout():
         ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-s', placeholder = process, style = {'display': 'none'}),
         ds.dcc.Checklist([sectionTag, subjectTag, codeJudgeTag, finishedTag], value = [], id = "choice-checklist-s", inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = "order-radioitem-s", inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.Checklist([text], value = [text], id = "text-checklist-s"),
+        ds.dcc.Checklist([text], value = [], id = "text-checklist-s"),
         ds.dcc.Graph(id = 'comparation-graph-s', figure = fig)
     ])
     return layout

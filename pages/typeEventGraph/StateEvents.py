@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.express as px
 
 import utils.Dataframe as frame
+import utils.FileOperation as file
 import utils.Getters as getter
 import utils.graph.TypeEventsGraph as typeEvent
 import utils.utilities.Utilities as utilities
@@ -15,16 +16,16 @@ codeEventTag = utilities.getTagName('codeEventTag')
 codeStateTag = utilities.getTagName('codeStateTag')
 eventTag = utilities.getTagName('eventTag')
 stateTag = utilities.getTagName('stateTag')
-eventTagChoice = eventTag
-stateTagChoice = stateTag
-isKey = False
-df = frame.keepOnlyRelevant(df, 0.005, stateTagChoice)
+importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+if importantStates != None and len(importantStates) > 0:
+    df = df[df[codeStateTag].isin(importantStates)]
 
 # return initial layout of page.
 def pageLayout():
     all = utilities.getPlaceholderName('all')
     avgTag = utilities.getTagName('avgTag')
     first = utilities.getPlaceholderName('first')
+    last = utilities.getPlaceholderName('last')
     median = utilities.getPlaceholderName('median')
     state = utilities.getPlaceholderName('state')
     text = utilities.getPlaceholderName('text')
@@ -32,7 +33,7 @@ def pageLayout():
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     subject = utilities.getPlaceholderName('subject')  
-    types = frame.getUniques(df, stateTagChoice)
+    types = frame.getGroupBy(df, stateTag)
     finishedTag = utilities.getTagName('finishedTag') 
     codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     median = utilities.getPlaceholderName('median') 
@@ -55,9 +56,9 @@ def pageLayout():
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-se', placeholder = subject, style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-se', placeholder = judge, style = {'width': 400}),
         ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-se', placeholder = process, style = {'width': 400}),
-        ds.dcc.RadioItems([first, all], value = all, id = 'display-radioitem-se', inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.RadioItems([first, all, last], value = all, id = 'display-radioitem-se', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-se', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.Checklist([text], value = [text], id = 'text-checklist-se'),
+        ds.dcc.Checklist([text], value = [], id = 'text-checklist-se'),
         ds.dcc.Graph(id = 'typeevent-graph-se', figure = fig)
     ])
     return layout
@@ -81,4 +82,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(state, display, avg, text, section, subject, judge, finished):
-    return typeEvent.typeEventUpdate(df, 'preferences/eventsName.json', isKey, stateTagChoice, state, eventTagChoice, display, avg, text, section, subject, judge, finished)
+    return typeEvent.typeEventUpdate(df, stateTag, state, eventTag, display, avg, text, section, subject, judge, finished)
