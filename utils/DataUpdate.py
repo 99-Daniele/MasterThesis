@@ -32,6 +32,7 @@ def restartData():
     dateTag = utilities.getTagName("dateTag")
     durationTag = utilities.getTagName("durationTag")
     durationFinalTag = utilities.getTagName("durationFinalTag")
+    durationPredictedTag = utilities.getTagName("durationPredictedTag")
     eventDurationSequenceTag = utilities.getTagName("eventDurationSequenceTag")
     eventTag = utilities.getTagName("eventTag")
     eventsTag = utilities.getTagName("eventsTag")
@@ -56,12 +57,12 @@ def restartData():
     eventsDataframe = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
     processesEvents, processInfo = getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventDurationSequenceTag, eventTag, eventsTag, eventSequenceTag, finishedTag, numEventTag, numProcessTag, phaseDBTag, phaseDurationSequenceTag, phaseSequenceTag, processDateTag, sectionTag, stateTag, stateDurationSequenceTag, stateSequenceTag, subjectTag)
     finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
-    predictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationFinalTag, finishedTag, numProcessTag, sectionTag)
+    predictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
     print('Prediction Error: ', predictionError)
     exit()
-    unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, finishedTag, numProcessTag, sectionTag)
-    file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
+    unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
     cache.updateCache('events.json', eventsDataframe)
+    file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
     file.writeOnJsonFile('cache/processesEvents.json', processesEvents)
     exit()
     refreshData()
@@ -160,24 +161,26 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
                     processDict.update({codeSubjectTag: processSubjectCode})
                     processDict.update({sectionTag: processSection})
                     processDict.update({finishedTag: processFinished})
-                    processDict.update({durationFinalTag: durationSequenceComplete[-1]})
+                    finalDuration = int(durationSequenceComplete[-1])
                     for j in range(len(processEventSequenceComplete)):
                         codeEvent = processEventSequenceComplete[j]
                         phase = processPhaseSequenceComplete[j]
                         if phase == None:
                             phase = '0.0'
                         codeState = processStateSequenceComplete[j]
-                        duration = durationSequenceComplete[j]
-                        eventCount = processDict.get(eventTag + ": " + codeEvent)
-                        phaseCount = processDict.get(phaseDBTag + ": " + phase)
-                        stateCount = processDict.get(stateTag + ": " + codeState)
-                        processDict.update({eventTag + ": " + codeEvent: eventCount + 1})
-                        processDict.update({phaseDBTag + ": " + phase: phaseCount + 1})
-                        processDict.update({stateTag + ": " + codeState: stateCount + 1})
-                        processDict.update({countTag: j})
-                        processDict.update({durationTag: duration})
-                        if processFinished == utilities.getProcessState('finished'):
-                            allProcessDict.append(processDict.copy())
+                        duration = int(durationSequenceComplete[j])
+                        if duration < finalDuration and j >= 9:
+                            eventCount = processDict.get(eventTag + ": " + codeEvent)
+                            phaseCount = processDict.get(phaseDBTag + ": " + phase)
+                            stateCount = processDict.get(stateTag + ": " + codeState)
+                            processDict.update({eventTag + ": " + codeEvent: eventCount + 1})
+                            processDict.update({phaseDBTag + ": " + phase: phaseCount + 1})
+                            processDict.update({stateTag + ": " + codeState: stateCount + 1})
+                            processDict.update({countTag: j + 1})
+                            processDict.update({durationTag: duration})
+                            processDict.update({durationFinalTag: finalDuration - duration})
+                            if processFinished == utilities.getProcessState('finished'):
+                                allProcessDict.append(processDict.copy())
                     if processFinished == utilities.getProcessState('unfinished'):
                         allProcessDict.append(processDict.copy())
                 if events[i][numProcessTag] == processId:
@@ -255,23 +258,26 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
             processDict.update({codeSubjectTag: processSubjectCode})
             processDict.update({sectionTag: processSection})
             processDict.update({finishedTag: processFinished})
-            processDict.update({durationFinalTag: durationSequenceComplete[-1]})
-            for i in range(len(processEventSequenceComplete)):
-                codeEvent = processEventSequenceComplete[i]
-                phase = processPhaseSequenceComplete[i]
+            finalDuration = int(durationSequenceComplete[-1])
+            for j in range(len(processEventSequenceComplete)):
+                codeEvent = processEventSequenceComplete[j]
+                phase = processPhaseSequenceComplete[j]
                 if phase == None:
                     phase = '0.0'
-                codeState = processStateSequenceComplete[i]
-                duration = durationSequenceComplete[i]
-                eventCount = processDict.get(eventTag + ": " + codeEvent)
-                phaseCount = processDict.get(phaseDBTag + ": " + phase)
-                stateCount = processDict.get(stateTag + ": " + codeState)
-                processDict.update({eventTag + ": " + codeEvent: eventCount + 1})
-                processDict.update({phaseDBTag + ": " + phase: phaseCount + 1})
-                processDict.update({stateTag + ": " + codeState: stateCount + 1})
-                processDict.update({durationTag: duration})
-                if processFinished == utilities.getProcessState('finished'):
-                    allProcessDict.append(processDict.copy())
+                codeState = processStateSequenceComplete[j]
+                duration = int(durationSequenceComplete[j])
+                if duration < finalDuration and j >= 9:
+                    eventCount = processDict.get(eventTag + ": " + codeEvent)
+                    phaseCount = processDict.get(phaseDBTag + ": " + phase)
+                    stateCount = processDict.get(stateTag + ": " + codeState)
+                    processDict.update({eventTag + ": " + codeEvent: eventCount + 1})
+                    processDict.update({phaseDBTag + ": " + phase: phaseCount + 1})
+                    processDict.update({stateTag + ": " + codeState: stateCount + 1})
+                    processDict.update({countTag: j + 1})
+                    processDict.update({durationTag: duration})
+                    processDict.update({durationFinalTag: finalDuration - duration})
+                    if processFinished == utilities.getProcessState('finished'):
+                        allProcessDict.append(processDict.copy())
             if processFinished == utilities.getProcessState('unfinished'):
                 allProcessDict.append(processDict.copy())
     processInfoDataframe = pd.DataFrame.from_dict(allProcessDict)
