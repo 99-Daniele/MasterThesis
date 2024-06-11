@@ -13,10 +13,7 @@ import utils.utilities.Utilities as utilities
 # get dataframe with all events. 
 # get important events from text file.
 df = getter.getAllEvents()
-try:
-    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
-except:
-    importantStates = None
+importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
 codeStateTag = utilities.getTagName('codeStateTag')
 
 # return initial layout of page.

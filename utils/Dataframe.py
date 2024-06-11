@@ -8,18 +8,9 @@ import utils.FileOperation as file
 import utils.utilities.Utilities as utilities
 
 # importantProcessStates, importantSections and importantSubjects are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
-try:
-    importantProcessStates = list(file.getDataFromTextFile('preferences/importantProcessStates.txt'))
-except:
-    importantProcessStates = None
-try:
-    importantSections = list(file.getDataFromTextFile('preferences/importantSections.txt'))
-except:
-    importantSections = None
-try:
-    importantSubjects = list(file.getDataFromTextFile('preferences/importantSubjects.txt'))
-except:
-    importantSubjects = None
+importantProcessStates = file.getDataFromTextFile('preferences/importantProcessStates.txt')
+importantSections = file.getDataFromTextFile('preferences/importantSections.txt')
+importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
 
 # from events list create basic events dataframe. Later he will be integrated with subject, state, phase chosen by user.
 def createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag):
@@ -62,7 +53,7 @@ def createProcessDurationsDataFrame(process, dateTag, durationTag, eventSequence
     if importantSections != None:
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
     if importantSubjects != None:
-        filteredDf = filteredDf[filteredDf[subjectTag].isin(importantSubjects)]
+        filteredDf = filteredDf[filteredDf[codeSubjectTag].isin(importantSubjects)]
     df = df.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
     filteredDf = filteredDf.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
     df = df.dropna()
@@ -76,7 +67,7 @@ def createTypeDurationsDataFrame(events, codeEventTag, codeJudgeTag, codeSubject
     if importantSections != None:
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
     if importantSubjects != None:
-        filteredDf = filteredDf[filteredDf[subjectTag].isin(importantSubjects)]
+        filteredDf = filteredDf[filteredDf[codeSubjectTag].isin(importantSubjects)]
     df = df.dropna()
     filteredDf = filteredDf.dropna()
     return [df, filteredDf]

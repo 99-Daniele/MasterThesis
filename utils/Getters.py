@@ -22,12 +22,6 @@ stallStatesQuery = "SELECT CCODST FROM tipostato WHERE FKFASEPROCESSO IS NULL"
 statesInfoQuery = "SELECT CCODST, CDESCR, FKFASEPROCESSO, IFNULL(CAST(FKFASEPROCESSO AS SIGNED), '-') FROM tipostato"
 subjectsInfoQuery = "SELECT codice, DESCCOMPLETA, rituale FROM tipomaterie"
 
-# courtHearingEvents are taken from text file. This are court hearings type events. Thay can be changed or removed directly from courtHearingEvents.txt file.
-try:
-    courtHearingsEvents = list(file.getDataFromTextFile('preferences/courtHearingsEvents.txt'))
-except:
-    courtHearingsEvents = None
-
 # get min date from all events of user database.
 def getMinDate():
     minDate = connect.getDataFromDatabase(connection, minDateQuery)

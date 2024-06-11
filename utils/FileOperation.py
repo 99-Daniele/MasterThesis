@@ -6,8 +6,6 @@ import pandas as pd
 import shutil
 import ujson
 
-import utils.utilities.Utilities as utilities
-
 # create folder.
 def createFolder(directory):
     if not os.path.isdir(directory):
@@ -28,7 +26,7 @@ def removeFile(filename):
 def getDataFromTextFile(filename):
     try:
         file = open(filename, 'r')
-        data = utilities.fromStringToList(file.read())
+        data = (file.read()).split(",")
         return data
     except (FileNotFoundError):
         return []

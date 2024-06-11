@@ -75,7 +75,7 @@ def pageLayout():
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-pr', placeholder = subject, style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-pr', placeholder = judge, style = {'width': 400}),
         ds.dcc.Dropdown(finished, multi = True, searchable = True, id = 'finished-dropdown-pr', placeholder = process, style = {'width': 400}),
-        ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-pr', placeholder = sequence, style = {'width': 400}, optionHeight = 80),
+        ds.dcc.Dropdown(sequences, multi = True, searchable = False, id = 'sequence-dropdown-pr', placeholder = sequence, style = {'width': 400}, optionHeight = 140),
         ds.dcc.Dropdown(phaseSequences, multi = True, searchable = False, id = 'phaseSequence-dropdown-pr', placeholder = phaseSequence, style = {'width': 400}),
         ds.html.Div(children = [
             ds.dcc.Dropdown(events, multi = False, searchable = True, id = 'events-dropdown-pr', placeholder = eventSequence, style = {'width': 400}),
@@ -84,7 +84,7 @@ def pageLayout():
             style = {'display': 'inline-flex', 'width': '100%'}
         ),
         ds.html.Div(children = [
-            ds.dcc.Dropdown(states, multi = False, searchable = True, id = 'states-dropdown-pr', placeholder = state, style = {'width': 400}),
+            ds.dcc.Dropdown(states, multi = False, searchable = True, id = 'states-dropdown-pr', placeholder = state, style = {'width': 400}, optionHeight = 80),
             ds.dcc.RadioItems([withTag, withOut], value = withTag, id = "states-radioitem-pr", inline = True, style = {'display': 'none'}, inputStyle = {'margin-left': "20px"})
             ],
             style = {'display': 'inline-flex', 'width': '100%'}
