@@ -3,7 +3,9 @@
 import dash as ds
 import plotly.express as px
 
+import Cache as cache
 import utils.Dataframe as frame
+import utils.FileOperation as file
 import utils.utilities.Utilities as utilities
 
 # hide page components if user select it.
@@ -144,11 +146,15 @@ def updateTypeData(df, startDate, endDate, sections, subjects, judges, finished)
 # this is done because if user wants to compare on chosen parameter, data must be updated without any filter on chosen parameter.
 # this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
 def updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio):
+    codeEventTag = utilities.getTagName("codeEventTag")
+    codeJudgeTag = utilities.getTagName("codeJudgeTag")
+    codeStateTag = utilities.getTagName("codeStateTag")
+    eventTag = utilities.getTagName("eventTag")
     eventSequenceTag = utilities.getTagName("eventSequenceTag")
     finishedTag = utilities.getTagName("finishedTag")
-    codeJudgeTag = utilities.getTagName("codeJudgeTag")
     phaseSequenceTag = utilities.getTagName("phaseSequenceTag")
     sectionTag = utilities.getTagName("sectionTag")
+    stateTag = utilities.getTagName("stateTag")
     stateSequenceTag = utilities.getTagName("stateSequenceTag")
     subjectTag = utilities.getTagName("subjectTag")
     if sections != None and len(sections) > 0:
@@ -193,10 +199,32 @@ def updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, se
     finished = frame.getGroupBy(df_temp_4, finishedTag)
     sequences = frame.getGroupBy(df_temp_5, stateSequenceTag)
     phaseSequences = frame.getGroupBy(df_temp_6, phaseSequenceTag)
-    event = frame.getGroupByFromString(df_temp_7, eventSequenceTag)
-    state = frame.getGroupByFromString(df_temp_8, phaseSequenceTag)
-    phase = frame.getGroupByFromString(df_temp_9, stateSequenceTag)
-    return [sections, subjects, judges, finished, sequences, phaseSequences, event, state, phase]
+    events = frame.getGroupByFromString(df_temp_7, eventSequenceTag)
+    importantCodeEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
+    if importantCodeEvents != None and len(importantCodeEvents) > 0:
+        eventsInfoDataframe = cache.getDataframe('eventsInfo.json')
+        eventsInfo = eventsInfoDataframe.to_dict('records')
+        importantEvents = []
+        for e in eventsInfo:
+            eventCode = e[codeEventTag]
+            eventEvent = e[eventTag]
+            if eventCode in importantCodeEvents:
+                importantEvents.append(eventEvent)
+        events = list(set(importantEvents) & set(events))
+    states = frame.getGroupByFromString(df_temp_8, stateSequenceTag)
+    importantCodeStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    if importantCodeStates != None and len(importantCodeStates) > 0:
+        statesInfoDataframe = cache.getDataframe('statesInfo.json')
+        statesInfo = statesInfoDataframe.to_dict('records')
+        importantStates = []
+        for s in statesInfo:
+            stateCode = s[codeStateTag]
+            stateState = s[stateTag]
+            if stateCode in importantCodeStates:
+                importantStates.append(stateState)
+        states = list(set(importantStates) & set(states))
+    phases = frame.getGroupByFromString(df_temp_9, phaseSequenceTag)
+    return [sections, subjects, judges, finished, sequences, phaseSequences, events, states, phases]
 
 # update data base on user choices on different parameters. In order to do that is use 'updateProcessData' method with chosen parameter as None. 
 # this is done because if user wants to compare on chosen parameter, data must be updated without any filter on chosen parameter.
@@ -270,15 +298,15 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         )
         if text == [textTag]:
             fig.add_traces(
-                px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 10)).data
+                px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
         else:
             fig.add_traces(
-                px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 10)).data
+                px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
         fig.update_layout(xaxis_tickvals = xticks)
         fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
-        return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, stateStyle, stateRadioStyle, phaseStyle, phaseRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choicesOptions
+        return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, stateStyle, stateRadioStyle, phaseStyle, phaseRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, state, phase, choicesOptions
     else:
         orderRadioStyle = {'display': 'block'}
         [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, eventChoice, stateChoice, phaseChoice)
@@ -303,7 +331,7 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != frame.addTotCountToName(allData, countTag) else False))
         fig.update_xaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
         fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
-        return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, stateStyle, stateRadioStyle, phaseStyle, phaseRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choicesOptions
+        return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, stateStyle, stateRadioStyle, phaseStyle, phaseRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, state, phase, choicesOptions
 
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for all comparation graphs except process ones.
@@ -319,7 +347,6 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
     filterTag = utilities.getTagName('filterTag')
     finishedTag = utilities.getTagName('finishedTag')
     quantileTag = utilities.getTagName('quantileTag')
-    phaseTag = utilities.getTagName('phaseTag')
     sectionTag = utilities.getTagName('sectionTag')
     subjectTag = utilities.getTagName('subjectTag')
     textTag = utilities.getPlaceholderName("text")
@@ -346,7 +373,7 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
                 px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
             fig.add_traces(
-                px.line(avgData, x = type, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 10)).data
+                px.line(avgData, x = type, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
         fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False)
         fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
@@ -369,11 +396,11 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
             )
             if text == [textTag]:
                 fig.add_traces(
-                    px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 10)).data
+                    px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
                 )
             else:
                 fig.add_traces(
-                    px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 10)).data
+                    px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
                 )
             fig.update_layout(xaxis_tickvals = xticks)
             fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
@@ -420,7 +447,7 @@ def parameterComparationUpdate(df, avgChoice, tag, text):
             px.line(avgData, x = tag, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
         )
         fig.add_traces(
-            px.line(avgData, x = tag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 10)).data
+            px.line(avgData, x = tag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
         )
     fig.update_layout(xaxis_tickvals = xticks)
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')

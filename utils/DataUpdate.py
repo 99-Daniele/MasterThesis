@@ -56,13 +56,13 @@ def restartData():
     getter.getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
     eventsDataframe = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
     processesEvents, processInfo = getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventDurationSequenceTag, eventTag, eventsTag, eventSequenceTag, finishedTag, numEventTag, numProcessTag, phaseDBTag, phaseDurationSequenceTag, phaseSequenceTag, processDateTag, sectionTag, stateTag, stateDurationSequenceTag, stateSequenceTag, subjectTag)
-    finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
-    predictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
-    print('Prediction Error: ', predictionError)
-    exit()
-    unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    #finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
+    #predictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    #print('Prediction Error: ', predictionError)
+    #exit()
+    #unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
     cache.updateCache('events.json', eventsDataframe)
-    file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
+    #file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
     file.writeOnJsonFile('cache/processesEvents.json', processesEvents)
     refreshData()
 

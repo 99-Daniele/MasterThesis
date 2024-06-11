@@ -28,15 +28,15 @@ def pageLayout():
     stateTag = utilities.getTagName('stateTag')
     layout = ds.html.Div([
         ds.dcc.ConfirmDialog(
-            id = 'update-s',
+            id = 'update-stp',
             message = 'State names table correctly updated',
         ),
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
         ds.dcc.Link('Parametri', href='/preference'),
         ds.html.H2('PARAMETRI STATI'),
-        ds.html.Button("REFRESH", id = 'refresh-button-s'),
-        ds.html.Button("RESET", id = 'reset-button-s'),
+        ds.html.Button("REFRESH", id = 'refresh-button-stp'),
+        ds.html.Button("RESET", id = 'reset-button-stp'),
         ds.dash_table.DataTable(
             df_temp.to_dict('records'), columns = [
                 {'name': code, 'id': codeStateTag, 'editable': False}, 
@@ -57,10 +57,10 @@ def pageLayout():
 # callback with input and output.
 @ds.callback(
     [ds.Output('statetable', 'data'),
-     ds.Output('update-s', 'displayed'),
+     ds.Output('update-stp', 'displayed'),
      ds.Output('statetable', 'selected_rows')],
-    [ds.Input('refresh-button-s', 'n_clicks'),
-     ds.Input('reset-button-s', 'n_clicks'),
+    [ds.Input('refresh-button-stp', 'n_clicks'),
+     ds.Input('reset-button-stp', 'n_clicks'),
      ds.Input('statetable', 'selected_rows')],
     ds.State('statetable', 'data')
 )
@@ -70,9 +70,11 @@ def update_dateframe(refreshButton, resetButton, importantIndex, data):
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         for d in data:
             d.update({phaseTag: d.get(phaseDBTag)})
-        return typeEvents.updateDatabase(data, df, codeStateTag, 'statesInfo.json'), importantIndex
+        newData, display = typeEvents.updateDatabase(data, df, codeStateTag, 'statesInfo.json')
+        return newData, display, importantIndex
     if ds.ctx.triggered_id != None and 'refresh-button' in ds.ctx.triggered_id:
-        return typeEvents.updateDatabase(data, df, codeStateTag, 'statesInfo.json'), importantIndex
+        newData, display = typeEvents.updateDatabase(data, df, codeStateTag, 'statesInfo.json')
+        return newData, display, importantIndex
     oldImportantStates = file.getDataFromTextFile('preferences/importantStates.txt')
     if oldImportantStates == None:
         oldImportantIndex = []
