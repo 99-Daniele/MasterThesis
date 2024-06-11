@@ -1,6 +1,7 @@
 from alive_progress import alive_bar
 import matplotlib.pyplot as plt
 import pandas as pd
+import random as rd
 from sklearn.tree import DecisionTreeClassifier
 
 import utils.Dataframe as frame
@@ -98,8 +99,9 @@ def predictDurationsWithoutLikenessTest(df, codeJudgeTag, codeSubjectTag, countT
             testNumProcesses = [numProcesses[i]]
             trainNumProcesses = numProcesses[:i] + numProcesses[i + 1:]
             testDF = df[df[numProcessTag].isin(testNumProcesses)].copy()
-            testDF = testDF.groupby(numProcessTag).apply(lambda x: x.sample(1)).reset_index(drop = True)
-            testDF_temp = testDF.iloc[0]
+            lTest = len(testDF)
+            r = rd.randint(0, lTest - 1)
+            testDF_temp = testDF.iloc[r]
             judge = testDF_temp[codeJudgeTag]
             subject = testDF_temp[codeSubjectTag]
             section = testDF_temp[sectionTag]
@@ -145,8 +147,9 @@ def predictDurationsWithoutLikenessTest(df, codeJudgeTag, codeSubjectTag, countT
     return meanError
 
 def predictDurationsWithoutLikeness(df, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
+    countTag = utilities.getTagName("countTag")
     finishedProcesses = df[df[finishedTag] == utilities.getProcessState('finished')]
-    unfinishedProcesses = df[df[finishedTag] == utilities.getProcessState('unfinished')]    
+    unfinishedProcesses = df[df[finishedTag] == utilities.getProcessState('unfinished')]  
     columns = df.columns.values.tolist()
     columns.remove(codeJudgeTag)
     columns.remove(codeSubjectTag)
@@ -154,7 +157,7 @@ def predictDurationsWithoutLikeness(df, codeJudgeTag, codeSubjectTag, durationTa
     columns.remove(numProcessTag)
     columns.remove(finishedTag)
     columns.remove(durationFinalTag)
-    predictions = []
+    predictions = {}
     with alive_bar(int(len(unfinishedProcesses))) as bar:
         for i in range(len(unfinishedProcesses)):
             u = unfinishedProcesses.iloc[i]
@@ -175,7 +178,9 @@ def predictDurationsWithoutLikeness(df, codeJudgeTag, codeSubjectTag, durationTa
                 model  = DecisionTreeClassifier()
                 model.fit(trainX.values, trainY)
                 predictedDuration = model.predict([testX.values])[0]
-                predictions.extend([{numProcessTag: str(processID), durationTag: str(currDuration), durationPredictedTag: str(predictedDuration)}])
+                currDuration = testX[durationTag]
+                predictedFinalDuration = currDuration + predictedDuration 
+                predictions.update({str(processID): {durationTag: str(currDuration), durationPredictedTag: str(predictedFinalDuration)}})
             bar()
     return predictions
 
