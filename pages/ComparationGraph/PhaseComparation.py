@@ -35,7 +35,7 @@ def pageLayout():
     trimesterYear = utilities.getPlaceholderName('trimesterYear')
     week = utilities.getPlaceholderName('week')
     year = utilities.getPlaceholderName('year') 
-    types = frame.getGroupBy(df, phaseTag)
+    types = frame.getUniques(df, phaseTag)
     typesSorted = sorted(types)
     sections = frame.getGroupBy(df, sectionTag)
     subjects = frame.getGroupBy(df, subjectTag)
@@ -114,5 +114,5 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, choices, order, text):
-    df_temp = df[df[phaseTag]].astype(str)
-    return comparation.typeComparationUpdate(df_temp, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, phaseTag, sections, subjects, judges, finished, choices, order, text)
+    df[phaseTag] = df[phaseTag].astype(str)
+    return comparation.typeComparationUpdate(df, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, phaseTag, sections, subjects, judges, finished, choices, order, text)

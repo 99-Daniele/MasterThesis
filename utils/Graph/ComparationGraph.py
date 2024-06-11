@@ -311,33 +311,40 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         startDate = minDate
         endDate = maxDate
+    codeJudgeTag = utilities.getTagName('codeJudgeTag')
     countTag = utilities.getTagName('countTag')
     dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
+    eventTag = utilities.getTagName('eventTag')
     filterTag = utilities.getTagName('filterTag')
     finishedTag = utilities.getTagName('finishedTag')
-    codeJudgeTag = utilities.getTagName('codeJudgeTag')
     quantileTag = utilities.getTagName('quantileTag')
+    phaseTag = utilities.getTagName('phaseTag')
     sectionTag = utilities.getTagName('sectionTag')
     subjectTag = utilities.getTagName('subjectTag')
     textTag = utilities.getPlaceholderName("text")
     df_temp = df.copy()
     if typeChoice == None:
         title = 'DURATA MEDIA ' + type[0:-1].upper() + 'I DEL PROCESSO'
-        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, type, avgChoice)  
+        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, type, avgChoice) 
         xticks = frame.getUniques(allData, type)
         [dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle] = hideAll()
         [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(df_temp, df_temp, startDate, endDate, sections, subjects, judges, finished)
-        colorMap = utilities.phaseColorMap(type)
-        fig = px.box(allData, x = type, y = durationTag, color = type, color_discrete_map = colorMap, labels = {durationTag:'Durata ' + type[0:-1] + 'i del processo [giorni]', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
-        fig.add_traces(
-            px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = 'black').data
-        )
         if text == [textTag]:
-            fig.add_traces(
-                px.line(avgData, x = type, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
-            )
+            if type == eventTag:   
+                fig = px.histogram(allData, x = type, color_discrete_sequence = ['#91BBF3'], labels = {durationTag:'Numero di ' + type[0:-1] + 'i del processo', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+            else:
+                colorMap = utilities.phaseColorMap(type)
+                fig = px.histogram(allData, x = type, color = type, color_discrete_map = colorMap, labels = {durationTag:'Numero di ' + type[0:-1] + 'i del processo', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
         else:
+            if type == eventTag:        
+                fig = px.box(allData, x = type, y = durationTag, color_discrete_sequence = ['#91BBF3'], labels = {durationTag:'Durata ' + type[0:-1] + 'i del processo [giorni]', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+            else:
+                colorMap = utilities.phaseColorMap(type)
+                fig = px.box(allData, x = type, y = durationTag, color = type, color_discrete_map = colorMap, labels = {durationTag:'Durata ' + type[0:-1] + 'i del processo [giorni]', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+            fig.add_traces(
+                px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = 'black').data
+            )
             fig.add_traces(
                 px.line(avgData, x = type, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
             )

@@ -5,14 +5,18 @@ import pandas as pd
 import plotly.express as px
 
 import utils.Dataframe as frame
+import utils.FileOperation as file
 import utils.Getters as getter
 import utils.graph.ComparationGraph as comparation
 import utils.utilities.Utilities as utilities
 
 # get dataframe with all events duration.
 df = getter.getEventsDurationFiltered()
+codeEventTag = utilities.getTagName('codeEventTag')
 eventTag = utilities.getTagName('eventTag')
-df = frame.keepOnlyRelevant(df, 0.01, eventTag)
+importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
+if importantEvents != None and len(importantEvents) > 0:
+    df = df[df[codeEventTag].isin(importantEvents)]
 
 # return initial layout of page.
 def pageLayout():
@@ -22,7 +26,7 @@ def pageLayout():
     event = utilities.getPlaceholderName('event') 
     finishedTag = utilities.getTagName('finishedTag') 
     judge = utilities.getPlaceholderName('judge') 
-    codeJudgeTag = utilities.getTagName('judcodeJudgeTaggeTag') 
+    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     median = utilities.getPlaceholderName('median') 
     month = utilities.getPlaceholderName('month')
     monthYear = utilities.getPlaceholderName('monthYear') 

@@ -10,7 +10,6 @@ import utils.utilities.Utilities as utilities
 # importantProcessStates, importantSections and importantSubjects are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
 importantProcessStates = file.getDataFromTextFile('preferences/importantProcessStates.txt')
 importantSections = file.getDataFromTextFile('preferences/importantSections.txt')
-importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
 
 # from events list create basic events dataframe. Later he will be integrated with subject, state, phase chosen by user.
 def createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag):
@@ -52,8 +51,6 @@ def createProcessDurationsDataFrame(process, dateTag, durationTag, eventSequence
         filteredDf = filteredDf[filteredDf[finishedTag].isin(importantProcessStates)]
     if importantSections != None:
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
-    if importantSubjects != None:
-        filteredDf = filteredDf[filteredDf[codeSubjectTag].isin(importantSubjects)]
     df = df.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
     filteredDf = filteredDf.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
     df = df.dropna()
@@ -66,8 +63,6 @@ def createTypeDurationsDataFrame(events, codeEventTag, codeJudgeTag, codeSubject
     filteredDf = df.copy()
     if importantSections != None:
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
-    if importantSubjects != None:
-        filteredDf = filteredDf[filteredDf[codeSubjectTag].isin(importantSubjects)]
     df = df.dropna()
     filteredDf = filteredDf.dropna()
     return [df, filteredDf]
@@ -313,6 +308,9 @@ def getAvgStdDataFrameByType(df, typeChoice, avgChoice):
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
     quantileTag = utilities.getTagName('quantileTag')
+    phaseTag = utilities.getTagName('phaseTag')
+    df = df.sort_values(by = phaseTag).reset_index(drop = True) 
+    types = getUniques(df, typeChoice)
     typeDuration = [typeChoice, durationTag]
     df1 = df[typeDuration].copy()
     if avgChoice == avgTag:
@@ -321,8 +319,14 @@ def getAvgStdDataFrameByType(df, typeChoice, avgChoice):
         df2 = df1.groupby(typeChoice, as_index = False).median()
     df2[countTag] = df1.groupby(typeChoice).size().tolist()
     df2[quantileTag] = df1.groupby(typeChoice, as_index = False).quantile(0.75)[durationTag]
-    df1 = df1.sort_values(typeChoice).reset_index(drop = True)
-    df2 = df2.sort_values(typeChoice).reset_index(drop = True)
+    df1[typeChoice] = df1[typeChoice].astype("category")
+    df1[typeChoice] = df1[typeChoice].cat.set_categories(types)
+    df1 = df1.sort_values([typeChoice]).reset_index(drop = True)
+    df1[typeChoice] = df1[typeChoice].astype(str)
+    df2[typeChoice] = df2[typeChoice].astype("category")
+    df2[typeChoice] = df2[typeChoice].cat.set_categories(types)
+    df2 = df2.sort_values([typeChoice]).reset_index(drop = True)
+    df2[typeChoice] = df2[typeChoice].astype(str)
     return [df1, df2]
 
 # return data group by chosen type.

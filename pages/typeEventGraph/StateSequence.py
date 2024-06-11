@@ -27,7 +27,7 @@ def pageLayout():
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     subject = utilities.getPlaceholderName('subject')  
-    types = frame.getGroupBy(df, stateTagChoice)
+    types = frame.getUniques(df, stateTagChoice)
     finishedTag = utilities.getTagName('finishedTag') 
     codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     median = utilities.getPlaceholderName('median') 
