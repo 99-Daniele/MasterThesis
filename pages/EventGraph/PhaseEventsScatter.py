@@ -14,6 +14,7 @@ import utils.utilities.Utilities as utilities
 # get must phases from text file.
 df = getter.getPhaseEvents()
 phaseTag = utilities.getTagName('phaseTag') 
+df[phaseTag] = df[phaseTag].astype(str)
 
 # return initial layout of page.
 def pageLayout():

@@ -13,11 +13,10 @@ import utils.utilities.Utilities as utilities
 # get dataframe with state events. 
 # get must states from text file.
 df = getter.getStateEvents()
-try:
-    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
-except:
-    importantStates = None
 codeStateTag = utilities.getTagName("codeStateTag")
+importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+if importantStates != None and len(importantStates) > 0:
+    df = df[df[codeStateTag].isin(importantStates)]
 
 # return initial layout of page.
 def pageLayout():
@@ -30,8 +29,6 @@ def pageLayout():
     sectionTag = utilities.getTagName('sectionTag')
     subject = utilities.getPlaceholderName('subject')  
     subjectTag = utilities.getTagName('subjectTag') 
-    print(df[dateTag])
-    exit()
     maxYear = dt.datetime.strptime(df[dateTag].max(), '%Y-%m-%d %H:%M:%S').year
     maxDateStart = dt.date(maxYear - 1, 1, 1)
     maxDateEnd = dt.date(maxYear, 1, 1)
@@ -80,4 +77,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
-    return event.eventUpdate(df, startDate, endDate, codeStateTag, importantStates, minDate, maxDate, sections, subjects, judges)
+    return event.eventUpdate(df, startDate, endDate, codeStateTag, None, minDate, maxDate, sections, subjects, judges)

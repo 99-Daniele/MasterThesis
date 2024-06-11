@@ -22,12 +22,6 @@ stallStatesQuery = "SELECT CCODST FROM tipostato WHERE FKFASEPROCESSO IS NULL"
 statesInfoQuery = "SELECT CCODST, CDESCR, FKFASEPROCESSO, IFNULL(CAST(FKFASEPROCESSO AS SIGNED), '-') FROM tipostato"
 subjectsInfoQuery = "SELECT codice, DESCCOMPLETA, rituale FROM tipomaterie"
 
-# courtHearingEvents are taken from text file. This are court hearings type events. Thay can be changed or removed directly from courtHearingEvents.txt file.
-try:
-    courtHearingsEvents = list(file.getDataFromTextFile('preferences/courtHearingsEvents.txt'))
-except:
-    courtHearingsEvents = None
-
 # get min date from all events of user database.
 def getMinDate():
     minDate = connect.getDataFromDatabase(connection, minDateQuery)
@@ -158,6 +152,11 @@ def getProcessesDurationFiltered():
     if processDurationDataframeFiltered is None:
         update.refreshData()
         processDurationDataframeFiltered = cache.getDataframe('processesDurationFiltered.json')
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
+    if importantSubjects != None and len(importantSubjects) > 0:
+        processDurationDataframeFiltered[codeSubjectTag] = processDurationDataframeFiltered[codeSubjectTag].astype(str)
+        processDurationDataframeFiltered = processDurationDataframeFiltered[processDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     return processDurationDataframeFiltered
 
 # get states duration from cache file.
@@ -174,6 +173,11 @@ def getStatesDurationFiltered():
     if stateDurationDataframeFiltered is None:
         update.refreshData()
         stateDurationDataframeFiltered = cache.getDataframe('statesDurationFiltered.json')
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
+    if importantSubjects != None and len(importantSubjects) > 0:
+        stateDurationDataframeFiltered[codeSubjectTag] = stateDurationDataframeFiltered[codeSubjectTag].astype(str)
+        stateDurationDataframeFiltered = stateDurationDataframeFiltered[stateDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     return stateDurationDataframeFiltered
 
 # get phases duration from cache file.
@@ -190,6 +194,11 @@ def getPhasesDurationFiltered():
     if phaseDurationDataframeFiltered is None:
         update.refreshData()
         phaseDurationDataframeFiltered = cache.getDataframe('phasesDurationFiltered.json')
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
+    if importantSubjects != None and len(importantSubjects) > 0:
+        phaseDurationDataframeFiltered[codeSubjectTag] = phaseDurationDataframeFiltered[codeSubjectTag].astype(str)
+        phaseDurationDataframeFiltered = phaseDurationDataframeFiltered[phaseDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     return phaseDurationDataframeFiltered
 
 # get events duration from cache file.
@@ -206,23 +215,12 @@ def getEventsDurationFiltered():
     if eventDurationDataframeFiltered is None:
         update.refreshData()
         eventDurationDataframeFiltered = cache.getDataframe('eventsDurationFiltered.json')
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
+    if importantSubjects != None and len(importantSubjects) > 0:
+        eventDurationDataframeFiltered[codeSubjectTag] = eventDurationDataframeFiltered[codeSubjectTag].astype(str)
+        eventDurationDataframeFiltered = eventDurationDataframeFiltered[eventDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     return eventDurationDataframeFiltered
-
-# get court hearings duration from cache file.
-def getCourtHearingsDuration():
-    courtHearingsDurationDataframe = cache.getDataframe('courtHearingsDuration.json')
-    if courtHearingsDurationDataframe is None:
-        update.refreshData()
-        courtHearingsDurationDataframe = cache.getDataframe('courtHearingsDuration.json')
-    return courtHearingsDurationDataframe
-
-# get court hearings duration from cache file filtered by important process types, sections and subjects.
-def getCourtHearingsDurationFiltered():
-    courtHearingsDurationFiltered = cache.getDataframe('courtHearingsDurationFiltered.json')
-    if courtHearingsDurationFiltered is None:
-        update.refreshData()
-        courtHearingsDurationFiltered = cache.getDataframe('courtHearingsDurationFiltered.json')
-    return courtHearingsDurationFiltered
 
 # get states name dataframe.
 def getStateNamesDataframe():

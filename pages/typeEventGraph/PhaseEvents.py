@@ -11,14 +11,9 @@ import utils.utilities.Utilities as utilities
 
 # get dataframe with all events duration.
 df = getter.getStatesDuration()
-code = utilities.getPlaceholderName('code')
-codeEventTag = utilities.getTagName('codeEventTag')
-codeStateTag = utilities.getTagName('codeStateTag')
 eventTag = utilities.getTagName('eventTag')
 stateTag = utilities.getTagName('stateTag')
 phaseTag = utilities.getTagName('phaseTag')
-eventTagChoice = eventTag
-stateTagChoice = stateTag
 isKey = False
 
 # return initial layout of page.
@@ -26,15 +21,16 @@ def pageLayout():
     all = utilities.getPlaceholderName('all')
     avgTag = utilities.getTagName('avgTag')
     first = utilities.getPlaceholderName('first')
+    judge = utilities.getPlaceholderName('judge') 
+    last = utilities.getPlaceholderName('last') 
     median = utilities.getPlaceholderName('median')
     phase = utilities.getPlaceholderName('phase')
-    text = utilities.getPlaceholderName('text')
-    judge = utilities.getPlaceholderName('judge') 
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     subject = utilities.getPlaceholderName('subject') 
     tag = utilities.getPlaceholderName('tag') 
-    types = frame.getGroupBy(df, phaseTag)
+    text = utilities.getPlaceholderName('text')
+    types = frame.getUniques(df, phaseTag)
     finishedTag = utilities.getTagName('finishedTag') 
     codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     median = utilities.getPlaceholderName('median') 
@@ -52,16 +48,15 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Grafici tipo eventi', href='/typeevent'),
         ds.html.H2('EVENTI FASE'),
-        ds.dcc.Dropdown(types, value = "2", multi = False, searchable = True, clearable = False, id = 'type-dropdown-phe', placeholder = phase, style = {'width': 400}),
+        ds.dcc.Dropdown(types, value = types[3], multi = False, searchable = True, clearable = False, id = 'type-dropdown-phe', placeholder = phase, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-phe', placeholder = section, style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-phe', placeholder = subject, style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-phe', placeholder = judge, style = {'width': 400}),
         ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-phe', placeholder = process, style = {'width': 400}),
-        ds.dcc.RadioItems([first, all], value = all, id = 'display-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.RadioItems([eventTagChoice, stateTagChoice], value = eventTagChoice, id = 'choice-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.RadioItems([first, all, last], value = all, id = 'display-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
+        ds.dcc.RadioItems([stateTag, eventTag], value = stateTag, id = 'choice-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.RadioItems([code, tag], value = tag, id = 'tag-radioitem-phe', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.Checklist([text], value = [text], id = 'text-checklist-phe'),
+        ds.dcc.Checklist([text], value = [], id = 'text-checklist-phe'),
         ds.dcc.Graph(id = 'typeevent-graph-phe', figure = fig)
     ])
     return layout
@@ -77,7 +72,6 @@ def pageLayout():
         ds.Input('display-radioitem-phe', 'value'),
         ds.Input('choice-radioitem-phe', 'value'),
         ds.Input('avg-radioitem-phe', 'value'),
-        ds.Input('tag-radioitem-phe', 'value'),
         ds.Input('text-checklist-phe', 'value'),
         ds.Input('section-dropdown-phe', 'value'),
         ds.Input('subject-dropdown-phe', 'value'),
@@ -86,11 +80,9 @@ def pageLayout():
 )
 
 # return updated data based on user choice.
-def updateOutput(state, display, tagChoice, avg, tag, text, section, subject, judge, finished):
-    if tagChoice == eventTagChoice:
+def updateOutput(state, display, tagChoice, avg, text, section, subject, judge, finished):
+    if tagChoice == eventTag:
         df = getter.getEventsDuration()
-        filename = 'preferences/eventsName.json'
     else:
         df = getter.getStatesDuration()
-        filename = 'preferences/statesName.json'
-    return typeEvent.typeEventUpdate(df, filename, isKey, phaseTag, state, tagChoice, display, avg, text, section, subject, judge, finished)
+    return typeEvent.typeEventUpdate(df, phaseTag, state, tagChoice, display, avg, text, section, subject, judge, finished)

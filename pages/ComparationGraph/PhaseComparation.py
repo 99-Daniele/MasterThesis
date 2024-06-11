@@ -12,6 +12,7 @@ import utils.utilities.Utilities as utilities
 # get dataframe with all phases duration.
 df = getter.getPhasesDurationFiltered()
 phaseTag = utilities.getTagName('phaseTag') 
+df[phaseTag] = df[phaseTag].astype(str)
 
 # return initial layout of page.
 def pageLayout():
@@ -35,7 +36,7 @@ def pageLayout():
     trimesterYear = utilities.getPlaceholderName('trimesterYear')
     week = utilities.getPlaceholderName('week')
     year = utilities.getPlaceholderName('year') 
-    types = frame.getGroupBy(df, phaseTag)
+    types = frame.getUniques(df, phaseTag)
     typesSorted = sorted(types)
     sections = frame.getGroupBy(df, sectionTag)
     subjects = frame.getGroupBy(df, subjectTag)
@@ -71,7 +72,7 @@ def pageLayout():
         ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-ph', placeholder = process, style = {'display': 'none'}),
         ds.dcc.Checklist([sectionTag, subjectTag, codeJudgeTag, finishedTag], value = [], id = 'choice-checklist-ph', inline = True, style = {'display': 'none'}),
         ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = 'order-radioitem-ph', inline = True, style = {'display': 'none'}),
-        ds.dcc.Checklist([text], value = [text], id = 'text-checklist-ph'),
+        ds.dcc.Checklist([text], value = [], id = 'text-checklist-ph'),
         ds.dcc.Graph(id = 'comparation-graph-ph', figure = fig)
     ])
     return layout
@@ -114,4 +115,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, choices, order, text):
-    return comparation.typeComparationUpdate(df, 'preferences/statesName.json', typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, phaseTag, sections, subjects, judges, finished, choices, order, text)
+    return comparation.typeComparationUpdate(df, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, phaseTag, sections, subjects, judges, finished, choices, order, text)

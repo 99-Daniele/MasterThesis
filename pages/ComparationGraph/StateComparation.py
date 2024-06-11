@@ -5,14 +5,19 @@ import pandas as pd
 import plotly.express as px
 
 import utils.Dataframe as frame
+import utils.FileOperation as file
 import utils.Getters as getter
 import utils.graph.ComparationGraph as comparation
 import utils.utilities.Utilities as utilities
 
 # get dataframe with all phases duration.
 df = getter.getStatesDurationFiltered()
+codeStateTag = utilities.getTagName('codeStateTag') 
+phaseTag = utilities.getTagName('phaseTag') 
 stateTag = utilities.getTagName('stateTag') 
-df = frame.keepOnlyRelevant(df, 0.01, stateTag)
+importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+if importantStates != None and len(importantStates) > 0:
+    df = df[df[codeStateTag].isin(importantStates)]
 
 # return initial layout of page.
 def pageLayout():
@@ -37,7 +42,6 @@ def pageLayout():
     week = utilities.getPlaceholderName('week')
     year = utilities.getPlaceholderName('year') 
     types = frame.getGroupBy(df, stateTag)
-    typesSorted = sorted(types)
     sections = frame.getGroupBy(df, sectionTag)
     subjects = frame.getGroupBy(df, subjectTag)
     judges = frame.getGroupBy(df, codeJudgeTag)
@@ -65,14 +69,14 @@ def pageLayout():
             ],
             style = {'display':'flex'}
         ),
-        ds.dcc.Dropdown(typesSorted, multi = False, searchable = False, id = 'type-dropdown-s', placeholder = state, style = {'width': 400}),
+        ds.dcc.Dropdown(types, multi = False, searchable = False, id = 'type-dropdown-s', placeholder = state, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-s', placeholder = section, style = {'display': 'none'}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-s', placeholder = subject, style = {'display': 'none'}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-s', placeholder = judge, style = {'display': 'none'}),
         ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-s', placeholder = process, style = {'display': 'none'}),
         ds.dcc.Checklist([sectionTag, subjectTag, codeJudgeTag, finishedTag], value = [], id = "choice-checklist-s", inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = "order-radioitem-s", inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.Checklist([text], value = [text], id = "text-checklist-s"),
+        ds.dcc.Checklist([text], value = [], id = "text-checklist-s"),
         ds.dcc.Graph(id = 'comparation-graph-s', figure = fig)
     ])
     return layout
@@ -115,4 +119,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, choices, order, text):
-    return comparation.typeComparationUpdate(df, 'preferences/statesName.json', typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, stateTag, sections, subjects, judges, finished, choices, order, text)
+    return comparation.typeComparationUpdate(df, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, stateTag, sections, subjects, judges, finished, choices, order, text)

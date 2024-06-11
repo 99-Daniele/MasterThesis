@@ -2,8 +2,8 @@
 
 import dash as ds
 
+import utils.FileOperation as file
 import utils.Getters as getter
-import utils.graph.TypeEventsPreference as typeEvents
 import utils.utilities.Utilities as utilities
 
 # get dataframe with judge names. 
@@ -22,15 +22,10 @@ def pageLayout():
     ritualTag = utilities.getTagName('ritualTag')
     subjectTag = utilities.getTagName('subjectTag')
     layout = ds.html.Div([
-        ds.dcc.ConfirmDialog(
-            id = 'update-su',
-            message = 'Subjects names table correctly updated',
-        ),
         ds.dcc.Link('Home', href='/'),
         ds.html.Br(),
         ds.dcc.Link('Parametri', href='/preference'),
         ds.html.H2('PARAMETRI MATERIA'),
-        ds.html.Button("REFRESH", id = 'refresh-button-su'),
         ds.dash_table.DataTable(
             df_temp.to_dict('records'), columns = [
                 {'name': code, 'id': codeSubjectTag, 'editable': False},
@@ -40,6 +35,7 @@ def pageLayout():
                 {'name': duration, 'id': durationTag, 'editable': False}],
             filter_action = "native",
             sort_action = "native",
+            row_selectable = 'multi',
             style_cell = {'textAlign': 'left'},
             id = "subjecttable"
         )
@@ -48,12 +44,28 @@ def pageLayout():
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('subjecttable', 'data'),
-     ds.Output('update-su', 'displayed')],
-    ds.Input('refresh-button-su', 'n_clicks'),
+    ds.Output('subjecttable', 'selected_rows'),
+    ds.Input('subjecttable', 'selected_rows'),
     ds.State('subjecttable', 'data')
 )
 
 # return updated data based on user choice.
-def update_dateframe(button, data):
-    return data, False
+def update_dateframe(importantIndex, data):
+    oldImportantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
+    if oldImportantSubjects == None:
+        oldImportantIndex = []
+    else:
+        oldImportantIndex = []
+        for i in range(len(data)):
+            d = data[i]
+            if d.get(codeSubjectTag) in oldImportantSubjects:
+                oldImportantIndex.extend([i])
+    if ds.ctx.triggered_id == None:
+        importantIndex = oldImportantIndex
+    else:
+        if importantIndex == None:
+            importantIndex = []
+        importantSubjects = [data[x].get(codeSubjectTag) for x in importantIndex]
+        if len(list(set(importantSubjects) - set(oldImportantSubjects))) > 0 or len(list(set(oldImportantSubjects) - set(importantSubjects))) > 0:
+            file.writeOnTextFile('preferences/importantSubjects.txt', utilities.fromListToString(importantSubjects))
+    return importantIndex

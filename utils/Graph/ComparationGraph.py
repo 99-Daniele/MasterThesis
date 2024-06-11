@@ -264,20 +264,20 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         orderRadioStyle = {'display': 'none'}
         [allData, avgData] = frame.getAvgStdDataFrameByDate(df_data, dateType, avgChoice)
         xticks = frame.getUniques(avgData, dateTag)
-        fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = ['#91BBF3'], labels = {durationTag:'Durata del processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
+        fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Durata del processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
         fig.add_traces(
-            px.line(avgData, x = dateTag, y = durationTag, markers = True).update_traces(line_color = 'black').data
+            px.line(avgData, x = dateTag, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
         )
         if text == [textTag]:
             fig.add_traces(
-                px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
+                px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 10)).data
             )
         else:
             fig.add_traces(
-                px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
+                px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 10)).data
             )
         fig.update_layout(xaxis_tickvals = xticks)
-        fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
+        fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
         return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, stateStyle, stateRadioStyle, phaseStyle, phaseRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choicesOptions
     else:
         orderRadioStyle = {'display': 'block'}
@@ -301,48 +301,55 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         )
         fig.update_layout(xaxis_tickvals = xticks)
         fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != frame.addTotCountToName(allData, countTag) else False))
-        fig.update_xaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
-        fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
+        fig.update_xaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
+        fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
         return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, stateStyle, stateRadioStyle, phaseStyle, phaseRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, choicesOptions
 
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for all comparation graphs except process ones.
-def typeComparationUpdate(df, filename, typeChoice, avgChoice, dateType, startDate, endDate, minDate, maxDate, type, sections, subjects, judges, finished, choices, order, text):
+def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate, minDate, maxDate, type, sections, subjects, judges, finished, choices, order, text):
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         startDate = minDate
         endDate = maxDate
+    codeJudgeTag = utilities.getTagName('codeJudgeTag')
     countTag = utilities.getTagName('countTag')
     dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
+    eventTag = utilities.getTagName('eventTag')
     filterTag = utilities.getTagName('filterTag')
     finishedTag = utilities.getTagName('finishedTag')
-    codeJudgeTag = utilities.getTagName('codeJudgeTag')
     quantileTag = utilities.getTagName('quantileTag')
+    phaseTag = utilities.getTagName('phaseTag')
     sectionTag = utilities.getTagName('sectionTag')
     subjectTag = utilities.getTagName('subjectTag')
     textTag = utilities.getPlaceholderName("text")
     df_temp = df.copy()
     if typeChoice == None:
         title = 'DURATA MEDIA ' + type[0:-1].upper() + 'I DEL PROCESSO'
-        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, type, avgChoice)  
+        [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, type, avgChoice) 
         xticks = frame.getUniques(allData, type)
         [dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle] = hideAll()
         [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(df_temp, df_temp, startDate, endDate, sections, subjects, judges, finished)
-        colorMap = utilities.phaseColorMap(type, filename, False)
-        fig = px.box(allData, x = type, y = durationTag, color = type, color_discrete_map = colorMap, labels = {durationTag:'Durata ' + type[0:-1] + 'i del processo [giorni]', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
-        fig.add_traces(
-            px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = 'black').data
-        )
         if text == [textTag]:
-            fig.add_traces(
-                px.line(avgData, x = type, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
-            )
+            if type == eventTag:   
+                fig = px.histogram(allData, x = type, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Numero di ' + type[0:-1] + 'i del processo', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+            else:
+                colorMap = utilities.phaseColorMap(type)
+                fig = px.histogram(allData, x = type, color = type, color_discrete_map = colorMap, labels = {durationTag:'Numero di ' + type[0:-1] + 'i del processo', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
         else:
+            if type == eventTag:        
+                fig = px.box(allData, x = type, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Durata ' + type[0:-1] + 'i del processo [giorni]', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+            else:
+                colorMap = utilities.phaseColorMap(type)
+                fig = px.box(allData, x = type, y = durationTag, color = type, color_discrete_map = colorMap, labels = {durationTag:'Durata ' + type[0:-1] + 'i del processo [giorni]', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
             fig.add_traces(
-                px.line(avgData, x = type, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
+                px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
+            )
+            fig.add_traces(
+                px.line(avgData, x = type, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 10)).data
             )
         fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False)
-        fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
+        fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
         return fig, startDate, endDate, dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, title
     else:
         title = 'CONFRONTO DURATA ' + type.upper() + ' ' + str(typeChoice).upper()            
@@ -351,24 +358,25 @@ def typeComparationUpdate(df, filename, typeChoice, avgChoice, dateType, startDa
         df_temp = frame.getTypesDataFrame(df_temp, type, [typeChoice])
         df_data = updateTypeData(df_temp, startDate, endDate, sections, subjects, judges, finished)
         [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(df_temp, df_data, startDate, endDate, sections, subjects, judges, finished)
+        
         if choices == None or len(choices) == 0:
             orderRadioStyle = {'display': 'none'}
             [allData, avgData] = frame.getAvgStdDataFrameByDate(df_data, dateType, avgChoice)
             xticks = frame.getUniques(avgData, dateTag)
-            fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = ['#91BBF3'], labels = {durationTag:'Durata ' + type + " " + str(typeChoice) + ' [giorni]', dateTag:'Data inizio ' + type + " " + str(typeChoice)}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
+            fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Durata ' + type + " " + str(typeChoice) + ' [giorni]', dateTag:'Data inizio ' + type + " " + str(typeChoice)}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
             fig.add_traces(
-                px.line(avgData, x = dateTag, y = durationTag, markers = True).update_traces(line_color = 'black').data
+                px.line(avgData, x = dateTag, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
             if text == [textTag]:
                 fig.add_traces(
-                    px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
+                    px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 10)).data
                 )
             else:
                 fig.add_traces(
-                    px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = "black", size = 10)).data
+                    px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 10)).data
                 )
             fig.update_layout(xaxis_tickvals = xticks)
-            fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
+            fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
             return fig, startDate, endDate, dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, title
         else:
             orderRadioStyle = {'display': 'block'}
@@ -392,6 +400,28 @@ def typeComparationUpdate(df, filename, typeChoice, avgChoice, dateType, startDa
             )
             fig.update_layout(xaxis_tickvals = xticks)
             fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != frame.addTotCountToName(allData, countTag) else False))
-            fig.update_xaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
-            fig.update_yaxes(gridcolor = 'rgb(160, 160, 160)', griddash = 'dash')
+            fig.update_xaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
+            fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
             return fig, startDate, endDate, dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, title
+
+# return all needed parameters in order to change graph after any user choice.
+# this method is only for process comparation graph.
+def parameterComparationUpdate(df, avgChoice, tag, text):
+    durationTag = utilities.getTagName('durationTag')
+    quantileTag = utilities.getTagName('quantileTag')
+    textTag = utilities.getPlaceholderName("text")
+    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df, tag, avgChoice)
+    xticks = frame.getUniques(avgData, tag)
+    if text == [textTag]:
+        fig = px.histogram(allData, x = tag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Numero processi', tag:tag}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8))
+    else:
+        fig = px.box(allData, x = tag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Durata del processo [giorni]', tag:tag}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
+        fig.add_traces(
+            px.line(avgData, x = tag, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
+        )
+        fig.add_traces(
+            px.line(avgData, x = tag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 10)).data
+        )
+    fig.update_layout(xaxis_tickvals = xticks)
+    fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
+    return fig

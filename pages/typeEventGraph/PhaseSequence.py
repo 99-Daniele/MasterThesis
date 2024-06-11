@@ -12,7 +12,6 @@ import utils.utilities.Utilities as utilities
 # get dataframe with all events duration.
 df = getter.getPhasesDuration()
 phaseTag = utilities.getTagName('phaseTag')
-isKey = False
 
 # return initial layout of page.
 def pageLayout():
@@ -24,7 +23,7 @@ def pageLayout():
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     subject = utilities.getPlaceholderName('subject')  
-    types = frame.getGroupBy(df, phaseTag)
+    types = frame.getUniques(df, phaseTag)
     finishedTag = utilities.getTagName('finishedTag') 
     codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     median = utilities.getPlaceholderName('median') 
@@ -48,7 +47,7 @@ def pageLayout():
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-phsq', placeholder = judge, style = {'width': 400}),
         ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-phsq', placeholder = process, style = {'width': 400}),
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-phsq', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.Checklist([text], value = [text], id = 'text-checklist-phsq'),
+        ds.dcc.Checklist([text], value = [], id = 'text-checklist-phsq'),
         ds.dcc.Graph(id = 'typeevent-graph-phsq', figure = fig)
     ])
     return layout
@@ -71,4 +70,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(phase, avg, text, section, subject, judge, finished):
-    return typeEvent.typeSequenceUpdate(df, 'preferences/statesName.json', isKey, phase, phaseTag, avg, text, section, subject, judge, finished)
+    return typeEvent.typeSequenceUpdate(df, phase, phaseTag, avg, text, section, subject, judge, finished)

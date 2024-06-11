@@ -22,19 +22,14 @@ def removeFile(filename):
         os.remove(filename)
 
 # get data from text file.
-# in case file not existing, raise an exception.
+# in case file not existing, return empty list.
 def getDataFromTextFile(filename):
     try:
         file = open(filename, 'r')
-        data = []
-        for line in file.read().splitlines():
-            if line[-1] == ',':
-                line = line[0:-1]
-            d = eval(line)
-            data.append(d)
+        data = (file.read()).split(",")
         return data
     except (FileNotFoundError):
-        raise Exception("\n" + filename + " does not exists!")
+        return []
 
 # get dataframe from text file.
 # in case file not existing, return None.
@@ -71,15 +66,6 @@ def getDataframeFromJsonFile(filename):
 def writeOnTextFile(filename, data):
     try:
         f = open(filename, 'w')
-        f.write(data)
-    except (FileNotFoundError):
-        raise Exception("\n" + filename + " does not exists!")
-
-# append on text file.
-# in case file not existing, raise an exception.
-def appendOnTextFile(filename, data):
-    try:
-        f = open(filename, 'a')
         f.write(data)
     except (FileNotFoundError):
         raise Exception("\n" + filename + " does not exists!")

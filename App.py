@@ -13,14 +13,11 @@ def start():
     import pages.comparationGraph.PhaseComparation as phaseComparationPage
     import pages.comparationGraph.ProcessComparation as processComparationPage
     import pages.comparationGraph.StateComparation as stateComparationPage
+    import pages.comparationGraph.TypeComparation as typeComparationPage
     import pages.eventGraph.AllEventsScatter as allEventsPage
-    import pages.eventGraph.CourtHearingEventsScatter as courtHearingEventsPage
-    import pages.eventGraph.ImportantEventsScatter as importantEventsPage
     import pages.eventGraph.PhaseEventsScatter as phaseEventsPage
     import pages.eventGraph.StateEventsScatter as stateEventsPage
-    #import pages.preference.CourtHearingPreference as courtHearingPreferencePage
     import pages.preference.EventPreference as eventPreferencePage
-    import pages.preference.JudgePreference as judgePreferencePage
     import pages.preference.StatePreference as statePreferencePage
     import pages.preference.SubjectPreference as subjectPreferencePage
     import pages.typeEventGraph.EventSequence as sequenceEventPage
@@ -56,22 +53,16 @@ def start():
                 return processComparationPage.pageLayout()
             case '/comparationgraph/statecomparation':
                 return stateComparationPage.pageLayout()
+            case '/comparationgraph/typecomparation':
+                return typeComparationPage.pageLayout()
             case '/eventgraph/allevents':
                 return allEventsPage.pageLayout()
-            case '/eventgraph/courthearingevents':
-                return courtHearingEventsPage.pageLayout()
-            case '/eventgraph/importantevents':
-                return importantEventsPage.pageLayout()
             case '/eventgraph/phaseevents':
                 return phaseEventsPage.pageLayout()
             case '/eventgraph/stateevents':
                 return stateEventsPage.pageLayout()
-            #case '/preference/courthearingpreference':
-            #    return courtHearingPreferencePage.pageLayout()
             case '/preference/eventpreference':
                 return eventPreferencePage.pageLayout()
-            case '/preference/judgepreference':
-                return judgePreferencePage.pageLayout()
             case '/preference/statepreference':
                 return statePreferencePage.pageLayout()
             case '/preference/subjectpreference':
