@@ -9,12 +9,8 @@ def pageLayout():
         ds.html.H2('Grafici eventi'),
         ds.dcc.Link('Tutti gli eventi', href = '/eventgraph/allevents'),
         ds.html.Br(),
-        ds.dcc.Link('Eventi importanti', href = '/eventgraph/importantevents'),
-        ds.html.Br(),
         ds.dcc.Link('Eventi fasi', href = '/eventgraph/phaseevents'),
         ds.html.Br(),
-        ds.dcc.Link('Eventi stati', href = '/eventgraph/stateevents'),
-        ds.html.Br(),
-        ds.dcc.Link('Eventi udienze', href = '/eventgraph/courthearingevents')
+        ds.dcc.Link('Eventi stati', href = '/eventgraph/stateevents')
     ])
     return layout

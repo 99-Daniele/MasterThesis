@@ -13,6 +13,8 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Confronto stati', href = '/comparationgraph/statecomparation'),        
         ds.html.Br(),
-        ds.dcc.Link('Confronto eventi', href = '/comparationgraph/eventcomparation')
+        ds.dcc.Link('Confronto eventi', href = '/comparationgraph/eventcomparation'),    
+        ds.html.Br(),
+        ds.dcc.Link('Confronto tipi', href = '/comparationgraph/typecomparation')
     ])
     return layout
