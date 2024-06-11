@@ -65,6 +65,15 @@ def displayEventComparation():
     ])
     app.run_server(debug = True)
 
+# display types comparation graph.
+def displayTypeComparation():
+    import pages.comparationGraph.TypeComparation as typeComparationPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = typeComparationPage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
 # display state events graph.
 def displayStatesEvents():
     import pages.typeEventGraph.StateEvents as stateEventsPage
@@ -153,4 +162,4 @@ def startApp():
     app.start()
 
 if __name__ == '__main__':
-    displayEventSequence()
+    displayTypeComparation()

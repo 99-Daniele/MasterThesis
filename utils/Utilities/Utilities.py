@@ -26,6 +26,16 @@ def getBoxColor():
     colors = file.getDataFromJsonFile('utils/utilities/graphColors.json')
     return [colors.get('box')]
 
+# get char color.
+def getCharColor():
+    colors = file.getDataFromJsonFile('utils/utilities/graphColors.json')
+    return colors.get('char')
+
+# get grid color.
+def getGridColor():
+    colors = file.getDataFromJsonFile('utils/utilities/graphColors.json')
+    return colors.get('grid')
+
 # get line color.
 def getLineColor():
     colors = file.getDataFromJsonFile('utils/utilities/graphColors.json')
