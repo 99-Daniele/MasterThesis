@@ -58,7 +58,7 @@ def update_dateframe(importantIndex, data):
         oldImportantIndex = []
         for i in range(len(data)):
             d = data[i]
-            if d.get(codeSubjectTag) in oldImportantSubjects:
+            if str(d.get(codeSubjectTag)) in oldImportantSubjects:
                 oldImportantIndex.extend([i])
     if ds.ctx.triggered_id == None:
         importantIndex = oldImportantIndex

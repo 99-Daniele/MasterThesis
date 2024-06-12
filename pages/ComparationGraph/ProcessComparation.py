@@ -127,6 +127,8 @@ def pageLayout():
         ds.Output('sequence-dropdown-pr', 'options'),
         ds.Output('phaseSequence-dropdown-pr', 'options'),
         ds.Output('events-dropdown-pr', 'options'),
+        ds.Output('states-dropdown-pr', 'options'),
+        ds.Output('phases-dropdown-pr', 'options'),
         ds.Output('choice-checklist-pr', 'options')],
     [ds.Input('avg-radioitem-pr', 'value'),
         ds.Input('date-radioitem-pr', 'value'),
