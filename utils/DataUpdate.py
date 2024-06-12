@@ -211,7 +211,7 @@ def getProcessEvents(events, stallStates, endPhase, codeEventTag, codeJudgeTag, 
                 continuative = False
             else:
                 if events[i][codeStateTag] in stallStates and not continuative:
-                    processFinished = utilities.getProcessState('continuatived')
+                    processFinished = utilities.getProcessState('continuative')
                     processEvents[finishedTag] = processFinished
                     continuative = True
                 if events[i][phaseDBTag] == endPhase and not continuative: 
