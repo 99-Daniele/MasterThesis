@@ -332,7 +332,6 @@ def calcTypeDuration(processEvents, unfinishedProcesses, statesName, endPhase, c
     phasesDuration = []
     statesDuration = []
     processesDuration = []
-    print(len(unfinishedProcesses))
     with alive_bar(int(len(processEvents))) as bar:
         for i in range(int(len(processEvents))):
             processId = processEvents[i][numProcessTag]
