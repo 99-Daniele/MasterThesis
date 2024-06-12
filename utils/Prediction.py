@@ -51,6 +51,7 @@ def getLikenessInfo(processSequenceU, processSequenceF, processDurationF):
     likeness = likeness * 100 / l1
     return pd.Series([likeness, processDurationF[curr]])
 
+# predict duration of unfinished processes based on likeness to other processes.
 def predictDurations(finishedProcesses, unfinishedProcesses, codeJudgeTag, codeSubjectTag, durationTag, eventDurationSequenceTag, eventSequenceTag, finishedTag, numProcessTag, phaseDurationSequenceTag, phaseSequenceTag, sectionTag, stateDurationSequenceTag, stateSequenceTag):
     processesDurations = {}
     import time
@@ -83,6 +84,7 @@ def predictDurations(finishedProcesses, unfinishedProcesses, codeJudgeTag, codeS
             bar()
     return processesDurations
 
+# predict duration of finished processes based on current events flow. This evaluate the error of the model.
 def predictDurationsWithoutLikenessTest(df, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
     columns = df.columns.values.tolist()
     columns.remove(codeJudgeTag)
@@ -148,6 +150,7 @@ def predictDurationsWithoutLikenessTest(df, codeJudgeTag, codeSubjectTag, countT
     #plt.show()
     return meanError, medianError
 
+# predict duration of finished processes based on current events flow.
 def predictDurationsWithoutLikeness(df, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
     finishedProcesses = df[df[finishedTag] == utilities.getProcessState('finished')]
     unfinishedProcesses = df[df[finishedTag] == utilities.getProcessState('unfinished')]  

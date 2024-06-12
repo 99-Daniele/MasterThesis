@@ -55,10 +55,10 @@ def pageLayout():
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([
-        ds.dcc.Link('Home', href='/'),
+        ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('Grafici confronto', href='/comparationgraph'),
-        ds.html.H2("CONFRONTO DURATA MEDIA PROCESSI"),        
+        ds.dcc.Link('DURATION COMPARISON GRAPHS', href='/comparationgraph'),
+        ds.html.H2("COMPARISON OF PROCESSES DURATION"),        
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-pr', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([week, month, monthYear, trimester, trimesterYear, year], value = month, id = 'date-radioitem-pr', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.DatePickerRange(

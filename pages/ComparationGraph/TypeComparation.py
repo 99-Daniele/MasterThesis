@@ -26,10 +26,10 @@ def pageLayout():
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([
-        ds.dcc.Link('Home', href='/'),
+        ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('Grafici confronto', href='/comparationgraph'),
-        ds.html.H2("CONFRONTO DURATA PROCESSI PER " + section, id = 'title-tr'),        
+        ds.dcc.Link('DURATION COMPARISON GRAPHS', href='/comparationgraph'),
+        ds.html.H2("COMPARISON OF PROCESSES DURATION BASED ON " + section, id = 'title-tr'),        
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-tr', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Dropdown([section, judge, subject], value = section, multi = False, searchable = False, clearable = False, id = 'type-dropdown-tr', placeholder = section, style = {'width': 400}),
         ds.dcc.Checklist([text], value = [], id = "text-checklist-tr"),
@@ -50,12 +50,12 @@ def pageLayout():
 def updateOutput(avgChoice, typeChoice, text):
     if typeChoice == section:
         typeID = sectionTag
-        title = "CONFRONTO DURATA PROCESSI PER " + section
+        title = "COMPARISON OF PROCESSES DURATION BASED ON " + section
     elif typeChoice == judge:
         typeID = codeJudgeTag
-        title = "CONFRONTO DURATA PROCESSI PER " + judge
+        title = "COMPARISON OF PROCESSES DURATION BASED ON " + judge
     else:
         typeID = codeSubjectTag
-        title = "CONFRONTO DURATA PROCESSI PER " + subject
+        title = "COMPARISON OF PROCESSES DURATION BASED ON " + subject
         df[codeSubjectTag] = df[codeSubjectTag].astype(str)
     return comparation.parameterComparationUpdate(df, avgChoice, typeID, text), title

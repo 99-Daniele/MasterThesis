@@ -352,7 +352,7 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
     textTag = utilities.getPlaceholderName("text")
     df_temp = df.copy()
     if typeChoice == None:
-        title = 'DURATA MEDIA ' + type[0:-1].upper() + 'I DEL PROCESSO'
+        title = 'PROCESS ' + type[0:-1].upper() + 'S DURATION'
         [allData, avgData] = frame.getAvgStdDataFrameByType(df_temp, type, avgChoice) 
         xticks = frame.getUniques(allData, type)
         [dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle] = hideAll()
@@ -379,7 +379,7 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
         fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
         return fig, startDate, endDate, dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, title
     else:
-        title = 'CONFRONTO DURATA ' + type.upper() + ' ' + str(typeChoice).upper()            
+        title = 'COMPARISON OF ' + type.upper() + ' ' + str(typeChoice).upper() + " DURATION"     
         [dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle] = showAll()
         [[sectionStyle, subjectStyle, judgeStyle, finishedStyle], [sections, subjects, judges, finished]] = hideChosen(choices, [sectionTag, subjectTag, codeJudgeTag, finishedTag], [sectionStyle, subjectStyle, judgeStyle, finishedStyle], [sections, subjects, judges, finished])
         df_temp = frame.getTypesDataFrame(df_temp, type, [typeChoice])

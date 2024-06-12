@@ -34,10 +34,10 @@ def pageLayout():
     judges = frame.getGroupBy(df, codeJudgeTag)
     fig = px.scatter(df, x = dateTag, y = numProcessTag, color = codeStateTag, labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = 1400, height = 1200)
     layout = ds.html.Div([
-        ds.dcc.Link('Home', href='/'),
+        ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('Grafici eventi', href='/eventgraph'),
-        ds.html.H2('TUTTI GLI EVENTI DEL PROCESSO'),
+        ds.dcc.Link('EVENTS VISUALIZATION GRAPH', href='/eventgraph'),
+        ds.html.H2('VISUALIZATION OF ALL PROCESS EVENTS'),
         ds.dcc.DatePickerRange(
             id = 'event-dateranger-aes',
             start_date = maxDateStart,

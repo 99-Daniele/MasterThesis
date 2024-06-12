@@ -21,10 +21,10 @@ def pageLayout():
     event = utilities.getPlaceholderName('event')
     eventTag = utilities.getTagName('eventTag')
     layout = ds.html.Div([
-        ds.dcc.Link('Home', href='/'),
+        ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('Parametri', href='/preference'),
-        ds.html.H2('PARAMETRI EVENTI'),
+        ds.dcc.Link('USER PARAMETERS PREFERENCES', href='/preference'),
+        ds.html.H2('EVENTS USER PREFERENCES'),
         ds.dash_table.DataTable(
             df_temp.to_dict('records'), columns = [
                 {'name': code, 'id': codeEventTag, 'editable': False}, 

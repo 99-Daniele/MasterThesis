@@ -6,15 +6,15 @@ import dash as ds
 def pageLayout():
     layout = ds.html.Div([
         ds.dcc.Link('Home', href = '/'),
-        ds.html.H2('Grafici confronto'),
-        ds.dcc.Link('Confronto processi', href = '/comparationgraph/processcomparation'),
+        ds.html.H2('DURATION COMPARISON GRAPHS'),
+        ds.dcc.Link('Comparison of Processes Duration', href = '/comparationgraph/processcomparation'),
         ds.html.Br(),
-        ds.dcc.Link('Confronto fasi', href = '/comparationgraph/phasecomparation'),
+        ds.dcc.Link('Comparison of Phases Duration', href = '/comparationgraph/phasecomparation'),
         ds.html.Br(),
-        ds.dcc.Link('Confronto stati', href = '/comparationgraph/statecomparation'),        
+        ds.dcc.Link('Comparison of States Duration', href = '/comparationgraph/statecomparation'),        
         ds.html.Br(),
-        ds.dcc.Link('Confronto eventi', href = '/comparationgraph/eventcomparation'),    
+        ds.dcc.Link('Comparison of Events Duration', href = '/comparationgraph/eventcomparation'),    
         ds.html.Br(),
-        ds.dcc.Link('Confronto tipi', href = '/comparationgraph/typecomparation')
+        ds.dcc.Link('Comparison of Duration Based on Type', href = '/comparationgraph/typecomparation')
     ])
     return layout

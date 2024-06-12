@@ -51,14 +51,14 @@ def restartData():
     getter.getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
     eventsDataframe = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
     processesEvents, processInfo = getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventTag, eventsTag, finishedTag, loadTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
-    #finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
-    #avgPredictionError, medianPredictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
-    #print('Average Prediction Error: ', avgPredictionError)
-    #print('Median Prediction Error: ', medianPredictionError)
-    #unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
+    avgPredictionError, medianPredictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    print('Average Prediction Error: ', avgPredictionError)
+    print('Median Prediction Error: ', medianPredictionError)
+    unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
     cache.updateCache('events.json', eventsDataframe)
     file.writeOnJsonFile('cache/processesEvents.json', processesEvents)
-    #file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
+    file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
     refreshData()
 
 # refresh current database data. 

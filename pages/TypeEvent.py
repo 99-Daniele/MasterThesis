@@ -6,15 +6,15 @@ import dash as ds
 def pageLayout():
     layout = ds.html.Div([
         ds.dcc.Link('Home', href = '/'),
-        ds.html.H2('Grafici tipo eventi'),
-        ds.dcc.Link('Eventi in uno stato', href = '/typeevent/stateevent'),
+        ds.html.H2('COMPOSITION GRAPHS'),
+        ds.dcc.Link('State Compositions', href = '/typeevent/stateevent'),
         ds.html.Br(),
-        ds.dcc.Link('Eventi in una fase', href = '/typeevent/phaseevent'),
+        ds.dcc.Link('Phase Compositions', href = '/typeevent/phaseevent'),
         ds.html.Br(),
-        ds.dcc.Link('Sequenza stati', href = '/typeevent/statesequence'),
+        ds.dcc.Link('State Sequence', href = '/typeevent/statesequence'),
         ds.html.Br(),
-        ds.dcc.Link('Sequenza fasi', href = '/typeevent/phasesequence'),
+        ds.dcc.Link('Phase Sequence', href = '/typeevent/phasesequence'),
         ds.html.Br(),
-        ds.dcc.Link('Sequenza eventi', href = '/typeevent/eventsequence')
+        ds.dcc.Link('Event Sequence', href = '/typeevent/eventsequence')
     ])
     return layout

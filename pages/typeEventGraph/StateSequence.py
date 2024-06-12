@@ -42,10 +42,10 @@ def pageLayout():
     types = sorted(types)
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([
-        ds.dcc.Link('Home', href='/'),
+        ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('Grafici tipo eventi', href='/typeevent'),
-        ds.html.H2('SEQUENZA STATI'),
+        ds.dcc.Link('COMPOSITION GRAPHS', href='/typeevent'),
+        ds.html.H2('STATE SEQUENCE'),
         ds.dcc.Dropdown(types, value = types[0], multi = False, searchable = True, clearable = False, id = 'type-dropdown-ssq', placeholder = phase, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-ssq', placeholder = section, style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-ssq', placeholder = subject, style = {'width': 400}, optionHeight = 80),

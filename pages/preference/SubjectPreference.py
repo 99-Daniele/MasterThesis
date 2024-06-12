@@ -22,10 +22,10 @@ def pageLayout():
     ritualTag = utilities.getTagName('ritualTag')
     subjectTag = utilities.getTagName('subjectTag')
     layout = ds.html.Div([
-        ds.dcc.Link('Home', href='/'),
+        ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('Parametri', href='/preference'),
-        ds.html.H2('PARAMETRI MATERIA'),
+        ds.dcc.Link('USER PARAMETERS PREFERENCES', href='/preference'),
+        ds.html.H2('SUBJECTS USER PREFERENCES'),
         ds.dash_table.DataTable(
             df_temp.to_dict('records'), columns = [
                 {'name': code, 'id': codeSubjectTag, 'editable': False},

@@ -28,7 +28,7 @@ def start():
 
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
-        ds.html.H2('PROGETTO TRIBUNALI'),
+        ds.html.H2('COURT OF MILAN PROCESSES'),
         ds.dcc.Location(id = 'url', refresh = False),
         ds.html.Div(id = 'page-content')
     ])

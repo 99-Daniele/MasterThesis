@@ -5,13 +5,13 @@ import dash as ds
 # return initial layout of page.
 def pageLayout():
     layout = ds.html.Div([
-        ds.html.H2('Progetto Tribunali'),
-        ds.dcc.Link('Grafici eventi', href = '/eventgraph'),
+        ds.html.H2('COURT OF MILAN PROCESSES'),
+        ds.dcc.Link('EVENTS VISUALIZATION GRAPHS', href = '/eventgraph'),
         ds.html.Br(),
-        ds.dcc.Link('Grafici confronto', href = '/comparationgraph'),
+        ds.dcc.Link('DURATION COMPARISON GRAPHS', href = '/comparationgraph'),
         ds.html.Br(),
-        ds.dcc.Link('Grafici tipo eventi', href = '/typeevent'),
+        ds.dcc.Link('COMPOSITION GRAPHS', href = '/typeevent'),
         ds.html.Br(),
-        ds.dcc.Link('Parametri', href = '/preference')
+        ds.dcc.Link('USER PARAMETERS PREFERENCES', href = '/preference')
     ])
     return layout

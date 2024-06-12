@@ -5,12 +5,12 @@ import dash as ds
 # return initial layout of page.
 def pageLayout():
     layout = ds.html.Div([
-        ds.dcc.Link('Home', href = '/'),
-        ds.html.H2('Parametri'),
-        ds.dcc.Link('Stati', href = '/preference/statepreference'),
+        ds.dcc.Link('HOME', href = '/'),
+        ds.html.H2('PARAMETER SELECTION'),
+        ds.dcc.Link('Select State Preference', href = '/preference/statepreference'),
         ds.html.Br(),
-        ds.dcc.Link('Eventi', href = '/preference/eventpreference'),
+        ds.dcc.Link('Select Event Preference', href = '/preference/eventpreference'),
         ds.html.Br(),
-        ds.dcc.Link('Materie', href = '/preference/subjectpreference')
+        ds.dcc.Link('Select Subject Preference', href = '/preference/subjectpreference')
     ])
     return layout

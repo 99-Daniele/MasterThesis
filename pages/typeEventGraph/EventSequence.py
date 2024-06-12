@@ -18,7 +18,6 @@ importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
 if importantEvents != None and len(importantEvents) > 0:
     df = df[df[codeEventTag].isin(importantEvents)]
 
-
 # return initial layout of page.
 def pageLayout():
     avgTag = utilities.getTagName('avgTag')
@@ -43,10 +42,10 @@ def pageLayout():
     types = sorted(types)
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([
-        ds.dcc.Link('Home', href='/'),
+        ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('Grafici tipo eventi', href='/typeevent'),
-        ds.html.H2('SEQUENZA EVENTI'),
+        ds.dcc.Link('COMPOSITION GRAPHS', href='/typeevent'),
+        ds.html.H2('EVENT SEQUENCE'),
         ds.dcc.Dropdown(types, value = types[0], multi = False, searchable = True, clearable = False, id = 'type-dropdown-esq', placeholder = phase, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-esq', placeholder = section, style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-esq', placeholder = subject, style = {'width': 400}, optionHeight = 80),

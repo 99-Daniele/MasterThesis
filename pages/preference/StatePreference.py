@@ -31,10 +31,10 @@ def pageLayout():
             id = 'update-stp',
             message = 'State names table correctly updated',
         ),
-        ds.dcc.Link('Home', href='/'),
+        ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('Parametri', href='/preference'),
-        ds.html.H2('PARAMETRI STATI'),
+        ds.dcc.Link('USER PARAMETERS PREFERENCES', href='/preference'),
+        ds.html.H2('STATES USER PREFERENCES'),
         ds.html.Button("REFRESH", id = 'refresh-button-stp'),
         ds.html.Button("RESET", id = 'reset-button-stp'),
         ds.dash_table.DataTable(
