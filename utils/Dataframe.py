@@ -387,7 +387,8 @@ def getAvgStdDataFrameByTypeChoice(df, typeChoice, avgChoice):
     df3 = df1.iloc[:0,:].copy()
     for i, row in df_q.iterrows():
         df_temp = df1[df1[typeChoice] == row[typeChoice]]
-        df_temp = df_temp[df_temp[durationTag] <= row[durationTag]]
+        df_temp = df_temp[df_temp[durationTag] <= row[durationTag]]        
+        df3 = pd.concat([df3, df_temp], ignore_index = True)
     if avgChoice == avgTag:
         df2 = df3.groupby(typeChoice, as_index = False).mean()
     else:
