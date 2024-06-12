@@ -5,7 +5,7 @@ import dash as ds
 # return initial layout of page.
 def pageLayout():
     layout = ds.html.Div([
-        ds.html.H2('COURT OF MILAN PROCESSES'),
+        ds.html.H2('HOME'),
         ds.dcc.Link('EVENTS VISUALIZATION GRAPHS', href = '/eventgraph'),
         ds.html.Br(),
         ds.dcc.Link('DURATION COMPARISON GRAPHS', href = '/comparationgraph'),
