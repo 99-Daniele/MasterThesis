@@ -1,6 +1,8 @@
 # this file handles operations on text and json files.
 
+import datetime as dt
 from io import StringIO
+import numpy as np
 import os
 import pandas as pd
 import shutil
@@ -57,7 +59,12 @@ def getDataframeFromJsonFile(filename):
         jsonCache = ujson.load(open(filename, 'r'))
         jsonData = ujson.dumps(jsonCache)
         data = ujson.loads(jsonData)
-        return pd.read_json(StringIO(data), orient = 'split') 
+        df = pd.read_json(StringIO(data), orient = 'split') 
+        columns = df.columns
+        for c in columns:
+            if np.issubdtype(df[c].dtype, np.datetime64):
+                df[c] = df[c].dt.strftime("%Y-%m-%d %H:%M:%S")
+        return df
     except (FileNotFoundError):
         return None
 

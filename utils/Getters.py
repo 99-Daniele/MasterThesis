@@ -1,7 +1,5 @@
 # this file handles data getters.
 
-import pandas as pd
-
 import Cache as cache
 import utils.database.DatabaseConnection as connect
 import utils.DataUpdate as update
@@ -106,14 +104,6 @@ def getAllEvents():
         allEventsDataframe = cache.getDataframe('allEvents.json')
     return allEventsDataframe
 
-# get important events from cache file.
-def getImportantEvents():
-    importantEventsDataframe = cache.getDataframe('importantEvents.json')
-    if importantEventsDataframe is None:
-        update.refreshData()
-        importantEventsDataframe = cache.getDataframe('importantEvents.json')
-    return importantEventsDataframe
-
 # get phases events from cache file.
 def getPhaseEvents():
     phaseEventsDataframe = cache.getDataframe('phaseEvents.json')
@@ -129,14 +119,6 @@ def getStateEvents():
         update.refreshData()
         stateEventsDataframe = cache.getDataframe('stateEvents.json')
     return stateEventsDataframe
-
-# get court hearings events from cache file.
-def getCourtHearingsEvents():
-    courtHearingsEventsDataframe = cache.getDataframe('courtHearingEvents.json')
-    if courtHearingsEventsDataframe is None:
-        update.refreshData()
-        courtHearingsEventsDataframe = cache.getDataframe('courtHearingEvents.json')
-    return courtHearingsEventsDataframe
 
 # get processes events from cache file.
 def getProcessesDuration():

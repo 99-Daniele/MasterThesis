@@ -292,7 +292,7 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         orderRadioStyle = {'display': 'none'}
         [allData, avgData] = frame.getAvgStdDataFrameByDate(df_data, dateType, avgChoice)
         xticks = frame.getUniques(avgData, dateTag)
-        fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Durata del processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
+        fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
         fig.add_traces(
             px.line(avgData, x = dateTag, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
         )
@@ -310,14 +310,15 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
     else:
         orderRadioStyle = {'display': 'block'}
         [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, eventChoice, stateChoice, phaseChoice)
+        print(allData)
         xticks = frame.getUniques(allData, dateTag)
         if text == [textTag]:
-            fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+            fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
             fig.add_traces(
                 px.line(typeData, x = dateTag, y = durationTag, text = countTag, color = filterTag, markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
             )
         else:
-            fig = px.line(allData, x = dateTag, y = durationTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+            fig = px.line(allData, x = dateTag, y = durationTag, labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
             fig.add_traces(
                 px.line(typeData, x = dateTag, y = durationTag, color = filterTag, markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
             )
@@ -359,16 +360,16 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
         [sections, subjects, judges, finished] = updateTypeDataframeFromSelection(df_temp, df_temp, startDate, endDate, sections, subjects, judges, finished)
         if text == [textTag]:
             if type == eventTag:   
-                fig = px.histogram(allData, x = type, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Numero di ' + type[0:-1] + 'i del processo', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+                fig = px.histogram(allData, x = type, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Number of ' + type[0:-1] + 's of process', type:type.title() + ' of process'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
             else:
                 colorMap = utilities.phaseColorMap(type)
-                fig = px.histogram(allData, x = type, color = type, color_discrete_map = colorMap, labels = {durationTag:'Numero di ' + type[0:-1] + 'i del processo', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+                fig = px.histogram(allData, x = type, color = type, color_discrete_map = colorMap, labels = {durationTag:'Number of ' + type[0:-1] + 's of process', type:type.title() + ' of process'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
         else:
             if type == eventTag:        
-                fig = px.box(allData, x = type, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Durata ' + type[0:-1] + 'i del processo [giorni]', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+                fig = px.box(allData, x = type, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Duration ' + type[0:-1] + 's of process [days]', type:type.title() + ' of process'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
             else:
                 colorMap = utilities.phaseColorMap(type)
-                fig = px.box(allData, x = type, y = durationTag, color = type, color_discrete_map = colorMap, labels = {durationTag:'Durata ' + type[0:-1] + 'i del processo [giorni]', type:type.title() + ' del processo'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+                fig = px.box(allData, x = type, y = durationTag, color = type, color_discrete_map = colorMap, labels = {durationTag:'Duration ' + type[0:-1] + 's of process [days]', type:type.title() + ' of process'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
             fig.add_traces(
                 px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
@@ -390,7 +391,7 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
             orderRadioStyle = {'display': 'none'}
             [allData, avgData] = frame.getAvgStdDataFrameByDate(df_data, dateType, avgChoice)
             xticks = frame.getUniques(avgData, dateTag)
-            fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Durata ' + type + " " + str(typeChoice) + ' [giorni]', dateTag:'Data inizio ' + type + " " + str(typeChoice)}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
+            fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Duration ' + type + " " + str(typeChoice) + ' [days]', dateTag:'Start Date ' + type + " " + str(typeChoice)}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
             fig.add_traces(
                 px.line(avgData, x = dateTag, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
@@ -410,12 +411,12 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
             [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, None, None, None)
             xticks = frame.getUniques(allData, dateTag)
             if text == [textTag]:
-                fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+                fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
                 fig.add_traces(
                     px.line(typeData, x = dateTag, y = durationTag, text = countTag, color = filterTag, markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
                 )
             else:
-                fig = px.line(allData, x = dateTag, y = durationTag, labels = {durationTag:'Durata processo [giorni]', dateTag:'Data inizio processo'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+                fig = px.line(allData, x = dateTag, y = durationTag, labels = {durationTag:'Duration Process [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
                 fig.add_traces(
                     px.line(typeData, x = dateTag, y = durationTag, color = filterTag, markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
                 )
@@ -440,9 +441,9 @@ def parameterComparationUpdate(df, avgChoice, tag, text):
     [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df, tag, avgChoice)
     xticks = frame.getUniques(avgData, tag)
     if text == [textTag]:
-        fig = px.histogram(allData, x = tag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Numero processi', tag:tag}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8))
+        fig = px.histogram(allData, x = tag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Number of processes', tag:tag}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8))
     else:
-        fig = px.box(allData, x = tag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Durata del processo [giorni]', tag:tag}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
+        fig = px.box(allData, x = tag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Process Duration [days]', tag:tag}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8), points = False)
         fig.add_traces(
             px.line(avgData, x = tag, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
         )

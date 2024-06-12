@@ -196,12 +196,14 @@ def getAvgTotDataframe(df, order_dict, avgChoice):
     df1['sort_column'] = df1[filterTag].map(order_dict)
     df1 = df1.sort_values(['sort_column', dateTag], ascending = [False, True]).drop(columns = 'sort_column').reset_index(drop = True)
     if avgChoice == avgTag:
-        df2 = df1.groupby([dateTag]) \
-            .agg({countTag: 'sum', durationTag:'mean'}) \
+        df2 = df.groupby([dateTag]) \
+            .agg({filterTag: 'size', durationTag:'mean'}) \
+            .rename(columns = {filterTag: countTag}) \
             .reset_index()
     else:
-        df2 = df1.groupby([dateTag]) \
-            .agg({countTag: 'sum', durationTag:'median'}) \
+        df2 = df.groupby([dateTag]) \
+            .agg({filterTag: 'size', durationTag:'median'}) \
+            .rename(columns = {filterTag: countTag}) \
             .reset_index()
     df2 = df2.sort_values([dateTag]).reset_index(drop = True)
     return [df1, df2]

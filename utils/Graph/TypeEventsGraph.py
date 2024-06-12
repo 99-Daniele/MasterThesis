@@ -69,9 +69,9 @@ def typeEventUpdate(df, type, typeChoice, tagChoice, first, avg, text, sections,
     xticks = frame.getUniques(allData, tagChoice)
     if tagChoice == eventTag:
         if text == [textTag]:
-            fig = px.histogram(allData, x = tagChoice, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Conteggio', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+            fig = px.histogram(allData, x = tagChoice, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
         else:
-            fig = px.box(allData, x = tagChoice, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Durata', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+            fig = px.box(allData, x = tagChoice, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
@@ -81,9 +81,9 @@ def typeEventUpdate(df, type, typeChoice, tagChoice, first, avg, text, sections,
     else:
         colorMap = utilities.phaseColorMap(tagChoice)
         if text == [textTag]:
-            fig = px.histogram(allData, x = tagChoice, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Conteggio', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+            fig = px.histogram(allData, x = tagChoice, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
         else:
-            fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Durata', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+            fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
@@ -108,9 +108,9 @@ def typeSequenceUpdate(df, typeChoice, tagChoice, avg, text, sections, subjects,
     xticks = frame.getUniques(allData, tagChoice)
     if tagChoice == eventTag:
         if text == [textTag]:
-            fig = px.histogram(allData, x = tagChoice, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Conteggio', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+            fig = px.histogram(allData, x = tagChoice, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
         else:
-            fig = px.box(allData, x = tagChoice, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Durata', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+            fig = px.box(allData, x = tagChoice, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
@@ -120,9 +120,9 @@ def typeSequenceUpdate(df, typeChoice, tagChoice, avg, text, sections, subjects,
     else:
         colorMap = utilities.phaseColorMap(tagChoice)
         if text == [textTag]:
-            fig = px.histogram(allData, x = tagChoice, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Conteggio', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+            fig = px.histogram(allData, x = tagChoice, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
         else:
-            fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Durata', tagChoice:'Codice'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+            fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )

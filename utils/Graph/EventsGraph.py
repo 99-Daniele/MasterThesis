@@ -55,7 +55,7 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
     df_temp = df_temp.sort_values(by = phaseTag).reset_index(drop = True)
     [sections, subjects, judges] = updateTypesBySelection(df, df_temp, startDate, endDate, sections, subjects, judges)
     colorMap = utilities.phaseColorMap(type)
-    fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_map = colorMap, labels = {numProcessTag:'Codice Processo', dateTag:'Data inizio processo'}, width = utilities.getWidth(1))
+    fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_map = colorMap, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = utilities.getWidth(1))
     fig.update_layout(
         legend = dict(
             yanchor = "top",

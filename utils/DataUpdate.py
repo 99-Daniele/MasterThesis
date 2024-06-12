@@ -22,7 +22,6 @@ def restartData():
     maxDateDt = dt.datetime.strptime(maxDate, '%Y-%m-%d %H:%M:%S')
     endPhase = getter.getEndPhase()
     stallStates = getter.getStallStates()
-    events = cache.getData('events.json')
     events = getter.getEvents()
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
@@ -104,7 +103,7 @@ def refreshData():
     endPhase = frame.getPhaseOfState(statesInfo, "DF", phaseTag)
     processesDuration = updateTypeDurationDataframe(processEvents, unfinishedProcesses, statesInfo, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, durationPredictedTag, eventTag, eventsTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag)
     updateProcessDurationDataframe(processesDuration, codeSubjectTag, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag)
-    updateEventsDataframe(eventsDataframe, statesInfoDataframe, endPhase, codeStateTag, codeEventTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, stateTag)
+    updateEventsDataframe(eventsDataframe, statesInfoDataframe, endPhase, codeStateTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, stateTag)
     print(str(time.time() - start) + " seconds")
 
 # group events by process.
@@ -152,7 +151,7 @@ def getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, cod
                     processDict = dict.fromkeys(dfColumns)
                     processDict = {x: 0 for x in processDict}
                     processDict.update({numProcessTag: processId})
-                    processDict.update({dateTag: distance})
+                    #processDict.update({dateTag: distance})
                     processDict.update({codeJudgeTag: processCodeJudge})
                     processDict.update({codeSubjectTag: processSubjectCode})
                     processDict.update({sectionTag: processSection})
@@ -250,7 +249,7 @@ def getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, cod
             processDict = dict.fromkeys(dfColumns)
             processDict = {x: 0 for x in processDict}
             processDict.update({numProcessTag: processId})
-            processDict.update({dateTag: distance})
+            #processDict.update({dateTag: distance})
             processDict.update({codeJudgeTag: processCodeJudge})
             processDict.update({codeSubjectTag: processSubjectCode})
             processDict.update({sectionTag: processSection})
@@ -281,7 +280,7 @@ def getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, cod
     return allProcessEvents, processInfoDataframe
 
 # update events dataframe.
-def updateEventsDataframe(eventsDataframe, statesNameDataframe, endPhase, codeStateTag, codeEventTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, stateTag):
+def updateEventsDataframe(eventsDataframe, statesNameDataframe, endPhase, codeStateTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, stateTag):
     eventsDataframeComplete = frame.joinDataframe(eventsDataframe, statesNameDataframe, codeStateTag, phaseDBTag, [phaseDBTag, stateTag])
     allEventsDataframe = frame.createEventsDataFrame(eventsDataframeComplete, endPhase, dateTag, numEventTag, numProcessTag, phaseTag)
     allEventsDataframe = allEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)

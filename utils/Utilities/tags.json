@@ -32,7 +32,7 @@
     "ritualTag": "ritual",
     "sectionTag": "section", 
     "stateDurationSequenceTag": "statesDurationSequence",
-    "stateSequenceTag": "satesSequence",
+    "stateSequenceTag": "statesSequence",
     "stateTag": "state",
     "subjectTag": "subject",
     "tagTag": "tag"

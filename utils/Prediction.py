@@ -20,8 +20,8 @@ def predictDurationsWithoutLikenessTest(df, codeJudgeTag, codeSubjectTag, countT
     numProcesses = frame.getUniques(df, numProcessTag).tolist()
     errors = []
     predictions = []
-    with alive_bar(int(len(numProcesses))) as bar:
-        for i in range(int(len(numProcesses))):
+    with alive_bar(int(len(numProcesses) / 20)) as bar:
+        for i in range(int(len(numProcesses) / 20)):
             testNumProcesses = [numProcesses[i]]
             trainNumProcesses = numProcesses[:i] + numProcesses[i + 1:]
             testDF = df[df[numProcessTag].isin(testNumProcesses)].copy()
