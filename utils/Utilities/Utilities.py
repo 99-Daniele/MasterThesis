@@ -173,11 +173,11 @@ def getHeight(perc):
     height = GetSystemMetrics(1)
     return height * perc
 
-# return date distance to current day.
-def distanceAtToday(date):
+# return date base on distance to current day.
+def dateFromDistance(distance):
     todayDate = dt.datetime.today().strftime('%d-%m-%Y')
     todayDate = dt.datetime.strptime(todayDate, '%d-%m-%Y')
-    return abs((date - todayDate).days)
+    return startDate(todayDate, distance)
 
 # translate alphanumeric string to integer.
 def fromAlphanumericStringToInt(string, filename):
@@ -207,3 +207,23 @@ def getPlaceholderName(placeholder):
     placeholders = file.getDataFromJsonFile('utils/utilities/placeholder.json')
     placeholderName = placeholders.get(placeholder)
     return placeholderName
+
+# calc start date given start date and duration.
+def startDate(endDate, duration):
+    if isinstance(endDate, str):
+        endDateDt = dt.datetime.strptime(endDate, '%Y-%m-%d %H:%M:%S')
+    else:
+        endDateDt = endDate
+    startDateDt = endDateDt - dt.timedelta(days = int(duration))
+    startDate = startDateDt.strftime("%Y-%m-%d %H:%M:%S")
+    return startDate
+
+# calc final date given start date and duration.
+def finalDate(startDate, duration):
+    if isinstance(startDate, str):
+        startDateDt = dt.datetime.strptime(startDate, '%Y-%m-%d %H:%M:%S')
+    else:
+        startDateDt = startDate
+    endDateDt = startDateDt + dt.timedelta(days = int(duration))
+    endDate = endDateDt.strftime("%Y-%m-%d %H:%M:%S")
+    return endDate

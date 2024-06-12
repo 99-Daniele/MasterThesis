@@ -19,6 +19,7 @@
     "filterTag": "filtro",
     "finishedTag": "finito", 
     "judgeTag": "giudice", 
+    "loadTag": "carico", 
     "nextDateTag": "dataSuccessiva",
     "nextIdTag": "eventoSuccessivo",
     "numEventTag": "numEvento",
