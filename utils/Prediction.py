@@ -109,9 +109,12 @@ def predictDurationsWithoutLikenessTest(df, codeJudgeTag, codeSubjectTag, countT
             count = testDF_temp[countTag]
             currDuration = testDF_temp[durationTag]
             trainDF_temp = df[df[numProcessTag].isin(trainNumProcesses)].copy()
-            trainDF_temp = trainDF_temp[trainDF_temp[codeJudgeTag] == judge]
-            trainDF_temp = trainDF_temp[trainDF_temp[codeSubjectTag] == subject]
-            trainDF_temp = trainDF_temp[trainDF_temp[sectionTag] == section]
+            if len(trainDF_temp[trainDF_temp[sectionTag] == section]) > 0:
+                trainDF_temp = trainDF_temp[trainDF_temp[sectionTag] == section]
+            if len(trainDF_temp[trainDF_temp[codeJudgeTag] == judge]) > 0:
+                trainDF_temp = trainDF_temp[trainDF_temp[codeJudgeTag] == judge]
+            if len(trainDF_temp[trainDF_temp[codeSubjectTag] == subject]) > 0:
+                trainDF_temp = trainDF_temp[trainDF_temp[codeSubjectTag] == subject]
             lenTrainTemp = len(trainDF_temp)
             if lenTrainTemp > 0:
                 trainX = trainDF_temp[columns]
@@ -136,7 +139,6 @@ def predictDurationsWithoutLikenessTest(df, codeJudgeTag, codeSubjectTag, countT
     else:
         medianError = (errors[m - 1] + errors[m]) / 2.0
     meanError = sum(errors) / len(errors)
-    print(len(errors), int(len(numProcesses) / 10), meanError, medianError)
     predictions = sorted(predictions, key = lambda x: x['errore'])
     file.writeOnJsonFile('cache/predictions.json', predictions)
     #plt.scatter(testY, predictedDurations)
@@ -144,10 +146,9 @@ def predictDurationsWithoutLikenessTest(df, codeJudgeTag, codeSubjectTag, countT
     #plt.ylabel('Predicted Petal Width')
     #plt.title('Actual vs Predicted Petal Width')
     #plt.show()
-    return meanError
+    return meanError, medianError
 
 def predictDurationsWithoutLikeness(df, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
-    countTag = utilities.getTagName("countTag")
     finishedProcesses = df[df[finishedTag] == utilities.getProcessState('finished')]
     unfinishedProcesses = df[df[finishedTag] == utilities.getProcessState('unfinished')]  
     columns = df.columns.values.tolist()
@@ -165,9 +166,12 @@ def predictDurationsWithoutLikeness(df, codeJudgeTag, codeSubjectTag, durationTa
             subject = u[codeSubjectTag]
             section = u[sectionTag]
             f = finishedProcesses.copy()
-            f = f[f[codeJudgeTag] == judge]
-            f = f[f[codeSubjectTag] == subject]
-            f = f[f[sectionTag] == section]
+            if len(f[f[sectionTag] == section]) > 0:
+                f = f[f[sectionTag] == section]
+            if len(f[f[codeJudgeTag] == judge]) > 0:
+                f = f[f[codeJudgeTag] == judge]
+            if len(f[f[codeSubjectTag] == subject]) > 0:
+                f = f[f[codeSubjectTag] == subject]
             lenFinished = len(f)
             processID = u[numProcessTag]
             currDuration = u[durationTag]
@@ -183,4 +187,3 @@ def predictDurationsWithoutLikeness(df, codeJudgeTag, codeSubjectTag, durationTa
                 predictions.update({str(processID): {durationTag: str(currDuration), durationPredictedTag: str(predictedFinalDuration)}})
             bar()
     return predictions
-
