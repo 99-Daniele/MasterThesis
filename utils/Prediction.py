@@ -1,5 +1,4 @@
 from alive_progress import alive_bar
-import matplotlib.pyplot as plt
 import pandas as pd
 import random as rd
 from sklearn.tree import DecisionTreeClassifier

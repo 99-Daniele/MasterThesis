@@ -310,7 +310,6 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
     else:
         orderRadioStyle = {'display': 'block'}
         [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, eventChoice, stateChoice, phaseChoice)
-        print(allData)
         xticks = frame.getUniques(allData, dateTag)
         if text == [textTag]:
             fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})

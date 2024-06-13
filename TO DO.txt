@@ -1,6 +1,4 @@
-- nomi in inglese
-
-- valore predetto di un processo finito --> errore medio
+- grafico errore predizione durata
 
 - disponibile per accesso esterno --> descrizione readme
 - migliorare grafico --> piu carino da vedere
