@@ -1,6 +1,7 @@
 # this page allows user to change subject names.
 
 import dash as ds
+import pandas as pd
 
 import utils.FileOperation as file
 import utils.Getters as getter
@@ -26,6 +27,7 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('USER PARAMETERS PREFERENCES', href='/preference'),
         ds.html.H2('SUBJECTS USER PREFERENCES'),
+        ds.html.Button("DOWNLOAD", id = 'download-button-sbp'),
         ds.dash_table.DataTable(
             df_temp.to_dict('records'), columns = [
                 {'name': code, 'id': codeSubjectTag, 'editable': False},
@@ -45,12 +47,16 @@ def pageLayout():
 # callback with input and output.
 @ds.callback(
     ds.Output('subjecttable', 'selected_rows'),
-    ds.Input('subjecttable', 'selected_rows'),
+    [ds.Input('subjecttable', 'selected_rows'),
+     ds.Input('download-button-sbp', 'n_clicks')],
     ds.State('subjecttable', 'data')
 )
 
 # return updated data based on user choice.
-def update_dateframe(importantIndex, data):
+def update_dateframe(importantIndex, downloadButton, data):
+    if ds.ctx.triggered_id != None and 'download-button' in ds.ctx.triggered_id:
+        dataDF = pd.DataFrame(data)
+        dataDF.to_csv('cache/subjectsInfo.csv')
     oldImportantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
     if oldImportantSubjects == None:
         oldImportantIndex = []

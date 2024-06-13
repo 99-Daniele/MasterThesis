@@ -1,7 +1,7 @@
 # this page allows user to change state parameters.
 
 import dash as ds
-import plotly as ply
+import pandas as pd
 
 import utils.FileOperation as file
 import utils.Getters as getter
@@ -38,7 +38,7 @@ def pageLayout():
         ds.html.H2('STATES USER PREFERENCES'),
         ds.html.Button("REFRESH", id = 'refresh-button-stp'),
         ds.html.Button("RESET", id = 'reset-button-stp'),
-        ds.html.Button("DOWNLOAD", id = 'img-button-stp'),
+        ds.html.Button("DOWNLOAD", id = 'download-button-stp'),
         ds.dash_table.DataTable(
             df_temp.to_dict('records'), columns = [
                 {'name': code, 'id': codeStateTag, 'editable': False}, 
@@ -63,15 +63,16 @@ def pageLayout():
      ds.Output('statetable', 'selected_rows')],
     [ds.Input('refresh-button-stp', 'n_clicks'),
      ds.Input('reset-button-stp', 'n_clicks'),
-     ds.Input('img-button-stp', 'n_clicks'),
+     ds.Input('download-button-stp', 'n_clicks'),
      ds.Input('statetable', 'selected_rows')],
     ds.State('statetable', 'data')
 )
 
 # return updated data based on user choice.
-def update_dateframe(refreshButton, resetButton, imageButton, importantIndex, data):
-    if ds.ctx.triggered_id != None and 'img-button' in ds.ctx.triggered_id:
-        ply.offline.plot(data, filename = 'images/prova.html')
+def update_dateframe(refreshButton, resetButton, downloadButton, importantIndex, data):
+    if ds.ctx.triggered_id != None and 'download-button' in ds.ctx.triggered_id:
+        dataDF = pd.DataFrame(data)
+        dataDF.to_csv('cache/statesInfo.csv')
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         for d in data:
             d.update({phaseTag: d.get(phaseDBTag)})

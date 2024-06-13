@@ -1,6 +1,7 @@
 # this page allows user to change events parameters.
 
 import dash as ds
+import pandas as pd
 
 import utils.FileOperation as file
 import utils.Getters as getter
@@ -25,6 +26,7 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('USER PARAMETERS PREFERENCES', href='/preference'),
         ds.html.H2('EVENTS USER PREFERENCES'),
+        ds.html.Button("DOWNLOAD", id = 'download-button-ep'),
         ds.dash_table.DataTable(
             df_temp.to_dict('records'), columns = [
                 {'name': code, 'id': codeEventTag, 'editable': False}, 
@@ -43,12 +45,16 @@ def pageLayout():
 # callback with input and output.
 @ds.callback(
     ds.Output('eventtable', 'selected_rows'),
-    ds.Input('eventtable', 'selected_rows'),
+    [ds.Input('eventtable', 'selected_rows'),
+     ds.Input('download-button-ep', 'n_clicks')],
     ds.State('eventtable', 'data')
 )
 
 # return updated data based on user choice.
-def update_dateframe(importantIndex, data):
+def update_dateframe(importantIndex, downloadButton, data):
+    if ds.ctx.triggered_id != None and 'download-button' in ds.ctx.triggered_id:
+        dataDF = pd.DataFrame(data)
+        dataDF.to_csv('cache/eventsInfo.csv')
     oldImportantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
     if oldImportantEvents == None:
         oldImportantIndex = []
