@@ -16,13 +16,15 @@ import utils.utilities.Utilities as utilities
 def restartData():
     connection = connect.getDatabaseConnection()
     verifyDatabase(connection)
-    file.removeFolder('cache')
-    file.createFolder('cache')
+    #file.removeFolder('cache')
+    #file.createFolder('cache')
     maxDate = getter.getMaxDate()
     maxDateDt = dt.datetime.strptime(maxDate, '%Y-%m-%d %H:%M:%S')
     endPhase = getter.getEndPhase()
     stallStates = getter.getStallStates()
     events = getter.getEvents()
+    file.writeOnJsonFile('cache/e.json', events)
+    exit()
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     codeStateTag = utilities.getTagName("codeStateTag")
@@ -48,16 +50,17 @@ def restartData():
     getter.getEventsInfo(codeEventTag, eventTag)
     getter.getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
     getter.getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
-    eventsDataframe = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
+    #eventsDataframe = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
     processesEvents, processInfo = getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventTag, eventsTag, finishedTag, loadTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
+    exit()
     finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
     avgPredictionError, medianPredictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
     print('Average Prediction Error: ', avgPredictionError)
     print('Median Prediction Error: ', medianPredictionError)
     unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
-    cache.updateCache('events.json', eventsDataframe)
+    #cache.updateCache('events.json', eventsDataframe)
     file.writeOnJsonFile('cache/processesEvents.json', processesEvents)
-    file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
+    #file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
     refreshData()
 
 # refresh current database data. 
@@ -93,6 +96,12 @@ def refreshData():
     if processEvents is None:
         restartData()
         processEvents = cache.getData('processesEvents.json')
+    lst = []
+    for i in range(len(processEvents)):
+        flt = list(filter(lambda p: p[codeEventTag] == "IA", processEvents[i][eventsTag]))
+        lst.extend(flt)
+    print(len(lst))
+    exit()
     unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
     if unfinishedProcesses is None:
         restartData()
@@ -142,6 +151,7 @@ def getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, cod
     processEvents = {numProcessTag: processId, codeJudgeTag: processCodeJudge, codeSubjectTag: processSubjectCode, subjectTag: processSubject, sectionTag: processSection, finishedTag: processFinished, eventsTag: []}
     end = False
     continuative = False
+    count = 0
     i = 0
     with alive_bar(int(len(events))) as bar:
         while i < int(len(events)):
@@ -224,6 +234,8 @@ def getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, cod
                 duration = (processDateDt - processStartDateDt).days
                 processEvents[eventsTag].append(events[i])
                 codeEvent = events[i][codeEventTag]
+                if codeEvent == 'IA':
+                    count += 1
                 phase = events[i][phaseDBTag]
                 if phase == None:
                     phase = '0.0'
@@ -243,6 +255,8 @@ def getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, cod
                 durationSequenceComplete.append(duration)
             bar()
             i += 1
+    print(count)
+    exit()
     if not end:
         allProcessEvents.append(processEvents)
         if len(durationSequenceComplete) > 0:
@@ -532,9 +546,9 @@ def verifyDatabase(connection):
         raise Exception("\n'tipoeventi' table does not have all requested columns. The requested columns are: 'CCDOEV'(VARCHAR(10)), 'CDESCR'(TEXT)")
     if not connect.doesATableExist(connection, "tipomaterie"):
         raise Exception("\n'tipomaterie' table is not present or is called differently than 'tipomaterie'. Please change name or add such table because it's fundamental for the analysis")
-    if not connect.doesATableHaveColumns(connection, "tipomaterie", ['codice', 'DESCOGGETTO', 'DESCCOMPLETA', 'rituale'], ['BIGINT', 'TEXT', 'TEXT', 'TEXT']):
-        raise Exception("\n'tipomaterie' table does not have all requested columns. The requested columns are: 'codice'(BIGINT), 'DESCOGGETTO'(TEXT), 'DESCCOMPLETA'(TEXT), 'rituale'(TEXT)")
+    if not connect.doesATableHaveColumns(connection, "tipomaterie", ['codice', 'DESCCOMPLETA', 'rituale'], ['BIGINT', 'TEXT', 'VARCHAR(5)']):
+        raise Exception("\n'tipomaterie' table does not have all requested columns. The requested columns are: 'codice'(BIGINT), 'DESCCOMPLETA'(TEXT), 'rituale'(VARCHAR(5))")
     if not connect.doesATableExist(connection, "tipostato"):
         raise Exception("\n'tipostato' table is not present or is called differently than 'tipostato'. Please change name or add such table because it's fundamental for the analysis")
-    if not connect.doesATableHaveColumns(connection, "tipostato", ['CCODST', 'CDESCR', 'FKFASEPROCESSO'], ['VARCHAR(2)', 'VARCHAR(80)', 'VARCHAR(3)']):
-        raise Exception("\n'tipostato' table does not have all requested columns. The requested columns are: 'CCODST'(VARCHAR(2)), 'CDESCR'(VARCHAR(80)), 'FKFASEPROCESSO'(VARCHAR(3))")
+    if not connect.doesATableHaveColumns(connection, "tipostato", ['CCODST', 'CDESCR', 'FKFASEPROCESSO'], ['VARCHAR(2)', 'TEXT', 'VARCHAR(3)']):
+        raise Exception("\n'tipostato' table does not have all requested columns. The requested columns are: 'CCODST'(VARCHAR(2)), 'CDESCR'(TEXT), 'FKFASEPROCESSO'(VARCHAR(3))")
