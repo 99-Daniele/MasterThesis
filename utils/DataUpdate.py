@@ -23,8 +23,6 @@ def restartData():
     endPhase = getter.getEndPhase()
     stallStates = getter.getStallStates()
     events = getter.getEvents()
-    file.writeOnJsonFile('cache/e.json', events)
-    exit()
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     codeStateTag = utilities.getTagName("codeStateTag")
@@ -50,15 +48,14 @@ def restartData():
     getter.getEventsInfo(codeEventTag, eventTag)
     getter.getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
     getter.getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
-    #eventsDataframe = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
+    eventsDataframe = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
     processesEvents, processInfo = getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventTag, eventsTag, finishedTag, loadTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
-    exit()
-    finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
-    avgPredictionError, medianPredictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
-    print('Average Prediction Error: ', avgPredictionError)
-    print('Median Prediction Error: ', medianPredictionError)
-    unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
-    #cache.updateCache('events.json', eventsDataframe)
+    #finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
+    #avgPredictionError, medianPredictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    #print('Average Prediction Error: ', avgPredictionError)
+    #print('Median Prediction Error: ', medianPredictionError)
+    #unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    cache.updateCache('events.json', eventsDataframe)
     file.writeOnJsonFile('cache/processesEvents.json', processesEvents)
     #file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
     refreshData()
@@ -96,20 +93,15 @@ def refreshData():
     if processEvents is None:
         restartData()
         processEvents = cache.getData('processesEvents.json')
-    lst = []
-    for i in range(len(processEvents)):
-        flt = list(filter(lambda p: p[codeEventTag] == "IA", processEvents[i][eventsTag]))
-        lst.extend(flt)
-    print(len(lst))
-    exit()
-    unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
-    if unfinishedProcesses is None:
-        restartData()
-        unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
+    #unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
+    #if unfinishedProcesses is None:
+    #    restartData()
+    #    unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
     eventsDataframe = getter.getEventsDataframe()
     statesInfoDataframe = getter.getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
     statesInfo = statesInfoDataframe.set_index(codeStateTag).T.to_dict('dict')
     endPhase = frame.getPhaseOfState(statesInfo, "DF", phaseTag)
+    
     processesDuration = updateTypeDurationDataframe(processEvents, unfinishedProcesses, statesInfo, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, durationPredictedTag, eventTag, eventsTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag)
     updateProcessDurationDataframe(processesDuration, codeSubjectTag, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag)
     updateEventsDataframe(eventsDataframe, statesInfoDataframe, endPhase, codeStateTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, stateTag)
@@ -155,7 +147,7 @@ def getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, cod
     i = 0
     with alive_bar(int(len(events))) as bar:
         while i < int(len(events)):
-            if events[i][numProcessTag] != processId or end:
+            if events[i][numProcessTag] != processId:
                 allProcessEvents.append(processEvents)
                 if len(durationSequenceComplete) > 0:
                     processDict = dict.fromkeys(dfColumns)
@@ -187,10 +179,6 @@ def getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, cod
                             allProcessDict.append(processDict.copy())
                     if processFinished == utilities.getProcessState('unfinished'):
                         allProcessDict.append(processDict.copy())
-                if events[i][numProcessTag] == processId:
-                    while i < len(events) - 1 and events[i][numProcessTag] == processId:
-                        bar()
-                        i += 1
                 processId = events[i][numProcessTag]
                 processCodeJudge = events[i][codeJudgeTag]
                 processSubjectCode = events[i][codeSubjectTag]
@@ -211,10 +199,9 @@ def getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, cod
                 processStateSequenceComplete = []
                 durationSequenceComplete = []
                 processEvents = {numProcessTag: processId, codeJudgeTag: processCodeJudge, codeSubjectTag: processSubjectCode, subjectTag: processSubject, sectionTag: processSection, finishedTag: processFinished, eventsTag: []}
-                if i < len(events) - 1:
-                    end = False
+                end = False
                 continuative = False
-            else:
+            if not end:
                 if events[i][codeStateTag] in stallStates and not continuative:
                     processFinished = utilities.getProcessState('continuative')
                     processEvents[finishedTag] = processFinished
@@ -255,8 +242,6 @@ def getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, cod
                 durationSequenceComplete.append(duration)
             bar()
             i += 1
-    print(count)
-    exit()
     if not end:
         allProcessEvents.append(processEvents)
         if len(durationSequenceComplete) > 0:
