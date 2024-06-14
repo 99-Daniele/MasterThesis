@@ -16,8 +16,8 @@ import utils.utilities.Utilities as utilities
 def restartData():
     connection = connect.getDatabaseConnection()
     verifyDatabase(connection)
-    #file.removeFolder('cache')
-    #file.createFolder('cache')
+    file.removeFolder('cache')
+    file.createFolder('cache')
     maxDate = getter.getMaxDate()
     maxDateDt = dt.datetime.strptime(maxDate, '%Y-%m-%d %H:%M:%S')
     endPhase = getter.getEndPhase()
@@ -50,14 +50,14 @@ def restartData():
     getter.getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
     eventsDataframe = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
     processesEvents, processInfo = getProcessEvents(events, maxDateDt, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventTag, eventsTag, finishedTag, loadTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
-    #finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
-    #avgPredictionError, medianPredictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
-    #print('Average Prediction Error: ', avgPredictionError)
-    #print('Median Prediction Error: ', medianPredictionError)
-    #unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
+    avgPredictionError, medianPredictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    print('Average Prediction Error: ', avgPredictionError)
+    print('Median Prediction Error: ', medianPredictionError)
+    unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
     cache.updateCache('events.json', eventsDataframe)
     file.writeOnJsonFile('cache/processesEvents.json', processesEvents)
-    #file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
+    file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
     refreshData()
 
 # refresh current database data. 
@@ -93,15 +93,14 @@ def refreshData():
     if processEvents is None:
         restartData()
         processEvents = cache.getData('processesEvents.json')
-    #unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
-    #if unfinishedProcesses is None:
-    #    restartData()
-    #    unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
+    unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
+    if unfinishedProcesses is None:
+        restartData()
+        unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
     eventsDataframe = getter.getEventsDataframe()
     statesInfoDataframe = getter.getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
     statesInfo = statesInfoDataframe.set_index(codeStateTag).T.to_dict('dict')
     endPhase = frame.getPhaseOfState(statesInfo, "DF", phaseTag)
-    
     processesDuration = updateTypeDurationDataframe(processEvents, unfinishedProcesses, statesInfo, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, durationPredictedTag, eventTag, eventsTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag)
     updateProcessDurationDataframe(processesDuration, codeSubjectTag, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag)
     updateEventsDataframe(eventsDataframe, statesInfoDataframe, endPhase, codeStateTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, stateTag)

@@ -186,8 +186,6 @@ def getPhasesDurationFiltered():
 # get events duration from cache file.
 def getEventsDuration():
     eventDurationDataframe = cache.getDataframe('eventsDuration.json')
-    print(eventDurationDataframe[eventDurationDataframe['eventCode'] == 'IA'])
-    exit()
     if eventDurationDataframe is None:
         update.refreshData()
         eventDurationDataframe = cache.getDataframe('eventsDuration.json')
