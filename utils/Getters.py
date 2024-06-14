@@ -47,7 +47,6 @@ def getStartProcessEvent():
     startProcessEvent = connect.getDataFromDatabase(connection, startProcessEventQuery)
     return startProcessEvent[0][0]
 
-
 # get all events.
 def getEvents():
     codeEventTag = utilities.getTagName("codeEventTag")
