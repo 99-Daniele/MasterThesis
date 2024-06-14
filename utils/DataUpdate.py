@@ -50,7 +50,7 @@ def restartData():
     getter.getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
     getter.getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
     filteredEvents, processesEvents, processInfo = getProcessEvents(events, startProcessEvent, maxDateDt, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventTag, eventsTag, finishedTag, loadTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
-    eventsDataframe = frame.createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
+    eventsDataframe = frame.createBasicEventsDataFrame(filteredEvents, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
     #finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
     #avgPredictionError, medianPredictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
     #print('Average Prediction Error: ', avgPredictionError)
