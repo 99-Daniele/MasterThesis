@@ -1,6 +1,5 @@
 # this file handles type events graph management.
 
-import dash as ds
 import plotly.express as px
 
 import utils.Dataframe as frame
