@@ -54,7 +54,6 @@ def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections
     firstTag = utilities.getPlaceholderName("first")
     lastTag = utilities.getPlaceholderName("last")
     numProcessTag = utilities.getTagName('numProcessTag')
-    phaseTag = utilities.getTagName('phaseTag')
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
     df_temp = df.copy()
@@ -98,7 +97,6 @@ def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections
 def typeSequenceUpdate(df, typeChoices, tagChoice, avg, text, sections, subjects, judges, finished):
     durationTag = utilities.getTagName('durationTag')
     eventTag = utilities.getTagName('eventTag')
-    phaseTag = utilities.getTagName('phaseTag')
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
     df_temp = df.copy()

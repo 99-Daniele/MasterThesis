@@ -612,9 +612,9 @@ def selectFollowingRows(df, tag, tagChoices):
     df = df.sort_values(by = [numProcessTag, numEventTag]).reset_index(drop = True)
     df_tag = df[df[tag].isin(tagChoices)].copy()
     df_tag = df_tag[df_tag[numEventTag] != df_tag[nextIdTag]]
-    df_tag = df_tag[[nextIdTag, tag]].reset_index(drop = True)
+    df_tag = df_tag[[nextIdTag]].reset_index(drop = True)
     df_tag = df_tag.rename(columns = {nextIdTag:numEventTag})
-    newDf = joinDataframe(df_tag, df, numEventTag, tag, None)
+    newDf = joinDataframe(df_tag, df, numEventTag, None, None)
     newDf = newDf.dropna()
     return newDf
 

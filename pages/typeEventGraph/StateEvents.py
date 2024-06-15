@@ -51,7 +51,7 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('COMPOSITION GRAPHS', href='/typeevent'),
         ds.html.H2('STATE COMPOSITION'),
-        ds.dcc.Dropdown(types, value = [types[0]], multi = True, searchable = True, clearable = False, id = 'type-dropdown-se', placeholder = state, style = {'width': 400}),
+        ds.dcc.Dropdown(types, value = [types[0]], multi = True, searchable = True, clearable = True, id = 'type-dropdown-se', placeholder = state, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-se', placeholder = section, style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-se', placeholder = subject, style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-se', placeholder = judge, style = {'width': 400}),

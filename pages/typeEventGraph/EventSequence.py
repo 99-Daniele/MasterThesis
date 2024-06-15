@@ -22,7 +22,7 @@ if importantEvents != None and len(importantEvents) > 0:
 def pageLayout():
     avgTag = utilities.getTagName('avgTag')
     median = utilities.getPlaceholderName('median')
-    phase = utilities.getPlaceholderName('phase')
+    event = utilities.getPlaceholderName('event')
     text = utilities.getPlaceholderName('text')
     judge = utilities.getPlaceholderName('judge') 
     process = utilities.getPlaceholderName('process')  
@@ -46,7 +46,7 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('COMPOSITION GRAPHS', href='/typeevent'),
         ds.html.H2('EVENT SEQUENCE'),
-        ds.dcc.Dropdown(types, value = [types[0]], multi = True, searchable = True, clearable = False, id = 'type-dropdown-esq', placeholder = phase, style = {'width': 400}),
+        ds.dcc.Dropdown(types, value = [types[0]], multi = True, searchable = True, clearable = True, id = 'type-dropdown-esq', placeholder = event, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-esq', placeholder = section, style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-esq', placeholder = subject, style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-esq', placeholder = judge, style = {'width': 400}),
