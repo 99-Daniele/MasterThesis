@@ -349,7 +349,7 @@ def getAvgStdDataFrameByTypeChoiceOrderByPhase(df, typeChoice, avgChoice):
     typeDuration = [typeChoice, durationTag]
     df1 = df[typeDuration].copy()
     df1[durationTag] = df1[durationTag].astype(int)
-    df1 = keepOnlyRelevant(df1, 0.005, typeChoice).reset_index(drop = True)
+    #df1 = keepOnlyRelevant(df1, 0.005, typeChoice).reset_index(drop = True)
     df_q = df1.groupby(typeChoice, as_index = False).quantile(0.75)
     df3 = df1.iloc[:0,:].copy()
     for i, row in df_q.iterrows():
@@ -611,12 +611,12 @@ def joinDataframe(df1, df2, tagJoin, dropJoin1, dropJoin2):
     return newDf
 
 # select following rows of chosen event.
-def selectFollowingRows(df, tag, tagChoice):
+def selectFollowingRows(df, tag, tagChoices):
     nextIdTag = utilities.getTagName("nextIdTag")
     numEventTag = utilities.getTagName('numEventTag')
     numProcessTag = utilities.getTagName('numProcessTag')
     df = df.sort_values(by = [numProcessTag, numEventTag]).reset_index(drop = True)
-    df_tag = df[df[tag] == tagChoice].copy()
+    df_tag = df[df[tag].isin(tagChoices)].copy()
     df_tag = df_tag[df_tag[numEventTag] != df_tag[nextIdTag]]
     df_tag = df_tag[[nextIdTag, tag]].reset_index(drop = True)
     df_tag = df_tag.rename(columns = {nextIdTag:numEventTag})

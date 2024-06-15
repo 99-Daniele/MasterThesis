@@ -49,7 +49,7 @@ def updateTypeDataBySelection(df, df_data, sections, subjects, judges, finished)
     return [sections, subjects, judges, finished]
 
 # update type events based on user choice.
-def typeEventUpdate(df, type, typeChoice, tagChoice, first, avg, text, sections, subjects, judges, finished):
+def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections, subjects, judges, finished):
     durationTag = utilities.getTagName('durationTag')
     eventTag = utilities.getTagName('eventTag')
     firstTag = utilities.getPlaceholderName("first")
@@ -62,7 +62,7 @@ def typeEventUpdate(df, type, typeChoice, tagChoice, first, avg, text, sections,
         df_temp = df_temp.groupby([type, numProcessTag]).first().reset_index()
     elif first == lastTag:
         df_temp = df_temp.groupby([type, numProcessTag]).last().reset_index()
-    df_temp = frame.getTypesDataFrame(df_temp, type, [typeChoice])
+    df_temp = frame.getTypesDataFrame(df_temp, type, typeChoices)
     df_data = updateTypeData(df_temp, sections, subjects, judges, finished)
     [sections, subjects, judges, finished] = updateTypeDataBySelection(df_temp, df_data, sections, subjects, judges, finished)
     [allData, avgData] = frame.getAvgStdDataFrameByTypeChoiceOrderByPhase(df_data, tagChoice, avg)   
@@ -95,13 +95,13 @@ def typeEventUpdate(df, type, typeChoice, tagChoice, first, avg, text, sections,
     return [fig, sections, subjects, judges, finished]
 
 # update type events based on user choice.
-def typeSequenceUpdate(df, typeChoice, tagChoice, avg, text, sections, subjects, judges, finished):
+def typeSequenceUpdate(df, typeChoices, tagChoice, avg, text, sections, subjects, judges, finished):
     durationTag = utilities.getTagName('durationTag')
     eventTag = utilities.getTagName('eventTag')
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
     df_temp = df.copy()
-    df_temp = frame.selectFollowingRows(df_temp, tagChoice, typeChoice)
+    df_temp = frame.selectFollowingRows(df_temp, tagChoice, typeChoices)
     df_data = updateTypeData(df_temp, sections, subjects, judges, finished) 
     [sections, subjects, judges, finished] = updateTypeDataBySelection(df_temp, df_data, sections, subjects, judges, finished)
     [allData, avgData] = frame.getAvgStdDataFrameByTypeChoiceOrderByPhase(df_data, tagChoice, avg)
