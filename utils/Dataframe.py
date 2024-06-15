@@ -122,19 +122,13 @@ def getAvgTotDataframeByDate(df1, avgChoice):
     durationTag = utilities.getTagName('durationTag')
     quantileTag = utilities.getTagName('quantileTag')
     df1 = df1.sort_values([dateTag]).reset_index(drop = True)
-    df_q = df1.groupby([dateTag], as_index = False).quantile(0.75)
-    df3 = df1.iloc[:0,:].copy()
-    for i, row in df_q.iterrows():
-        df_temp = df1[df1[dateTag] == row[dateTag]]
-        df_temp = df_temp[df_temp[durationTag] <= row[durationTag]]
-        df3 = pd.concat([df3, df_temp], ignore_index = True)
     if avgChoice == avgTag:
-        df2 = df3.groupby([dateTag], as_index = False).mean()
+        df2 = df1.groupby([dateTag], as_index = False).mean()
     else:
-        df2 = df3.groupby([dateTag], as_index = False).median()
-    df2[countTag] = df3.groupby([dateTag]).size().tolist()
-    df2[quantileTag] = df3.groupby([dateTag], as_index = False).quantile(0.75)[durationTag]
-    return [df3, df2]
+        df2 = df1.groupby([dateTag], as_index = False).median()
+    df2[countTag] = df1.groupby([dateTag]).size().tolist()
+    df2[quantileTag] = df1.groupby([dateTag], as_index = False).quantile(0.75)[durationTag]
+    return [df1, df2]
 
 # return data group by chosen data type.
 def getAvgStdDataFrameByDate(df, dataType, avgChoice):

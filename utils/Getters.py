@@ -44,10 +44,8 @@ def getStallStates():
 
 # get event that starts processes.
 def getStartProcessEvent():
-    return 'AS'
     startProcessEvent = connect.getDataFromDatabase(connection, startProcessEventQuery)
     return startProcessEvent[0][0]
-
 
 # get all events.
 def getEvents():
