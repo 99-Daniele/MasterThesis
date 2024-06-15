@@ -343,7 +343,7 @@ def getAvgStdDataFrameByTypeChoiceOrderByPhase(df, typeChoice, avgChoice):
     typeDuration = [typeChoice, durationTag]
     df1 = df[typeDuration].copy()
     df1[durationTag] = df1[durationTag].astype(int)
-    #df1 = keepOnlyRelevant(df1, 0.005, typeChoice).reset_index(drop = True)
+    df1 = keepOnlyRelevant(df1, 0.005, typeChoice).reset_index(drop = True)
     df_q = df1.groupby(typeChoice, as_index = False).quantile(0.75)
     df3 = df1.iloc[:0,:].copy()
     for i, row in df_q.iterrows():

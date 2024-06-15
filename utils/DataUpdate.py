@@ -23,7 +23,7 @@ def restartData():
     endPhase = getter.getEndPhase()
     stallStates = getter.getStallStates()
     #startProcessEvent = getter.getStartProcessEvent()
-    startProcessEvent = 'AS'
+    startProcessEvent = 'IA'
     events = getter.getEvents()
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
@@ -373,55 +373,51 @@ def getDurations(processEvents, processId, processSubjectCode, processSubject, p
     phasesSequence = []
     statesDuration = []
     statesSequence = []
-    startProcessDate = events[0][dateTag]
-    startProcessEventId = events[0][numEventTag]
-    endProcessDate = events[-1][dateTag]
-    endProcessEventId = events[-1][numEventTag]
     startPhaseEvent = events[0]
     startStateEvent = events[0]
+    startProcessEventId = events[0][numEventTag]
+    endProcessEventId = events[-1][numEventTag]
+    startProcessDate = events[0][dateTag]
+    endProcessDate = events[-1][dateTag]
     startProcessDateDt = dt.datetime.strptime(startProcessDate, '%Y-%m-%d %H:%M:%S')
     endProcessDateDt = dt.datetime.strptime(endProcessDate, '%Y-%m-%d %H:%M:%S')
     processDuration = (endProcessDateDt - startProcessDateDt).days
     for i in range(len(events) - 1):
         curr = events[i]
         next = events[i + 1]
-        startStateEventCode = startStateEvent[codeStateTag]
-        nextStateEventCode = next[codeStateTag]
-        startPhase = frame.getPhaseOfState(statesName, startStateEventCode, phaseTag)
+        startPhase = frame.getPhaseOfState(statesName, startPhaseEvent[codeStateTag], phaseTag)
         currPhase = frame.getPhaseOfState(statesName, curr[codeStateTag], phaseTag)
-        nextPhase = frame.getPhaseOfState(statesName, nextStateEventCode, phaseTag)
+        nextPhase = frame.getPhaseOfState(statesName, next[codeStateTag], phaseTag)
         currEventDateDt = dt.datetime.strptime(curr[dateTag], '%Y-%m-%d %H:%M:%S')
         nextEventDateDt = dt.datetime.strptime(next[dateTag], '%Y-%m-%d %H:%M:%S')
         eventDuration = (nextEventDateDt - currEventDateDt).days
         eventsDuration.append([curr[numEventTag], processId, curr[codeEventTag], curr[eventTag], eventDuration, curr[dateTag], curr[codeJudgeTag], curr[codeStateTag], curr[stateTag], currPhase, processSubjectCode, processSubject, curr[sectionTag], processFinished, next[dateTag], next[numEventTag]])
         eventsPhaseSequence.append(currPhase)
         eventsSequence.append(curr[numEventTag])
-        if startStateEventCode != nextStateEventCode:
+        if nextPhase != '-' and startStateEvent[codeStateTag] != next[codeStateTag]:
             startStateDateDt = dt.datetime.strptime(startStateEvent[dateTag], '%Y-%m-%d %H:%M:%S')
-            nextStateDateDt = dt.datetime.strptime(curr[dateTag], '%Y-%m-%d %H:%M:%S')
+            nextStateDateDt = dt.datetime.strptime(next[dateTag], '%Y-%m-%d %H:%M:%S')
             stateDuration = (nextStateDateDt - startStateDateDt).days
             statesDuration.append([startStateEvent[numEventTag], processId, startStateEvent[codeEventTag], startStateEvent[eventTag], stateDuration, startStateEvent[dateTag], startStateEvent[codeJudgeTag], startStateEvent[codeStateTag], startStateEvent[stateTag], startPhase, processSubjectCode, processSubject, startStateEvent[sectionTag], processFinished, next[dateTag], next[numEventTag]])
             if startStateEvent[stateTag] not in statesSequence and startPhase != '-':
                 statesSequence.append(startStateEvent[stateTag])
-            startStateEvent = next  
-        if startPhase != nextPhase:
+            startStateEvent = next.copy()  
+        if nextPhase != '-' and startPhase != nextPhase:
             startPhaseDateDt = dt.datetime.strptime(startPhaseEvent[dateTag], '%Y-%m-%d %H:%M:%S')
-            nextPhaseDateDt = dt.datetime.strptime(curr[dateTag], '%Y-%m-%d %H:%M:%S')
+            nextPhaseDateDt = dt.datetime.strptime(next[dateTag], '%Y-%m-%d %H:%M:%S')
             phaseDuration = (nextPhaseDateDt - startPhaseDateDt).days
             phasesDuration.append([startPhaseEvent[numEventTag], processId, startPhaseEvent[codeEventTag], startPhaseEvent[eventTag], phaseDuration, startPhaseEvent[dateTag], startPhaseEvent[codeJudgeTag], startPhaseEvent[codeStateTag], startPhaseEvent[stateTag], startPhase, processSubjectCode, processSubject, startPhaseEvent[sectionTag], processFinished, next[dateTag], next[numEventTag]])
-            if startPhase == '-':
-                startPhaseEvent = next
-            elif len(phasesSequence) == 0:
+            if len(phasesSequence) == 0:
                 phasesSequence.append(startPhase)
             elif phasesSequence[-1] == "RESTART":
-                 if startPhase != '-' and int(startPhase) > int(phasesSequence[-2]):
+                 if startPhase.isdigit() and int(startPhase) > int(phasesSequence[-2]):
                     phasesSequence.append(startPhase)
             else:
-                if startPhase != '-' and int(startPhase) > int(phasesSequence[-1]):
+                if startPhase.isdigit() and int(startPhase) > int(phasesSequence[-1]):
                     phasesSequence.append(startPhase)
-                elif startPhase != '-' and int(startPhase) < int(phasesSequence[-1]):
+                elif startPhase.isdigit() and int(startPhase) < int(phasesSequence[-1]):
                     phasesSequence.append("RESTART")
-            startPhaseEvent = next 
+            startPhaseEvent = next.copy()
     curr = events[-1]
     currPhase = frame.getPhaseOfState(statesName, curr[codeStateTag], phaseTag)
     eventDuration = 0
@@ -431,38 +427,21 @@ def getDurations(processEvents, processId, processSubjectCode, processSubject, p
     if currPhase == endPhase:
         stateDuration = 0
         statesDuration.append([startStateEvent[numEventTag], processId, startStateEvent[codeEventTag], startStateEvent[eventTag], stateDuration, startStateEvent[dateTag], startStateEvent[codeJudgeTag], startStateEvent[codeStateTag], startStateEvent[stateTag], currPhase, processSubjectCode, processSubject, startStateEvent[sectionTag], processFinished, curr[dateTag], curr[numEventTag]])
-        if startStateEvent[stateTag] not in statesSequence and startPhase != '-':
+        if (len(statesSequence) == 0 or startStateEvent[stateTag] not in statesSequence):
             statesSequence.append(startStateEvent[stateTag])
         phaseDuration = 0
         phasesDuration.append([startPhaseEvent[numEventTag], processId, startPhaseEvent[codeEventTag], startPhaseEvent[eventTag], phaseDuration, startPhaseEvent[dateTag], startPhaseEvent[codeJudgeTag], startPhaseEvent[codeStateTag], startPhaseEvent[stateTag], startPhase, processSubjectCode, processSubject, startPhaseEvent[sectionTag], processFinished, curr[dateTag], curr[numEventTag]])
-        if startPhase == '-':
-            startPhaseEvent = next
-        elif len(phasesSequence) == 0:
-            phasesSequence.append(startPhase)
-        elif phasesSequence[-1] == "RESTART":
-                if startPhase != '-' and int(startPhase) > int(phasesSequence[-2]):
-                    phasesSequence.append(startPhase)
-        else:
-            if startPhase != '-' and int(startPhase) > int(phasesSequence[-1]):
-                phasesSequence.append(startPhase)
-            elif startPhase != '-' and int(startPhase) < int(phasesSequence[-1]):
+        if len(phasesSequence) > 1 and phasesSequence[-1] == "RESTART":
+            if currPhase != '-' and int(currPhase) > int(phasesSequence[-2]):
+                phasesSequence.append(currPhase)
+        elif len(phasesSequence) > 0:
+            if currPhase != '-' and int(currPhase) > int(phasesSequence[-1]):
+                phasesSequence.append(currPhase)
+            elif currPhase != '-' and int(currPhase) < int(phasesSequence[-1]):
                 phasesSequence.append("RESTART")
-        startPhaseEvent = next 
-    eventsPhaseSequence.append(currPhase)
-    eventsSequence.append(curr[numEventTag])
-    if len(phasesSequence) > 1 and phasesSequence[-1] == "RESTART":
-        if currPhase != '-' and int(currPhase) > int(phasesSequence[-2]):
-            phasesSequence.append(currPhase)
-    elif len(phasesSequence) > 0:
-        if currPhase != '-' and int(currPhase) > int(phasesSequence[-1]):
-            phasesSequence.append(currPhase)
-        elif currPhase != '-' and int(currPhase) < int(phasesSequence[-1]):
-            phasesSequence.append("RESTART")
-    else:
-        if currPhase != '-':
-            phasesSequence.append(currPhase)
-    if (len(statesSequence) == 0 or startStateEvent[stateTag] not in statesSequence) and currPhase != '-':
-        statesSequence.append(startStateEvent[stateTag])
+        else:
+            if currPhase != '-':
+                phasesSequence.append(currPhase)
     return [eventsDuration, eventsSequence, eventsPhaseSequence, phasesDuration, phasesSequence, statesDuration, statesSequence, processDuration, startProcessDate, startProcessEventId, endProcessDate, endProcessEventId]
 
 # update process duration dataframe.
