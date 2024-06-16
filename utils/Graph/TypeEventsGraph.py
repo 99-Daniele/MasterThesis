@@ -89,7 +89,7 @@ def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
-    fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False)
+    fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False, legend = dict(font = dict(size = 16)))
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
     return [fig, sections, subjects, judges, finished]
 
@@ -128,7 +128,7 @@ def typeSequenceUpdate(df, typeChoices, tagChoice, avg, text, sections, subjects
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
-    fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False)
+    fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False, legend = dict(font = dict(size = 16)))
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
     return [fig, sections, subjects, judges, finished]
         

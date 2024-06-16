@@ -14,9 +14,6 @@ import utils.utilities.Utilities as utilities
 df = getter.getEventsDuration()
 codeEventTag = utilities.getTagName('codeEventTag')
 eventTag = utilities.getTagName('eventTag')
-importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
-if importantEvents != None and len(importantEvents) > 0:
-    df = df[df[codeEventTag].isin(importantEvents)]
 
 # return initial layout of page.
 def pageLayout():
@@ -28,16 +25,19 @@ def pageLayout():
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     subject = utilities.getPlaceholderName('subject')  
-    types = frame.getUniques(df, eventTag)
+    importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
+    if importantEvents != None and len(importantEvents) > 0:
+        df_temp = df[df[codeEventTag].isin(importantEvents)]
+    types = frame.getUniques(df_temp, eventTag)
     finishedTag = utilities.getTagName('finishedTag') 
     codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     median = utilities.getPlaceholderName('median') 
     sectionTag = utilities.getTagName('sectionTag')
     subjectTag = utilities.getTagName('codeSubjectTag') 
-    judges = frame.getGroupBy(df, codeJudgeTag)
-    sections = frame.getGroupBy(df, sectionTag)
-    subjects = frame.getGroupBy(df, subjectTag)
-    finished = frame.getGroupBy(df, finishedTag)
+    judges = frame.getGroupBy(df_temp, codeJudgeTag)
+    sections = frame.getGroupBy(df_temp, sectionTag)
+    subjects = frame.getGroupBy(df_temp, subjectTag)
+    finished = frame.getGroupBy(df_temp, finishedTag)
     df_temp = pd.DataFrame({'A' : (), 'B': ()})
     types = sorted(types)
     fig = px.box(df_temp, x = 'A', y = 'B')
@@ -75,4 +75,9 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(event, avg, text, section, subject, judge, finished):
-    return typeEvent.typeSequenceUpdate(df, event, eventTag, avg, text, section, subject, judge, finished)
+    importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
+    if importantEvents != None and len(importantEvents) > 0:
+        df_temp = df[df[codeEventTag].isin(importantEvents)]
+    else:
+        df_temp = df
+    return typeEvent.typeSequenceUpdate(df_temp, event, eventTag, avg, text, section, subject, judge, finished)

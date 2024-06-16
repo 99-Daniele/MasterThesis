@@ -20,10 +20,6 @@ judges = frame.getGroupBy(df, 'giudice')
 maxYear = dt.datetime.strptime(df['data'].max(), '%Y-%m-%d %H:%M:%S').year
 maxDateStart = dt.date(maxYear - 1, 1, 1)
 maxDateEnd = dt.date(maxYear, 1, 1)
-try:
-    mustStates = file.getDataFromTextFile('preferences/mustStates.txt')
-except:
-    mustStates = None
 
 # return initial layout of page.
 def pageLayout():
@@ -76,4 +72,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
-    return event.eventUpdate(df, startDate, endDate, 'stato', mustStates, minDate, maxDate, sections, subjects, judges)
+    return event.eventUpdate(df, startDate, endDate, 'stato', None, minDate, maxDate, sections, subjects, judges)

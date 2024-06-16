@@ -14,9 +14,6 @@ import utils.utilities.Utilities as utilities
 df = getter.getEventsDurationFiltered()
 codeEventTag = utilities.getTagName('codeEventTag')
 eventTag = utilities.getTagName('eventTag')
-importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
-if importantEvents != None and len(importantEvents) > 0:
-    df = df[df[codeEventTag].isin(importantEvents)]
 
 # return initial layout of page.
 def pageLayout():
@@ -40,12 +37,15 @@ def pageLayout():
     trimesterYear = utilities.getPlaceholderName('trimesterYear')
     week = utilities.getPlaceholderName('week')
     year = utilities.getPlaceholderName('year')
-    types = frame.getGroupBy(df, eventTag)
+    importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
+    if importantEvents != None and len(importantEvents) > 0:
+        df_temp = df[df[codeEventTag].isin(importantEvents)]
+    types = frame.getGroupBy(df_temp, eventTag)
     typesSorted = sorted(types)
-    sections = frame.getGroupBy(df, sectionTag)
-    subjects = frame.getGroupBy(df, subjectTag)
-    judges = frame.getGroupBy(df, codeJudgeTag)
-    finished = frame.getGroupBy(df, finishedTag)
+    sections = frame.getGroupBy(df_temp, sectionTag)
+    subjects = frame.getGroupBy(df_temp, subjectTag)
+    judges = frame.getGroupBy(df_temp, codeJudgeTag)
+    finished = frame.getGroupBy(df_temp, finishedTag)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([
@@ -119,4 +119,9 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, choices, order, text):
-    return comparation.typeComparationUpdate(df, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, eventTag, sections, subjects, judges, finished, choices, order, text)
+    importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
+    if importantEvents != None and len(importantEvents) > 0:
+        df_temp = df[df[codeEventTag].isin(importantEvents)]
+    else:
+        df_temp = df
+    return comparation.typeComparationUpdate(df_temp, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, eventTag, sections, subjects, judges, finished, choices, order, text)

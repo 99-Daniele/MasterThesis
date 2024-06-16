@@ -59,7 +59,8 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
     fig.update_layout(
         legend = dict(
             yanchor = "top",
-            y = 0.99
+            y = 0.99,
+            font = dict(size = 16)
         ),
         yaxis = dict(
             showticklabels = False

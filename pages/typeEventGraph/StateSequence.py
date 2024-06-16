@@ -14,9 +14,6 @@ import utils.utilities.Utilities as utilities
 df = getter.getStatesDuration()
 codeStateTag = utilities.getTagName('codeStateTag')
 stateTag = utilities.getTagName('stateTag')
-importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
-if importantStates != None and len(importantStates) > 0:
-    df = df[df[codeStateTag].isin(importantStates)]
 
 # return initial layout of page.
 def pageLayout():
@@ -28,16 +25,19 @@ def pageLayout():
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     subject = utilities.getPlaceholderName('subject')  
-    types = frame.getGroupBy(df, stateTag)
+    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    if importantStates != None and len(importantStates) > 0:
+        df_temp = df[df[codeStateTag].isin(importantStates)]
+    types = frame.getGroupBy(df_temp, stateTag)
     finishedTag = utilities.getTagName('finishedTag') 
     codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     median = utilities.getPlaceholderName('median') 
     sectionTag = utilities.getTagName('sectionTag')
     subjectTag = utilities.getTagName('codeSubjectTag') 
-    sections = frame.getGroupBy(df, sectionTag)
-    subjects = frame.getGroupBy(df, subjectTag)
-    judges = frame.getGroupBy(df, codeJudgeTag)
-    finished = frame.getGroupBy(df, finishedTag)
+    sections = frame.getGroupBy(df_temp, sectionTag)
+    subjects = frame.getGroupBy(df_temp, subjectTag)
+    judges = frame.getGroupBy(df_temp, codeJudgeTag)
+    finished = frame.getGroupBy(df_temp, finishedTag)
     df_temp = pd.DataFrame({'A' : (), 'B': ()})
     types = sorted(types)
     fig = px.box(df_temp, x = 'A', y = 'B')
@@ -75,4 +75,10 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(state, avg, text, section, subject, judge, finished):
-    return typeEvent.typeSequenceUpdate(df, state, stateTag, avg, text, section, subject, judge, finished)
+    
+    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    if importantStates != None and len(importantStates) > 0:
+        df_temp = df[df[codeStateTag].isin(importantStates)]
+    else:
+        df_temp = df
+    return typeEvent.typeSequenceUpdate(df_temp, state, stateTag, avg, text, section, subject, judge, finished)

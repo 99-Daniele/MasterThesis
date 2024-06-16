@@ -15,9 +15,6 @@ df = getter.getStatesDurationFiltered()
 codeStateTag = utilities.getTagName('codeStateTag') 
 phaseTag = utilities.getTagName('phaseTag') 
 stateTag = utilities.getTagName('stateTag') 
-importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
-if importantStates != None and len(importantStates) > 0:
-    df = df[df[codeStateTag].isin(importantStates)]
 
 # return initial layout of page.
 def pageLayout():
@@ -41,11 +38,14 @@ def pageLayout():
     trimesterYear = utilities.getPlaceholderName('trimesterYear')
     week = utilities.getPlaceholderName('week')
     year = utilities.getPlaceholderName('year') 
-    types = frame.getGroupBy(df, stateTag)
-    sections = frame.getGroupBy(df, sectionTag)
-    subjects = frame.getGroupBy(df, subjectTag)
-    judges = frame.getGroupBy(df, codeJudgeTag)
-    finished = frame.getGroupBy(df, finishedTag)
+    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    if importantStates != None and len(importantStates) > 0:
+        df_temp = df[df[codeStateTag].isin(importantStates)]
+    types = frame.getGroupBy(df_temp, stateTag)
+    sections = frame.getGroupBy(df_temp, sectionTag)
+    subjects = frame.getGroupBy(df_temp, subjectTag)
+    judges = frame.getGroupBy(df_temp, codeJudgeTag)
+    finished = frame.getGroupBy(df_temp, finishedTag)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([
@@ -119,4 +119,9 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, choices, order, text):
-    return comparation.typeComparationUpdate(df, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, stateTag, sections, subjects, judges, finished, choices, order, text)
+    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    if importantStates != None and len(importantStates) > 0:
+        df_temp = df[df[codeStateTag].isin(importantStates)]
+    else:
+        df_temp = df
+    return comparation.typeComparationUpdate(df_temp, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, stateTag, sections, subjects, judges, finished, choices, order, text)

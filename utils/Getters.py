@@ -212,29 +212,35 @@ def getEventsDurationFiltered():
 # get states name dataframe.
 def getStateNamesDataframe():
     codeStateTag = utilities.getTagName("codeStateTag")
+    durationTag = utilities.getTagName("durationTag")
     phaseTag = utilities.getTagName("phaseTag")
     phaseDBTag = utilities.getTagName("phaseDBTag")
     stateTag = utilities.getTagName("codeStateTag")
     statesNameDataframe = getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
     stateDurationDataframe = getStatesDuration()  
     df = frame.createStateNameDataframeWithInfo(stateDurationDataframe, statesNameDataframe) 
+    df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
     return df
 
 # get events name dataframe.
 def getEventNamesDataframe():
     codeEventTag = utilities.getTagName("codeEventTag")
+    durationTag = utilities.getTagName("durationTag")
     eventTag = utilities.getTagName("eventTag")
     eventNamesDataframe = getEventsInfo(codeEventTag, eventTag)
     eventDurationDataframe = getEventsDuration()
     df = frame.createEventNameDataframeWithInfo(eventDurationDataframe, eventNamesDataframe)
+    df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
     return df
 
 # get subject name dataframe.
 def getSubjectNamesDataframe():
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    durationTag = utilities.getTagName("durationTag")
     ritualTag = utilities.getTagName("ritualTag")
     subjectTag = utilities.getTagName("subjectTag")
     subjectNamesDataframe = getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
     processDurationDataframe = getProcessesDuration()
     df = frame.createSubjectNameDataframeWithInfo(processDurationDataframe, subjectNamesDataframe)
+    df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
     return df

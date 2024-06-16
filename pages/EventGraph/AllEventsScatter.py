@@ -13,7 +13,6 @@ import utils.utilities.Utilities as utilities
 # get dataframe with all events. 
 # get important events from text file.
 df = getter.getAllEvents()
-importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
 codeStateTag = utilities.getTagName('codeStateTag')
 
 # return initial layout of page.
@@ -74,4 +73,5 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
+    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
     return event.eventUpdate(df, startDate, endDate, codeStateTag, importantStates, minDate, maxDate, sections, subjects, judges)
