@@ -5,7 +5,7 @@ import utils.database.DatabaseConnection as connect
 import utils.DataUpdate as update
 import utils.Dataframe as frame
 import utils.FileOperation as file
-import utils.utilities.Utilities as utilities
+import utils.Utilities as utilities
 
 # connection is user database connection.
 connection = connect.getDatabaseConnection()
@@ -100,6 +100,38 @@ def getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag):
         subjectsInfoDataframe = frame.createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, ritualTag, subjectTag)
         cache.updateCache('subjectsInfo.json', subjectsInfoDataframe)
     return subjectsInfoDataframe
+
+# get processes events.
+def getProcessesEvents():
+    processEvents = cache.getData('processesEvents.json')
+    if processEvents is None:
+        update.restartData()
+        processEvents = cache.getData('processesEvents.json')
+    return processEvents
+
+# get processes events.
+def getProcessesInfo():
+    processEvents = cache.getDataframe('processesInfo.json')
+    if processEvents is None:
+        update.restartData()
+        processEvents = cache.getDataframe('prrocessesInfo.json')
+    return processEvents
+
+# get predicted duration dataframe.
+def getPredictedDurationDataframe():
+    predictedDurationFataframe = cache.getDataframe('predictions.json')
+    if predictedDurationFataframe is None:
+        update.predictTest()
+        predictedDurationFataframe = cache.getDataframe('predictions.json')
+    return predictedDurationFataframe
+
+# get unfinished processes duration.
+def getUnfinishedProcessesDuration():
+    unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
+    if unfinishedProcesses is None:
+        update.predictDuration()
+        unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
+    return unfinishedProcesses
 
 # get all events from cache file.
 def getAllEvents():
@@ -244,6 +276,3 @@ def getSubjectNamesDataframe():
     df = frame.createSubjectNameDataframeWithInfo(processDurationDataframe, subjectNamesDataframe)
     df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
     return df
-
-# get predicted duration dataframe.
-def getPredictedDurationDataframe():

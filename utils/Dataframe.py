@@ -5,7 +5,7 @@ import pandas as pd
 import textwrap
 
 import utils.FileOperation as file
-import utils.utilities.Utilities as utilities
+import utils.Utilities as utilities
 
 # importantProcessStates, importantSections and importantSubjects are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
 importantProcessStates = file.getDataFromTextFile('preferences/importantProcessStates.txt')
@@ -622,3 +622,15 @@ def selectFollowingRows(df, tag, tagChoices):
 def getPhaseOfState(statesName, state, phaseTag):
     phase = statesName.get(state)[phaseTag]
     return phase
+
+# create map to decide color based on state phase.
+def phaseColorMap(type, statesInfoDataframe):
+    statesInfo = statesInfoDataframe.to_dict('records')
+    colors = file.getDataFromJsonFile('utils/utilities/phaseColors.json')
+    phaseTag = utilities.getTagName("phaseTag")
+    map = {}
+    for s in statesInfo:
+        key = s[type]
+        phase = s[phaseTag]
+        map.update({key: colors.get(str(phase))})
+    return map

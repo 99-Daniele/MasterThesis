@@ -156,9 +156,24 @@ def displayPredictionError():
     app.run_server(debug = True)
 
 # refresh database and cache data.
+def restartData():
+    import utils.DataUpdate as update
+    update.restartData()
+
+# refresh database and cache data.
 def refreshData():
     import utils.DataUpdate as update
     update.refreshData()
+
+# test prediction of unifinished processes.
+def predictTest():
+    import utils.DataUpdate as update
+    update.predictTest()
+
+# predicts duration of unfinished processes.
+def predictDuration():
+    import utils.DataUpdate as update
+    update.predictDuration()
 
 # start app to allow user select graph to be displayed.
 def startApp():
@@ -166,4 +181,4 @@ def startApp():
     app.start()
 
 if __name__ == '__main__':
-    startApp()
+    predictTest()

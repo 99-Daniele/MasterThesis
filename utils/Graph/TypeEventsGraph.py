@@ -3,7 +3,8 @@
 import plotly.express as px
 
 import utils.Dataframe as frame
-import utils.utilities.Utilities as utilities
+import utils.Getters as getter
+import utils.Utilities as utilities
 
 # update data based on user choices on different parameters.
 def updateTypeData(df, sections, subjects, judges, finished):
@@ -56,6 +57,7 @@ def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections
     numProcessTag = utilities.getTagName('numProcessTag')
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
+    statesInfo = getter.getStatesInfo()
     df_temp = df.copy()
     if first == firstTag:
         df_temp = df_temp.groupby([type, numProcessTag]).first().reset_index()
@@ -78,7 +80,7 @@ def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections
                 px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )         
     else:
-        colorMap = utilities.phaseColorMap(tagChoice)
+        colorMap = frame.phaseColorMap(tagChoice, statesInfo)
         if text == [textTag]:
             fig = px.histogram(allData, x = tagChoice, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
         else:
@@ -117,7 +119,7 @@ def typeSequenceUpdate(df, typeChoices, tagChoice, avg, text, sections, subjects
                 px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )         
     else:
-        colorMap = utilities.phaseColorMap(tagChoice)
+        colorMap = frame.phaseColorMap(tagChoice, statesInfo)
         if text == [textTag]:
             fig = px.histogram(allData, x = tagChoice, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
         else:

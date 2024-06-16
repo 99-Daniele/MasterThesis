@@ -6,7 +6,7 @@ import pandas as pd
 import Cache as cache
 import utils.DataUpdate as update
 import utils.FileOperation as file
-import utils.utilities.Utilities as utilities
+import utils.Utilities as utilities
 
 def updateDatabase(data, dfDatabase, tag, filename):
     countTag = utilities.getTagName("countTag")

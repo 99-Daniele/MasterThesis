@@ -3,10 +3,10 @@
 import dash as ds
 import plotly.express as px
 
-import Cache as cache
 import utils.Dataframe as frame
 import utils.FileOperation as file
-import utils.utilities.Utilities as utilities
+import utils.Getters as getter
+import utils.Utilities as utilities
 
 # hide page components if user select it.
 def hideChosen(choices, tags, styles, parameters):
@@ -145,7 +145,7 @@ def updateTypeData(df, startDate, endDate, sections, subjects, judges, finished)
 # update data base on user choices on different parameters. In order to do that is use 'updateProcessData' method with chosen parameter as None. 
 # this is done because if user wants to compare on chosen parameter, data must be updated without any filter on chosen parameter.
 # this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
-def updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio):
+def updateProcessDataframeFromSelection(df_temp, df_data, eventsInfoDataframe, statesInfoDataframe, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio):
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     codeStateTag = utilities.getTagName("codeStateTag")
@@ -202,7 +202,6 @@ def updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, se
     events = frame.getGroupByFromString(df_temp_7, eventSequenceTag)
     importantCodeEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
     if importantCodeEvents != None and len(importantCodeEvents) > 0:
-        eventsInfoDataframe = cache.getDataframe('eventsInfo.json')
         eventsInfo = eventsInfoDataframe.to_dict('records')
         importantEvents = []
         for e in eventsInfo:
@@ -214,7 +213,6 @@ def updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, se
     states = frame.getGroupByFromString(df_temp_8, stateSequenceTag)
     importantCodeStates = file.getDataFromTextFile('preferences/importantStates.txt')
     if importantCodeStates != None and len(importantCodeStates) > 0:
-        statesInfoDataframe = cache.getDataframe('statesInfo.json')
         statesInfo = statesInfoDataframe.to_dict('records')
         importantStates = []
         for s in statesInfo:
@@ -284,10 +282,12 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
     filterTag = utilities.getTagName('filterTag')
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
+    eventsInfo = getter.getEventsInfo()
+    statesInfo = getter.getStatesInfo()
     df_temp = df.copy()
     [sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, stateStyle, stateRadioStyle, phaseStyle, phaseRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, state, phase] = hideProcessChosen(choices, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, stateChoice, phaseChoice)
     df_data = updateProcessData(df_temp, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio)
-    [sections, subjects, judges, finished, sequences, phaseSequences, event, state, phase] = updateProcessDataframeFromSelection(df_temp, df_data, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio, stateChoice, stateRadio, phaseChoice, phaseRadio)
+    [sections, subjects, judges, finished, sequences, phaseSequences, event, state, phase] = updateProcessDataframeFromSelection(df_temp, df_data, eventsInfo, statesInfo, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio, stateChoice, stateRadio, phaseChoice, phaseRadio)
     if choices == None or len(choices) == 0:
         orderRadioStyle = {'display': 'none'}
         [allData, avgData] = frame.getAvgStdDataFrameByDate(df_data, dateType, avgChoice)
@@ -350,6 +350,7 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
     sectionTag = utilities.getTagName('sectionTag')
     subjectTag = utilities.getTagName('subjectTag')
     textTag = utilities.getPlaceholderName("text")
+    statesInfo = getter.getStatesInfo()
     df_temp = df.copy()
     if typeChoice == None:
         title = 'PROCESS ' + type.upper() + 'S DURATION'
@@ -361,13 +362,13 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
             if type == eventTag:   
                 fig = px.histogram(allData, x = type, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Number of ' + type + 's of process', type:type.title() + ' of process'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
             else:
-                colorMap = utilities.phaseColorMap(type)
+                colorMap = frame.phaseColorMap(type, statesInfo)
                 fig = px.histogram(allData, x = type, color = type, color_discrete_map = colorMap, labels = {durationTag:'Number of ' + type + 's of process', type:type.title() + ' of process'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
         else:
             if type == eventTag:        
                 fig = px.box(allData, x = type, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Duration ' + type + 's of process [days]', type:type.title() + ' of process'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
             else:
-                colorMap = utilities.phaseColorMap(type)
+                colorMap = frame.phaseColorMap(type, statesInfo)
                 fig = px.box(allData, x = type, y = durationTag, color = type, color_discrete_map = colorMap, labels = {durationTag:'Duration ' + type + 's of process [days]', type:type.title() + ' of process'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
             fig.add_traces(
                 px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data

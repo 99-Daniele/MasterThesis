@@ -7,7 +7,7 @@ import plotly.express as px
 import utils.Dataframe as frame
 import utils.Getters as getter
 import utils.graph.ComparationGraph as comparation
-import utils.utilities.Utilities as utilities
+import utils.Utilities as utilities
 
 # get dataframe with all processes duration.
 df = getter.getProcessesDurationFiltered()

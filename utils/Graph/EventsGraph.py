@@ -4,7 +4,8 @@ import dash as ds
 import plotly.express as px
 
 import utils.Dataframe as frame
-import utils.utilities.Utilities as utilities
+import utils.Getters as getter
+import utils.Utilities as utilities
 
 # update dataframe based on user selections.
 def updateDataframe(df, startDate, endDate, sections, subjects, judges):
@@ -51,10 +52,11 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
     dateTag = utilities.getTagName('dateTag')
     numProcessTag = utilities.getTagName('numProcessTag')
     phaseTag = utilities.getTagName('phaseTag') 
+    statesInfo = getter.getStatesInfo()
     df_temp = updateDataframe(df_temp, startDate, endDate, sections, subjects, judges)
     df_temp = df_temp.sort_values(by = phaseTag).reset_index(drop = True)
     [sections, subjects, judges] = updateTypesBySelection(df, df_temp, startDate, endDate, sections, subjects, judges)
-    colorMap = utilities.phaseColorMap(type)
+    colorMap = frame.phaseColorMap(type, statesInfo)
     fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_map = colorMap, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = utilities.getWidth(1))
     fig.update_layout(
         legend = dict(

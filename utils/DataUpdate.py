@@ -10,20 +10,19 @@ import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Prediction as prediction
-import utils.utilities.Utilities as utilities
+import utils.Utilities as utilities
 
 # restart current database data in case events or process table are changed.
 def restartData():
     connection = connect.getDatabaseConnection()
     verifyDatabase(connection)
-    file.removeFolder('cache')
-    file.createFolder('cache')
+    #file.removeFolder('cache')
+    #file.createFolder('cache')
     maxDate = getter.getMaxDate()
     maxDateDt = dt.datetime.strptime(maxDate, '%Y-%m-%d %H:%M:%S')
+    startProcessEvent = 'IA'
     endPhase = getter.getEndPhase()
     stallStates = getter.getStallStates()
-    #startProcessEvent = getter.getStartProcessEvent()
-    startProcessEvent = 'IA'
     events = getter.getEvents()
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
@@ -33,7 +32,6 @@ def restartData():
     dateTag = utilities.getTagName("dateTag")
     durationTag = utilities.getTagName("durationTag")
     durationFinalTag = utilities.getTagName("durationFinalTag")
-    durationPredictedTag = utilities.getTagName("durationPredictedTag")
     eventTag = utilities.getTagName("eventTag")
     eventsTag = utilities.getTagName("eventsTag")
     finishedTag = utilities.getTagName("finishedTag")
@@ -50,24 +48,47 @@ def restartData():
     getter.getEventsInfo(codeEventTag, eventTag)
     getter.getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
     getter.getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
-    filteredEvents, processesEvents, processInfo = getProcessEvents(events, startProcessEvent, maxDateDt, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventTag, eventsTag, finishedTag, loadTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
+    filteredEvents, processesEvents, processesInfo = getProcessEvents(events, startProcessEvent, maxDateDt, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventTag, eventsTag, finishedTag, loadTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
     eventsDataframe = frame.createBasicEventsDataFrame(filteredEvents, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag)
-    #finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
-    #avgPredictionError, medianPredictionError = prediction.predictDurationsWithoutLikenessTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
-    #print('Average Prediction Error: ', avgPredictionError)
-    #print('Median Prediction Error: ', medianPredictionError)
-    #exit()
-    unfinishedProcessesDurations = prediction.predictDurationsWithoutLikeness(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
     cache.updateCache('events.json', eventsDataframe)
+    cache.updateCache('processesInfo.json', processesInfo)
     file.writeOnJsonFile('cache/processesEvents.json', processesEvents)
-    file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
+    predictDuration()
     refreshData()
+
+# test unfinished processes prediction.
+def predictTest():
+    codeJudgeTag = utilities.getTagName("codeJudgeTag")
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    countTag = utilities.getTagName("countTag")
+    durationTag = utilities.getTagName("durationTag")
+    durationFinalTag = utilities.getTagName("durationFinalTag")
+    durationPredictedTag = utilities.getTagName("durationPredictedTag")
+    finishedTag = utilities.getTagName("finishedTag")
+    numProcessTag = utilities.getTagName("numProcessTag")
+    sectionTag = utilities.getTagName("sectionTag")
+    processInfo = getter.getProcessesInfo()
+    finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
+    predictionDf = prediction.predictDurationsTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    cache.updateCache('predictions.json', predictionDf)
+
+# predict unfinished processes duration.
+def predictDuration():
+    codeJudgeTag = utilities.getTagName("codeJudgeTag")
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    durationTag = utilities.getTagName("durationTag")
+    durationFinalTag = utilities.getTagName("durationFinalTag")
+    durationPredictedTag = utilities.getTagName("durationPredictedTag")
+    finishedTag = utilities.getTagName("finishedTag")
+    numProcessTag = utilities.getTagName("numProcessTag")
+    sectionTag = utilities.getTagName("sectionTag")
+    processInfo = getter.getProcessesInfo()
+    unfinishedProcessesDurations = prediction.predictDurations(processInfo, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
 
 # refresh current database data. 
 # calcs event, phases, states, process, courtHearing durations, comprare with current database data and in case update them.
 def refreshData():
-    import time
-    start = time.time()
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     codeStateTag = utilities.getTagName("codeStateTag")
@@ -92,22 +113,15 @@ def refreshData():
     stateSequenceTag = utilities.getTagName("stateSequenceTag")
     stateTag = utilities.getTagName("stateTag")
     subjectTag = utilities.getTagName("subjectTag")
-    processEvents = cache.getData('processesEvents.json')
-    if processEvents is None:
-        restartData()
-        processEvents = cache.getData('processesEvents.json')
-    unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
-    if unfinishedProcesses is None:
-        restartData()
-        unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
     eventsDataframe = getter.getEventsDataframe()
+    processEvents = getter.getProcessesEvents()
+    unfinishedProcesses =getter.getUnfinishedProcessesDuration()
     statesInfoDataframe = getter.getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
     statesInfo = statesInfoDataframe.set_index(codeStateTag).T.to_dict('dict')
     endPhase = frame.getPhaseOfState(statesInfo, "DF", phaseTag)
     processesDuration = updateTypeDurationDataframe(processEvents, unfinishedProcesses, statesInfo, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, durationPredictedTag, eventTag, eventsTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag)
     updateProcessDurationDataframe(processesDuration, codeSubjectTag, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag)
     updateEventsDataframe(eventsDataframe, statesInfoDataframe, endPhase, codeStateTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, stateTag)
-    print(str(time.time() - start) + " seconds")
 
 # group events by process.
 def getProcessEvents(events, startProcessEvent, maxDateDt, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, eventTag, eventsTag, finishedTag, loadTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag):

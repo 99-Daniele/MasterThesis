@@ -8,7 +8,7 @@ import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.Getters as getter
 import utils.graph.ComparationGraph as comparation
-import utils.utilities.Utilities as utilities
+import utils.Utilities as utilities
 
 # get dataframe with all events duration.
 df = getter.getEventsDurationFiltered()

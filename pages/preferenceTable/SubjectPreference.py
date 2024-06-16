@@ -5,7 +5,7 @@ import pandas as pd
 
 import utils.FileOperation as file
 import utils.Getters as getter
-import utils.utilities.Utilities as utilities
+import utils.Utilities as utilities
 
 # get dataframe with judge names. 
 df = getter.getSubjectNamesDataframe()
