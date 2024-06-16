@@ -3,5 +3,6 @@
     "box": "#91BBF3", 
     "char": "black",
     "grid": "rgb(160, 160, 160)",
-    "line": "black"
+    "line": "black",
+    "point": "red"
 }

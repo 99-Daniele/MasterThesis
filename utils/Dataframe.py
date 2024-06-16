@@ -524,9 +524,9 @@ def getPhaseDataFrame(df, phase):
         phaseSequence = utilities.fromStringToList(row[phaseSequenceTag])
         try:
             phaseSequence.index(phase)
-            phaseString = withTag + " FASE " + phase
+            phaseString = withTag + " " + phaseTag + " " + phase
         except:
-            phaseString = withOut + " FASE " + phase
+            phaseString = withOut + " " + phaseTag + " " + phase
         df_temp.at[i, phaseTag] = phaseString
     return df_temp
 

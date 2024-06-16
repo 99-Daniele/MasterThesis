@@ -17,9 +17,10 @@ def start():
     import pages.eventGraph.AllEventsScatter as allEventsPage
     import pages.eventGraph.PhaseEventsScatter as phaseEventsPage
     import pages.eventGraph.StateEventsScatter as stateEventsPage
-    import pages.preference.EventPreference as eventPreferencePage
-    import pages.preference.StatePreference as statePreferencePage
-    import pages.preference.SubjectPreference as subjectPreferencePage
+    import pages.predictionGraph.PredictionError as predictionErrorPage
+    import pages.preferenceTable.EventPreference as eventPreferencePage
+    import pages.preferenceTable.StatePreference as statePreferencePage
+    import pages.preferenceTable.SubjectPreference as subjectPreferencePage
     import pages.typeEventGraph.EventSequence as sequenceEventPage
     import pages.typeEventGraph.PhaseEvents as eventsPhasePage
     import pages.typeEventGraph.PhaseSequence as sequencePhasePage
@@ -61,6 +62,8 @@ def start():
                 return phaseEventsPage.pageLayout()
             case '/eventgraph/stateevents':
                 return stateEventsPage.pageLayout()
+            case '/prediction':
+                return predictionErrorPage.pageLayout()
             case '/preference/eventpreference':
                 return eventPreferencePage.pageLayout()
             case '/preference/statepreference':

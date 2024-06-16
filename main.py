@@ -121,7 +121,7 @@ def displayEventSequence():
 
 # display state names.
 def displayStatePreferences():
-    import pages.preference.StatePreference as statePreferencePage
+    import pages.preferenceTable.StatePreference as statePreferencePage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = statePreferencePage.pageLayout())
@@ -130,7 +130,7 @@ def displayStatePreferences():
 
 # display event names.
 def displayEventPreferences():
-    import pages.preference.EventPreference as eventPreferencePage
+    import pages.preferenceTable.EventPreference as eventPreferencePage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = eventPreferencePage.pageLayout())
@@ -139,7 +139,7 @@ def displayEventPreferences():
 
 # display subject names.
 def displaySubjectPreferences():
-    import pages.preference.SubjectPreference as subjectPreferencePage
+    import pages.preferenceTable.SubjectPreference as subjectPreferencePage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = subjectPreferencePage.pageLayout())
@@ -181,4 +181,4 @@ def startApp():
     app.start()
 
 if __name__ == '__main__':
-    predictTest()
+    startApp()

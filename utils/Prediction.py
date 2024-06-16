@@ -16,7 +16,7 @@ def predictDurationsTest(df, codeJudgeTag, codeSubjectTag, countTag, durationTag
     columns.remove(finishedTag)
     columns.remove(durationFinalTag)
     numProcesses = frame.getUniques(df, numProcessTag).tolist()
-    lTrain = int(len(numProcesses) / 50)
+    lTrain = int(len(numProcesses) / 20)
     trainNumProcesses = numProcesses[lTrain:]
     testNumProcesses = list(set(numProcesses) - set(trainNumProcesses))
     predictions = []

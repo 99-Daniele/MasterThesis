@@ -12,60 +12,20 @@ import utils.Utilities as utilities
 
 # get dataframe with predictions.
 df = getter.getPredictedDurationDataframe()
-codeStateTag = utilities.getTagName('codeStateTag')
 
 # return initial layout of page.
 def pageLayout():
-    dateTag = utilities.getTagName('dateTag') 
-    judge = utilities.getPlaceholderName('judge') 
-    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
-    numProcessTag = utilities.getTagName('numProcessTag')
-    section = utilities.getPlaceholderName('section') 
-    sectionTag = utilities.getTagName('sectionTag')
-    subject = utilities.getPlaceholderName('subject')  
-    subjectTag = utilities.getTagName('subjectTag') 
-    
-    fig = px.scatter(df, x = dateTag, y = numProcessTag, color = codeStateTag, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = 1400, height = 1200)
+    finalDurationTag = utilities.getTagName('finalDurationTag')  
+    numProcessTag = utilities.getTagName('numProcessTag') 
+    predictedDurationTag = utilities.getTagName('durationPredictedTag')
+    df_temp = df.sort_values(by = numProcessTag).reset_index(drop = True)
+    fig = px.scatter(df_temp, x = numProcessTag, y = predictedDurationTag, color_discrete_sequence = [utilities.getPointColor()], labels = {numProcessTag:'processID', predictedDurationTag:'Predicted duration of process'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+    fig.add_traces(
+        px.line(df_temp, x = numProcessTag, y = finalDurationTag).update_traces(line_color = utilities.getLineColor()).data
+    )
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
-        ds.html.Br(),
-        ds.dcc.Link('EVENTS VISUALIZATION GRAPH', href='/eventgraph'),
-        ds.html.H2('VISUALIZATION OF ALL PROCESS EVENTS'),
-        ds.dcc.DatePickerRange(
-            id = 'event-dateranger-aes',
-            start_date = maxDateStart,
-            end_date = maxDateEnd,
-            min_date_allowed = df[dateTag].min(),
-            max_date_allowed = df[dateTag].max(),
-            display_format = 'DD MM YYYY',
-            style = {'width': 300}
-        ),
-        ds.html.Button("RESET", id = 'reset-button-aes'),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-aes', placeholder = section, style = {'width': 400}),
-        ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-aes', placeholder = subject, style = {'width': 400}, optionHeight = 80),
-        ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-aes', placeholder = judge, style = {'width': 400}),
-        ds.dcc.Graph(figure = fig, id = 'events-graph-aes')
+        ds.html.H2('PREDICTED DURATION ERROR GRAPH'),
+        ds.dcc.Graph(figure = fig, id = 'prediction-graph')
     ])
     return layout
-
-# callback with input and output.
-@ds.callback(
-    [ds.Output('events-graph-aes', 'figure'),
-        ds.Output('event-dateranger-aes', 'start_date'), 
-        ds.Output('event-dateranger-aes', 'end_date'),
-        ds.Output('section-dropdown-aes', 'options'),
-        ds.Output('subject-dropdown-aes', 'options'),
-        ds.Output('judge-dropdown-aes', 'options')],
-    [ds.Input('event-dateranger-aes', 'start_date'), 
-        ds.Input('event-dateranger-aes', 'end_date'), 
-        ds.Input('event-dateranger-aes', 'min_date_allowed'), 
-        ds.Input('event-dateranger-aes', 'max_date_allowed'), 
-        ds.Input('reset-button-aes', 'n_clicks'),
-        ds.Input('section-dropdown-aes', 'value'),
-        ds.Input('subject-dropdown-aes', 'value'),
-        ds.Input('judge-dropdown-aes', 'value')])
-
-# return updated data based on user choice.
-def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
-    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
-    return event.eventUpdate(df, startDate, endDate, codeStateTag, importantStates, minDate, maxDate, sections, subjects, judges)

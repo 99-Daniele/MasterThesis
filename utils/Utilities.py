@@ -26,6 +26,11 @@ def getLineColor():
     colors = file.getDataFromJsonFile('utils/utilities/graphColors.json')
     return colors.get('line')
 
+# get point color.
+def getPointColor():
+    colors = file.getDataFromJsonFile('utils/utilities/graphColors.json')
+    return colors.get('point')
+
 # return week datetime from given date. 
 def getWeekNumber(date):
     datetime = dt.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')

@@ -121,9 +121,9 @@ def updateProcessData(df, startDate, endDate, sections, subjects, judges, finish
     if phaseChoice != None:
         df_temp = frame.getPhaseDataFrame(df_temp, phaseChoice)
         if phaseRadio == withOut:
-            return df_temp[df_temp[phaseTag] == withOut + " FASE " + phaseChoice]
+            return df_temp[df_temp[phaseTag] == withOut + " " + phaseTag + " " + phaseChoice]
         else:
-            return df_temp[df_temp[phaseTag] != withOut + " FASE " + phaseChoice]
+            return df_temp[df_temp[phaseTag] != withOut + " " + phaseTag + " " + phaseChoice]
     return df_temp
 
 # update data base on user choices on different parameters.

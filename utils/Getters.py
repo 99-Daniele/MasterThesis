@@ -75,7 +75,9 @@ def getEventsDataframe():
     return eventsDataframe
 
 # get events info.
-def getEventsInfo(codeEventTag, eventTag):
+def getEventsInfo():
+    codeEventTag = utilities.getTagName("codeEventTag")
+    eventTag = utilities.getTagName("eventTag")
     eventsInfoDataframe = cache.getDataframe('eventsInfo.json')
     if eventsInfoDataframe is None:
         eventsInfo = connect.getDataFromDatabase(connection, eventsInfoQuery)
@@ -84,7 +86,11 @@ def getEventsInfo(codeEventTag, eventTag):
     return eventsInfoDataframe
 
 # get states info.
-def getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag):
+def getStatesInfo():
+    codeStateTag = utilities.getTagName("codeStateTag")
+    phaseTag = utilities.getTagName("phaseTag")
+    phaseDBTag = utilities.getTagName("phaseDBTag")
+    stateTag = utilities.getTagName("stateTag")
     statesInfoDataframe = cache.getDataframe('statesInfo.json')
     if statesInfoDataframe is None:
         statesInfo = connect.getDataFromDatabase(connection, statesInfoQuery)
@@ -93,7 +99,10 @@ def getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag):
     return statesInfoDataframe
 
 # get subjects info.
-def getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag):
+def getSubjectsInfo():
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    ritualTag = utilities.getTagName("ritualTag") 
+    subjectTag = utilities.getTagName("subjectTag")
     subjectsInfoDataframe = cache.getDataframe('subjectsInfo.json')
     if subjectsInfoDataframe is None:
         subjectsInfo = connect.getDataFromDatabase(connection, subjectsInfoQuery)
@@ -243,12 +252,8 @@ def getEventsDurationFiltered():
 
 # get states name dataframe.
 def getStateNamesDataframe():
-    codeStateTag = utilities.getTagName("codeStateTag")
     durationTag = utilities.getTagName("durationTag")
-    phaseTag = utilities.getTagName("phaseTag")
-    phaseDBTag = utilities.getTagName("phaseDBTag")
-    stateTag = utilities.getTagName("codeStateTag")
-    statesNameDataframe = getStatesInfo(codeStateTag, phaseTag, phaseDBTag, stateTag)
+    statesNameDataframe = getStatesInfo()
     stateDurationDataframe = getStatesDuration()  
     df = frame.createStateNameDataframeWithInfo(stateDurationDataframe, statesNameDataframe) 
     df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
@@ -256,10 +261,8 @@ def getStateNamesDataframe():
 
 # get events name dataframe.
 def getEventNamesDataframe():
-    codeEventTag = utilities.getTagName("codeEventTag")
     durationTag = utilities.getTagName("durationTag")
-    eventTag = utilities.getTagName("eventTag")
-    eventNamesDataframe = getEventsInfo(codeEventTag, eventTag)
+    eventNamesDataframe = getEventsInfo()
     eventDurationDataframe = getEventsDuration()
     df = frame.createEventNameDataframeWithInfo(eventDurationDataframe, eventNamesDataframe)
     df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
@@ -267,11 +270,8 @@ def getEventNamesDataframe():
 
 # get subject name dataframe.
 def getSubjectNamesDataframe():
-    codeSubjectTag = utilities.getTagName("codeSubjectTag")
     durationTag = utilities.getTagName("durationTag")
-    ritualTag = utilities.getTagName("ritualTag")
-    subjectTag = utilities.getTagName("subjectTag")
-    subjectNamesDataframe = getSubjectsInfo(codeSubjectTag, ritualTag, subjectTag)
+    subjectNamesDataframe = getSubjectsInfo()
     processDurationDataframe = getProcessesDuration()
     df = frame.createSubjectNameDataframeWithInfo(processDurationDataframe, subjectNamesDataframe)
     df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))

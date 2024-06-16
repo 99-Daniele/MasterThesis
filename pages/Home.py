@@ -12,6 +12,8 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('COMPOSITION GRAPHS', href = '/typeevent'),
         ds.html.Br(),
-        ds.dcc.Link('USER PARAMETERS PREFERENCES', href = '/preference')
+        ds.dcc.Link('USER PARAMETERS PREFERENCES', href = '/preference'),
+        ds.html.Br(),
+        ds.dcc.Link('PREDICTION DURATION PAGE', href = '/prediction')
     ])
     return layout

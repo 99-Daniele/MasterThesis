@@ -101,6 +101,7 @@ def typeSequenceUpdate(df, typeChoices, tagChoice, avg, text, sections, subjects
     eventTag = utilities.getTagName('eventTag')
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
+    statesInfo = getter.getStatesInfo()
     df_temp = df.copy()
     df_temp = frame.selectFollowingRows(df_temp, tagChoice, typeChoices)
     df_data = updateTypeData(df_temp, sections, subjects, judges, finished) 
