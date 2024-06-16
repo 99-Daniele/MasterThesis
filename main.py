@@ -146,10 +146,14 @@ def displaySubjectPreferences():
     ])
     app.run_server(debug = True)
 
-# refresh database and cache data.
-def restartData():
-    import utils.DataUpdate as update
-    update.restartData()
+# display prediction error pagse.
+def displayPredictionError():
+    import pages.predictionGraph.PredictionError as predictionErrorPage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = predictionErrorPage.pageLayout())
+    ])
+    app.run_server(debug = True)
 
 # refresh database and cache data.
 def refreshData():
@@ -162,4 +166,4 @@ def startApp():
     app.start()
 
 if __name__ == '__main__':
-    restartData()
+    startApp()
