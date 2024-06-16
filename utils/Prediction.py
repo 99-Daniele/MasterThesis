@@ -2,7 +2,9 @@ from alive_progress import alive_bar
 import pandas as pd
 import random as rd
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LinearRegression
 
+import Cache as cache
 import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.utilities.Utilities as utilities
@@ -17,14 +19,14 @@ def predictDurationsWithoutLikenessTest(df, codeJudgeTag, codeSubjectTag, countT
     columns.remove(finishedTag)
     columns.remove(durationFinalTag)
     numProcesses = frame.getUniques(df, numProcessTag).tolist()
-    lTrain = int(len(numProcesses) / 5)
+    lTrain = int(len(numProcesses) / 50)
     trainNumProcesses = numProcesses[lTrain:]
     testNumProcesses = list(set(numProcesses) - set(trainNumProcesses))
     errors = []
     predictions = []
-    with alive_bar(int(len(numProcesses))) as bar:
-        for i in range(int(len(numProcesses))):
-            testDF = df[df[numProcessTag].isin(testNumProcesses)].copy()
+    with alive_bar(int(len(testNumProcesses))) as bar:
+        for i in range(int(len(testNumProcesses))):
+            testDF = df[df[numProcessTag] == testNumProcesses[i]].copy()
             lTest = len(testDF)
             r = rd.randint(0, lTest - 1)
             testDF_temp = testDF.iloc[r]
@@ -47,16 +49,16 @@ def predictDurationsWithoutLikenessTest(df, codeJudgeTag, codeSubjectTag, countT
                 trainY = trainDF_temp[[durationFinalTag]]
                 testX = testDF_temp[columns]
                 testY = testDF_temp[[durationFinalTag]]
-                model  = DecisionTreeClassifier()
-                model.fit(trainX.values, trainY)
-                predictedDuration = model.predict([testX.values])[0]
                 currDuration = testX[durationTag]
                 finalDuration = currDuration + testY[durationFinalTag]
-                predictedFinalDuration = currDuration + predictedDuration 
+                model = DecisionTreeClassifier()
+                model.fit(trainX.values, trainY)
+                predictedDuration = model.predict([testX.values])[0]
+                predictedFinalDuration = currDuration + predictedDuration
                 if finalDuration > 0:
                     error = abs(predictedFinalDuration - finalDuration) * 100 / finalDuration
                     errors.extend([error])
-                    predictions.extend([{numProcessTag: str(processID), countTag: str(count), durationTag: str(currDuration), durationFinalTag: str(finalDuration), durationPredictedTag: str(predictedFinalDuration), 'errore': error}])
+                    predictions.extend([{numProcessTag: str(processID), countTag: str(count), durationTag: str(currDuration), durationFinalTag: str(finalDuration), durationPredictedTag: str(predictedFinalDuration), 'error': error}])
             bar() 
     errors = sorted(errors)
     m = int(len(errors) / 2)
@@ -65,14 +67,10 @@ def predictDurationsWithoutLikenessTest(df, codeJudgeTag, codeSubjectTag, countT
     else:
         medianError = (errors[m - 1] + errors[m]) / 2.0
     meanError = sum(errors) / len(errors)
-    predictions = sorted(predictions, key = lambda x: x['errore'])
-    file.writeOnJsonFile('cache/predictions.json', predictions)
-    #plt.scatter(testY, predictedDurations)
-    #plt.xlabel('Actual Petal Width')
-    #plt.ylabel('Predicted Petal Width')
-    #plt.title('Actual vs Predicted Petal Width')
-    #plt.show()
-    return meanError, medianError
+    print('Average Prediction Error: ', meanError)
+    print('Median Prediction Error: ', medianError)
+    predictionDf = pd.DataFrame(predictions)
+    cache.updateCache('predictions.json', predictionDf)
 
 # predict duration of finished processes based on current events flow. This evaluate the error of the model.
 def predictDurationsWithoutLikenessTest2(df, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
@@ -86,8 +84,8 @@ def predictDurationsWithoutLikenessTest2(df, codeJudgeTag, codeSubjectTag, count
     numProcesses = frame.getUniques(df, numProcessTag).tolist()
     errors = []
     predictions = []
-    with alive_bar(int(len(numProcesses) / 20)) as bar:
-        for i in range(int(len(numProcesses) / 20)):
+    with alive_bar(int(len(numProcesses))) as bar:
+        for i in range(int(len(numProcesses))):
             testNumProcesses = [numProcesses[i]]
             trainNumProcesses = numProcesses[:i] + numProcesses[i + 1:]
             testDF = df[df[numProcessTag].isin(testNumProcesses)].copy()
@@ -131,14 +129,8 @@ def predictDurationsWithoutLikenessTest2(df, codeJudgeTag, codeSubjectTag, count
     else:
         medianError = (errors[m - 1] + errors[m]) / 2.0
     meanError = sum(errors) / len(errors)
-    predictions = sorted(predictions, key = lambda x: x['errore'])
-    file.writeOnJsonFile('cache/predictions.json', predictions)
-    #plt.scatter(testY, predictedDurations)
-    #plt.xlabel('Actual Petal Width')
-    #plt.ylabel('Predicted Petal Width')
-    #plt.title('Actual vs Predicted Petal Width')
-    #plt.show()
-    return meanError, medianError
+    predictionDf = pd.DataFrame(predictions)
+    cache.updateCache('predictions.json', predictionDf)
 
 # predict duration of finished processes based on current events flow.
 def predictDurationsWithoutLikeness(df, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
