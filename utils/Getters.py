@@ -244,3 +244,6 @@ def getSubjectNamesDataframe():
     df = frame.createSubjectNameDataframeWithInfo(processDurationDataframe, subjectNamesDataframe)
     df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
     return df
+
+# get predicted duration dataframe.
+def getPredictedDurationDataframe():
