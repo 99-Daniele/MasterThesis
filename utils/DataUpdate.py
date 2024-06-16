@@ -16,15 +16,15 @@ import utils.utilities.Utilities as utilities
 def restartData():
     connection = connect.getDatabaseConnection()
     verifyDatabase(connection)
-    #file.removeFolder('cache')
-    #file.createFolder('cache')
+    file.removeFolder('cache')
+    file.createFolder('cache')
     maxDate = getter.getMaxDate()
     maxDateDt = dt.datetime.strptime(maxDate, '%Y-%m-%d %H:%M:%S')
     endPhase = getter.getEndPhase()
     stallStates = getter.getStallStates()
     #startProcessEvent = getter.getStartProcessEvent()
     startProcessEvent = 'IA'
-    #events = getter.getEvents()
+    events = getter.getEvents()
     codeEventTag = utilities.getTagName("codeEventTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     codeStateTag = utilities.getTagName("codeStateTag")
