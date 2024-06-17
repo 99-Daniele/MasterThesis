@@ -122,7 +122,7 @@ def refreshData():
     endPhase = frame.getPhaseOfState(statesInfo, "DF", phaseTag)
     processesDuration = updateTypeDurationDataframe(processEvents, unfinishedProcesses, statesInfo, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, dateTag, durationTag, durationPredictedTag, eventTag, eventsTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, subjectTag)
     updateProcessDurationDataframe(processesDuration, codeSubjectTag, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag)
-    updateEventsDataframe(eventsDataframe, statesInfoDataframe, endPhase, codeStateTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, processDateTag, stateTag)
+    updateEventsDataframe(eventsDataframe, statesInfoDataframe, endPhase, codeStateTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, stateTag)
 
 # group events by process.
 def getProcessEvents(events, startProcessEvent, stallStates, endPhase, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, eventTag, eventsTag, finishedTag, loadTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag):
@@ -307,9 +307,9 @@ def getProcessEvents(events, startProcessEvent, stallStates, endPhase, codeEvent
     return filteredEvents, allProcessEvents, processInfoDataframe
 
 # update events dataframe.
-def updateEventsDataframe(eventsDataframe, statesNameDataframe, endPhase, codeStateTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, processDateTag, stateTag):
+def updateEventsDataframe(eventsDataframe, statesNameDataframe, endPhase, codeStateTag, dateTag, numEventTag, numProcessTag, phaseTag, phaseDBTag, stateTag):
     eventsDataframeComplete = frame.joinDataframe(eventsDataframe, statesNameDataframe, codeStateTag, phaseDBTag, [phaseDBTag, stateTag])
-    allEventsDataframe = frame.createEventsDataFrame(eventsDataframeComplete, endPhase, dateTag, numEventTag, numProcessTag, phaseTag, processDateTag)
+    allEventsDataframe = frame.createEventsDataFrame(eventsDataframeComplete, endPhase, dateTag, numEventTag, numProcessTag, phaseTag)
     allEventsDataframe = allEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     updateAllEventsDataframe(allEventsDataframe)
     updateStateEventsDataframe(allEventsDataframe, codeStateTag, dateTag, numEventTag, numProcessTag)
