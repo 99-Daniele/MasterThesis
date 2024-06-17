@@ -1,3 +1,5 @@
+# this file handles prediction test and calculation.
+
 from alive_progress import alive_bar
 import pandas as pd
 import random as rd
@@ -7,7 +9,7 @@ import utils.Dataframe as frame
 import utils.Utilities as utilities
 
 # predict duration of finished processes based on current events flow. This evaluate the error of the model.
-def predictDurationsTest(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag):
+def predictDurationsTest8020(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag):
     columns = df.columns.values.tolist()
     columns.remove(codeJudgeTag)
     columns.remove(codeSubjectTag)
@@ -18,7 +20,8 @@ def predictDurationsTest(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, di
     columns.remove(dateTag)
     columns.remove(distanceTag)
     numProcesses = frame.getUniques(df, numProcessTag).tolist()
-    lTrain = int(len(numProcesses) / 20)
+    rd.shuffle(numProcesses)
+    lTrain = int(len(numProcesses) / 5)
     trainNumProcesses = numProcesses[lTrain:]
     testNumProcesses = list(set(numProcesses) - set(trainNumProcesses))
     predictions = []
@@ -61,7 +64,7 @@ def predictDurationsTest(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, di
     return predictionDf
 
 # predict duration of finished processes based on current events flow. This evaluate the error of the model.
-def predictDurationsTest2(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag):
+def predictDurationsTestTotal(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag):
     columns = df.columns.values.tolist()
     columns.remove(codeJudgeTag)
     columns.remove(codeSubjectTag)
