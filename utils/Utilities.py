@@ -162,6 +162,12 @@ def dateFromDistance(distance):
     todayDate = dt.datetime.strptime(todayDate, '%d-%m-%Y')
     return startDate(todayDate, distance)
 
+# return date base on distance to current day.
+def distanceFromFirstOfTheYear(date):
+    year = date.year
+    firstOfTheYear = pd.Timestamp(day = 1, month = 1, year = year)
+    return (date - firstOfTheYear).days
+
 # translate alphanumeric string to integer.
 def fromAlphanumericStringToInt(string, filename):
     translation = file.getDataFromJsonFile(filename)

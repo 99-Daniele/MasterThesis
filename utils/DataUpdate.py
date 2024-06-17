@@ -16,8 +16,8 @@ import utils.Utilities as utilities
 def restartData():
     connection = connect.getDatabaseConnection()
     verifyDatabase(connection)
-    #file.removeFolder('cache')
-    #file.createFolder('cache')
+    file.removeFolder('cache')
+    file.createFolder('cache')
     startProcessEvent = 'IA'
     endPhase = getter.getEndPhase()
     stallStates = getter.getStallStates()
@@ -59,7 +59,6 @@ def predictTest():
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     countTag = utilities.getTagName("countTag")
     dateTag = utilities.getTagName("dateTag")
-    distanceTag = utilities.getTagName("distanceTag")
     durationTag = utilities.getTagName("durationTag")
     durationFinalTag = utilities.getTagName("durationFinalTag")
     durationPredictedTag = utilities.getTagName("durationPredictedTag")
@@ -69,7 +68,7 @@ def predictTest():
     sectionTag = utilities.getTagName("sectionTag")
     processInfo = getter.getProcessesInfo()
     finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
-    predictionDf = prediction.predictDurationsTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag)
+    predictionDf = prediction.predictDurationsTestTotal(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag)
     cache.updateCache('predictions.json', predictionDf)
 
 # predict unfinished processes duration.
@@ -77,7 +76,6 @@ def predictDuration():
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     dateTag = utilities.getTagName("dateTag")
-    distanceTag = utilities.getTagName("distanceTag")
     durationTag = utilities.getTagName("durationTag")
     durationFinalTag = utilities.getTagName("durationFinalTag")
     durationPredictedTag = utilities.getTagName("durationPredictedTag")
@@ -85,7 +83,7 @@ def predictDuration():
     numProcessTag = utilities.getTagName("numProcessTag")
     sectionTag = utilities.getTagName("sectionTag")
     processInfo = getter.getProcessesInfo()
-    unfinishedProcessesDurations = prediction.predictDurations(processInfo, codeJudgeTag, codeSubjectTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    unfinishedProcessesDurations = prediction.predictDurations(processInfo, codeJudgeTag, codeSubjectTag, dateTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
     file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
 
 # refresh current database data. 
@@ -162,7 +160,7 @@ def getProcessEvents(events, startProcessEvent, stallStates, endPhase, codeEvent
             processFinished = utilities.getProcessState('unfinished')
             processStartDate = events[i][dateTag]
             processStartDateDt = dt.datetime.strptime(processStartDate, '%Y-%m-%d %H:%M:%S')
-            distance = utilities.getDistanceFromFirstOfTheYear(processStartDateDt)
+            distance = utilities.distanceFromFirstOfTheYear(processStartDateDt)
             processEvents = {numProcessTag: processId, codeJudgeTag: processCodeJudge, codeSubjectTag: processSubjectCode, subjectTag: processSubject, sectionTag: processSection, finishedTag: processFinished, eventsTag: []}
             end = False
             continuative = False
@@ -212,7 +210,7 @@ def getProcessEvents(events, startProcessEvent, stallStates, endPhase, codeEvent
                     processSection = events[i][sectionTag]
                     processStartDate = events[i][dateTag]
                     processStartDateDt = dt.datetime.strptime(processStartDate, '%Y-%m-%d %H:%M:%S')
-                    distance = utilities.getDistanceFromFirstOfTheYear(processStartDateDt)
+                    distance = utilities.distanceFromFirstOfTheYear(processStartDateDt)
                     processFinished = utilities.getProcessState('unfinished')
                     processEventSequence = []
                     processPhaseSequence = []
