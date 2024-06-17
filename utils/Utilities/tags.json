@@ -12,6 +12,7 @@
     "durationPredictedTag": "predictedDuration",
     "descriptionTag": "description", 
     "descriptionSubjectTag": "subjectDescription",
+    "errorTag": "error",
     "eventTag": "event",
     "eventsTag": "events",
     "eventDurationSequenceTag": "eventsDurationSequence",

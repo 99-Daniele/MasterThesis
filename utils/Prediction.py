@@ -7,7 +7,7 @@ import utils.Dataframe as frame
 import utils.Utilities as utilities
 
 # predict duration of finished processes based on current events flow. This evaluate the error of the model.
-def predictDurationsTest(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
+def predictDurationsTest(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag):
     columns = df.columns.values.tolist()
     columns.remove(codeJudgeTag)
     columns.remove(codeSubjectTag)
@@ -55,13 +55,13 @@ def predictDurationsTest(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, di
                 predictedFinalDuration = currDuration + predictedDuration
                 if finalDuration > 0:
                     error = abs(predictedFinalDuration - finalDuration) * 100 / finalDuration
-                    predictions.extend([{numProcessTag: str(processID), countTag: str(count), durationTag: str(currDuration), durationFinalTag: str(finalDuration), durationPredictedTag: str(predictedFinalDuration), 'error': error}])
+                    predictions.extend([{numProcessTag: str(processID), countTag: str(count), durationTag: str(currDuration), durationFinalTag: str(finalDuration), durationPredictedTag: str(predictedFinalDuration), errorTag: error}])
             bar() 
     predictionDf = pd.DataFrame(predictions)
     return predictionDf
 
 # predict duration of finished processes based on current events flow. This evaluate the error of the model.
-def predictDurationsTest2(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
+def predictDurationsTest2(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag):
     columns = df.columns.values.tolist()
     columns.remove(codeJudgeTag)
     columns.remove(codeSubjectTag)
@@ -108,7 +108,7 @@ def predictDurationsTest2(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, d
                 predictedFinalDuration = currDuration + predictedDuration 
                 if finalDuration > 0:
                     error = abs(predictedFinalDuration - finalDuration) * 100 / finalDuration
-                    predictions.extend([{numProcessTag: str(processID), countTag: str(count), durationTag: str(currDuration), durationFinalTag: str(finalDuration), durationPredictedTag: str(predictedFinalDuration), 'errore': error}])
+                    predictions.extend([{numProcessTag: str(processID), countTag: str(count), durationTag: str(currDuration), durationFinalTag: str(finalDuration), durationPredictedTag: str(predictedFinalDuration), errorTag: error}])
             bar() 
     predictionDf = pd.DataFrame(predictions)
     return predictionDf

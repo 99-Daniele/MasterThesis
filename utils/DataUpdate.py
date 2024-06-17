@@ -63,12 +63,13 @@ def predictTest():
     durationTag = utilities.getTagName("durationTag")
     durationFinalTag = utilities.getTagName("durationFinalTag")
     durationPredictedTag = utilities.getTagName("durationPredictedTag")
+    errorTag = utilities.getTagName("errorTag")
     finishedTag = utilities.getTagName("finishedTag")
     numProcessTag = utilities.getTagName("numProcessTag")
     sectionTag = utilities.getTagName("sectionTag")
     processInfo = getter.getProcessesInfo()
     finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
-    predictionDf = prediction.predictDurationsTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    predictionDf = prediction.predictDurationsTest(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag)
     cache.updateCache('predictions.json', predictionDf)
 
 # predict unfinished processes duration.
