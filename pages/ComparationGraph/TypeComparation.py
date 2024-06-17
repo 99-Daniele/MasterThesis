@@ -11,18 +11,24 @@ import utils.Utilities as utilities
 
 # get dataframe with all processes duration.
 df = getter.getProcessesDurationFiltered()
-codeJudgeTag = utilities.getTagName('codeJudgeTag') 
-judge = utilities.getPlaceholderName('judge') 
-median = utilities.getPlaceholderName('median') 
-section = utilities.getPlaceholderName('section') 
-sectionTag = utilities.getTagName('sectionTag')
-subject = utilities.getPlaceholderName('subject')  
-codeSubjectTag = utilities.getTagName('codeSubjectTag') 
+codeSubjectTag = utilities.getTagName('codeSubjectTag')  
+df[codeSubjectTag] = df[codeSubjectTag].astype(str)
 
 # return initial layout of page.
 def pageLayout():
     avgTag = utilities.getTagName('avgTag')  
+    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
+    judge = utilities.getPlaceholderName('judge') 
+    median = utilities.getPlaceholderName('median') 
+    section = utilities.getPlaceholderName('section') 
+    sectionTag = utilities.getTagName('sectionTag')
+    subject = utilities.getPlaceholderName('subject')  
+    subjectTag = utilities.getTagName('subjectTag')  
     text = utilities.getPlaceholderName('text') 
+    typeTag = utilities.getPlaceholderName('type') 
+    sections = frame.getGroupBy(df, sectionTag)
+    judges = frame.getGroupBy(df, codeJudgeTag)
+    subjects = frame.getGroupBy(df, subjectTag)
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([
@@ -31,7 +37,10 @@ def pageLayout():
         ds.dcc.Link('DURATION COMPARISON GRAPHS', href='/comparationgraph'),
         ds.html.H2("COMPARISON OF PROCESSES DURATION BASED ON " + section, id = 'title-tr'),        
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-tr', inline = True, inputStyle = {'margin-left': "20px"}),
-        ds.dcc.Dropdown([section, judge, subject], value = section, multi = False, searchable = False, clearable = False, id = 'type-dropdown-tr', placeholder = section, style = {'width': 400}),
+        ds.dcc.Dropdown([sectionTag, codeJudgeTag, codeSubjectTag], value = sectionTag, multi = False, searchable = False, clearable = False, id = 'type-dropdown-tr', placeholder = typeTag, style = {'width': 400}),
+        ds.dcc.Dropdown(sections, multi = True, searchable = True, clearable = True, id = 'type-dropdown-se', placeholder = section, style = {'width': 400}),
+        ds.dcc.Dropdown(judges, multi = True, searchable = True, clearable = True, id = 'type-dropdown-j', placeholder = judge, style = {'width': 400}),
+        ds.dcc.Dropdown(subjects, multi = True, searchable = True, clearable = True, id = 'type-dropdown-su', placeholder = subject, style = {'width': 400}),
         ds.dcc.Checklist([text], value = [], id = "text-checklist-tr"),
         ds.dcc.Graph(id = 'comparation-graph-tr', figure = fig)
     ])
@@ -43,19 +52,12 @@ def pageLayout():
         ds.Output('title-tr', 'children')],
     [ds.Input('avg-radioitem-tr', 'value'),
         ds.Input('type-dropdown-tr', 'value'),
+        ds.Input('type-dropdown-se', 'value'),
+        ds.Input('type-dropdown-j', 'value'),
+        ds.Input('type-dropdown-su', 'value'),
         ds.Input('text-checklist-tr', 'value')]
     )
 
 # return updated data based on user choice.
-def updateOutput(avgChoice, typeChoice, text):
-    if typeChoice == section:
-        typeID = sectionTag
-        title = "COMPARISON OF PROCESSES DURATION BASED ON " + section
-    elif typeChoice == judge:
-        typeID = codeJudgeTag
-        title = "COMPARISON OF PROCESSES DURATION BASED ON " + judge
-    else:
-        typeID = codeSubjectTag
-        title = "COMPARISON OF PROCESSES DURATION BASED ON " + subject
-        df[codeSubjectTag] = df[codeSubjectTag].astype(str)
-    return comparation.parameterComparationUpdate(df, avgChoice, typeID, text), title
+def updateOutput(avgChoice, typeChoice, section, judge, subject, text):
+    return comparation.parameterComparationUpdate(df, avgChoice, typeChoice, section, judge, subject, text)

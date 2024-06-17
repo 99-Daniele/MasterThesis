@@ -142,6 +142,18 @@ def updateTypeData(df, startDate, endDate, sections, subjects, judges, finished)
     df_temp = frame.getTypesDataFrame(df_temp, finishedTag, finished)
     return df_temp
 
+# update data base on user choices on different parameters.
+# this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
+def updateProcessTypeData(df, sections, subjects, judges):
+    codeJudgeTag = utilities.getTagName("codeJudgeTag")
+    sectionTag = utilities.getTagName("sectionTag")
+    subjectTag = utilities.getTagName("subjectTag")
+    df_temp = df.copy()
+    df_temp = frame.getTypesDataFrame(df_temp, sectionTag, sections)
+    df_temp = frame.getTypesDataFrame(df_temp, subjectTag, subjects)
+    df_temp = frame.getTypesDataFrame(df_temp, codeJudgeTag, judges)
+    return df_temp
+
 # update data base on user choices on different parameters. In order to do that is use 'updateProcessData' method with chosen parameter as None. 
 # this is done because if user wants to compare on chosen parameter, data must be updated without any filter on chosen parameter.
 # this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
@@ -298,11 +310,11 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         )
         if text == [textTag]:
             fig.add_traces(
-                px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
         else:
             fig.add_traces(
-                px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
         fig.update_layout(xaxis_tickvals = xticks, legend = dict(font = dict(size = 16)))
         fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
@@ -374,7 +386,7 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
                 px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
             fig.add_traces(
-                px.line(avgData, x = type, y = quantileTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = type, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
         fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False, legend = dict(font = dict(size = 16)))
         fig.update_xaxes(tickangle = 45)
@@ -398,11 +410,11 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
             )
             if text == [textTag]:
                 fig.add_traces(
-                    px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                    px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
                 )
             else:
                 fig.add_traces(
-                    px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                    px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
                 )
             fig.update_layout(xaxis_tickvals = xticks, legend = dict(font = dict(size = 16)))
             fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
@@ -435,11 +447,14 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
 
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for process comparation graph.
-def parameterComparationUpdate(df, avgChoice, tag, text):
+def parameterComparationUpdate(df, avgChoice, tag, sections, judges, subjects, text):
+    title = "COMPARISON OF PROCESSES DURATION BASED ON " + tag.upper()
     durationTag = utilities.getTagName('durationTag')
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
-    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df, tag, avgChoice)
+    df_temp = df.copy()
+    df_temp = updateProcessTypeData(df_temp, sections, subjects, judges)
+    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df_temp, tag, avgChoice)
     xticks = frame.getUniques(avgData, tag)
     if text == [textTag]:
         fig = px.histogram(allData, x = tag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Number of processes', tag:tag}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8))
@@ -449,9 +464,9 @@ def parameterComparationUpdate(df, avgChoice, tag, text):
             px.line(avgData, x = tag, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
         )
         fig.add_traces(
-            px.line(avgData, x = tag, y = quantileTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+            px.line(avgData, x = tag, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
         )
     fig.update_layout(xaxis_tickvals = xticks, legend = dict(font = dict(size = 16)))
     fig.update_xaxes(tickangle = 45)
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
-    return fig
+    return fig, title
