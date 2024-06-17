@@ -22,6 +22,11 @@ def getGridColor():
     return colors.get('grid')
 
 # get line color.
+def getInvisibleColor():
+    colors = file.getDataFromJsonFile('utils/utilities/graphColors.json')
+    return colors.get('invisible')
+
+# get line color.
 def getLineColor():
     colors = file.getDataFromJsonFile('utils/utilities/graphColors.json')
     return colors.get('line')

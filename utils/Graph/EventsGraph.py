@@ -1,6 +1,7 @@
 # this file handles events graph management.
 
 import dash as ds
+import numpy as np
 import plotly.express as px
 
 import utils.Dataframe as frame
@@ -44,12 +45,13 @@ def updateTypesBySelection(df, df_data, startDate, endDate, sections, subjects, 
     return [sections, subjects, judges]
 
 # return all needed parameters in order to change graph after any user choice.
-def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sections, subjects, judges):
+def eventUpdate(df, startDate, endDate, symbol, type, minDate, maxDate, sections, subjects, judges):
     df_temp = df.copy()
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         startDate = minDate
         endDate = maxDate
     dateTag = utilities.getTagName('dateTag')
+    codeEventTag = utilities.getTagName('codeEventTag')
     numProcessTag = utilities.getTagName('numProcessTag')
     phaseTag = utilities.getTagName('phaseTag') 
     statesInfo = getter.getStatesInfo()
@@ -57,7 +59,20 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
     df_temp = df_temp.sort_values(by = phaseTag).reset_index(drop = True)
     [sections, subjects, judges] = updateTypesBySelection(df, df_temp, startDate, endDate, sections, subjects, judges)
     colorMap = frame.phaseColorMap(type, statesInfo)
-    fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_map = colorMap, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = utilities.getWidth(1))
+    if symbol:
+        symbols = list(frame.getUniques(df_temp, codeEventTag))
+        fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, symbol = codeEventTag, color_discrete_map = colorMap, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = utilities.getWidth(1))   
+        for i, trace in enumerate(fig.data):
+            name = trace.name.split(', ')
+            trace['name'] = name[1]
+            trace['legendgroup'] = symbols.index(name[1])
+        names = set()
+        fig.for_each_trace(
+            lambda trace:
+                trace.update(showlegend=False)
+                if (trace.name in names) else names.add(trace.name))
+    else:
+        fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_map = colorMap, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = utilities.getWidth(1))   
     fig.update_layout(
         legend = dict(
             yanchor = "top",
@@ -72,7 +87,5 @@ def eventUpdate(df, startDate, endDate, type, mustEvents, minDate, maxDate, sect
         dtick = "M1",
         tickformat = "%b\n%Y",
         ticklabelmode = "period"
-    )   
-    if mustEvents != None and len(mustEvents) > 0:
-        fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name not in mustEvents else False))
+    ) 
     return fig, startDate, endDate, sections, subjects, judges

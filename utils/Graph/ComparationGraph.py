@@ -298,11 +298,11 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         )
         if text == [textTag]:
             fig.add_traces(
-                px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
         else:
             fig.add_traces(
-                px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
         fig.update_layout(xaxis_tickvals = xticks, legend = dict(font = dict(size = 16)))
         fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
@@ -374,7 +374,7 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
                 px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
             fig.add_traces(
-                px.line(avgData, x = type, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = type, y = quantileTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
         fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False, legend = dict(font = dict(size = 16)))
         fig.update_xaxes(tickangle = 45)
@@ -398,11 +398,11 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
             )
             if text == [textTag]:
                 fig.add_traces(
-                    px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                    px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
                 )
             else:
                 fig.add_traces(
-                    px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                    px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
                 )
             fig.update_layout(xaxis_tickvals = xticks, legend = dict(font = dict(size = 16)))
             fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
@@ -449,7 +449,7 @@ def parameterComparationUpdate(df, avgChoice, tag, text):
             px.line(avgData, x = tag, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
         )
         fig.add_traces(
-            px.line(avgData, x = tag, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+            px.line(avgData, x = tag, y = quantileTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
         )
     fig.update_layout(xaxis_tickvals = xticks, legend = dict(font = dict(size = 16)))
     fig.update_xaxes(tickangle = 45)

@@ -77,7 +77,7 @@ def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
             fig.add_traces(
-                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )         
     else:
         colorMap = frame.phaseColorMap(tagChoice, statesInfo)
@@ -89,7 +89,7 @@ def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
             fig.add_traces(
-                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
     fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False, legend = dict(font = dict(size = 16)))
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
@@ -117,7 +117,7 @@ def typeSequenceUpdate(df, typeChoices, tagChoice, avg, text, sections, subjects
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
             fig.add_traces(
-                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )         
     else:
         colorMap = frame.phaseColorMap(tagChoice, statesInfo)
@@ -129,7 +129,7 @@ def typeSequenceUpdate(df, typeChoices, tagChoice, avg, text, sections, subjects
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
             fig.add_traces(
-                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = 'rgba(0, 0, 0, 0)', textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = [utilities.getInvisibleColor()], textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
             )
     fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False, legend = dict(font = dict(size = 16)))
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')

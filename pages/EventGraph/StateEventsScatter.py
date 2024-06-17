@@ -14,6 +14,7 @@ import utils.Utilities as utilities
 # get must states from text file.
 df = getter.getStateEvents()
 codeStateTag = utilities.getTagName("codeStateTag")
+stateTag = utilities.getTagName("stateTag")
 
 # return initial layout of page.
 def pageLayout():
@@ -79,4 +80,4 @@ def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subject
         df_temp = df[df[codeStateTag].isin(importantStates)]
     else:
         df_temp = df
-    return event.eventUpdate(df_temp, startDate, endDate, codeStateTag, None, minDate, maxDate, sections, subjects, judges)
+    return event.eventUpdate(df_temp, startDate, endDate, False, stateTag, minDate, maxDate, sections, subjects, judges)
