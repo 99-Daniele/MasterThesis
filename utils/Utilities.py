@@ -26,10 +26,10 @@ def getLineColor():
     colors = file.getDataFromJsonFile('utils/utilities/graphColors.json')
     return colors.get('line')
 
-# get point color.
-def getPointColor():
+# get prediction color.
+def getPredictionColor():
     colors = file.getDataFromJsonFile('utils/utilities/graphColors.json')
-    return colors.get('point')
+    return colors.get('prediction')
 
 # return week datetime from given date. 
 def getWeekNumber(date):

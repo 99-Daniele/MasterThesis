@@ -7,7 +7,7 @@ import utils.Dataframe as frame
 import utils.Utilities as utilities
 
 # predict duration of finished processes based on current events flow. This evaluate the error of the model.
-def predictDurationsTest(df, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
+def predictDurationsTest(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
     columns = df.columns.values.tolist()
     columns.remove(codeJudgeTag)
     columns.remove(codeSubjectTag)
@@ -15,6 +15,8 @@ def predictDurationsTest(df, codeJudgeTag, codeSubjectTag, countTag, durationTag
     columns.remove(numProcessTag)
     columns.remove(finishedTag)
     columns.remove(durationFinalTag)
+    columns.remove(dateTag)
+    columns.remove(distanceTag)
     numProcesses = frame.getUniques(df, numProcessTag).tolist()
     lTrain = int(len(numProcesses) / 20)
     trainNumProcesses = numProcesses[lTrain:]
@@ -59,7 +61,7 @@ def predictDurationsTest(df, codeJudgeTag, codeSubjectTag, countTag, durationTag
     return predictionDf
 
 # predict duration of finished processes based on current events flow. This evaluate the error of the model.
-def predictDurationsTest2(df, codeJudgeTag, codeSubjectTag, countTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
+def predictDurationsTest2(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
     columns = df.columns.values.tolist()
     columns.remove(codeJudgeTag)
     columns.remove(codeSubjectTag)
@@ -67,6 +69,8 @@ def predictDurationsTest2(df, codeJudgeTag, codeSubjectTag, countTag, durationTa
     columns.remove(numProcessTag)
     columns.remove(finishedTag)
     columns.remove(durationFinalTag)
+    columns.remove(dateTag)
+    columns.remove(distanceTag)
     numProcesses = frame.getUniques(df, numProcessTag).tolist()
     predictions = []
     with alive_bar(int(len(numProcesses))) as bar:
@@ -110,7 +114,7 @@ def predictDurationsTest2(df, codeJudgeTag, codeSubjectTag, countTag, durationTa
     return predictionDf
 
 # predict duration of finished processes based on current events flow.
-def predictDurations(df, codeJudgeTag, codeSubjectTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
+def predictDurations(df, codeJudgeTag, codeSubjectTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
     finishedProcesses = df[df[finishedTag] == utilities.getProcessState('finished')]
     unfinishedProcesses = df[df[finishedTag] == utilities.getProcessState('unfinished')]  
     columns = df.columns.values.tolist()
@@ -119,6 +123,8 @@ def predictDurations(df, codeJudgeTag, codeSubjectTag, durationTag, durationFina
     columns.remove(sectionTag)
     columns.remove(numProcessTag)
     columns.remove(finishedTag)
+    columns.remove(dateTag)
+    columns.remove(distanceTag)
     columns.remove(durationFinalTag)
     predictions = {}
     with alive_bar(int(len(unfinishedProcesses))) as bar:

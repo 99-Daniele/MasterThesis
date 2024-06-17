@@ -6,6 +6,7 @@
     "codeSubjectTag": "subjectCode",
     "countTag": "count", 
     "dateTag": "date", 
+    "distanceTag": "distance",
     "durationTag": "duration",
     "durationFinalTag": "finalDuration",
     "durationPredictedTag": "predictedDuration",
