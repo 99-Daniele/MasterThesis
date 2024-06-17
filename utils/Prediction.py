@@ -82,7 +82,6 @@ def predictDurationsTestTotal(df, codeJudgeTag, codeSubjectTag, countTag, dateTa
             testDF = df[df[numProcessTag] == testNumProcesses].copy()
             lTest = len(testDF)
             r = rd.randint(0, lTest - 1)
-            r = 4
             testDF_temp = testDF.iloc[r]
             judge = testDF_temp[codeJudgeTag]
             subject = testDF_temp[codeSubjectTag]
