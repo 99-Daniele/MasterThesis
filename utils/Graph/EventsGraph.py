@@ -51,7 +51,7 @@ def eventUpdate(df, startDate, endDate, symbol, type, minDate, maxDate, sections
         startDate = minDate
         endDate = maxDate
     dateTag = utilities.getTagName('dateTag')
-    codeEventTag = utilities.getTagName('codeEventTag')
+    eventTag = utilities.getTagName('eventTag')
     numProcessTag = utilities.getTagName('numProcessTag')
     phaseTag = utilities.getTagName('phaseTag') 
     statesInfo = getter.getStatesInfo()
@@ -60,8 +60,8 @@ def eventUpdate(df, startDate, endDate, symbol, type, minDate, maxDate, sections
     [sections, subjects, judges] = updateTypesBySelection(df, df_temp, startDate, endDate, sections, subjects, judges)
     colorMap = frame.phaseColorMap(type, statesInfo)
     if symbol:
-        symbols = list(frame.getUniques(df_temp, codeEventTag))
-        fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, symbol = codeEventTag, color_discrete_map = colorMap, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = utilities.getWidth(1))   
+        symbols = list(frame.getUniques(df_temp, eventTag))
+        fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, symbol = eventTag, color_discrete_map = colorMap, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = utilities.getWidth(1))   
         for i, trace in enumerate(fig.data):
             name = trace.name.split(', ')
             trace['name'] = name[1]
