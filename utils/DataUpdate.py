@@ -59,7 +59,6 @@ def predictTest():
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     countTag = utilities.getTagName("countTag")
     dateTag = utilities.getTagName("dateTag")
-    distanceTag = utilities.getTagName("distanceTag")
     durationTag = utilities.getTagName("durationTag")
     durationFinalTag = utilities.getTagName("durationFinalTag")
     durationPredictedTag = utilities.getTagName("durationPredictedTag")
@@ -69,7 +68,7 @@ def predictTest():
     sectionTag = utilities.getTagName("sectionTag")
     processInfo = getter.getProcessesInfo()
     finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
-    predictionDf = prediction.predictDurationsTestTotal(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag)
+    predictionDf = prediction.predictDurationsTestTotal(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag)
     cache.updateCache('predictions.json', predictionDf)
 
 # predict unfinished processes duration.
@@ -77,7 +76,6 @@ def predictDuration():
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     dateTag = utilities.getTagName("dateTag")
-    distanceTag = utilities.getTagName("distanceTag")
     durationTag = utilities.getTagName("durationTag")
     durationFinalTag = utilities.getTagName("durationFinalTag")
     durationPredictedTag = utilities.getTagName("durationPredictedTag")
@@ -85,7 +83,7 @@ def predictDuration():
     numProcessTag = utilities.getTagName("numProcessTag")
     sectionTag = utilities.getTagName("sectionTag")
     processInfo = getter.getProcessesInfo()
-    unfinishedProcessesDurations = prediction.predictDurations(processInfo, codeJudgeTag, codeSubjectTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
+    unfinishedProcessesDurations = prediction.predictDurations(processInfo, codeJudgeTag, codeSubjectTag, dateTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag)
     file.writeOnJsonFile('cache/unfinishedProcessesDurations.json', unfinishedProcessesDurations)
 
 # refresh current database data. 

@@ -9,7 +9,7 @@ import utils.Dataframe as frame
 import utils.Utilities as utilities
 
 # predict duration of finished processes based on current events flow. This evaluate the error of the model.
-def predictDurationsTest8020(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag):
+def predictDurationsTest8020(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag):
     columns = df.columns.values.tolist()
     columns.remove(codeJudgeTag)
     columns.remove(codeSubjectTag)
@@ -18,7 +18,6 @@ def predictDurationsTest8020(df, codeJudgeTag, codeSubjectTag, countTag, dateTag
     columns.remove(finishedTag)
     columns.remove(durationFinalTag)
     columns.remove(dateTag)
-    columns.remove(distanceTag)
     numProcesses = frame.getUniques(df, numProcessTag).tolist()
     rd.shuffle(numProcesses)
     lTrain = int(len(numProcesses) / 5)
@@ -64,7 +63,7 @@ def predictDurationsTest8020(df, codeJudgeTag, codeSubjectTag, countTag, dateTag
     return predictionDf
 
 # predict duration of finished processes based on current events flow. This evaluate the error of the model.
-def predictDurationsTestTotal(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag):
+def predictDurationsTestTotal(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag):
     columns = df.columns.values.tolist()
     columns.remove(codeJudgeTag)
     columns.remove(codeSubjectTag)
@@ -73,16 +72,17 @@ def predictDurationsTestTotal(df, codeJudgeTag, codeSubjectTag, countTag, dateTa
     columns.remove(finishedTag)
     columns.remove(durationFinalTag)
     columns.remove(dateTag)
-    columns.remove(distanceTag)
     numProcesses = frame.getUniques(df, numProcessTag).tolist()
+    rd.shuffle(numProcesses)
     predictions = []
     with alive_bar(int(len(numProcesses))) as bar:
         for i in range(int(len(numProcesses))):
-            testNumProcesses = [numProcesses[i]]
+            testNumProcesses = numProcesses[i]
             trainNumProcesses = numProcesses[:i] + numProcesses[i + 1:]
-            testDF = df[df[numProcessTag].isin(testNumProcesses)].copy()
+            testDF = df[df[numProcessTag] == testNumProcesses].copy()
             lTest = len(testDF)
             r = rd.randint(0, lTest - 1)
+            r = 4
             testDF_temp = testDF.iloc[r]
             judge = testDF_temp[codeJudgeTag]
             subject = testDF_temp[codeSubjectTag]
@@ -117,7 +117,7 @@ def predictDurationsTestTotal(df, codeJudgeTag, codeSubjectTag, countTag, dateTa
     return predictionDf
 
 # predict duration of finished processes based on current events flow.
-def predictDurations(df, codeJudgeTag, codeSubjectTag, dateTag, distanceTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
+def predictDurations(df, codeJudgeTag, codeSubjectTag, dateTag, durationTag, durationFinalTag, durationPredictedTag, finishedTag, numProcessTag, sectionTag):
     finishedProcesses = df[df[finishedTag] == utilities.getProcessState('finished')]
     unfinishedProcesses = df[df[finishedTag] == utilities.getProcessState('unfinished')]  
     columns = df.columns.values.tolist()
@@ -127,7 +127,6 @@ def predictDurations(df, codeJudgeTag, codeSubjectTag, dateTag, distanceTag, dur
     columns.remove(numProcessTag)
     columns.remove(finishedTag)
     columns.remove(dateTag)
-    columns.remove(distanceTag)
     columns.remove(durationFinalTag)
     predictions = {}
     with alive_bar(int(len(unfinishedProcesses))) as bar:
