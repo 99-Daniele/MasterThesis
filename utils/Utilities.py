@@ -95,6 +95,11 @@ def getMonth(monthNumber):
     months = file.getDataFromJsonFile('utils/utilities/months.json')
     return months.get(str(monthNumber))
 
+# get months from file.
+def getMonths():
+    months = file.getDataFromJsonFile('utils/utilities/months.json')
+    return months
+
 # get given month from months and given year.
 def getMonthYear(date):
     m = date.month

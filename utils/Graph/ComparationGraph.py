@@ -144,7 +144,7 @@ def updateTypeData(df, startDate, endDate, sections, subjects, judges, finished)
 
 # update data base on user choices on different parameters.
 # this method is only for process comparation graph since there are more parameters such as 'sequences' and 'phaseSequences'.
-def updateProcessTypeData(df, sections, subjects, judges):
+def updateProcessTypeData(df, sections, subjects, judges, months):
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     sectionTag = utilities.getTagName("sectionTag")
     subjectTag = utilities.getTagName("subjectTag")
@@ -152,6 +152,7 @@ def updateProcessTypeData(df, sections, subjects, judges):
     df_temp = frame.getTypesDataFrame(df_temp, sectionTag, sections)
     df_temp = frame.getTypesDataFrame(df_temp, subjectTag, subjects)
     df_temp = frame.getTypesDataFrame(df_temp, codeJudgeTag, judges)
+    df_temp = frame.getMonthDataFrame(df_temp, months)
     return df_temp
 
 # update data base on user choices on different parameters. In order to do that is use 'updateProcessData' method with chosen parameter as None. 
@@ -447,13 +448,16 @@ def typeComparationUpdate(df, typeChoice, avgChoice, dateType, startDate, endDat
 
 # return all needed parameters in order to change graph after any user choice.
 # this method is only for process comparation graph.
-def parameterComparationUpdate(df, avgChoice, tag, sections, judges, subjects, text):
+def parameterComparationUpdate(df, avgChoice, tag, sections, judges, subjects, months, text):
     title = "COMPARISON OF PROCESSES DURATION BASED ON " + tag.upper()
+    avgTag = utilities.getTagName("avgTag")
+    dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
+    month = utilities.getPlaceholderName("month")
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
     df_temp = df.copy()
-    df_temp = updateProcessTypeData(df_temp, sections, subjects, judges)
+    df_temp = updateProcessTypeData(df_temp, sections, subjects, judges, months)
     [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(df_temp, tag, avgChoice)
     xticks = frame.getUniques(avgData, tag)
     if text == [textTag]:

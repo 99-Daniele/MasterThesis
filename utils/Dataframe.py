@@ -446,7 +446,7 @@ def getMonthDataFrame(df, months):
         return df
     dateTag = utilities.getTagName('dateTag')
     df_temp = df.copy()
-    df_temp[dateTag] = df_temp[dateTag].map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').month)
+    df_temp[dateTag] = df_temp[dateTag].map(lambda x: str(dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').month))
     return df_temp[df_temp[dateTag].isin(months)]
 
 # return dataframe rows where date year is contained given years.

@@ -19,6 +19,7 @@ def pageLayout():
     avgTag = utilities.getTagName('avgTag')  
     codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     judge = utilities.getPlaceholderName('judge') 
+    month = utilities.getPlaceholderName('month') 
     median = utilities.getPlaceholderName('median') 
     section = utilities.getPlaceholderName('section') 
     sectionTag = utilities.getTagName('sectionTag')
@@ -29,6 +30,7 @@ def pageLayout():
     sections = frame.getGroupBy(df, sectionTag)
     judges = frame.getGroupBy(df, codeJudgeTag)
     subjects = frame.getGroupBy(df, subjectTag)
+    months = utilities.getMonths()
     df_temp = pd.DataFrame({'A' : [], 'B': []})
     fig = px.box(df_temp, x = 'A', y = 'B')
     layout = ds.html.Div([
@@ -41,6 +43,7 @@ def pageLayout():
         ds.dcc.Dropdown(sections, multi = True, searchable = True, clearable = True, id = 'type-dropdown-se', placeholder = section, style = {'width': 400}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, clearable = True, id = 'type-dropdown-j', placeholder = judge, style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, clearable = True, id = 'type-dropdown-su', placeholder = subject, style = {'width': 400}),
+        ds.dcc.Dropdown(months, multi = True, searchable = True, clearable = True, id = 'type-dropdown-mt', placeholder = month, style = {'width': 400}),
         ds.dcc.Checklist([text], value = [], id = "text-checklist-tr"),
         ds.dcc.Graph(id = 'comparation-graph-tr', figure = fig)
     ])
@@ -55,9 +58,10 @@ def pageLayout():
         ds.Input('type-dropdown-se', 'value'),
         ds.Input('type-dropdown-j', 'value'),
         ds.Input('type-dropdown-su', 'value'),
+        ds.Input('type-dropdown-mt', 'value'),
         ds.Input('text-checklist-tr', 'value')]
     )
 
 # return updated data based on user choice.
-def updateOutput(avgChoice, typeChoice, section, judge, subject, text):
-    return comparation.parameterComparationUpdate(df, avgChoice, typeChoice, section, judge, subject, text)
+def updateOutput(avgChoice, typeChoice, sections, judges, subjects, months, text):
+    return comparation.parameterComparationUpdate(df, avgChoice, typeChoice, sections, judges, subjects, months, text)
