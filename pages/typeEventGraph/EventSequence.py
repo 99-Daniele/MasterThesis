@@ -11,7 +11,7 @@ import utils.graph.TypeEventsGraph as typeEvent
 import utils.Utilities as utilities
 
 # get dataframe with all events duration.
-df = getter.getEventsDuration()
+df = getter.getEventsDurationFiltered()
 codeEventTag = utilities.getTagName('codeEventTag')
 eventTag = utilities.getTagName('eventTag')
 

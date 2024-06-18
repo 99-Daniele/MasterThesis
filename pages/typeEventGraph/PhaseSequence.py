@@ -10,7 +10,7 @@ import utils.graph.TypeEventsGraph as typeEvent
 import utils.Utilities as utilities
 
 # get dataframe with all events duration.
-df = getter.getPhasesDuration()
+df = getter.getPhasesDurationFiltered()
 phaseTag = utilities.getTagName('phaseTag')
 df[phaseTag] = df[phaseTag].astype(str)
 

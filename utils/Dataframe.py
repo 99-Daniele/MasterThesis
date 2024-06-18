@@ -309,27 +309,21 @@ def getAvgStdDataFrameByType(df, typeChoice, avgChoice):
     types = getUniques(df, typeChoice)
     typeDuration = [typeChoice, durationTag]
     df1 = df[typeDuration].copy()
-    df_q = df1.groupby(typeChoice, as_index = False).quantile(0.75)
-    df3 = df1.iloc[:0,:].copy()
-    for i, row in df_q.iterrows():
-        df_temp = df1[df1[typeChoice] == row[typeChoice]]
-        df_temp = df_temp[df_temp[durationTag] <= row[durationTag]]
-        df3 = pd.concat([df3, df_temp], ignore_index = True)
     if avgChoice == avgTag:
-        df2 = df3.groupby(typeChoice, as_index = False).mean()
+        df2 = df1.groupby(typeChoice, as_index = False).mean()
     else:
-        df2 = df3.groupby(typeChoice, as_index = False).median()
-    df2[countTag] = df3.groupby(typeChoice).size().tolist()
-    df2[quantileTag] = df3.groupby(typeChoice, as_index = False).quantile(0.75)[durationTag]
-    df3[typeChoice] = df3[typeChoice].astype("category")
-    df3[typeChoice] = df3[typeChoice].cat.set_categories(types)
-    df3 = df3.sort_values([typeChoice]).reset_index(drop = True)
-    df3[typeChoice] = df3[typeChoice].astype(str)
+        df2 = df1.groupby(typeChoice, as_index = False).median()
+    df2[countTag] = df1.groupby(typeChoice).size().tolist()
+    df2[quantileTag] = df1.groupby(typeChoice, as_index = False).quantile(0.75)[durationTag]
+    df1[typeChoice] = df1[typeChoice].astype("category")
+    df1[typeChoice] = df1[typeChoice].cat.set_categories(types)
+    df1 = df1.sort_values([typeChoice]).reset_index(drop = True)
+    df1[typeChoice] = df1[typeChoice].astype(str)
     df2[typeChoice] = df2[typeChoice].astype("category")
     df2[typeChoice] = df2[typeChoice].cat.set_categories(types)
     df2 = df2.sort_values([typeChoice]).reset_index(drop = True)
     df2[typeChoice] = df2[typeChoice].astype(str)
-    return [df3, df2]
+    return [df1, df2]
 
 # return data group by chosen type order by phase.
 def getAvgStdDataFrameByTypeChoiceOrderByPhase(df, typeChoice, avgChoice):
@@ -344,27 +338,21 @@ def getAvgStdDataFrameByTypeChoiceOrderByPhase(df, typeChoice, avgChoice):
     df1 = df[typeDuration].copy()
     df1[durationTag] = df1[durationTag].astype(int)
     df1 = keepOnlyRelevant(df1, 0.005, typeChoice).reset_index(drop = True)
-    df_q = df1.groupby(typeChoice, as_index = False).quantile(0.75)
-    df3 = df1.iloc[:0,:].copy()
-    for i, row in df_q.iterrows():
-        df_temp = df1[df1[typeChoice] == row[typeChoice]]
-        df_temp = df_temp[df_temp[durationTag] <= row[durationTag]]
-        df3 = pd.concat([df3, df_temp], ignore_index = True)
     if avgChoice == avgTag:
-        df2 = df3.groupby(typeChoice, as_index = False).mean()
+        df2 = df1.groupby(typeChoice, as_index = False).mean()
     else:
-        df2 = df3.groupby(typeChoice, as_index = False).median()
-    df2[countTag] = df3.groupby(typeChoice).size().tolist()
-    df2[quantileTag] = df3.groupby(typeChoice, as_index = False).quantile(0.75)[durationTag]
-    df3[typeChoice] = df3[typeChoice].astype("category")
-    df3[typeChoice] = df3[typeChoice].cat.set_categories(types)
-    df3 = df3.sort_values([typeChoice]).reset_index(drop = True)
-    df3[typeChoice] = df3[typeChoice].astype(str)
+        df2 = df1.groupby(typeChoice, as_index = False).median()
+    df2[countTag] = df1.groupby(typeChoice).size().tolist()
+    df2[quantileTag] = df1.groupby(typeChoice, as_index = False).quantile(0.75)[durationTag]
+    df1[typeChoice] = df1[typeChoice].astype("category")
+    df1[typeChoice] = df1[typeChoice].cat.set_categories(types)
+    df1 = df1.sort_values([typeChoice]).reset_index(drop = True)
+    df1[typeChoice] = df1[typeChoice].astype(str)
     df2[typeChoice] = df2[typeChoice].astype("category")
     df2[typeChoice] = df2[typeChoice].cat.set_categories(types)
     df2 = df2.sort_values([typeChoice]).reset_index(drop = True)
     df2[typeChoice] = df2[typeChoice].astype(str)
-    return [df3, df2]
+    return [df1, df2]
 
 # return data group by chosen type.
 def getAvgStdDataFrameByTypeChoice(df, typeChoice, avgChoice):

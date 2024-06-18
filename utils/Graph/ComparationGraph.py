@@ -325,7 +325,7 @@ def processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDat
         [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, eventChoice, stateChoice, phaseChoice)
         xticks = frame.getUniques(allData, dateTag)
         if text == [textTag]:
-            fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+            fig = px.line(allData, x = dateTag, y = durationTag, labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.8)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
             fig.add_traces(
                 px.line(typeData, x = dateTag, y = durationTag, text = countTag, color = filterTag, markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9)).data
             )

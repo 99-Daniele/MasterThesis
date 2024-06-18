@@ -10,7 +10,7 @@ import utils.graph.TypeEventsGraph as typeEvent
 import utils.Utilities as utilities
 
 # get dataframe with all events duration.
-df = getter.getStatesDuration()
+df = getter.getStatesDurationFiltered()
 eventTag = utilities.getTagName('eventTag')
 stateTag = utilities.getTagName('stateTag')
 phaseTag = utilities.getTagName('phaseTag')
@@ -81,8 +81,8 @@ def pageLayout():
 # return updated data based on user choice.
 def updateOutput(state, display, tagChoice, avg, text, section, subject, judge, finished):
     if tagChoice == eventTag:
-        df = getter.getEventsDuration()
+        df = getter.getEventsDurationFiltered()
     else:
-        df = getter.getStatesDuration()
+        df = getter.getStatesDurationFiltered()
     df[phaseTag] = df[phaseTag].astype(str)
     return typeEvent.typeEventUpdate(df, phaseTag, state, tagChoice, display, avg, text, section, subject, judge, finished)

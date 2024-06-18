@@ -108,6 +108,7 @@ def getSubjectsInfo():
         subjectsInfo = connect.getDataFromDatabase(connection, subjectsInfoQuery)
         subjectsInfoDataframe = frame.createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, ritualTag, subjectTag)
         cache.updateCache('subjectsInfo.json', subjectsInfoDataframe)
+    subjectsInfoDataframe[codeSubjectTag] = subjectsInfoDataframe[codeSubjectTag].astype(str)
     return subjectsInfoDataframe
 
 # get processes events.
@@ -172,6 +173,8 @@ def getProcessesDuration():
     if processDurationDataframe is None:
         update.refreshData()
         processDurationDataframe = cache.getDataframe('processesDuration.json')
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    processDurationDataframe[codeSubjectTag] = processDurationDataframe[codeSubjectTag].astype(str)
     return processDurationDataframe
 
 # get processes events from cache file filtered by important process types, sections and subjects.
@@ -181,9 +184,9 @@ def getProcessesDurationFiltered():
         update.refreshData()
         processDurationDataframeFiltered = cache.getDataframe('processesDurationFiltered.json')
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    processDurationDataframeFiltered[codeSubjectTag] = processDurationDataframeFiltered[codeSubjectTag].astype(str)
     importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
     if importantSubjects != None and len(importantSubjects) > 0:
-        processDurationDataframeFiltered[codeSubjectTag] = processDurationDataframeFiltered[codeSubjectTag].astype(str)
         processDurationDataframeFiltered = processDurationDataframeFiltered[processDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     return processDurationDataframeFiltered
 
@@ -254,7 +257,7 @@ def getEventsDurationFiltered():
 def getStateNamesDataframe():
     durationTag = utilities.getTagName("durationTag")
     statesNameDataframe = getStatesInfo()
-    stateDurationDataframe = getStatesDuration()  
+    stateDurationDataframe = getStatesDurationFiltered()  
     df = frame.createStateNameDataframeWithInfo(stateDurationDataframe, statesNameDataframe) 
     df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
     return df
@@ -263,7 +266,7 @@ def getStateNamesDataframe():
 def getEventNamesDataframe():
     durationTag = utilities.getTagName("durationTag")
     eventNamesDataframe = getEventsInfo()
-    eventDurationDataframe = getEventsDuration()
+    eventDurationDataframe = getEventsDurationFiltered()
     df = frame.createEventNameDataframeWithInfo(eventDurationDataframe, eventNamesDataframe)
     df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
     return df
