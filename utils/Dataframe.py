@@ -47,9 +47,9 @@ def createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, ritualTag, subject
 def createProcessDurationsDataFrame(process, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag, codeSubjectTag):
     df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, codeJudgeTag, codeSubjectTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, eventPhaseSequenceTag, nextDateTag, nextIdTag])
     filteredDf = df.copy()
-    if importantProcessStates != None:
+    if importantProcessStates != None and len(importantProcessStates) > 0:
         filteredDf = filteredDf[filteredDf[finishedTag].isin(importantProcessStates)]
-    if importantSections != None:
+    if importantSections != None and len(importantSections) > 0:
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
     df = df.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
     filteredDf = filteredDf.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
@@ -61,7 +61,7 @@ def createProcessDurationsDataFrame(process, dateTag, durationTag, eventSequence
 def createTypeDurationsDataFrame(events, codeEventTag, codeJudgeTag, codeSubjectTag, dateTag, durationTag, eventTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, codeStateTag, subjectTag):
     df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, codeEventTag, eventTag, durationTag, dateTag, codeJudgeTag, codeStateTag, stateTag, phaseTag, codeSubjectTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
     filteredDf = df.copy()
-    if importantSections != None:
+    if importantSections != None and len(importantSections) > 0:
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
     df = df.dropna()
     filteredDf = filteredDf.dropna()
