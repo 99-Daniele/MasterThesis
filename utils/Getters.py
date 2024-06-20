@@ -1,6 +1,6 @@
 # this file handles data getters.
 
-import Cache as cache
+import utils.Cache as cache
 import utils.database.DatabaseConnection as connect
 import utils.DataUpdate as update
 import utils.Dataframe as frame
@@ -185,7 +185,7 @@ def getProcessesDurationFiltered():
         processDurationDataframeFiltered = cache.getDataframe('processesDurationFiltered.json')
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     processDurationDataframeFiltered[codeSubjectTag] = processDurationDataframeFiltered[codeSubjectTag].astype(str)
-    importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
+    importantSubjects = file.getDataFromTextFile('utils/preferences/importantSubjects.txt')
     if importantSubjects != None and len(importantSubjects) > 0:
         processDurationDataframeFiltered = processDurationDataframeFiltered[processDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     return processDurationDataframeFiltered
@@ -205,7 +205,7 @@ def getStatesDurationFiltered():
         update.refreshData()
         stateDurationDataframeFiltered = cache.getDataframe('statesDurationFiltered.json')
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
-    importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
+    importantSubjects = file.getDataFromTextFile('utils/preferences/importantSubjects.txt')
     if importantSubjects != None and len(importantSubjects) > 0:
         stateDurationDataframeFiltered[codeSubjectTag] = stateDurationDataframeFiltered[codeSubjectTag].astype(str)
         stateDurationDataframeFiltered = stateDurationDataframeFiltered[stateDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
@@ -226,7 +226,7 @@ def getPhasesDurationFiltered():
         update.refreshData()
         phaseDurationDataframeFiltered = cache.getDataframe('phasesDurationFiltered.json')
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
-    importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
+    importantSubjects = file.getDataFromTextFile('utils/preferences/importantSubjects.txt')
     if importantSubjects != None and len(importantSubjects) > 0:
         phaseDurationDataframeFiltered[codeSubjectTag] = phaseDurationDataframeFiltered[codeSubjectTag].astype(str)
         phaseDurationDataframeFiltered = phaseDurationDataframeFiltered[phaseDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
@@ -247,7 +247,7 @@ def getEventsDurationFiltered():
         update.refreshData()
         eventDurationDataframeFiltered = cache.getDataframe('eventsDurationFiltered.json')
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
-    importantSubjects = file.getDataFromTextFile('preferences/importantSubjects.txt')
+    importantSubjects = file.getDataFromTextFile('utils/preferences/importantSubjects.txt')
     if importantSubjects != None and len(importantSubjects) > 0:
         eventDurationDataframeFiltered[codeSubjectTag] = eventDurationDataframeFiltered[codeSubjectTag].astype(str)
         eventDurationDataframeFiltered = eventDurationDataframeFiltered[eventDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]

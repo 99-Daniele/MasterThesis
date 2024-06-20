@@ -177,7 +177,7 @@ def predictDuration():
 
 # start app to allow user select graph to be displayed.
 def startApp():
-    import App as app
+    import utils.App as app
     app.start()
 
 if __name__ == '__main__':

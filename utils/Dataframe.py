@@ -8,8 +8,8 @@ import utils.FileOperation as file
 import utils.Utilities as utilities
 
 # importantProcessStates, importantSections and importantSubjects are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
-importantProcessStates = file.getDataFromTextFile('preferences/importantProcessStates.txt')
-importantSections = file.getDataFromTextFile('preferences/importantSections.txt')
+importantProcessStates = file.getDataFromTextFile('utils/preferences/importantProcessStates.txt')
+importantSections = file.getDataFromTextFile('utils/preferences/importantSections.txt')
 
 # from events list create basic events dataframe. Later he will be integrated with subject, state, phase chosen by user.
 def createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag):

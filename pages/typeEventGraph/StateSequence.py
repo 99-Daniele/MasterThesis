@@ -25,7 +25,7 @@ def pageLayout():
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     subject = utilities.getPlaceholderName('subject')  
-    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    importantStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
     if importantStates != None and len(importantStates) > 0:
         df_temp = df[df[codeStateTag].isin(importantStates)]
     types = frame.getGroupBy(df_temp, stateTag)
@@ -76,7 +76,7 @@ def pageLayout():
 # return updated data based on user choice.
 def updateOutput(state, avg, text, section, subject, judge, finished):
     
-    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    importantStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
     if importantStates != None and len(importantStates) > 0:
         df_temp = df[df[codeStateTag].isin(importantStates)]
     else:

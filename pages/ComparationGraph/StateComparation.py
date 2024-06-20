@@ -38,7 +38,7 @@ def pageLayout():
     trimesterYear = utilities.getPlaceholderName('trimesterYear')
     week = utilities.getPlaceholderName('week')
     year = utilities.getPlaceholderName('year') 
-    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    importantStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
     if importantStates != None and len(importantStates) > 0:
         df_temp = df[df[codeStateTag].isin(importantStates)]
     types = frame.getGroupBy(df_temp, stateTag)
@@ -119,7 +119,7 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, choices, order, text):
-    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    importantStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
     if importantStates != None and len(importantStates) > 0:
         df_temp = df[df[codeStateTag].isin(importantStates)]
     else:

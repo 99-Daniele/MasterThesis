@@ -213,7 +213,7 @@ def updateProcessDataframeFromSelection(df_temp, df_data, eventsInfoDataframe, s
     sequences = frame.getGroupBy(df_temp_5, stateSequenceTag)
     phaseSequences = frame.getGroupBy(df_temp_6, phaseSequenceTag)
     events = frame.getGroupByFromString(df_temp_7, eventSequenceTag)
-    importantCodeEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
+    importantCodeEvents = file.getDataFromTextFile('utils/preferences/importantEvents.txt')
     if importantCodeEvents != None and len(importantCodeEvents) > 0:
         eventsInfo = eventsInfoDataframe.to_dict('records')
         importantEvents = []
@@ -224,7 +224,7 @@ def updateProcessDataframeFromSelection(df_temp, df_data, eventsInfoDataframe, s
                 importantEvents.append(eventEvent)
         events = list(set(importantEvents) & set(events))
     states = frame.getGroupByFromString(df_temp_8, stateSequenceTag)
-    importantCodeStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    importantCodeStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
     if importantCodeStates != None and len(importantCodeStates) > 0:
         statesInfo = statesInfoDataframe.to_dict('records')
         importantStates = []

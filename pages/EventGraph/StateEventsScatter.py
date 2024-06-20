@@ -75,7 +75,7 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
-    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    importantStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
     if importantStates != None and len(importantStates) > 0:
         df_temp = df[df[codeStateTag].isin(importantStates)]
     else:

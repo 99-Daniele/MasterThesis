@@ -4,7 +4,7 @@ from alive_progress import alive_bar
 import datetime as dt
 import pandas as pd
 
-import Cache as cache
+import utils.Cache as cache
 import utils.database.DatabaseConnection as connect
 import utils.Dataframe as frame
 import utils.FileOperation as file
@@ -321,7 +321,7 @@ def updateAllEventsDataframe(allEventsDataframe):
 # update state events dataframe.
 def updateStateEventsDataframe(stateEventsDataframe, codeStateTag, dateTag, numEventTag, numProcessTag):
     stateEventsDataframe = stateEventsDataframe.groupby([numProcessTag, codeStateTag], as_index = False).first()
-    importantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    importantStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
     if importantStates != None and len(importantStates) > 0:
         stateEventsDataframe = stateEventsDataframe[stateEventsDataframe[codeStateTag].isin(importantStates)]
     stateEventsDataframe = stateEventsDataframe.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)

@@ -81,7 +81,7 @@ def update_dateframe(refreshButton, resetButton, downloadButton, importantIndex,
     if ds.ctx.triggered_id != None and 'refresh-button' in ds.ctx.triggered_id:
         newData, display = typeEvents.updateDatabase(data, df, codeStateTag, 'statesInfo.json')
         return newData, display, importantIndex
-    oldImportantStates = file.getDataFromTextFile('preferences/importantStates.txt')
+    oldImportantStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
     if oldImportantStates == None:
         oldImportantIndex = []
     else:
@@ -97,5 +97,5 @@ def update_dateframe(refreshButton, resetButton, downloadButton, importantIndex,
             importantIndex = []
         importantStates = [data[x].get(codeStateTag) for x in importantIndex]
         if len(list(set(importantStates) - set(oldImportantStates))) > 0 or len(list(set(oldImportantStates) - set(importantStates))) > 0:
-            file.writeOnTextFile('preferences/importantStates.txt', utilities.fromListToString(importantStates))
+            file.writeOnTextFile('utils/preferences/importantStates.txt', utilities.fromListToString(importantStates))
     return data, False, importantIndex

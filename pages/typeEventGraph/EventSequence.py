@@ -25,7 +25,7 @@ def pageLayout():
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     subject = utilities.getPlaceholderName('subject')  
-    importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
+    importantEvents = file.getDataFromTextFile('utils/preferences/importantEvents.txt')
     if importantEvents != None and len(importantEvents) > 0:
         df_temp = df[df[codeEventTag].isin(importantEvents)]
     types = frame.getUniques(df_temp, eventTag)
@@ -75,7 +75,7 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(event, avg, text, section, subject, judge, finished):
-    importantEvents = file.getDataFromTextFile('preferences/importantEvents.txt')
+    importantEvents = file.getDataFromTextFile('utils/preferences/importantEvents.txt')
     if importantEvents != None and len(importantEvents) > 0:
         df_temp = df[df[codeEventTag].isin(importantEvents)]
     else:
