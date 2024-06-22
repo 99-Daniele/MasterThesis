@@ -18,7 +18,7 @@ def restartData():
     verifyDatabase(connection)
     file.removeFolder('cache')
     file.createFolder('cache')
-    startProcessEvent = 'IA'
+    startProcessEvent = 'AS'
     endPhase = getter.getEndPhase()
     stallStates = getter.getStallStates()
     events = getter.getEvents()
@@ -170,7 +170,7 @@ def getProcessEvents(events, startProcessEvent, stallStates, endPhase, codeEvent
         while i < int(len(events)):
             if events[i][numProcessTag] != processId:
                 start = False
-                if events[i][codeEventTag] == startProcessEvent:
+                if events[i][codeEventTag] == startProcessEvent or events[i][codeStateTag] in stallStates:
                     allProcessEvents.append(processEvents)
                     if len(durationSequenceComplete) > 0:
                         processDict = dict.fromkeys(dfColumns)
