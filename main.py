@@ -174,6 +174,7 @@ def predictTest():
 def predictDuration():
     import utils.DataUpdate as update
     update.predictDuration()
+    update.refreshData()
 
 # start app to allow user select graph to be displayed.
 def startApp():

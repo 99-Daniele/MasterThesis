@@ -214,6 +214,7 @@ def startDate(endDate, duration):
 
 # calc final date given start date and duration.
 def finalDate(startDate, duration):
+    duration = float(duration)
     if isinstance(startDate, str):
         startDateDt = dt.datetime.strptime(startDate, '%Y-%m-%d %H:%M:%S')
     else:

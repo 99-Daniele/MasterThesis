@@ -3,9 +3,8 @@
 from alive_progress import alive_bar
 import pandas as pd
 import random as rd
-import sklearn.metrics as mtc
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.tree import DecisionTreeClassifier
+import sklearn.metrics as mtx
 
 import utils.Dataframe as frame
 import utils.Utilities as utilities
@@ -53,7 +52,7 @@ def predictDurationsTest8020(df, codeJudgeTag, codeSubjectTag, countTag, dateTag
                 testY = testDF_temp[[durationFinalTag]]
                 currDuration = testX[durationTag]
                 finalDuration = currDuration + testY[durationFinalTag]
-                model = DecisionTreeClassifier()
+                model = De()
                 model.fit(trainX.values, trainY)
                 predictedDuration = model.predict([testX.values])[0]
                 predictedFinalDuration = currDuration + predictedDuration
@@ -62,6 +61,9 @@ def predictDurationsTest8020(df, codeJudgeTag, codeSubjectTag, countTag, dateTag
                     predictions.extend([{numProcessTag: str(processID), countTag: str(count), durationTag: str(currDuration), durationFinalTag: str(finalDuration), durationPredictedTag: str(predictedFinalDuration), errorTag: error}])
             bar() 
     predictionDf = pd.DataFrame(predictions)
+    errorR2 = mtx.r2_score(predictionDf[durationFinalTag], predictionDf[durationPredictedTag])
+    meanError = mtx.mean_absolute_percentage_error(predictionDf[durationFinalTag], predictionDf[durationPredictedTag])
+    print(errorR2, meanError)
     return predictionDf
 
 # predict duration of finished processes based on current events flow. This evaluate the error of the model.
@@ -83,7 +85,7 @@ def predictDurationsTestTotal(df, codeJudgeTag, codeSubjectTag, countTag, dateTa
             trainNumProcesses = numProcesses[:i] + numProcesses[i + 1:]
             testDF = df[df[numProcessTag] == testNumProcesses].copy()
             lTest = len(testDF)
-            r = rd.randint(0, lTest - 1)
+            r = rd.randint(0, lTest - 2)
             testDF_temp = testDF.iloc[r]
             judge = testDF_temp[codeJudgeTag]
             subject = testDF_temp[codeSubjectTag]
@@ -91,6 +93,7 @@ def predictDurationsTestTotal(df, codeJudgeTag, codeSubjectTag, countTag, dateTa
             processID = testDF_temp[numProcessTag]
             count = testDF_temp[countTag]
             currDuration = testDF_temp[durationTag]
+            date = testDF_temp[dateTag]
             trainDF_temp = df[df[numProcessTag].isin(trainNumProcesses)].copy()
             if len(trainDF_temp[trainDF_temp[sectionTag] == section]) > 0:
                 trainDF_temp = trainDF_temp[trainDF_temp[sectionTag] == section]
@@ -112,7 +115,7 @@ def predictDurationsTestTotal(df, codeJudgeTag, codeSubjectTag, countTag, dateTa
                 predictedFinalDuration = currDuration + predictedDuration 
                 if finalDuration > 0:
                     error = abs(predictedFinalDuration - finalDuration) * 100 / finalDuration
-                    predictions.extend([{numProcessTag: str(processID), countTag: str(count), durationTag: str(currDuration), durationFinalTag: str(finalDuration), durationPredictedTag: str(predictedFinalDuration), errorTag: error}])
+                    predictions.extend([{numProcessTag: str(processID), dateTag: date, countTag: str(count), durationTag: str(currDuration), durationFinalTag: str(finalDuration), durationPredictedTag: str(predictedFinalDuration), errorTag: error}])
             bar() 
     predictionDf = pd.DataFrame(predictions)
     return predictionDf
@@ -150,7 +153,7 @@ def predictDurations(df, codeJudgeTag, codeSubjectTag, dateTag, durationTag, dur
                 trainX = f[columns]
                 trainY = f[[durationFinalTag]]
                 testX = u[columns]
-                model  = DecisionTreeClassifier()
+                model  = DecisionTreeRegressor()
                 model.fit(trainX.values, trainY)
                 predictedDuration = model.predict([testX.values])[0]
                 currDuration = testX[durationTag]
