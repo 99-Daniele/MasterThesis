@@ -4,4 +4,4 @@
 - df1, df2, df_data nomi migliori
 - predittore condivisibile
 - filtro durata
-
+- implement ui for alert and input data
