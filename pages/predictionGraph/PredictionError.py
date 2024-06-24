@@ -3,6 +3,7 @@
 import dash as ds
 import pandas as pd
 import plotly.express as px
+import sklearn.metrics as mtc
 
 import utils.Getters as getter
 import utils.Utilities as utilities
@@ -25,6 +26,8 @@ df['plus20'] = (df[durationFinalTag] + (df[durationFinalTag] * 0.2))
 df['minus50'] = (df[durationFinalTag] - (df[durationFinalTag] * 0.5))
 df['minus20'] = (df[durationFinalTag] - (df[durationFinalTag] * 0.2))
 dfError = df.agg(Size = (errorTag, 'size'), Median = (errorTag, 'median'), Mean = (errorTag, 'mean')).transpose().rename(columns = {"Size":countTag, "Median": medianTag + " " + errorTag, "Mean": avgTag + " " + errorTag})
+errorR2 = mtc.r2_score(df[durationFinalTag], df[predictedDurationTag])
+dfError['R2'] = errorR2
 df20 = df[df[errorTag] <= 20.0]
 df50 = df[df[errorTag] <= 50.0]
 df50 = pd.concat([df50, df20]).drop_duplicates(keep = False)
@@ -71,12 +74,17 @@ def pageLayout():
     )
     fig.data[-1].name = 'error50'
     fig.data[-1].legendgroup = '6'
+    fig.update_layout(font = dict(size = 22))
     fig.update_traces(showlegend = True)
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
         ds.html.H2('PREDICTED DURATION ERROR GRAPH'),
         ds.dash_table.DataTable(
-            dfError.to_dict('records')),
+            dfError.to_dict('records'),
+            style_cell = {
+                'font-size': 25,
+                'text-align': 'center'
+            }),
         ds.dcc.Graph(figure = fig, id = 'prediction-graph')
     ])
     return layout

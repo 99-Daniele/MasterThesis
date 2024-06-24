@@ -70,9 +70,9 @@ def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections
     xticks = frame.getUniques(allData, tagChoice)
     if tagChoice == eventTag:
         if text == [textTag]:
-            fig = px.histogram(allData, x = tagChoice, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+            fig = px.histogram(allData, x = tagChoice, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(1.1))
         else:
-            fig = px.box(allData, x = tagChoice, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+            fig = px.box(allData, x = tagChoice, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(1.1), points  = False)
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
@@ -82,16 +82,17 @@ def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections
     else:
         colorMap = frame.phaseColorMap(tagChoice, statesInfo)
         if text == [textTag]:
-            fig = px.histogram(allData, x = tagChoice, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+            fig = px.histogram(allData, x = tagChoice, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(1.1))
         else:
-            fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+            fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(1.1), points  = False)
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
             fig.add_traces(
-                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 25)).data
             )
-    fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False, legend = dict(font = dict(size = 16)))
+    fig.update_layout(xaxis_tickvals = xticks, showlegend = False, font = dict(size = 18))
+    fig.update_xaxes(tickangle = 45)
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
     return [fig, sections, subjects, judges, finished]
 
@@ -110,28 +111,29 @@ def typeSequenceUpdate(df, typeChoices, tagChoice, avg, text, sections, subjects
     xticks = frame.getUniques(allData, tagChoice)
     if tagChoice == eventTag:
         if text == [textTag]:
-            fig = px.histogram(allData, x = tagChoice, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+            fig = px.histogram(allData, x = tagChoice, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(1.1))
         else:
-            fig = px.box(allData, x = tagChoice, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+            fig = px.box(allData, x = tagChoice, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(1.1), points  = False)
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
             fig.add_traces(
-                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 20)).data
             )         
     else:
         colorMap = frame.phaseColorMap(tagChoice, statesInfo)
         if text == [textTag]:
-            fig = px.histogram(allData, x = tagChoice, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9))
+            fig = px.histogram(allData, x = tagChoice, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(1.1))
         else:
-            fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(0.9), points  = False)
+            fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(1.1), points  = False)
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
             fig.add_traces(
-                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 12)).data
+                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 20)).data
             )
-    fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False, legend = dict(font = dict(size = 16)))
+    fig.update_layout(xaxis_tickvals = xticks, showlegend = False, font = dict(size = 18))
+    fig.update_xaxes(tickangle = 45)
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
     return [fig, sections, subjects, judges, finished]
         

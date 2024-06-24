@@ -3,6 +3,8 @@
 from alive_progress import alive_bar
 import pandas as pd
 import random as rd
+import sklearn.metrics as mtc
+from sklearn.tree import DecisionTreeRegressor
 from sklearn.tree import DecisionTreeClassifier
 
 import utils.Dataframe as frame
@@ -102,7 +104,7 @@ def predictDurationsTestTotal(df, codeJudgeTag, codeSubjectTag, countTag, dateTa
                 trainY = trainDF_temp[[durationFinalTag]]
                 testX = testDF_temp[columns]
                 testY = testDF_temp[[durationFinalTag]]
-                model  = DecisionTreeClassifier()
+                model  = DecisionTreeRegressor()
                 model.fit(trainX.values, trainY)
                 predictedDuration = model.predict([testX.values])[0]
                 currDuration = testX[durationTag]

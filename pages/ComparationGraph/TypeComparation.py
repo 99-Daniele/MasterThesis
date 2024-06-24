@@ -10,7 +10,7 @@ import utils.graph.ComparationGraph as comparation
 import utils.Utilities as utilities
 
 # get dataframe with all processes duration.
-df = getter.getProcessesDuration()
+df = getter.getProcessesDurationFiltered()
 codeSubjectTag = utilities.getTagName('codeSubjectTag')  
 df[codeSubjectTag] = df[codeSubjectTag].astype(str)
 

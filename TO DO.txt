@@ -1,6 +1,7 @@
 - disponibile per accesso esterno --> descrizione readme
-- migliorare grafico --> piu carino da vedere
 - dimensione grafici
 - df_temp e df copy()
 - df1, df2, df_data nomi migliori
 - predittore condivisibile
+- filtro durata
+

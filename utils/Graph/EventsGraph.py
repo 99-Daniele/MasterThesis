@@ -61,7 +61,7 @@ def eventUpdate(df, startDate, endDate, symbol, type, minDate, maxDate, sections
     colorMap = frame.phaseColorMap(type, statesInfo)
     if symbol:
         symbols = list(frame.getUniques(df_temp, eventTag))
-        fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, symbol = eventTag, color_discrete_map = colorMap, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = utilities.getWidth(1))   
+        fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, symbol = eventTag, color_discrete_map = colorMap, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.95))   
         for i, trace in enumerate(fig.data):
             name = trace.name.split(', ')
             trace['name'] = name[1]
@@ -72,15 +72,17 @@ def eventUpdate(df, startDate, endDate, symbol, type, minDate, maxDate, sections
                 trace.update(showlegend=False)
                 if (trace.name in names) else names.add(trace.name))
     else:
-        fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_map = colorMap, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = utilities.getWidth(1))   
+        fig = px.scatter(df_temp, x = dateTag, y = numProcessTag, color = type, color_discrete_map = colorMap, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.95))   
     fig.update_layout(
+        font = dict(size = 18),
         legend = dict(
             yanchor = "top",
             y = 0.99,
-            font = dict(size = 16)
+        ),
+        xaxis = dict(
         ),
         yaxis = dict(
-            showticklabels = False
+            showticklabels = False,
         )
     )
     fig.update_xaxes(
