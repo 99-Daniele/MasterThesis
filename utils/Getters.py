@@ -247,7 +247,7 @@ def getEventsDurationFiltered():
 def getStateNamesDataframe():
     durationTag = utilities.getTagName("durationTag")
     statesNameDataframe = getStatesInfo()
-    stateDurationDataframe = getStatesDuration()  
+    stateDurationDataframe = getStatesDurationFiltered()  
     df = frame.createStateNameDataframeWithInfo(stateDurationDataframe, statesNameDataframe) 
     df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
     return df
@@ -256,7 +256,7 @@ def getStateNamesDataframe():
 def getEventNamesDataframe():
     durationTag = utilities.getTagName("durationTag")
     eventNamesDataframe = getEventsInfo()
-    eventDurationDataframe = getEventsDuration()
+    eventDurationDataframe = getEventsDurationFiltered()
     df = frame.createEventNameDataframeWithInfo(eventDurationDataframe, eventNamesDataframe)
     df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
     return df

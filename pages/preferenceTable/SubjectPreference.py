@@ -58,5 +58,5 @@ def update_dateframe(importantIndex, downloadButton, data):
     if ds.ctx.triggered_id != None and 'download-button' in ds.ctx.triggered_id:
         dataDF = pd.DataFrame(data)
         dataDF.to_csv('cache/subjectsInfo.csv')
-    typeEvents.updateImportant(data, codeSubjectTag, importantIndex, 'utils/preferences/importantSubjects.txt')
+    importantIndex = typeEvents.updateImportant(ds.ctx.triggered_id, data, codeSubjectTag, importantIndex, 'utils/preferences/importantSubjects.txt')
     return importantIndex
