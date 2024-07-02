@@ -2,8 +2,8 @@
 
 import utils.Cache as cache
 import utils.database.DatabaseConnection as connect
-import utils.DataUpdate as update
 import utils.Dataframe as frame
+import utils.DataUpdate as update
 import utils.FileOperation as file
 import utils.Utilities as utilities
 
@@ -18,7 +18,6 @@ minDateQuery = "SELECT DATE_FORMAT(MIN(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 maxDateQuery = "SELECT DATE_FORMAT(MAX(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 stallStatesQuery = "SELECT CCODST FROM tipostato WHERE FKFASEPROCESSO IS NULL"
 statesInfoQuery = "SELECT CCODST, CDESCR, CDESCR, FKFASEPROCESSO, IFNULL(CAST(FKFASEPROCESSO AS SIGNED), 0) FROM tipostato"
-startProcessEventQuery = "SELECT DISTINCT codice FROM eventi WHERE statoiniziale = '__'"
 subjectsInfoQuery = "SELECT codice, DESCCOMPLETA, DESCCOMPLETA, rituale FROM tipomaterie"
 
 # get min date from all events of user database.
@@ -31,21 +30,16 @@ def getMaxDate():
     maxDate = connect.getDataFromDatabase(connection, maxDateQuery)
     return maxDate[0][0]
 
-# get end phase from all events of user database.
+# get end phase.
 def getEndPhase():
     endPhase = connect.getDataFromDatabase(connection, endPhaseQuery)
     return endPhase[0][0]
 
-# get stall phase from all events of user database.
+# get stall states.
 def getStallStates():
     stallStateTuples = connect.getDataFromDatabase(connection, stallStatesQuery)
     stallStates = utilities.fromListOfTuplesToList(stallStateTuples)
     return stallStates
-
-# get event that starts processes.
-def getStartProcessEvent():
-    startProcessEvent = connect.getDataFromDatabase(connection, startProcessEventQuery)
-    return startProcessEvent[0][0]
 
 # get all events.
 def getEvents():
@@ -74,7 +68,7 @@ def getEventsDataframe():
         eventsDataframe = cache.getDataframe('events.json')
     return eventsDataframe
 
-# get events info.
+# get events info dataframe.
 def getEventsInfo():
     codeEventTag = utilities.getTagName("codeEventTag")
     descriptionTag = utilities.getTagName("descriptionTag")
@@ -86,7 +80,7 @@ def getEventsInfo():
         cache.updateCache('eventsInfo.json', eventsInfoDataframe)
     return eventsInfoDataframe
 
-# get states info.
+# get states info dataframe.
 def getStatesInfo():
     codeStateTag = utilities.getTagName("codeStateTag")
     descriptionTag = utilities.getTagName("descriptionTag")
@@ -100,7 +94,7 @@ def getStatesInfo():
         cache.updateCache('statesInfo.json', statesInfoDataframe)
     return statesInfoDataframe
 
-# get subjects info.
+# get subjects info dataframe.
 def getSubjectsInfo():
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     descriptionTag = utilities.getTagName("descriptionTag")
@@ -122,7 +116,7 @@ def getProcessesEvents():
         processEvents = cache.getData('processesEvents.json')
     return processEvents
 
-# get processes events.
+# get processes info.
 def getProcessesInfo():
     processEvents = cache.getDataframe('processesInfo.json')
     if processEvents is None:
@@ -146,7 +140,7 @@ def getUnfinishedProcessesDuration():
         unfinishedProcesses = cache.getData('unfinishedProcessesDurations.json')
     return unfinishedProcesses
 
-# get all events from cache file.
+# get all events dataframe from cache file.
 def getAllEvents():
     allEventsDataframe = cache.getDataframe('allEvents.json')
     if allEventsDataframe is None:
@@ -154,16 +148,17 @@ def getAllEvents():
         allEventsDataframe = cache.getDataframe('allEvents.json')
     return allEventsDataframe
 
-# get phases events from cache file.
+# get phases events dataframe from cache file.
 def getPhaseEvents():
+    phaseTag = utilities.getTagName("phaseTag")
     phaseEventsDataframe = cache.getDataframe('phaseEvents.json')
     if phaseEventsDataframe is None:
         update.refreshData()
         phaseEventsDataframe = cache.getDataframe('phaseEvents.json')
-    df[phaseTag] = df[phaseTag].astype(str)
+    phaseEventsDataframe[phaseTag] = phaseEventsDataframe[phaseTag].astype(str)
     return phaseEventsDataframe
 
-# get states events from cache file.
+# get states events dataframe from cache file.
 def getStateEvents():
     stateEventsDataframe = cache.getDataframe('stateEvents.json')
     if stateEventsDataframe is None:
@@ -171,7 +166,7 @@ def getStateEvents():
         stateEventsDataframe = cache.getDataframe('stateEvents.json')
     return stateEventsDataframe
 
-# get processes events from cache file.
+# get processes duration dataframe from cache file.
 def getProcessesDuration():
     processDurationDataframe = cache.getDataframe('processesDuration.json')
     if processDurationDataframe is None:
@@ -181,7 +176,7 @@ def getProcessesDuration():
     processDurationDataframe[codeSubjectTag] = processDurationDataframe[codeSubjectTag].astype(str)
     return processDurationDataframe
 
-# get processes events from cache file filtered by important process types, sections and subjects.
+# get processes duration dataframe from cache file filtered by important process types, sections and subjects.
 def getProcessesDurationFiltered():
     processDurationDataframeFiltered = cache.getDataframe('processesDurationFiltered.json')
     if processDurationDataframeFiltered is None:
@@ -189,11 +184,6 @@ def getProcessesDurationFiltered():
         processDurationDataframeFiltered = cache.getDataframe('processesDurationFiltered.json')
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     processDurationDataframeFiltered[codeSubjectTag] = processDurationDataframeFiltered[codeSubjectTag].astype(str)
-    importantSubjects = file.getDataFromTextFile('utils/preferences/importantSubjects.txt')
-    if importantSubjects != None and len(importantSubjects) > 0:
-        processDurationDataframeFiltered = processDurationDataframeFiltered[processDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
-    processDurationDataframeFiltered[codeSubjectTag] = processDurationDataframeFiltered[codeSubjectTag].astype(str)
-
     return processDurationDataframeFiltered
 
 # get states duration from cache file.
@@ -213,11 +203,6 @@ def getStatesDurationFiltered():
     if stateDurationDataframeFiltered is None:
         update.refreshData()
         stateDurationDataframeFiltered = cache.getDataframe('statesDurationFiltered.json')
-    codeSubjectTag = utilities.getTagName("codeSubjectTag")
-    importantSubjects = file.getDataFromTextFile('utils/preferences/importantSubjects.txt')
-    if importantSubjects != None and len(importantSubjects) > 0:
-        stateDurationDataframeFiltered[codeSubjectTag] = stateDurationDataframeFiltered[codeSubjectTag].astype(str)
-        stateDurationDataframeFiltered = stateDurationDataframeFiltered[stateDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     stateDurationDataframeFiltered[phaseTag] = stateDurationDataframeFiltered[phaseTag].astype(str)
     return stateDurationDataframeFiltered
 
@@ -233,16 +218,11 @@ def getPhasesDuration():
 
 # get phases duration from cache file filtered by important process types, sections and subjects.
 def getPhasesDurationFiltered():
-    codeSubjectTag = utilities.getTagName("codeSubjectTag")
     phaseTag = utilities.getTagName('phaseTag') 
     phaseDurationDataframeFiltered = cache.getDataframe('phasesDurationFiltered.json')
     if phaseDurationDataframeFiltered is None:
         update.refreshData()
         phaseDurationDataframeFiltered = cache.getDataframe('phasesDurationFiltered.json')
-    importantSubjects = file.getDataFromTextFile('utils/preferences/importantSubjects.txt')
-    if importantSubjects != None and len(importantSubjects) > 0:
-        phaseDurationDataframeFiltered[codeSubjectTag] = phaseDurationDataframeFiltered[codeSubjectTag].astype(str)
-        phaseDurationDataframeFiltered = phaseDurationDataframeFiltered[phaseDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     phaseDurationDataframeFiltered[phaseTag] = phaseDurationDataframeFiltered[phaseTag].astype(str)
     return phaseDurationDataframeFiltered
 
@@ -258,16 +238,11 @@ def getEventsDuration():
 
 # get events duration from cache file filtered by important process types, sections and subjects.
 def getEventsDurationFiltered():
-    codeSubjectTag = utilities.getTagName("codeSubjectTag")
     phaseTag = utilities.getTagName("phaseTag")
     eventDurationDataframeFiltered = cache.getDataframe('eventsDurationFiltered.json')
     if eventDurationDataframeFiltered is None:
         update.refreshData()
         eventDurationDataframeFiltered = cache.getDataframe('eventsDurationFiltered.json')
-    importantSubjects = file.getDataFromTextFile('utils/preferences/importantSubjects.txt')
-    if importantSubjects != None and len(importantSubjects) > 0:
-        eventDurationDataframeFiltered[codeSubjectTag] = eventDurationDataframeFiltered[codeSubjectTag].astype(str)
-        eventDurationDataframeFiltered = eventDurationDataframeFiltered[eventDurationDataframeFiltered[codeSubjectTag].isin(importantSubjects)]
     eventDurationDataframeFiltered[phaseTag] = eventDurationDataframeFiltered[phaseTag].astype(str)
     return eventDurationDataframeFiltered
 

@@ -81,7 +81,7 @@ def typeUpdate(df, type, typeChoices, tagChoice, first, avgChoice, text, section
     df_data = updateTypeData(newDF, sections, subjects, judges, finished)
     # parameters remaining choices are calculated based on user choices.
     [sections, subjects, judges, finished] = updateTypeDataBySelection(newDF, df_data, sections, subjects, judges, finished)
-    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoiceOrderByPhase(df_data, tagChoice, avgChoice)   
+    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoiceOrderedByPhase(df_data, tagChoice, avgChoice)   
     xticks = frame.getUniques(allData, tagChoice)
     # if it's an event graph color is unique, otherwise color is decised based on colorMap which associate to each phase a different color.
     if tagChoice == eventTag:
@@ -131,7 +131,7 @@ def typeSequenceUpdate(df, typeChoices, tagChoice, avgChoice, text, sections, su
     newDF = frame.selectFollowingRows(newDF, tagChoice, typeChoices)
     df_data = updateTypeData(newDF, sections, subjects, judges, finished) 
     [sections, subjects, judges, finished] = updateTypeDataBySelection(newDF, df_data, sections, subjects, judges, finished)
-    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoiceOrderByPhase(df_data, tagChoice, avgChoice)
+    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoiceOrderedByPhase(df_data, tagChoice, avgChoice)
     xticks = frame.getUniques(allData, tagChoice)
     if tagChoice == eventTag:
         if text == [textTag]:

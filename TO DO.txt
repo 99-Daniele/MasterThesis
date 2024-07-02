@@ -3,4 +3,5 @@
 - predittore condivisibile
 - errore grafico confronto
 - preference modifica
-- data updatemigliore visualizzazione
+- data update migliore visualizzazione
+- preference sezioni e tipo processi

@@ -365,7 +365,7 @@ def processComparisonUpdate(df, avgChoice, dateType, startDate, endDate, minDate
     # if user has selected a parameter to compare, a process comparison duration graph is shown.
     else:
         orderRadioStyle = {'display': 'block'}
-        [typeData, allData, infoData] = frame.getAvgDataFrameByType(newDF, avgChoice, dateType, choices, order, eventChoice, stateChoice, phaseChoice)
+        [typeData, allData, infoData] = frame.getAvgDataFrameByTypeChoices(newDF, avgChoice, dateType, choices, order, eventChoice, stateChoice, phaseChoice)
         xticks = frame.getUniques(allData, dateTag)
         if text == [textTag]:
             fig = px.line(allData, x = dateTag, y = durationTag, labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.95)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
@@ -489,7 +489,7 @@ def typeComparisonUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate
         # if user selects comparison parameter, comparison type duration graph is shown.
         else:
             orderRadioStyle = {'display': 'block'}
-            [typeData, allData, infoData] = frame.getAvgDataFrameByType(df_data, avgChoice, dateType, choices, order, None, None, None)
+            [typeData, allData, infoData] = frame.getAvgDataFrameByTypeChoices(df_data, avgChoice, dateType, choices, order, None, None, None)
             xticks = frame.getUniques(allData, dateTag)
             if text == [textTag]:
                 fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.95)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
@@ -529,7 +529,7 @@ def parameterComparisonUpdate(df, avgChoice, tag, sections, judges, subjects, mo
     newDF = df.copy()
     # newDF is calculated as df filtered based on user choices.
     newDF = updateProcessTypeData(newDF, sections, subjects, judges, months)
-    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoice(newDF, tag, avgChoice)
+    [allData, avgData] = frame.getAvgStdDataFrameByTypeQuantileFilter(newDF, tag, avgChoice)
     xticks = frame.getUniques(avgData, tag)
     # if text is selected by user then an histogram graph is shown, otherwise boxplot.
     if text == [textTag]:

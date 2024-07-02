@@ -1,6 +1,5 @@
 # this file handles operations on text and json files.
 
-import datetime as dt
 from io import StringIO
 import numpy as np
 import os
@@ -18,11 +17,6 @@ def removeFolder(directory):
     if os.path.isdir(directory):
         shutil.rmtree(directory)
 
-# remove file.
-def removeFile(filename):
-    if os.path.isfile(filename):
-        os.remove(filename)
-
 # get data from text file.
 # in case file not existing, return empty list.
 def getDataFromTextFile(filename):
@@ -32,17 +26,6 @@ def getDataFromTextFile(filename):
         return data
     except (FileNotFoundError):
         return []
-
-# get dataframe from text file.
-# in case file not existing, return None.
-def getDataframeFromTextFile(filename, tags):
-    try:
-        data = getDataFromTextFile(filename)
-        data = list(data[0])
-        dataframe = pd.DataFrame(data, columns = tags)
-        return dataframe, True
-    except:
-        return None, False
 
 # get data from json file.
 # in case file not existing, return empty dictionary.
@@ -82,14 +65,5 @@ def writeOnTextFile(filename, data):
 def writeOnJsonFile(filename, data):
     try:
         ujson.dump(data, open(filename, 'w'))
-    except (FileNotFoundError):
-        raise Exception("\n" + filename + " does not exists!")
-
-# write dataframe on json file.
-# in case file not existing, raise an exception.
-def writeDataframeOnJsonFile(filename, data):
-    try:
-        jsonData = data.to_json()
-        ujson.dump(jsonData, open(filename, 'w'))
     except (FileNotFoundError):
         raise Exception("\n" + filename + " does not exists!")

@@ -1,6 +1,7 @@
 # this is the main file.
 
 import dash as ds
+import os
 
 # display all events.
 def displayAllEventsScatter():
@@ -181,5 +182,8 @@ def startApp():
     import utils.App as app
     app.start()
 
+if not os.path.isdir('cache'):
+    restartData()
+
 if __name__ == '__main__':
-    displayStatePreferences()
+    startApp()

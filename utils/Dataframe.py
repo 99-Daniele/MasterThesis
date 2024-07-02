@@ -7,9 +7,11 @@ import textwrap
 import utils.FileOperation as file
 import utils.Utilities as utilities
 
-# importantProcessStates, importantSections and importantSubjects are taken from text file. This are type of events that are the most important. Thay can be changed or removed.
+# importantProcessStates, importantSections and importantSubjects are taken from text file. This are type of events that are the most important.
 importantProcessStates = file.getDataFromTextFile('utils/preferences/importantProcessStates.txt')
 importantSections = file.getDataFromTextFile('utils/preferences/importantSections.txt')
+importantSubjects = file.getDataFromTextFile('utils/preferences/importantSubjects.txt')
+
 
 # from events list create basic events dataframe. Later he will be integrated with subject, state, phase chosen by user.
 def createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, codeStateTag, codeSubjectTag, eventTag, numEventTag, numProcessTag, phaseDBTag, processDateTag, sectionTag, stateTag, subjectTag):
@@ -17,11 +19,14 @@ def createBasicEventsDataFrame(events, dateTag, codeEventTag, codeJudgeTag, code
     df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
     return df
 
-# from events list create events dataframe.
+# create events dataframe with only one end phase event for each process.
 def createEventsDataFrame(df, endPhase, dateTag, numEventTag, numProcessTag, phaseTag):
+    # divide df into dfEnd which have only end phase events and dfNotEnd which are the other events.
     dfNotEnd = df[df[phaseTag] != endPhase].reset_index(drop = True)
     dfEnd = df[df[phaseTag] == endPhase].reset_index(drop = True)
+    # dfEnd takes only the first event of each process.
     dfEnd = dfEnd.groupby(numProcessTag, as_index = False).first().reset_index(drop = True)
+    # then concant dfNotEnd and calculated dfEnd.
     df = pd.concat([dfNotEnd, dfEnd])
     df = df.dropna()
     df = df.sort_values(by = [numProcessTag, dateTag, numEventTag]).reset_index(drop = True)
@@ -46,32 +51,41 @@ def createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, descriptionTag, ri
 # from processes list create process duration dataframe.
 def createProcessDurationsDataFrame(process, dateTag, durationTag, eventSequenceTag, eventPhaseSequenceTag, finishedTag, codeJudgeTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseSequenceTag, sectionTag, stateSequenceTag, subjectTag, codeSubjectTag):
     df = pd.DataFrame(process, columns = [numProcessTag, durationTag, dateTag, numEventTag, codeJudgeTag, codeSubjectTag, subjectTag, sectionTag, finishedTag, stateSequenceTag, phaseSequenceTag, eventSequenceTag, eventPhaseSequenceTag, nextDateTag, nextIdTag])
+    df[codeSubjectTag] = df[codeSubjectTag].astype(str)
+    # filteredDf is df filtered by only important process states, important sections and important subjects.
     filteredDf = df.copy()
     if importantProcessStates != None and len(importantProcessStates) > 0:
         filteredDf = filteredDf[filteredDf[finishedTag].isin(importantProcessStates)]
     if importantSections != None and len(importantSections) > 0:
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
+    if importantSubjects != None and len(importantSubjects) > 0:
+        filteredDf = filteredDf[filteredDf[codeSubjectTag].isin(importantSubjects)]
     df = df.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
-    filteredDf = filteredDf.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
     df = df.dropna()
+    filteredDf = filteredDf.sort_values(by = [dateTag, numProcessTag]).reset_index(drop = True)
     filteredDf = filteredDf.dropna()
     return [df, filteredDf]
 
 # from events list create type duration dataframe.
 def createTypeDurationsDataFrame(events, codeEventTag, codeJudgeTag, codeSubjectTag, dateTag, durationTag, eventTag, finishedTag, nextDateTag, nextIdTag, numEventTag, numProcessTag, phaseTag, sectionTag, stateTag, codeStateTag, subjectTag):
     df = pd.DataFrame(events, columns = [numEventTag, numProcessTag, codeEventTag, eventTag, durationTag, dateTag, codeJudgeTag, codeStateTag, stateTag, phaseTag, codeSubjectTag, subjectTag, sectionTag, finishedTag, nextDateTag, nextIdTag])
+    df[codeSubjectTag] = df[codeSubjectTag].astype(str)
+    # filteredDf is df filtered by only important sections and important subjects.
     filteredDf = df.copy()
     if importantSections != None and len(importantSections) > 0:
         filteredDf = filteredDf[filteredDf[sectionTag].isin(importantSections)]
+    if importantSubjects != None and len(importantSubjects) > 0:
+        filteredDf = filteredDf[filteredDf[codeSubjectTag].isin(importantSubjects)]
     df = df.dropna()
     filteredDf = filteredDf.dropna()
     return [df, filteredDf]
 
-# from state names list create state names dataframe with info.
+# from states duration and state names list create state names dataframe with info.
 def createStateNameDataframeWithInfo(statesDuration, stateNames):
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
     codeStateTag = utilities.getTagName('codeStateTag')
+    # from statesDuration calculates mean duration and size of each state.
     statesDuration = statesDuration.groupby([codeStateTag]) \
         .agg({statesDuration.columns[2]: 'size', durationTag: 'mean'}) \
         .rename(columns = {statesDuration.columns[2]:countTag}) \
@@ -83,11 +97,12 @@ def createStateNameDataframeWithInfo(statesDuration, stateNames):
     result = result.sort_values([codeStateTag]).reset_index(drop = True)
     return result
 
-# from event names list create event names dataframe with info.
+# from events duration and event names list create event names dataframe with info.
 def createEventNameDataframeWithInfo(eventsDuration, eventNames):
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
     codeEventTag = utilities.getTagName('codeEventTag')
+    # from eventDuration calculates mean duration and size of each event.
     eventsDuration = eventsDuration.groupby([codeEventTag]) \
         .agg({eventsDuration.columns[2]: 'size', durationTag: 'mean'}) \
         .rename(columns = {eventsDuration.columns[2]:countTag}) \
@@ -99,11 +114,12 @@ def createEventNameDataframeWithInfo(eventsDuration, eventNames):
     result = result.sort_values([codeEventTag]).reset_index(drop = True)
     return result
 
-# from subject names list create subjects names dataframe with info.
+# from subject duration and subject names list create subject names dataframe with info.
 def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
     codeSubjectTag = utilities.getTagName('codeSubjectTag')
+    # from subjectsDuration calculates mean duration and size of each process subject.
     processDuration = processDuration.groupby([codeSubjectTag]) \
         .agg({processDuration.columns[2]: 'size', durationTag: 'mean'}) \
         .rename(columns = {processDuration.columns[2]:countTag}) \
@@ -114,23 +130,23 @@ def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
     result = result.sort_values([codeSubjectTag]).reset_index(drop = True)
     return result
 
-# return avg and tot dataframe.
-def getAvgTotDataframeByDate(df1, avgChoice):
+# from input df return another dataframe with size and mean/median duration group by date.
+def getAvgTotDataframeByDate(df, avgChoice):
     avgTag = utilities.getTagName('avgTag')
     countTag = utilities.getTagName('countTag')
     dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
     quantileTag = utilities.getTagName('quantileTag')
-    df1 = df1.sort_values([dateTag]).reset_index(drop = True)
+    df = df.sort_values([dateTag]).reset_index(drop = True)
     if avgChoice == avgTag:
-        df2 = df1.groupby([dateTag], as_index = False).mean()
+        df2 = df.groupby([dateTag], as_index = False).mean()
     else:
-        df2 = df1.groupby([dateTag], as_index = False).median()
-    df2[countTag] = df1.groupby([dateTag]).size().tolist()
-    df2[quantileTag] = df1.groupby([dateTag], as_index = False).quantile(0.75)[durationTag]
-    return [df1, df2]
+        df2 = df.groupby([dateTag], as_index = False).median()
+    df2[countTag] = df.groupby([dateTag]).size().tolist()
+    df2[quantileTag] = df.groupby([dateTag], as_index = False).quantile(0.75)[durationTag]
+    return [df, df2]
 
-# return data group by chosen data type.
+# return dataframe grouped by chosen data type.
 def getAvgStdDataFrameByDate(df, dataType, avgChoice):
     dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
@@ -175,8 +191,8 @@ def getAvgStdDataFrameByDate(df, dataType, avgChoice):
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getYearNumber(x))
         return getAvgTotDataframeByDate(df1, avgChoice)
 
-# return avg and tot dataframe.
-def getAvgTotDataframe(df, order_dict, avgChoice):
+# from input df return another dataframe with size and mean/median duration group by date and filter.
+def getAvgTotDataframeByDataAndFilter(df, order_dict, avgChoice):
     avgTag = utilities.getTagName('avgTag')
     countTag = utilities.getTagName('countTag')
     dateTag = utilities.getTagName('dateTag')
@@ -202,32 +218,42 @@ def getAvgTotDataframe(df, order_dict, avgChoice):
     df2 = df2.sort_values([dateTag]).reset_index(drop = True)
     return [df1, df2]
 
-# return data group by chosen data type and types.
-def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoice, stateChoice, phaseChoice):
+# return data group by user type and datetype choices.
+def getAvgDataFrameByTypeChoices(df, avgChoice, datetype, typesChoice, order, eventChoice, stateChoice, phaseChoice):
     avgTag = utilities.getTagName('avgTag')
     countTag = utilities.getTagName('countTag')
     dateTag = utilities.getTagName('dateTag')
     durationTag = utilities.getTagName('durationTag')
     eventTag = utilities.getTagName('eventTag')
     filterTag = utilities.getTagName('filterTag')
+    month = utilities.getPlaceholderName("month")
+    monthYear = utilities.getPlaceholderName("monthYear")
     phaseTag = utilities.getTagName('phaseTag')
     stateTag = utilities.getTagName('stateTag')
+    trimester = utilities.getPlaceholderName("trimester")
+    trimesterYear = utilities.getPlaceholderName("trimesterYear")
+    week = utilities.getPlaceholderName("week")
+    year = utilities.getPlaceholderName("year")
     if typesChoice == None or len(typesChoice) == 0:
         return None
     df5 = df.copy()
     types = typesChoice.copy()
+    # if user select event choice getEventDataframe() is called.
     if eventChoice != None and eventChoice in types:
         df5 = getEventDataFrame(df5, eventChoice)
         index = types.index(eventChoice)
         types[index] = eventTag
+    # if user select state choice getStateDataframe() is called.
     if stateChoice != None and stateChoice in types:
         df5 = getStateDataFrame(df5, stateChoice)
         index = types.index(stateChoice)
         types[index] = stateTag
+    # if user select phase choice getPhaseDataframe() is called.
     if phaseChoice != None and phaseChoice in types:
         df5 = getPhaseDataFrame(df5, phaseChoice)
         index = types.index(phaseChoice)
         types[index] = phaseTag
+    # group dataframe by chosen types.
     if avgChoice == avgTag:
         df4 = df5.groupby(types) \
             .agg({df5.columns[2]:'size', durationTag: 'mean'}) \
@@ -241,15 +267,19 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
     for t in types: 
         df4.drop(df4[df4[t] == 'null'].index, inplace = True)
     df3 = df4[[types[0], countTag, avgTag]].copy()
+    # df3 concatenates all chosen types into one column named filterTag.
     df3 = df3.rename(columns = {types[0]: filterTag})
     i = 1
     while i < len(types):
         df3[filterTag] = df3[filterTag].astype(str) + " - " + df4[types[i]].astype(str)
         i = i + 1
+    # df3 is filtered by only important data.
     df3 = keepOnlyImportant(df3, 0.5, 18)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
+    # order_dict and order_list frame the selected order of filter tag based on order user choice.
     order_dict = df3.set_index(filterTag)[order].to_dict()
     order_list = df3[filterTag].tolist()
+    # newDF concatenates all chosen types into one column named filterTag and order it.
     newDF = df5[[dateTag, durationTag, types[0]]].copy()
     newDF = newDF.rename(columns = {types[0]:filterTag})
     i = 1
@@ -257,45 +287,40 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
         newDF[filterTag] = newDF[filterTag].astype(str) + " - " + df5[types[i]].astype(str)
         i = i + 1
     newDF = newDF[newDF[filterTag].isin(order_list)]
-    month = utilities.getPlaceholderName("month")
-    monthYear = utilities.getPlaceholderName("monthYear")
-    trimester = utilities.getPlaceholderName("trimester")
-    trimesterYear = utilities.getPlaceholderName("trimesterYear")
-    week = utilities.getPlaceholderName("week")
-    year = utilities.getPlaceholderName("year")
+    # based on user date choices aggregate newDF.
     if datetype == week:
         newDF[dateTag] = newDF[dateTag].map(lambda x: utilities.getWeekNumber(x))
-        [df1, df2] = getAvgTotDataframe(newDF, order_dict, avgChoice)
+        [df1, df2] = getAvgTotDataframeByDataAndFilter(newDF, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getWeek(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getWeek(x))
         return [df1, df2, df3]
     elif datetype == month:
         newDF[dateTag] = newDF[dateTag].map(lambda x: utilities.getMonthNumber(x))
-        [df1, df2] = getAvgTotDataframe(newDF, order_dict, avgChoice)
+        [df1, df2] = getAvgTotDataframeByDataAndFilter(newDF, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getMonth(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getMonth(x))
         return [df1, df2, df3]
     elif datetype == monthYear:
         newDF[dateTag] = newDF[dateTag].map(lambda x: utilities.getMonthYearDate(x))
-        [df1, df2] = getAvgTotDataframe(newDF, order_dict, avgChoice)
+        [df1, df2] = getAvgTotDataframeByDataAndFilter(newDF, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getMonthYear(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getMonthYear(x))
         return [df1, df2, df3]
     elif datetype == trimester:
         newDF[dateTag] = newDF[dateTag].map(lambda x: utilities.getTrimesterDate(x))
-        [df1, df2] = getAvgTotDataframe(newDF, order_dict, avgChoice)
+        [df1, df2] = getAvgTotDataframeByDataAndFilter(newDF, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getTrimester(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getTrimester(x))
         return [df1, df2, df3]
     elif datetype == trimesterYear:
         newDF[dateTag] = newDF[dateTag].map(lambda x: utilities.getTrimesterYearDate(x))
-        [df1, df2] = getAvgTotDataframe(newDF, order_dict, avgChoice)
+        [df1, df2] = getAvgTotDataframeByDataAndFilter(newDF, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getTrimesterYear(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getTrimesterYear(x))
         return [df1, df2, df3]
     elif datetype == year:
         newDF[dateTag] = newDF[dateTag].map(lambda x: utilities.getYearNumber(x))
-        [df1, df2] = getAvgTotDataframe(newDF, order_dict, avgChoice)
+        [df1, df2] = getAvgTotDataframeByDataAndFilter(newDF, order_dict, avgChoice)
         return [df1, df2, df3]
         
 # return data group by chosen type.
@@ -325,8 +350,8 @@ def getAvgStdDataFrameByType(df, typeChoice, avgChoice):
     df2[typeChoice] = df2[typeChoice].astype(str)
     return [df1, df2]
 
-# return data group by chosen type order by phase.
-def getAvgStdDataFrameByTypeChoiceOrderByPhase(df, typeChoice, avgChoice):
+# return data group by chosen type ordered by phase.
+def getAvgStdDataFrameByTypeChoiceOrderedByPhase(df, typeChoice, avgChoice):
     avgTag = utilities.getTagName('avgTag')
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
@@ -354,8 +379,8 @@ def getAvgStdDataFrameByTypeChoiceOrderByPhase(df, typeChoice, avgChoice):
     df2[typeChoice] = df2[typeChoice].astype(str)
     return [df1, df2]
 
-# return data group by chosen type.
-def getAvgStdDataFrameByTypeChoice(df, typeChoice, avgChoice):
+# return data group by chosen type filtered by quantile. Remove all outlier value.
+def getAvgStdDataFrameByTypeQuantileFilter(df, typeChoice, avgChoice):
     avgTag = utilities.getTagName('avgTag')
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
@@ -446,7 +471,7 @@ def getYearDataFrame(df, years):
     newDF[dateTag] = newDF[dateTag].map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year)
     return newDF[newDF[dateTag].isin(years)]
 
-# return dataframe rows where date is between given stratDate and endDate.
+# return dataframe rows where date is between given startDate and endDate.
 def getDateDataFrame(df, type, startDate, endDate):
     if startDate == None or endDate == None:
         return df
@@ -568,19 +593,6 @@ def addTotCountToName(df, countTag):
     newName = all + " (" + str(totCount) + ")"
     return newName
 
-# return index of dataframe selected rows.
-def getSelectedRows(df, selection, tag):
-    newDF = df.copy()
-    newDF = newDF[newDF[tag].isin(selection)]
-    selectedRows = list(newDF.index)
-    return selectedRows
-
-# return dataframe rows from given index.
-def getRowsFromIndex(df, index):
-    newDF = df.copy()
-    newDF = newDF.iloc[index]
-    return newDF
-
 # return joins of dataframe
 def joinDataframe(df1, df2, tagJoin, dropJoin1, dropJoin2):
     newDF_1 = df1.copy()
@@ -592,7 +604,7 @@ def joinDataframe(df1, df2, tagJoin, dropJoin1, dropJoin2):
     newDf = newDF_1.join(newDF_2.set_index(tagJoin), on = tagJoin)
     return newDf
 
-# select following rows of chosen event.
+# return following rows of chosen event/state/phase.
 def selectFollowingRows(df, tag, tagChoices):
     nextIdTag = utilities.getTagName("nextIdTag")
     numEventTag = utilities.getTagName('numEventTag')
