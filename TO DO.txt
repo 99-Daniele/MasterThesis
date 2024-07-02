@@ -1,8 +1,6 @@
 - disponibile per accesso esterno --> descrizione readme
 - documentazione
 
-- dimensione grafici
 - font size
 
 - errore grafico confronto
-- preference sezioni e tipo processi

@@ -214,8 +214,8 @@ def getProcessEvents(events, startProcessEvent, stallStates, endPhase, codeEvent
             if events[i][numProcessTag] != processId:
                 # start is set to false until a start event is found.
                 start = False
-                # if start event is found, previous process is added to allProcessEvents and a new process loop starts.
-                if events[i][codeEventTag] == startProcessEvent:
+                # if start event or stall state is found, previous process is added to allProcessEvents and a new process loop starts.
+                if events[i][codeEventTag] == startProcessEvent or events[i][codeStateTag] in stallStates:
                     allProcessEvents.append(processEvents)
                     # if process has at least one event, allProcessDict, judgeDict, sectionDict, subjectDict are updated with process data. 
                     if len(durationSequenceComplete) > 0:
@@ -225,17 +225,6 @@ def getProcessEvents(events, startProcessEvent, stallStates, endPhase, codeEvent
                     start = True
                     end = False
                     continuative = False
-                # if stall state is found, previous process is added to allProcessEvents and a new process loop starts with continuative = True.
-                elif  events[i][codeStateTag] in stallStates:
-                    allProcessEvents.append(processEvents)
-                    # if process has at least one event, allProcessDict, judgeDict, sectionDict, subjectDict are updated with process data. 
-                    if len(durationSequenceComplete) > 0:
-                        [allProcessDict, judgeDict, sectionDict, subjectDict] = updateDict(dfColumns, allProcessDict, judgeDict, sectionDict, subjectDict, durationSequenceComplete, processEventSequenceComplete, processStateSequenceComplete, processPhaseSequenceComplete, processId, processStartDate, distance, processCodeJudge, processSubjectCode, processSection, processFinished, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, eventTag, finishedTag, numProcessTag, phaseDBTag, sectionTag, stateTag)
-                    # new process info are reset for new loop.                    
-                    [processId, processCodeJudge, processSubjectCode, processSection, processStartDate, processStartDateDt, distance, processFinished, processEventSequence, processPhaseSequence, processStateSequence, eventDurationSequence, phaseDurationSequence, stateDurationSequence, processEventSequenceComplete, processPhaseSequenceComplete, processStateSequenceComplete, durationSequenceComplete, processEvents] = reset(events, i, codeJudgeTag, codeSubjectTag, dateTag, eventsTag, finishedTag, numProcessTag, sectionTag, subjectTag)
-                    start = True
-                    end = False
-                    continuative = True
             # when end = False and start = True means that process loop holds.
             if not end and start:
                 # if i-th event state is a stall state then process is set as continuative.
@@ -334,7 +323,7 @@ def findFirstEvent(events, startProcessEvent, codeEventTag, codeJudgeTag, events
             processEvents = {numProcessTag: processId, codeJudgeTag: processCodeJudge, codeSubjectTag: processSubjectCode, subjectTag: processSubject, sectionTag: processSection, finishedTag: processFinished, eventsTag: []}
             break
         i += 1
-    return [i, processId, processCodeJudge, processSubjectCode, processSubject, processSection, processFinished, processStartDate, distance, processStartDateDt, processEvents]
+    return [i, processId, processCodeJudge, processSubjectCode, processSection, processFinished, processStartDate, distance, processStartDateDt, processEvents]
 
 # reset initialize new process info values and set lists as [].
 def reset(events, i, codeJudgeTag, codeSubjectTag, dateTag, eventsTag, finishedTag, numProcessTag, sectionTag, subjectTag):
@@ -358,7 +347,7 @@ def reset(events, i, codeJudgeTag, codeSubjectTag, dateTag, eventsTag, finishedT
     processStateSequenceComplete = []
     durationSequenceComplete = []
     processEvents = {numProcessTag: processId, codeJudgeTag: processCodeJudge, codeSubjectTag: processSubjectCode, subjectTag: processSubject, sectionTag: processSection, finishedTag: processFinished, eventsTag: []}
-    return [processId, processCodeJudge, processSubjectCode, processSubject, processSection, processStartDate, processStartDateDt, distance, processFinished, processEventSequence, processPhaseSequence, processStateSequence, eventDurationSequence, phaseDurationSequence, stateDurationSequence, processEventSequenceComplete, processPhaseSequenceComplete, processStateSequenceComplete, durationSequenceComplete, processEvents]
+    return [processId, processCodeJudge, processSubjectCode, processSection, processStartDate, processStartDateDt, distance, processFinished, processEventSequence, processPhaseSequence, processStateSequence, eventDurationSequence, phaseDurationSequence, stateDurationSequence, processEventSequenceComplete, processPhaseSequenceComplete, processStateSequenceComplete, durationSequenceComplete, processEvents]
 
 # update dictionaries based on collected process info.
 def updateDict(dfColumns, allProcessDict, judgeDict, sectionDict, subjectDict, durationSequenceComplete, processEventSequenceComplete, processStateSequenceComplete, processPhaseSequenceComplete, processId, processStartDate, distance, processCodeJudge, processSubjectCode, processSection, processFinished, codeJudgeTag, codeSubjectTag, countTag, dateTag, distanceTag, durationTag, durationFinalTag, eventTag, finishedTag, numProcessTag, phaseDBTag, sectionTag, stateTag):

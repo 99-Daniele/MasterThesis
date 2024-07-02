@@ -33,19 +33,19 @@ def createEventsDataFrame(df, endPhase, dateTag, numEventTag, numProcessTag, pha
     return df
 
 # from events info list create events info dataframe.
-def createEventsInfoDataFrame(eventsInfo, codeEventTag, descriptionTag, eventTag):
-    df = pd.DataFrame(eventsInfo, columns = [codeEventTag, descriptionTag, eventTag])
+def createEventsInfoDataFrame(eventsInfo, codeEventTag, eventTag):
+    df = pd.DataFrame(eventsInfo, columns = [codeEventTag, eventTag])
     return df
 
 # from states info list create states info dataframe.
-def createStatesInfoDataFrame(statesInfo, codeStateTag, descriptionTag, phaseTag, phaseDBTag, stateTag):
-    df = pd.DataFrame(statesInfo, columns = [codeStateTag, descriptionTag, stateTag, phaseDBTag, phaseTag])
+def createStatesInfoDataFrame(statesInfo, codeStateTag, phaseTag, phaseDBTag, stateTag):
+    df = pd.DataFrame(statesInfo, columns = [codeStateTag, stateTag, phaseDBTag, phaseTag])
     df[phaseTag] = df[phaseTag].fillna(0)
     return df
 
 # from events info list create events info dataframe.
-def createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, descriptionTag, ritualTag, subjectTag):
-    df = pd.DataFrame(subjectsInfo, columns = [codeSubjectTag, descriptionTag, subjectTag, ritualTag])
+def createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, ritualTag, subjectTag):
+    df = pd.DataFrame(subjectsInfo, columns = [codeSubjectTag, subjectTag, ritualTag])
     return df
 
 # from processes list create process duration dataframe.

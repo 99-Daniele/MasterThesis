@@ -13,12 +13,12 @@ connection = connect.getDatabaseConnection()
 # queries to obtain data from database.
 endPhaseQuery = "SELECT FKFASEPROCESSO FROM tipostato WHERE CCODST = 'DF'"
 eventsQuery = "SELECT e.numEvento, e.numProcesso, e.codice, te.CDESCR, e.giudice, DATE_FORMAT(e.data,'%Y-%m-%d %H:%i:%S'), e.statofinale, ts.CDESCR, ts.FKFASEPROCESSO, p.codiceMateria, p.materia, p.sezione FROM eventi AS e JOIN (SELECT p.numProcesso AS numProcesso, p.materia AS codiceMateria, tm.DESCCOMPLETA AS materia, p.sezione AS sezione FROM processi AS p JOIN tipomaterie AS tm ON p.materia = tm.codice) AS p ON e.numProcesso = p.numProcesso JOIN tipoeventi AS te ON e.codice = te.CCDOEV JOIN tipostato AS ts ON e.statofinale = ts.CCODST ORDER BY numProcesso, data, numEvento"
-eventsInfoQuery = "SELECT CCDOEV, CDESCR, CDESCR, FROM tipoeventi"
+eventsInfoQuery = "SELECT CCDOEV, CDESCR FROM tipoeventi"
 minDateQuery = "SELECT DATE_FORMAT(MIN(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 maxDateQuery = "SELECT DATE_FORMAT(MAX(data),'%Y-%m-%d %H:%i:%S') FROM eventi"
 stallStatesQuery = "SELECT CCODST FROM tipostato WHERE FKFASEPROCESSO IS NULL"
-statesInfoQuery = "SELECT CCODST, CDESCR, CDESCR, FKFASEPROCESSO, IFNULL(CAST(FKFASEPROCESSO AS SIGNED), 0) FROM tipostato"
-subjectsInfoQuery = "SELECT codice, DESCCOMPLETA, DESCCOMPLETA, rituale FROM tipomaterie"
+statesInfoQuery = "SELECT CCODST, CDESCR, FKFASEPROCESSO, IFNULL(CAST(FKFASEPROCESSO AS SIGNED), 0) FROM tipostato"
+subjectsInfoQuery = "SELECT codice, DESCCOMPLETA, rituale FROM tipomaterie"
 
 # get min date from all events of user database.
 def getMinDate():
@@ -71,39 +71,36 @@ def getEventsDataframe():
 # get events info dataframe.
 def getEventsInfo():
     codeEventTag = utilities.getTagName("codeEventTag")
-    descriptionTag = utilities.getTagName("descriptionTag")
     eventTag = utilities.getTagName("eventTag")
     eventsInfoDataframe = cache.getDataframe('eventsInfo.json')
     if eventsInfoDataframe is None:
         eventsInfo = connect.getDataFromDatabase(connection, eventsInfoQuery)
-        eventsInfoDataframe = frame.createEventsInfoDataFrame(eventsInfo, codeEventTag, descriptionTag, eventTag)
+        eventsInfoDataframe = frame.createEventsInfoDataFrame(eventsInfo, codeEventTag, eventTag)
         cache.updateCacheDataframe('eventsInfo.json', eventsInfoDataframe)
     return eventsInfoDataframe
 
 # get states info dataframe.
 def getStatesInfo():
     codeStateTag = utilities.getTagName("codeStateTag")
-    descriptionTag = utilities.getTagName("descriptionTag")
     phaseTag = utilities.getTagName("phaseTag")
     phaseDBTag = utilities.getTagName("phaseDBTag")
     stateTag = utilities.getTagName("stateTag")
     statesInfoDataframe = cache.getDataframe('statesInfo.json')
     if statesInfoDataframe is None:
         statesInfo = connect.getDataFromDatabase(connection, statesInfoQuery)
-        statesInfoDataframe = frame.createStatesInfoDataFrame(statesInfo, codeStateTag, descriptionTag, phaseTag, phaseDBTag, stateTag)
+        statesInfoDataframe = frame.createStatesInfoDataFrame(statesInfo, codeStateTag, phaseTag, phaseDBTag, stateTag)
         cache.updateCacheDataframe('statesInfo.json', statesInfoDataframe)
     return statesInfoDataframe
 
 # get subjects info dataframe.
 def getSubjectsInfo():
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
-    descriptionTag = utilities.getTagName("descriptionTag")
     ritualTag = utilities.getTagName("ritualTag") 
     subjectTag = utilities.getTagName("subjectTag")
     subjectsInfoDataframe = cache.getDataframe('subjectsInfo.json')
     if subjectsInfoDataframe is None:
         subjectsInfo = connect.getDataFromDatabase(connection, subjectsInfoQuery)
-        subjectsInfoDataframe = frame.createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, descriptionTag, ritualTag, subjectTag)
+        subjectsInfoDataframe = frame.createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, ritualTag, subjectTag)
         cache.updateCacheDataframe('subjectsInfo.json', subjectsInfoDataframe)
     subjectsInfoDataframe[codeSubjectTag] = subjectsInfoDataframe[codeSubjectTag].astype(str)
     return subjectsInfoDataframe
