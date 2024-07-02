@@ -29,54 +29,54 @@ def displayStateEventsScatter():
     ])
     app.run_server(debug = True)
 
-# display processes comparation graph.
-def displayProcessComparation():
-    import pages.comparationGraph.ProcessComparation as processComparationPage
+# display processes comparison graph.
+def displayProcessComparison():
+    import pages.comparisonGraph.ProcessComparison as processComparisonPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
-        ds.html.Div(children = processComparationPage.pageLayout())
+        ds.html.Div(children = processComparisonPage.pageLayout())
     ])
     app.run_server(debug = True)
 
-# display phases comparation graph.
-def displayPhaseComparation():
-    import pages.comparationGraph.PhaseComparation as phaseComparationPage
+# display phases comparison graph.
+def displayPhaseComparison():
+    import pages.comparisonGraph.PhaseComparison as phaseComparisonPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
-        ds.html.Div(children = phaseComparationPage.pageLayout())
+        ds.html.Div(children = phaseComparisonPage.pageLayout())
     ])
     app.run_server(debug = True)
 
-# display states comparation graph.
-def displayStateComparation():
-    import pages.comparationGraph.StateComparation as stateComparationPage
+# display states comparison graph.
+def displayStateComparison():
+    import pages.comparisonGraph.StateComparison as stateComparisonPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
-        ds.html.Div(children = stateComparationPage.pageLayout())
+        ds.html.Div(children = stateComparisonPage.pageLayout())
     ])
     app.run_server(debug = True)
 
-# display events comparation graph.
-def displayEventComparation():
-    import pages.comparationGraph.EventComparation as eventComparationPage
+# display events comparison graph.
+def displayEventComparison():
+    import pages.comparisonGraph.EventComparison as eventComparisonPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
-        ds.html.Div(children = eventComparationPage.pageLayout())
+        ds.html.Div(children = eventComparisonPage.pageLayout())
     ])
     app.run_server(debug = True)
 
-# display types comparation graph.
-def displayTypeComparation():
-    import pages.comparationGraph.TypeComparation as typeComparationPage
+# display types comparison graph.
+def displayTypeComparison():
+    import pages.comparisonGraph.ProcessComparisonByType as typeComparisonPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
-        ds.html.Div(children = typeComparationPage.pageLayout())
+        ds.html.Div(children = typeComparisonPage.pageLayout())
     ])
     app.run_server(debug = True)
 
 # display state events graph.
 def displayStatesEvents():
-    import pages.typeEventGraph.StateEvents as stateEventsPage
+    import pages.compositionGraph.StateEvents as stateEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = stateEventsPage.pageLayout())
@@ -85,7 +85,7 @@ def displayStatesEvents():
 
 # display phase events graph.
 def displayPhasesEvents():
-    import pages.typeEventGraph.PhaseEvents as phaseEventsPage
+    import pages.compositionGraph.PhaseEvents as phaseEventsPage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = phaseEventsPage.pageLayout())
@@ -94,7 +94,7 @@ def displayPhasesEvents():
 
 # display state sequence graph.
 def displayStatesSequence():
-    import pages.typeEventGraph.StateSequence as stateSequencePage
+    import pages.compositionGraph.StateSequence as stateSequencePage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = stateSequencePage.pageLayout())
@@ -103,7 +103,7 @@ def displayStatesSequence():
 
 # display phase sequence graph.
 def displayPhaseSequence():
-    import pages.typeEventGraph.PhaseSequence as phaseSequencePage
+    import pages.compositionGraph.PhaseSequence as phaseSequencePage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = phaseSequencePage.pageLayout())
@@ -112,7 +112,7 @@ def displayPhaseSequence():
 
 # display event sequence graph.
 def displayEventSequence():
-    import pages.typeEventGraph.EventSequence as eventSequencePage
+    import pages.compositionGraph.EventSequence as eventSequencePage
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
         ds.html.Div(children = eventSequencePage.pageLayout())
@@ -182,4 +182,4 @@ def startApp():
     app.start()
 
 if __name__ == '__main__':
-    predictTest()
+    displayStatePreferences()

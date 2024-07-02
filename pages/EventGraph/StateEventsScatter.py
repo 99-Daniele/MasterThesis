@@ -7,11 +7,10 @@ import plotly.express as px
 import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.Getters as getter
-import utils.graph.EventsGraph as event
 import utils.Utilities as utilities
+import utils.graph.EventsGraph as event
 
 # get dataframe with state events. 
-# get must states from text file.
 df = getter.getStateEvents()
 codeStateTag = utilities.getTagName("codeStateTag")
 stateTag = utilities.getTagName("stateTag")
@@ -27,6 +26,9 @@ def pageLayout():
     sectionTag = utilities.getTagName('sectionTag')
     subject = utilities.getPlaceholderName('subject')  
     subjectTag = utilities.getTagName('subjectTag') 
+    # maxYear is the year of the las registered event. 
+    # The time interval selected for initial analysis is the year preceding maxYear.
+    # So start date is 1/1/(maxYear - 1) and end date is 1/1/maxYear.
     maxYear = dt.datetime.strptime(df[dateTag].max(), '%Y-%m-%d %H:%M:%S').year
     maxDateStart = dt.date(maxYear - 1, 1, 1)
     maxDateEnd = dt.date(maxYear, 1, 1)
@@ -37,7 +39,7 @@ def pageLayout():
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('EVENTS VISUALIZATION GRAPH', href='/eventgraph'),
+        ds.dcc.Link('EVENTS VISUALIZATION GRAPH', href='/event'),
         ds.html.H2('VISUALIZATION OF PROCESS STATE EVENTS'),
         ds.dcc.DatePickerRange(
             id = 'event-dateranger-ses',
@@ -75,9 +77,8 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
+    # filter important states chosen by user. Those are taken from stored file.
     importantStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
     if importantStates != None and len(importantStates) > 0:
-        df_temp = df[df[codeStateTag].isin(importantStates)]
-    else:
-        df_temp = df
-    return event.eventUpdate(df_temp, startDate, endDate, False, stateTag, minDate, maxDate, sections, subjects, judges)
+        df = df[df[codeStateTag].isin(importantStates)]
+    return event.eventUpdate(df, startDate, endDate, False, stateTag, minDate, maxDate, sections, subjects, judges)

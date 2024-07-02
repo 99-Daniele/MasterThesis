@@ -127,6 +127,8 @@ def getProcessState(state):
 
 # transform list into string by "," join.
 def fromListToString(list):
+    if len(list) == 0:
+        return ""
     string = ",".join(str(l) for l in list)
     return string
 

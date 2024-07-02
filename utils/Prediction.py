@@ -4,20 +4,20 @@ from alive_progress import alive_bar
 import pandas as pd
 import random as rd
 from sklearn.tree import DecisionTreeRegressor
-import sklearn.metrics as mtx
 
 import utils.Dataframe as frame
 import utils.Utilities as utilities
 
 # predict duration of finished processes based on current events flow. This evaluate the error of the model.
+# 
 def predictDurationsTest8020(df, codeJudgeTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag):
     columns = df.columns.values.tolist()
-    columns.remove(codeJudgeTag)
-    columns.remove(codeSubjectTag)
-    columns.remove(sectionTag)
     columns.remove(numProcessTag)
     columns.remove(finishedTag)
     columns.remove(durationFinalTag)
+    columns.remove(codeJudgeTag)
+    columns.remove(codeSubjectTag)
+    columns.remove(sectionTag)
     columns.remove(dateTag)
     numProcesses = frame.getUniques(df, numProcessTag).tolist()
     rd.shuffle(numProcesses)
@@ -25,11 +25,12 @@ def predictDurationsTest8020(df, codeJudgeTag, codeSubjectTag, countTag, dateTag
     trainNumProcesses = numProcesses[lTrain:]
     testNumProcesses = list(set(numProcesses) - set(trainNumProcesses))
     predictions = []
+    trainDf = df[df[numProcessTag].isin(trainNumProcesses)].copy()
     with alive_bar(int(len(testNumProcesses))) as bar:
-        for i in range(int(len(testNumProcesses))):
+        for i in range(int(len(testNumProcesses))):                
             testDF = df[df[numProcessTag] == testNumProcesses[i]].copy()
             lTest = len(testDF)
-            r = rd.randint(0, lTest - 1)
+            r = rd.randint(0, lTest - 2)
             testDF_temp = testDF.iloc[r]
             judge = testDF_temp[codeJudgeTag]
             subject = testDF_temp[codeSubjectTag]
@@ -37,7 +38,8 @@ def predictDurationsTest8020(df, codeJudgeTag, codeSubjectTag, countTag, dateTag
             processID = testDF_temp[numProcessTag]
             count = testDF_temp[countTag]
             currDuration = testDF_temp[durationTag]
-            trainDF_temp = df[df[numProcessTag].isin(trainNumProcesses)].copy()
+            date = testDF_temp[dateTag]
+            trainDF_temp = trainDf[trainDf[numProcessTag].isin(trainNumProcesses)].copy()
             if len(trainDF_temp[trainDF_temp[sectionTag] == section]) > 0:
                 trainDF_temp = trainDF_temp[trainDF_temp[sectionTag] == section]
             if len(trainDF_temp[trainDF_temp[codeJudgeTag] == judge]) > 0:
@@ -50,20 +52,16 @@ def predictDurationsTest8020(df, codeJudgeTag, codeSubjectTag, countTag, dateTag
                 trainY = trainDF_temp[[durationFinalTag]]
                 testX = testDF_temp[columns]
                 testY = testDF_temp[[durationFinalTag]]
-                currDuration = testX[durationTag]
                 finalDuration = currDuration + testY[durationFinalTag]
-                model = De()
-                model.fit(trainX.values, trainY)
+                model  = DecisionTreeRegressor()
+                model.fit(trainX.values, trainY.values)
                 predictedDuration = model.predict([testX.values])[0]
-                predictedFinalDuration = currDuration + predictedDuration
+                predictedFinalDuration = currDuration + predictedDuration 
                 if finalDuration > 0:
                     error = abs(predictedFinalDuration - finalDuration) * 100 / finalDuration
-                    predictions.extend([{numProcessTag: str(processID), countTag: str(count), durationTag: str(currDuration), durationFinalTag: str(finalDuration), durationPredictedTag: str(predictedFinalDuration), errorTag: error}])
+                    predictions.extend([{numProcessTag: str(processID), dateTag: date, countTag: str(count), durationTag: str(currDuration), durationFinalTag: str(finalDuration), durationPredictedTag: str(predictedFinalDuration), errorTag: error}])
             bar() 
     predictionDf = pd.DataFrame(predictions)
-    errorR2 = mtx.r2_score(predictionDf[durationFinalTag], predictionDf[durationPredictedTag])
-    meanError = mtx.mean_absolute_percentage_error(predictionDf[durationFinalTag], predictionDf[durationPredictedTag])
-    print(errorR2, meanError)
     return predictionDf
 
 # predict duration of finished processes based on current events flow. This evaluate the error of the model.

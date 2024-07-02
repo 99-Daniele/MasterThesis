@@ -6,12 +6,14 @@ import pandas as pd
 import utils.FileOperation as file
 import utils.Getters as getter
 import utils.Utilities as utilities
+import utils.graph.TypeEventsPreference as typeEvents
 
 # get dataframe with events names. 
 df = getter.getEventNamesDataframe()
 codeEventTag = utilities.getTagName('codeEventTag')
 countTag = utilities.getTagName('countTag')
-df_temp = df[df[countTag] > 0]
+# for better readability only events that are registered at least one time in the database are shown.
+df = df[df[countTag] > 0]
 
 # return initial layout of page.
 def pageLayout():
@@ -28,7 +30,7 @@ def pageLayout():
         ds.html.H2('EVENTS USER PREFERENCES'),
         ds.html.Button("DOWNLOAD", id = 'download-button-ep'),
         ds.dash_table.DataTable(
-            df_temp.to_dict('records'), columns = [
+            df.to_dict('records'), columns = [
                 {'name': code, 'id': codeEventTag, 'editable': False}, 
                 {'name': event, 'id': eventTag, 'editable': False},  
                 {'name': count, 'id': countTag, 'editable': False},  
@@ -55,21 +57,5 @@ def update_dateframe(importantIndex, downloadButton, data):
     if ds.ctx.triggered_id != None and 'download-button' in ds.ctx.triggered_id:
         dataDF = pd.DataFrame(data)
         dataDF.to_csv('cache/eventsInfo.csv')
-    oldImportantEvents = file.getDataFromTextFile('utils/preferences/importantEvents.txt')
-    if oldImportantEvents == None:
-        oldImportantIndex = []
-    else:
-        oldImportantIndex = []
-        for i in range(len(data)):
-            d = data[i]
-            if d.get(codeEventTag) in oldImportantEvents:
-                oldImportantIndex.extend([i])
-    if ds.ctx.triggered_id == None:
-        importantIndex = oldImportantIndex
-    else:
-        if importantIndex == None:
-            importantIndex = []
-        importantEvents = [data[x].get(codeEventTag) for x in importantIndex]
-        if len(list(set(importantEvents) - set(oldImportantEvents))) > 0 or len(list(set(oldImportantEvents) - set(importantEvents))) > 0:
-            file.writeOnTextFile('utils/preferences/importantEvents.txt', utilities.fromListToString(importantEvents))
+    typeEvents.updateImportant(data, codeEventTag, importantIndex, 'utils/preferences/importantEvents.txt')
     return importantIndex

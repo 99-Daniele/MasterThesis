@@ -19,7 +19,7 @@ def connectToDatabase(h, usr, psw, db):
     return connection
 
 # return database connection with user credentials. 
-# the first time user must write his credentials which are then saved in a file. After that is no longer needed to input credentials.
+# the first time user must write his credentials which are then saved in a file. After that credentials are retrieved from file.
 def getDatabaseConnection():
     if os.path.isfile('utils/Database/databaseCredentials.json'):
         credentials = file.getDataFromJsonFile('utils/Database/databaseCredentials.json')

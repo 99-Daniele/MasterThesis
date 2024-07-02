@@ -6,11 +6,11 @@ import dash as ds
 def pageLayout():
     layout = ds.html.Div([
         ds.html.H2('HOME'),
-        ds.dcc.Link('EVENTS VISUALIZATION GRAPHS', href = '/eventgraph'),
+        ds.dcc.Link('EVENTS VISUALIZATION GRAPHS', href = '/event'),
         ds.html.Br(),
-        ds.dcc.Link('DURATION COMPARISON GRAPHS', href = '/comparationgraph'),
+        ds.dcc.Link('DURATION COMPARISON GRAPHS', href = '/comparison'),
         ds.html.Br(),
-        ds.dcc.Link('COMPOSITION GRAPHS', href = '/typeevent'),
+        ds.dcc.Link('COMPOSITION GRAPHS', href = '/composition'),
         ds.html.Br(),
         ds.dcc.Link('USER PARAMETERS PREFERENCES', href = '/preference'),
         ds.html.Br(),

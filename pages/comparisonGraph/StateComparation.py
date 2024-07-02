@@ -1,4 +1,4 @@
-# this page shows phases duration and comparation.
+# this page shows states duration and comparison.
 
 import dash as ds
 import pandas as pd
@@ -7,23 +7,22 @@ import plotly.express as px
 import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.Getters as getter
-import utils.graph.ComparationGraph as comparation
 import utils.Utilities as utilities
+import utils.graph.ComparisonGraph as comparison
 
-# get dataframe with all phases duration.
+# get dataframe with all states duration.
 df = getter.getStatesDurationFiltered()
 codeStateTag = utilities.getTagName('codeStateTag') 
-phaseTag = utilities.getTagName('phaseTag') 
 stateTag = utilities.getTagName('stateTag') 
 
 # return initial layout of page.
 def pageLayout():
     avgTag = utilities.getTagName('avgTag') 
+    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     countTag = utilities.getTagName('countTag') 
     dateTag = utilities.getTagName('dateTag') 
     finishedTag = utilities.getTagName('finishedTag') 
     judge = utilities.getPlaceholderName('judge') 
-    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     median = utilities.getPlaceholderName('median') 
     month = utilities.getPlaceholderName('month')
     monthYear = utilities.getPlaceholderName('monthYear') 
@@ -38,20 +37,22 @@ def pageLayout():
     trimesterYear = utilities.getPlaceholderName('trimesterYear')
     week = utilities.getPlaceholderName('week')
     year = utilities.getPlaceholderName('year') 
+    # filter important states chosen by user. Those are taken from stored file.
     importantStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
     if importantStates != None and len(importantStates) > 0:
-        df_temp = df[df[codeStateTag].isin(importantStates)]
-    types = frame.getGroupBy(df_temp, stateTag)
-    sections = frame.getGroupBy(df_temp, sectionTag)
-    subjects = frame.getGroupBy(df_temp, subjectTag)
-    judges = frame.getGroupBy(df_temp, codeJudgeTag)
-    finished = frame.getGroupBy(df_temp, finishedTag)
-    df_temp = pd.DataFrame({'A' : [], 'B': []})
-    fig = px.box(df_temp, x = 'A', y = 'B')
+        df = df[df[codeStateTag].isin(importantStates)]
+    finished = frame.getGroupBy(df, finishedTag)
+    judges = frame.getGroupBy(df, codeJudgeTag)
+    sections = frame.getGroupBy(df, sectionTag)
+    subjects = frame.getGroupBy(df, subjectTag)
+    types = frame.getGroupBy(df, stateTag)
+    # since figure is constantly updated, initial data are empty for faster graph creation
+    df_start = pd.DataFrame({'A' : [], 'B': []})
+    fig = px.box(df_start, x = 'A', y = 'B')
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('DURATION COMPARISON GRAPHS', href='/comparationgraph'),
+        ds.dcc.Link('DURATION COMPARISON GRAPHS', href='/comparison'),
         ds.html.H2('PROCESS STATES DURATION', id = 'title-s'),
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-s', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([week, month, monthYear, trimester, trimesterYear, year], value = month, id = 'date-radioitem-s', inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
@@ -77,13 +78,13 @@ def pageLayout():
         ds.dcc.Checklist([sectionTag, subjectTag, codeJudgeTag, finishedTag], value = [], id = "choice-checklist-s", inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = "order-radioitem-s", inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Checklist([text], value = [], id = "text-checklist-s"),
-        ds.dcc.Graph(id = 'comparation-graph-s', figure = fig)
+        ds.dcc.Graph(id = 'comparison-graph-s', figure = fig)
     ])
     return layout
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('comparation-graph-s', 'figure'),
+    [ds.Output('comparison-graph-s', 'figure'),
         ds.Output('event-dateranger-s', 'start_date'), 
         ds.Output('event-dateranger-s', 'end_date'),
         ds.Output('event-dateranger-s', 'style'),
@@ -119,9 +120,8 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, choices, order, text):
+    # filter important states chosen by user. Those are taken from stored file.
     importantStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
     if importantStates != None and len(importantStates) > 0:
-        df_temp = df[df[codeStateTag].isin(importantStates)]
-    else:
-        df_temp = df
-    return comparation.typeComparationUpdate(df_temp, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, stateTag, sections, subjects, judges, finished, choices, order, text)
+        df = df[df[codeStateTag].isin(importantStates)]
+    return comparison.typeComparisonUpdate(df, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, stateTag, sections, subjects, judges, finished, choices, order, text)

@@ -12,44 +12,55 @@ def updateTypeData(df, sections, subjects, judges, finished):
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     sectionTag = utilities.getTagName("sectionTag")
     subjectTag = utilities.getTagName("subjectTag")
-    df_temp = df.copy()
-    df_temp = frame.getTypesDataFrame(df_temp, sectionTag, sections)
-    df_temp = frame.getTypesDataFrame(df_temp, subjectTag, subjects)
-    df_temp = frame.getTypesDataFrame(df_temp, codeJudgeTag, judges)
-    df_temp = frame.getTypesDataFrame(df_temp, finishedTag, finished)
-    return df_temp
+    newDF = df.copy()
+    newDF = frame.getTypesDataFrame(newDF, sectionTag, sections)
+    newDF = frame.getTypesDataFrame(newDF, subjectTag, subjects)
+    newDF = frame.getTypesDataFrame(newDF, codeJudgeTag, judges)
+    newDF = frame.getTypesDataFrame(newDF, finishedTag, finished)
+    return newDF
 
-# update types based on user choices on different parameters.
+# update types based on user choices on different parameters. In order to do that is used 'updateTypeData' method with chosen parameter as None. 
+# this is done because when user select a parameter, analysed dataframe is filtered to only processes where chosen parameters holds.
+# by doing that other chooseable parameters would disappear since they are calculated from input datafram which contains only processes with selected ones.
+# so it calculates paramers like if no one was chosen and it set them in dropdown.
 def updateTypeDataBySelection(df, df_data, sections, subjects, judges, finished):
     finishedTag = utilities.getTagName("finishedTag")
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     sectionTag = utilities.getTagName("sectionTag")
     subjectTag = utilities.getTagName("subjectTag")
-    df_temp = df.copy()
+    newDF = df.copy()
     if sections != None and len(sections) > 0:
-        df_temp_1 = updateTypeData(df_temp, None, subjects, judges, finished)
+        newDF_1 = updateTypeData(newDF, None, subjects, judges, finished)
     else:
-        df_temp_1 = df_data
+        newDF_1 = df_data
     if subjects != None and len(subjects) > 0:
-        df_temp_2 = updateTypeData(df_temp, sections, None, judges, finished)
+        newDF_2 = updateTypeData(newDF, sections, None, judges, finished)
     else:
-        df_temp_2 = df_data
+        newDF_2 = df_data
     if judges != None and len(judges) > 0:
-        df_temp_3 = updateTypeData(df_temp, sections, subjects, None, finished)
+        newDF_3 = updateTypeData(newDF, sections, subjects, None, finished)
     else:
-        df_temp_3 = df_data
+        newDF_3 = df_data
     if finished != None and len(finished) > 0:
-        df_temp_4 = updateTypeData(df_temp, sections, subjects, judges, None)
+        newDF_4 = updateTypeData(newDF, sections, subjects, judges, None)
     else:
-        df_temp_4 = df_data
-    sections = frame.getGroupBy(df_temp_1, sectionTag)
-    subjects = frame.getGroupBy(df_temp_2, subjectTag)
-    judges = frame.getGroupBy(df_temp_3, codeJudgeTag)
-    finished = frame.getGroupBy(df_temp_4, finishedTag)
+        newDF_4 = df_data
+    sections = frame.getGroupBy(newDF_1, sectionTag)
+    subjects = frame.getGroupBy(newDF_2, subjectTag)
+    judges = frame.getGroupBy(newDF_3, codeJudgeTag)
+    finished = frame.getGroupBy(newDF_4, finishedTag)
     return [sections, subjects, judges, finished]
 
 # update type events based on user choice.
-def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections, subjects, judges, finished):
+#
+# input data are: df is the dataframe, type refers to what type graph is shown (event, state or phase), typeChoices are the types chosen by user to be shown,
+# tagChoice is the tag correlated to type, first refers to if user wnats to show first, last or all, avgChoice is the user choice on how aggregate data on median or mean,
+# text is chosen by user to decide to show load of processes or not, sections are the sections chosen by user to filter data, subjects are the subjects chosen by user to filter data, 
+# judges are the judges chosen by user to filter data, finished are the type of processes chosen by user to filter data.
+#
+# return data are: fig is the figure shown, sections are the new updated chooseable sections, subjects are the new updated chooseable subjects, 
+# judges are the new updated chooseable judges, finished are the new updated chooseable process types.
+def typeUpdate(df, type, typeChoices, tagChoice, first, avgChoice, text, sections, subjects, judges, finished):
     durationTag = utilities.getTagName('durationTag')
     eventTag = utilities.getTagName('eventTag')
     firstTag = utilities.getPlaceholderName("first")
@@ -58,17 +69,23 @@ def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
     statesInfo = getter.getStatesInfo()
-    df_temp = df.copy()
+    newDF = df.copy()
+    # if first is selected newDF is filtered by only first events/states.
     if first == firstTag:
-        df_temp = df_temp.groupby([type, numProcessTag]).first().reset_index()
+        newDF = newDF.groupby([type, numProcessTag]).first().reset_index()
+    # if last is selected newDF is filtered by only last events/states.
     elif first == lastTag:
-        df_temp = df_temp.groupby([type, numProcessTag]).last().reset_index()
-    df_temp = frame.getTypesDataFrame(df_temp, type, typeChoices)
-    df_data = updateTypeData(df_temp, sections, subjects, judges, finished)
-    [sections, subjects, judges, finished] = updateTypeDataBySelection(df_temp, df_data, sections, subjects, judges, finished)
-    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoiceOrderByPhase(df_data, tagChoice, avg)   
+        newDF = newDF.groupby([type, numProcessTag]).last().reset_index()
+    newDF = frame.getTypesDataFrame(newDF, type, typeChoices)
+    # df_data is calculated as newDF filtered based on user choices.
+    df_data = updateTypeData(newDF, sections, subjects, judges, finished)
+    # parameters remaining choices are calculated based on user choices.
+    [sections, subjects, judges, finished] = updateTypeDataBySelection(newDF, df_data, sections, subjects, judges, finished)
+    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoiceOrderByPhase(df_data, tagChoice, avgChoice)   
     xticks = frame.getUniques(allData, tagChoice)
+    # if it's an event graph color is unique, otherwise color is decised based on colorMap which associate to each phase a different color.
     if tagChoice == eventTag:
+        # if text is selected by user then an histogram graph is shown, otherwise boxplot.
         if text == [textTag]:
             fig = px.histogram(allData, x = tagChoice, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Count', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(1.1))
         else:
@@ -94,20 +111,27 @@ def typeEventUpdate(df, type, typeChoices, tagChoice, first, avg, text, sections
     fig.update_layout(xaxis_tickvals = xticks, showlegend = False, font = dict(size = 18))
     fig.update_xaxes(tickangle = 45)
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
-    return [fig, sections, subjects, judges, finished]
+    return fig, sections, subjects, judges, finished
 
 # update type events based on user choice.
-def typeSequenceUpdate(df, typeChoices, tagChoice, avg, text, sections, subjects, judges, finished):
+#
+# input data are: df is the dataframe, typeChoices are the types chosen by user to be shown, tagChoice is the tag correlated to type, first refers to if user wnats to show first, last or all, 
+# avgChoice is the user choice on how aggregate data on median or mean, text is chosen by user to decide to show load of processes or not, sections are the sections chosen by user to filter data, 
+# subjects are the subjects chosen by user to filter data, judges are the judges chosen by user to filter data, finished are the type of processes chosen by user to filter data.
+#
+# return data are: fig is the figure shown, sections are the new updated chooseable sections, subjects are the new updated chooseable subjects, 
+# judges are the new updated chooseable judges, finished are the new updated chooseable process types.
+def typeSequenceUpdate(df, typeChoices, tagChoice, avgChoice, text, sections, subjects, judges, finished):
     durationTag = utilities.getTagName('durationTag')
     eventTag = utilities.getTagName('eventTag')
     quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
     statesInfo = getter.getStatesInfo()
-    df_temp = df.copy()
-    df_temp = frame.selectFollowingRows(df_temp, tagChoice, typeChoices)
-    df_data = updateTypeData(df_temp, sections, subjects, judges, finished) 
-    [sections, subjects, judges, finished] = updateTypeDataBySelection(df_temp, df_data, sections, subjects, judges, finished)
-    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoiceOrderByPhase(df_data, tagChoice, avg)
+    newDF = df.copy()
+    newDF = frame.selectFollowingRows(newDF, tagChoice, typeChoices)
+    df_data = updateTypeData(newDF, sections, subjects, judges, finished) 
+    [sections, subjects, judges, finished] = updateTypeDataBySelection(newDF, df_data, sections, subjects, judges, finished)
+    [allData, avgData] = frame.getAvgStdDataFrameByTypeChoiceOrderByPhase(df_data, tagChoice, avgChoice)
     xticks = frame.getUniques(allData, tagChoice)
     if tagChoice == eventTag:
         if text == [textTag]:
@@ -135,5 +159,5 @@ def typeSequenceUpdate(df, typeChoices, tagChoice, avg, text, sections, subjects
     fig.update_layout(xaxis_tickvals = xticks, showlegend = False, font = dict(size = 18))
     fig.update_xaxes(tickangle = 45)
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
-    return [fig, sections, subjects, judges, finished]
+    return fig, sections, subjects, judges, finished
         

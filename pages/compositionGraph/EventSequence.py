@@ -18,35 +18,36 @@ eventTag = utilities.getTagName('eventTag')
 # return initial layout of page.
 def pageLayout():
     avgTag = utilities.getTagName('avgTag')
-    median = utilities.getPlaceholderName('median')
+    codeJudgeTag = utilities.getTagName('codeJudgeTag')
     event = utilities.getPlaceholderName('event')
-    text = utilities.getPlaceholderName('text')
+    finishedTag = utilities.getTagName('finishedTag')  
     judge = utilities.getPlaceholderName('judge') 
+    median = utilities.getPlaceholderName('median')
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
-    subject = utilities.getPlaceholderName('subject')  
+    sectionTag = utilities.getTagName('sectionTag')
+    subject = utilities.getPlaceholderName('subject') 
+    subjectTag = utilities.getTagName('subjectTag') 
+    text = utilities.getPlaceholderName('text')
+    # filter important events chosen by user. Those are taken from stored file. Those are taken from stored file.
     importantEvents = file.getDataFromTextFile('utils/preferences/importantEvents.txt')
     if importantEvents != None and len(importantEvents) > 0:
-        df_temp = df[df[codeEventTag].isin(importantEvents)]
-    types = frame.getUniques(df_temp, eventTag)
-    finishedTag = utilities.getTagName('finishedTag') 
-    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
-    median = utilities.getPlaceholderName('median') 
-    sectionTag = utilities.getTagName('sectionTag')
-    subjectTag = utilities.getTagName('codeSubjectTag') 
-    judges = frame.getGroupBy(df_temp, codeJudgeTag)
-    sections = frame.getGroupBy(df_temp, sectionTag)
-    subjects = frame.getGroupBy(df_temp, subjectTag)
-    finished = frame.getGroupBy(df_temp, finishedTag)
-    df_temp = pd.DataFrame({'A' : (), 'B': ()})
-    types = sorted(types)
-    fig = px.box(df_temp, x = 'A', y = 'B')
+        df = df[df[codeEventTag].isin(importantEvents)]
+    finished = frame.getGroupBy(df, finishedTag)
+    judges = frame.getGroupBy(df, codeJudgeTag)
+    sections = frame.getGroupBy(df, sectionTag)
+    subjects = frame.getGroupBy(df, subjectTag)
+    events = frame.getUniques(df, eventTag)
+    events = sorted(events)
+    # since figure is constantly updated, initial data are empty for faster graph creation
+    df_start = pd.DataFrame({'A' : (), 'B': ()})
+    fig = px.box(df_start, x = 'A', y = 'B')
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('COMPOSITION GRAPHS', href='/typeevent'),
+        ds.dcc.Link('COMPOSITION GRAPHS', href='/composition'),
         ds.html.H2('EVENT SEQUENCE'),
-        ds.dcc.Dropdown(types, value = [types[0]], multi = True, searchable = True, clearable = True, id = 'type-dropdown-esq', placeholder = event, style = {'width': 400}),
+        ds.dcc.Dropdown(events, value = [events[0]], multi = True, searchable = True, clearable = True, id = 'type-dropdown-esq', placeholder = event, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-esq', placeholder = section, style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-esq', placeholder = subject, style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-esq', placeholder = judge, style = {'width': 400}),
@@ -75,9 +76,8 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(event, avg, text, section, subject, judge, finished):
+    # filter important events chosen by user. Those are taken from stored file. Those are taken from stored file.
     importantEvents = file.getDataFromTextFile('utils/preferences/importantEvents.txt')
     if importantEvents != None and len(importantEvents) > 0:
-        df_temp = df[df[codeEventTag].isin(importantEvents)]
-    else:
-        df_temp = df
-    return typeEvent.typeSequenceUpdate(df_temp, event, eventTag, avg, text, section, subject, judge, finished)
+        df = df[df[codeEventTag].isin(importantEvents)]
+    return typeEvent.typeSequenceUpdate(df, event, eventTag, avg, text, section, subject, judge, finished)

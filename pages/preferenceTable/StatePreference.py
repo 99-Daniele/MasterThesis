@@ -3,30 +3,32 @@
 import dash as ds
 import pandas as pd
 
-import utils.FileOperation as file
 import utils.Getters as getter
-import utils.graph.TypeEventsPreference as typeEvents
 import utils.Utilities as utilities
+import utils.graph.TypeEventsPreference as typeEvents
 
 # get dataframe with state names. 
 df = getter.getStateNamesDataframe()
 codeStateTag = utilities.getTagName('codeStateTag')
 countTag = utilities.getTagName('countTag')
+descriptionTag = utilities.getTagName('descriptionTag')
 phaseTag = utilities.getTagName('phaseTag')
 phaseDBTag = utilities.getTagName('phaseDBTag')
-df_temp = df[df[countTag] > 0]
+stateTag = utilities.getTagName('stateTag')
+# for better readability only states that are registered at least one time in the database are shown.
+df = df[df[countTag] > 0]
 
 # return initial layout of page.
 def pageLayout():
     code = utilities.getPlaceholderName('code')
     codeStateTag = utilities.getTagName('codeStateTag')
     count = utilities.getPlaceholderName('count')
+    description = utilities.getPlaceholderName('description')
     durationTag = utilities.getTagName('durationTag')
     duration = utilities.getPlaceholderName('duration')
     phase = utilities.getPlaceholderName('phase')
     phaseDB = utilities.getPlaceholderName('phaseDB')
     state = utilities.getPlaceholderName('state')
-    stateTag = utilities.getTagName('stateTag')
     layout = ds.html.Div([
         ds.dcc.ConfirmDialog(
             id = 'update-stp',
@@ -40,9 +42,10 @@ def pageLayout():
         ds.html.Button("RESET", id = 'reset-button-stp'),
         ds.html.Button("DOWNLOAD", id = 'download-button-stp'),
         ds.dash_table.DataTable(
-            df_temp.to_dict('records'), columns = [
+            df.to_dict('records'), columns = [
                 {'name': code, 'id': codeStateTag, 'editable': False}, 
-                {'name': state, 'id': stateTag, 'editable': False}, 
+                {'name': description, 'id': descriptionTag, 'editable': False}, 
+                {'name': state, 'id': stateTag, 'editable': True},  
                 {'name': phaseDB, 'id': phaseDBTag, 'editable': False}, 
                 {'name': phase, 'id': phaseTag, 'editable': True}, 
                 {'name': count, 'id': countTag, 'editable': False},  
@@ -75,27 +78,12 @@ def update_dateframe(refreshButton, resetButton, downloadButton, importantIndex,
         dataDF.to_csv('cache/statesInfo.csv')
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         for d in data:
+            d.update({stateTag: d.get(descriptionTag)})
             d.update({phaseTag: d.get(phaseDBTag)})
-        newData, display = typeEvents.updateDatabase(data, df, codeStateTag, 'statesInfo.json')
+        newData, display = typeEvents.updateData(data, df, codeStateTag, 'statesInfo.json')
         return newData, display, importantIndex
     if ds.ctx.triggered_id != None and 'refresh-button' in ds.ctx.triggered_id:
-        newData, display = typeEvents.updateDatabase(data, df, codeStateTag, 'statesInfo.json')
+        newData, display = typeEvents.updateData(data, df, codeStateTag, 'statesInfo.json')
         return newData, display, importantIndex
-    oldImportantStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
-    if oldImportantStates == None:
-        oldImportantIndex = []
-    else:
-        oldImportantIndex = []
-        for i in range(len(data)):
-            d = data[i]
-            if d.get(codeStateTag) in oldImportantStates:
-                oldImportantIndex.extend([i])
-    if ds.ctx.triggered_id == None:
-        importantIndex = oldImportantIndex
-    else:
-        if importantIndex == None:
-            importantIndex = []
-        importantStates = [data[x].get(codeStateTag) for x in importantIndex]
-        if len(list(set(importantStates) - set(oldImportantStates))) > 0 or len(list(set(oldImportantStates) - set(importantStates))) > 0:
-            file.writeOnTextFile('utils/preferences/importantStates.txt', utilities.fromListToString(importantStates))
+    importantIndex = typeEvents.updateImportant(ds.ctx.triggered_id, data, codeStateTag, importantIndex, 'utils/preferences/importantStates.txt')
     return data, False, importantIndex

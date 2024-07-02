@@ -28,19 +28,19 @@ def createEventsDataFrame(df, endPhase, dateTag, numEventTag, numProcessTag, pha
     return df
 
 # from events info list create events info dataframe.
-def createEventsInfoDataFrame(eventsInfo, codeEventTag, eventTag):
-    df = pd.DataFrame(eventsInfo, columns = [codeEventTag, eventTag])
+def createEventsInfoDataFrame(eventsInfo, codeEventTag, descriptionTag, eventTag):
+    df = pd.DataFrame(eventsInfo, columns = [codeEventTag, descriptionTag, eventTag])
     return df
 
 # from states info list create states info dataframe.
-def createStatesInfoDataFrame(statesInfo, codeStateTag, phaseTag, phaseDBTag, stateTag):
-    df = pd.DataFrame(statesInfo, columns = [codeStateTag, stateTag, phaseDBTag, phaseTag])
-    df[phaseTag] = df[phaseTag].fillna("-")
+def createStatesInfoDataFrame(statesInfo, codeStateTag, descriptionTag, phaseTag, phaseDBTag, stateTag):
+    df = pd.DataFrame(statesInfo, columns = [codeStateTag, descriptionTag, stateTag, phaseDBTag, phaseTag])
+    df[phaseTag] = df[phaseTag].fillna(0)
     return df
 
 # from events info list create events info dataframe.
-def createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, ritualTag, subjectTag):
-    df = pd.DataFrame(subjectsInfo, columns = [codeSubjectTag, subjectTag, ritualTag])
+def createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, descriptionTag, ritualTag, subjectTag):
+    df = pd.DataFrame(subjectsInfo, columns = [codeSubjectTag, descriptionTag, subjectTag, ritualTag])
     return df
 
 # from processes list create process duration dataframe.
@@ -250,13 +250,13 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
     order_dict = df3.set_index(filterTag)[order].to_dict()
     order_list = df3[filterTag].tolist()
-    df_temp = df5[[dateTag, durationTag, types[0]]].copy()
-    df_temp = df_temp.rename(columns = {types[0]:filterTag})
+    newDF = df5[[dateTag, durationTag, types[0]]].copy()
+    newDF = newDF.rename(columns = {types[0]:filterTag})
     i = 1
     while i < len(types):
-        df_temp[filterTag] = df_temp[filterTag].astype(str) + " - " + df5[types[i]].astype(str)
+        newDF[filterTag] = newDF[filterTag].astype(str) + " - " + df5[types[i]].astype(str)
         i = i + 1
-    df_temp = df_temp[df_temp[filterTag].isin(order_list)]
+    newDF = newDF[newDF[filterTag].isin(order_list)]
     month = utilities.getPlaceholderName("month")
     monthYear = utilities.getPlaceholderName("monthYear")
     trimester = utilities.getPlaceholderName("trimester")
@@ -264,38 +264,38 @@ def getAvgDataFrameByType(df, avgChoice, datetype, typesChoice, order, eventChoi
     week = utilities.getPlaceholderName("week")
     year = utilities.getPlaceholderName("year")
     if datetype == week:
-        df_temp[dateTag] = df_temp[dateTag].map(lambda x: utilities.getWeekNumber(x))
-        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
+        newDF[dateTag] = newDF[dateTag].map(lambda x: utilities.getWeekNumber(x))
+        [df1, df2] = getAvgTotDataframe(newDF, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getWeek(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getWeek(x))
         return [df1, df2, df3]
     elif datetype == month:
-        df_temp[dateTag] = df_temp[dateTag].map(lambda x: utilities.getMonthNumber(x))
-        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
+        newDF[dateTag] = newDF[dateTag].map(lambda x: utilities.getMonthNumber(x))
+        [df1, df2] = getAvgTotDataframe(newDF, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getMonth(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getMonth(x))
         return [df1, df2, df3]
     elif datetype == monthYear:
-        df_temp[dateTag] = df_temp[dateTag].map(lambda x: utilities.getMonthYearDate(x))
-        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
+        newDF[dateTag] = newDF[dateTag].map(lambda x: utilities.getMonthYearDate(x))
+        [df1, df2] = getAvgTotDataframe(newDF, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getMonthYear(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getMonthYear(x))
         return [df1, df2, df3]
     elif datetype == trimester:
-        df_temp[dateTag] = df_temp[dateTag].map(lambda x: utilities.getTrimesterDate(x))
-        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
+        newDF[dateTag] = newDF[dateTag].map(lambda x: utilities.getTrimesterDate(x))
+        [df1, df2] = getAvgTotDataframe(newDF, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getTrimester(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getTrimester(x))
         return [df1, df2, df3]
     elif datetype == trimesterYear:
-        df_temp[dateTag] = df_temp[dateTag].map(lambda x: utilities.getTrimesterYearDate(x))
-        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
+        newDF[dateTag] = newDF[dateTag].map(lambda x: utilities.getTrimesterYearDate(x))
+        [df1, df2] = getAvgTotDataframe(newDF, order_dict, avgChoice)
         df1[dateTag] = df1[dateTag].map(lambda x: utilities.getTrimesterYear(x))
         df2[dateTag] = df2[dateTag].map(lambda x: utilities.getTrimesterYear(x))
         return [df1, df2, df3]
     elif datetype == year:
-        df_temp[dateTag] = df_temp[dateTag].map(lambda x: utilities.getYearNumber(x))
-        [df1, df2] = getAvgTotDataframe(df_temp, order_dict, avgChoice)
+        newDF[dateTag] = newDF[dateTag].map(lambda x: utilities.getYearNumber(x))
+        [df1, df2] = getAvgTotDataframe(newDF, order_dict, avgChoice)
         return [df1, df2, df3]
         
 # return data group by chosen type.
@@ -368,14 +368,14 @@ def getAvgStdDataFrameByTypeChoice(df, typeChoice, avgChoice):
     df_q = df1.groupby(typeChoice, as_index = False).quantile(0.75)
     df3 = df1.iloc[:0,:].copy()
     for i, row in df_q.iterrows():
-        df_temp = df1[df1[typeChoice] == row[typeChoice]]
-        df_temp = df_temp[df_temp[durationTag] <= row[durationTag]]        
-        df3 = pd.concat([df3, df_temp], ignore_index = True)
+        newDF = df1[df1[typeChoice] == row[typeChoice]]
+        newDF = newDF[newDF[durationTag] <= row[durationTag]]        
+        df3 = pd.concat([df3, newDF], ignore_index = True)
     if avgChoice == avgTag:
         df2 = df3.groupby(typeChoice, as_index = False).mean()
     else:
         df2 = df3.groupby(typeChoice, as_index = False).median()
-        df3 = pd.concat([df3, df_temp], ignore_index = True)
+        df3 = pd.concat([df3, newDF], ignore_index = True)
     df2[countTag] = df3.groupby(typeChoice).size().tolist()
     df2[quantileTag] = df3.groupby(typeChoice, as_index = False).quantile(0.75)[durationTag]
     df3[typeChoice] = df3[typeChoice].astype("category")
@@ -391,23 +391,23 @@ def getAvgStdDataFrameByTypeChoice(df, typeChoice, avgChoice):
 # return dataframe with rows which type is present a relevant number of times.
 def keepOnlyRelevant(df, perc, tag):
     countTag = utilities.getTagName('countTag')
-    df_temp = df.copy()
-    df_temp = df_temp.groupby([tag])[tag].size().sort_values(ascending = False).reset_index(name = countTag)
-    totCount = df_temp[countTag].sum()
+    newDF = df.copy()
+    newDF = newDF.groupby([tag])[tag].size().sort_values(ascending = False).reset_index(name = countTag)
+    totCount = newDF[countTag].sum()
     threshold = totCount * perc
-    relevant = df_temp[df_temp[countTag] >= threshold][tag].tolist()
+    relevant = newDF[newDF[countTag] >= threshold][tag].tolist()
     return df[df[tag].isin(relevant)]
 
 # reduce dataframe to a number of rows such that they cover at least given percentage.
 def keepOnlyImportant(df, perc, minNumber):
     countTag = utilities.getTagName('countTag')
-    df_temp = df.copy()
-    totCount = df_temp[countTag].sum()
+    newDF = df.copy()
+    totCount = newDF[countTag].sum()
     threshold = totCount * perc
-    df_temp = df_temp.sort_values([countTag], ascending = False).reset_index(drop = True)
+    newDF = newDF.sort_values([countTag], ascending = False).reset_index(drop = True)
     sum = 0
-    newDf = df_temp.iloc[:0,:].copy()
-    for i, row in df_temp.iterrows():
+    newDf = newDF.iloc[:0,:].copy()
+    for i, row in newDF.iterrows():
         sum = sum + row[countTag]
         newDf = newDf._append(row, ignore_index = True)
         if sum > threshold and i > minNumber:
@@ -418,40 +418,40 @@ def keepOnlyImportant(df, perc, minNumber):
 def getTypesDataFrame(df, tag, types):
     if types == None or len(types) == 0:
         return df
-    df_temp = df.copy()
-    return df_temp[df_temp[tag].isin(types)]
+    newDF = df.copy()
+    return newDF[newDF[tag].isin(types)]
 
 # return dataframe rows where given tag is contained in given types from string.
 def getTypesDataFrameFromString(df, tag, type):
     if type == None:
         return df
-    df_temp = df.copy()
-    return df_temp[df_temp[tag].str.contains(type)]
+    newDF = df.copy()
+    return newDF[newDF[tag].str.contains(type)]
 
 # return dataframe rows where date month is contained given months.
 def getMonthDataFrame(df, months):
     if months == None or len(months) == 0:
         return df
     dateTag = utilities.getTagName('dateTag')
-    df_temp = df.copy()
-    df_temp[dateTag] = df_temp[dateTag].map(lambda x: str(dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').month))
-    return df_temp[df_temp[dateTag].isin(months)]
+    newDF = df.copy()
+    newDF[dateTag] = newDF[dateTag].map(lambda x: str(dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').month))
+    return newDF[newDF[dateTag].isin(months)]
 
 # return dataframe rows where date year is contained given years.
 def getYearDataFrame(df, years):
     if years == None or len(years) == 0:
         return df
     dateTag = utilities.getTagName('dateTag')
-    df_temp = df.copy()
-    df_temp[dateTag] = df_temp[dateTag].map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year)
-    return df_temp[df_temp[dateTag].isin(years)]
+    newDF = df.copy()
+    newDF[dateTag] = newDF[dateTag].map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year)
+    return newDF[newDF[dateTag].isin(years)]
 
 # return dataframe rows where date is between given stratDate and endDate.
 def getDateDataFrame(df, type, startDate, endDate):
     if startDate == None or endDate == None:
         return df
-    df_temp = df.copy()
-    d = df_temp[df_temp[type] >= startDate]
+    newDF = df.copy()
+    d = newDF[newDF[type] >= startDate]
     d = d[d[type] <= endDate]
     return d
 
@@ -464,9 +464,9 @@ def getEventDataFrame(df, event):
     eventPhaseSequenceTag = utilities.getTagName("eventPhaseSequenceTag")
     phaseTag = utilities.getPlaceholderName("phase")
     withOut = utilities.getPlaceholderName("without")
-    df_temp = df.copy()
-    df_temp[eventTag] = df_temp[eventSequenceTag]
-    for i, row in df_temp.iterrows():
+    newDF = df.copy()
+    newDF[eventTag] = newDF[eventSequenceTag]
+    for i, row in newDF.iterrows():
         eventSequence = utilities.fromStringToList(row[eventSequenceTag])
         eventPhaseSequence = utilities.fromStringToList(row[eventPhaseSequenceTag])
         try:
@@ -475,8 +475,8 @@ def getEventDataFrame(df, event):
             eventString = event + " " + phaseTag.upper() + " " + str(phase)
         except:
             eventString = withOut + " " + event
-        df_temp.at[i, eventTag] = eventString
-    return df_temp
+        newDF.at[i, eventTag] = eventString
+    return newDF
 
 # return dataframe where state sequence contains or not a particular state.
 def getStateDataFrame(df, state):
@@ -486,17 +486,17 @@ def getStateDataFrame(df, state):
     stateSequenceTag = utilities.getTagName('stateSequenceTag')
     withTag = utilities.getPlaceholderName("with")
     withOut = utilities.getPlaceholderName("without")
-    df_temp = df.copy()
-    df_temp[stateTag] = df_temp[stateSequenceTag]
-    for i, row in df_temp.iterrows():
+    newDF = df.copy()
+    newDF[stateTag] = newDF[stateSequenceTag]
+    for i, row in newDF.iterrows():
         stateSequence = utilities.fromStringToList(row[stateSequenceTag])
         try:
             stateSequence.index(state)
             stateString = withTag + " " + state
         except:
             stateString = withOut + " " + state
-        df_temp.at[i, stateTag] = stateString
-    return df_temp
+        newDF.at[i, stateTag] = stateString
+    return newDF
 
 # return dataframe where phase sequence contains or not a particular phase.
 def getPhaseDataFrame(df, phase):
@@ -506,38 +506,38 @@ def getPhaseDataFrame(df, phase):
     phaseSequenceTag = utilities.getTagName('phaseSequenceTag')
     withTag = utilities.getPlaceholderName("with")
     withOut = utilities.getPlaceholderName("without")
-    df_temp = df.copy()
-    df_temp[phaseTag] = df_temp[phaseSequenceTag]
-    for i, row in df_temp.iterrows():
+    newDF = df.copy()
+    newDF[phaseTag] = newDF[phaseSequenceTag]
+    for i, row in newDF.iterrows():
         phaseSequence = utilities.fromStringToList(row[phaseSequenceTag])
         try:
             phaseSequence.index(phase)
             phaseString = withTag + " " + phaseTag + " " + phase
         except:
             phaseString = withOut + " " + phaseTag + " " + phase
-        df_temp.at[i, phaseTag] = phaseString
-    return df_temp
+        newDF.at[i, phaseTag] = phaseString
+    return newDF
 
 # return unique years in given dataframe dates.
 def getAllYears(df):
     dateTag = utilities.getTagName('dateTag')
-    df_temp = df[dateTag].copy()
-    df_temp = df_temp.map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year).sort_values().reset_index(drop = True)
-    years = df_temp.unique()
+    newDF = df[dateTag].copy()
+    newDF = newDF.map(lambda x: dt.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').year).sort_values().reset_index(drop = True)
+    years = newDF.unique()
     return years
 
 # return group by types with corrispondent counts.
 def getGroupBy(df, tag):
     countTag = utilities.getTagName('countTag')
-    df_temp = df.copy()
-    types = df_temp.groupby([tag])[tag].size().sort_values(ascending = False).reset_index(name = countTag)[tag].tolist()
+    newDF = df.copy()
+    types = newDF.groupby([tag])[tag].size().sort_values(ascending = False).reset_index(name = countTag)[tag].tolist()
     return types
 
 # return group by types with corrispondent counts from string.
 def getGroupByFromString(df, tag):
-    df_temp = df.copy()
+    newDF = df.copy()
     types = {}
-    for d in df_temp[tag]:
+    for d in newDF[tag]:
         typeList = utilities.fromStringToList(d)
         for l in typeList:
             if l in types.keys():
@@ -550,8 +550,8 @@ def getGroupByFromString(df, tag):
 
 # return uniques values of dataframe column.
 def getUniques(df, tag):
-    df_temp = df[tag].copy()
-    uniques = df_temp.unique()
+    newDF = df[tag].copy()
+    uniques = newDF.unique()
     return uniques
 
 # returns a string with input name followed by how many times is present in the dataframe.
@@ -570,26 +570,26 @@ def addTotCountToName(df, countTag):
 
 # return index of dataframe selected rows.
 def getSelectedRows(df, selection, tag):
-    df_temp = df.copy()
-    df_temp = df_temp[df_temp[tag].isin(selection)]
-    selectedRows = list(df_temp.index)
+    newDF = df.copy()
+    newDF = newDF[newDF[tag].isin(selection)]
+    selectedRows = list(newDF.index)
     return selectedRows
 
 # return dataframe rows from given index.
 def getRowsFromIndex(df, index):
-    df_temp = df.copy()
-    df_temp = df_temp.iloc[index]
-    return df_temp
+    newDF = df.copy()
+    newDF = newDF.iloc[index]
+    return newDF
 
 # return joins of dataframe
 def joinDataframe(df1, df2, tagJoin, dropJoin1, dropJoin2):
-    df_temp_1 = df1.copy()
-    df_temp_2 = df2.copy()
+    newDF_1 = df1.copy()
+    newDF_2 = df2.copy()
     if dropJoin1 != None:
-        df_temp_1 = df_temp_1.drop(dropJoin1, axis = 1)
+        newDF_1 = newDF_1.drop(dropJoin1, axis = 1)
     if dropJoin2 != None:
-        df_temp_2 = df_temp_2.drop(dropJoin2, axis = 1)
-    newDf = df_temp_1.join(df_temp_2.set_index(tagJoin), on = tagJoin)
+        newDF_2 = newDF_2.drop(dropJoin2, axis = 1)
+    newDf = newDF_1.join(newDF_2.set_index(tagJoin), on = tagJoin)
     return newDf
 
 # select following rows of chosen event.

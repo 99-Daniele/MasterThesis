@@ -1,4 +1,4 @@
-# this page shows phases duration and comparation.
+# this page shows phases duration and comparison.
 
 import dash as ds
 import pandas as pd
@@ -6,13 +6,11 @@ import plotly.express as px
 
 import utils.Dataframe as frame
 import utils.Getters as getter
-import utils.graph.ComparationGraph as comparation
 import utils.Utilities as utilities
+import utils.graph.ComparisonGraph as comparison
 
 # get dataframe with all phases duration.
 df = getter.getPhasesDurationFiltered()
-phaseTag = utilities.getTagName('phaseTag') 
-df[phaseTag] = df[phaseTag].astype(str)
 
 # return initial layout of page.
 def pageLayout():
@@ -26,6 +24,7 @@ def pageLayout():
     month = utilities.getPlaceholderName('month')
     monthYear = utilities.getPlaceholderName('monthYear') 
     phase = utilities.getPlaceholderName('phase') 
+    phaseTag = utilities.getTagName('phaseTag') 
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     sectionTag = utilities.getTagName('sectionTag')
@@ -38,16 +37,17 @@ def pageLayout():
     year = utilities.getPlaceholderName('year') 
     types = frame.getUniques(df, phaseTag)
     typesSorted = sorted(types)
+    finished = frame.getGroupBy(df, finishedTag)
+    judges = frame.getGroupBy(df, codeJudgeTag)
     sections = frame.getGroupBy(df, sectionTag)
     subjects = frame.getGroupBy(df, subjectTag)
-    judges = frame.getGroupBy(df, codeJudgeTag)
-    finished = frame.getGroupBy(df, finishedTag)
-    df_temp = pd.DataFrame({'A' : [], 'B': []})
-    fig = px.box(df_temp, x = 'A', y = 'B')
+    # since figure is constantly updated, initial data are empty for faster graph creation
+    df_start = pd.DataFrame({'A' : [], 'B': []})
+    fig = px.box(df_start, x = 'A', y = 'B')
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('DURATION COMPARISON GRAPHS', href='/comparationgraph'),
+        ds.dcc.Link('DURATION COMPARISON GRAPHS', href='/comparison'),
         ds.html.H2('PROCESS PHASES DURATION', id = 'title-ph'),
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-ph', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([week, month, monthYear, trimester, trimesterYear, year], value = month, id = 'date-radioitem-ph', inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
@@ -73,13 +73,13 @@ def pageLayout():
         ds.dcc.Checklist([sectionTag, subjectTag, codeJudgeTag, finishedTag], value = [], id = 'choice-checklist-ph', inline = True, style = {'display': 'none'}),
         ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = 'order-radioitem-ph', inline = True, style = {'display': 'none'}),
         ds.dcc.Checklist([text], value = [], id = 'text-checklist-ph'),
-        ds.dcc.Graph(id = 'comparation-graph-ph', figure = fig)
+        ds.dcc.Graph(id = 'comparison-graph-ph', figure = fig)
     ])
     return layout
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('comparation-graph-ph', 'figure'),
+    [ds.Output('comparison-graph-ph', 'figure'),
         ds.Output('event-dateranger-ph', 'start_date'), 
         ds.Output('event-dateranger-ph', 'end_date'),
         ds.Output('event-dateranger-ph', 'style'),
@@ -115,4 +115,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, choices, order, text):
-    return comparation.typeComparationUpdate(df, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, phaseTag, sections, subjects, judges, finished, choices, order, text)
+    return comparison.typeComparisonUpdate(df, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, phaseTag, sections, subjects, judges, finished, choices, order, text)

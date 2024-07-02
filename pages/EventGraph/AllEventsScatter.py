@@ -7,36 +7,38 @@ import plotly.express as px
 import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.Getters as getter
-import utils.graph.EventsGraph as event
 import utils.Utilities as utilities
+import utils.graph.EventsGraph as event
 
 # get dataframe with all events. 
-# get important events from text file.
 df = getter.getAllEvents()
 codeEventTag = utilities.getTagName("codeEventTag")
 codeStateTag = utilities.getTagName('codeStateTag')
 
 # return initial layout of page.
 def pageLayout():
+    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     dateTag = utilities.getTagName('dateTag') 
     judge = utilities.getPlaceholderName('judge') 
-    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     numProcessTag = utilities.getTagName('numProcessTag')
     section = utilities.getPlaceholderName('section') 
     sectionTag = utilities.getTagName('sectionTag')
     subject = utilities.getPlaceholderName('subject')  
     subjectTag = utilities.getTagName('subjectTag') 
+    # maxYear is the year of the las registered event. 
+    # The time interval selected for initial analysis is the year preceding maxYear.
+    # So start date is 1/1/(maxYear - 1) and end date is 1/1/maxYear.
     maxYear = dt.datetime.strptime(df[dateTag].max(), '%Y-%m-%d %H:%M:%S').year
     maxDateStart = dt.date(maxYear - 1, 1, 1)
     maxDateEnd = dt.date(maxYear, 1, 1)
+    judges = frame.getGroupBy(df, codeJudgeTag)
     sections = frame.getGroupBy(df, sectionTag)
     subjects = frame.getGroupBy(df, subjectTag)
-    judges = frame.getGroupBy(df, codeJudgeTag)
     fig = px.scatter(df, x = dateTag, y = numProcessTag, color = codeStateTag, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = 1400, height = 1200)
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('EVENTS VISUALIZATION GRAPH', href='/eventgraph'),
+        ds.dcc.Link('EVENTS VISUALIZATION GRAPH', href='/event'),
         ds.html.H2('VISUALIZATION OF ALL PROCESS EVENTS'),
         ds.dcc.DatePickerRange(
             id = 'event-dateranger-aes',
@@ -74,9 +76,8 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(startDate, endDate, minDate, maxDate, button, sections, subjects, judges):
+    # filter important events chosen by user. Those are taken from stored file.
     importantEvents = file.getDataFromTextFile('utils/preferences/importantEvents.txt')
     if importantEvents != None and len(importantEvents) > 0:
-        df_temp = df[df[codeEventTag].isin(importantEvents)]
-    else:
-        df_temp = df
-    return event.eventUpdate(df_temp, startDate, endDate, True, codeStateTag, minDate, maxDate, sections, subjects, judges)
+        df = df[df[codeEventTag].isin(importantEvents)]
+    return event.eventUpdate(df, startDate, endDate, True, codeStateTag, minDate, maxDate, sections, subjects, judges)

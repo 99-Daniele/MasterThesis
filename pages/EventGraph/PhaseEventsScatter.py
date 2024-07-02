@@ -5,39 +5,39 @@ import datetime as dt
 import plotly.express as px
 
 import utils.Dataframe as frame
-import utils.FileOperation as file
 import utils.Getters as getter
-import utils.graph.EventsGraph as event
 import utils.Utilities as utilities
+import utils.graph.EventsGraph as event
 
 # get dataframe with phase events. 
-# get must phases from text file.
 df = getter.getPhaseEvents()
 phaseTag = utilities.getTagName('phaseTag') 
-df[phaseTag] = df[phaseTag].astype(str)
 
 # return initial layout of page.
 def pageLayout():
+    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     dateTag = utilities.getTagName('dateTag') 
     eventTag = utilities.getTagName('eventTag') 
     judge = utilities.getPlaceholderName('judge') 
-    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     numProcessTag = utilities.getTagName('numProcessTag')
     section = utilities.getPlaceholderName('section') 
     sectionTag = utilities.getTagName('sectionTag')
     subject = utilities.getPlaceholderName('subject')  
     subjectTag = utilities.getTagName('subjectTag') 
+    # maxYear is the year of the las registered event. 
+    # The time interval selected for initial analysis is the year preceding maxYear.
+    # So start date is 1/1/(maxYear - 1) and end date is 1/1/maxYear.
     maxYear = dt.datetime.strptime(df[dateTag].max(), '%Y-%m-%d %H:%M:%S').year
     maxDateStart = dt.date(maxYear - 1, 1, 1)
     maxDateEnd = dt.date(maxYear, 1, 1)
+    judges = frame.getGroupBy(df, codeJudgeTag)
     sections = frame.getGroupBy(df, sectionTag)
     subjects = frame.getGroupBy(df, subjectTag)
-    judges = frame.getGroupBy(df, codeJudgeTag)
     fig = px.scatter(df, x = dateTag, y = numProcessTag, color = eventTag, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = 1400, height = 1200)
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('EVENTS VISUALIZATION GRAPH', href='/eventgraph'),
+        ds.dcc.Link('EVENTS VISUALIZATION GRAPH', href='/event'),
         ds.html.H2('VISUALIZATION OF PROCESS PHASE EVENTS'),
         ds.dcc.DatePickerRange(
             id = 'event-dateranger-phes',

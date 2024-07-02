@@ -1,4 +1,4 @@
-# this page shows processes comparation.
+# this page shows processes duration and comparison.
 
 import dash as ds
 import pandas as pd
@@ -6,8 +6,8 @@ import plotly.express as px
 
 import utils.Dataframe as frame
 import utils.Getters as getter
-import utils.graph.ComparationGraph as comparation
 import utils.Utilities as utilities
+import utils.graph.ComparisonGraph as comparison
 
 # get dataframe with all processes duration.
 df = getter.getProcessesDurationFiltered()
@@ -15,13 +15,13 @@ df = getter.getProcessesDurationFiltered()
 # return initial layout of page.
 def pageLayout():
     avgTag = utilities.getTagName('avgTag') 
+    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     countTag = utilities.getTagName('countTag') 
     dateTag = utilities.getTagName('dateTag') 
     eventSequence = utilities.getPlaceholderName('eventSequence')
     eventSequenceTag = utilities.getTagName('eventSequenceTag')
     finishedTag = utilities.getTagName('finishedTag') 
     judge = utilities.getPlaceholderName('judge') 
-    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     median = utilities.getPlaceholderName('median') 
     month = utilities.getPlaceholderName('month')
     monthYear = utilities.getPlaceholderName('monthYear') 
@@ -43,21 +43,22 @@ def pageLayout():
     withTag = utilities.getPlaceholderName('with')
     withOut = utilities.getPlaceholderName('without')
     year = utilities.getPlaceholderName('year') 
-    subjects = frame.getGroupBy(df, subjectTag)
-    sections = frame.getGroupBy(df, sectionTag)
-    judges = frame.getGroupBy(df, codeJudgeTag)
     finished = frame.getGroupBy(df, finishedTag)
-    sequences = frame.getGroupBy(df, stateSequenceTag)
+    judges = frame.getGroupBy(df, codeJudgeTag)
     phaseSequences = frame.getGroupBy(df, phaseSequenceTag)
+    sections = frame.getGroupBy(df, sectionTag)
+    sequences = frame.getGroupBy(df, stateSequenceTag)
+    subjects = frame.getGroupBy(df, subjectTag)
     events = frame.getGroupByFromString(df, eventSequenceTag)
-    states = frame.getGroupByFromString(df, stateSequenceTag)
     phases = frame.getGroupByFromString(df, phaseSequenceTag)
-    df_temp = pd.DataFrame({'A' : [], 'B': []})
-    fig = px.box(df_temp, x = 'A', y = 'B')
+    states = frame.getGroupByFromString(df, stateSequenceTag)
+    # since figure is constantly updated, initial data are empty for faster graph creation
+    df_start = pd.DataFrame({'A' : [], 'B': []})
+    fig = px.box(df_start, x = 'A', y = 'B')
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('DURATION COMPARISON GRAPHS', href='/comparationgraph'),
+        ds.dcc.Link('DURATION COMPARISON GRAPHS', href='/comparison'),
         ds.html.H2("COMPARISON OF PROCESSES DURATION"),        
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-pr', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([week, month, monthYear, trimester, trimesterYear, year], value = month, id = 'date-radioitem-pr', inline = True, inputStyle = {'margin-left': "20px"}),
@@ -98,13 +99,13 @@ def pageLayout():
         ds.dcc.Checklist([sectionTag, subjectTag, codeJudgeTag, finishedTag, stateSequenceTag, phaseSequenceTag], value = [], id = "choice-checklist-pr", inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = "order-radioitem-pr", inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Checklist([text], value = [text], id = "text-checklist-pr"),
-        ds.dcc.Graph(id = 'comparation-graph-pr', figure = fig)
+        ds.dcc.Graph(id = 'comparison-graph-pr', figure = fig)
     ])
     return layout
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('comparation-graph-pr', 'figure'),
+    [ds.Output('comparison-graph-pr', 'figure'),
         ds.Output('event-dateranger-pr', 'start_date'), 
         ds.Output('event-dateranger-pr', 'end_date'),
         ds.Output('section-dropdown-pr', 'style'),
@@ -157,4 +158,4 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(avgChoice, dateType, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio, choices, choicesOptions, order, text):
-    return comparation.processComparationUpdate(df, avgChoice, dateType, startDate, endDate, minDate, maxDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio, choices, choicesOptions, order, text)
+    return comparison.processComparisonUpdate(df, avgChoice, dateType, startDate, endDate, minDate, maxDate, sections, subjects, judges, finished, sequences, phaseSequences, event, eventRadio, state, stateRadio, phase, phaseRadio, choices, choicesOptions, order, text)

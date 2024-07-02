@@ -18,7 +18,7 @@ def restartData():
     verifyDatabase(connection)
     file.removeFolder('cache')
     file.createFolder('cache')
-    startProcessEvent = 'AS'
+    startProcessEvent = 'IA'
     endPhase = getter.getEndPhase()
     stallStates = getter.getStallStates()
     events = getter.getEvents()
@@ -148,6 +148,9 @@ def getProcessEvents(events, startProcessEvent, stallStates, endPhase, codeEvent
     processPhaseSequenceComplete = []
     processStateSequenceComplete = []
     durationSequenceComplete = []
+    judgeDict = {}
+    sectionDict = {}
+    subjectDict = {}
     i = 0
     while i < int(len(events)):
         if events[i][codeEventTag] == startProcessEvent:
@@ -178,9 +181,33 @@ def getProcessEvents(events, startProcessEvent, stallStates, endPhase, codeEvent
                         processDict.update({numProcessTag: processId})
                         processDict.update({dateTag: processStartDate})
                         processDict.update({distanceTag: distance})
-                        processDict.update({codeJudgeTag: processCodeJudge})
-                        processDict.update({codeSubjectTag: processSubjectCode})
-                        processDict.update({sectionTag: processSection})
+                        if processCodeJudge in judgeDict.keys():
+                            judgeID = judgeDict.get(processCodeJudge)
+                        else:
+                            if len(list(judgeDict.values())) == 0:
+                                judgeID = 0
+                            else:
+                                judgeID = list(judgeDict.values())[-1] + 10000
+                            judgeDict.update({processCodeJudge: judgeID})
+                        processDict.update({codeJudgeTag: judgeID})
+                        if processSubjectCode in subjectDict.keys():
+                            subjectID = subjectDict.get(processSubjectCode)
+                        else:
+                            if len(list(subjectDict.values())) == 0:
+                                subjectID = 0
+                            else:
+                                subjectID = list(subjectDict.values())[-1] + 10000
+                            subjectDict.update({processSubjectCode: subjectID})
+                        processDict.update({codeSubjectTag: subjectID})
+                        if processSection in sectionDict.keys():
+                            sectionID = sectionDict.get(processSection)
+                        else:
+                            if len(list(sectionDict.values())) == 0:
+                                sectionID = 0
+                            else:
+                                sectionID = list(sectionDict.values())[-1] + 10000
+                            sectionDict.update({processSection: sectionID})
+                        processDict.update({sectionTag: sectionID})
                         processDict.update({finishedTag: processFinished})
                         finalDuration = int(durationSequenceComplete[-1])
                         for j in range(len(processEventSequenceComplete)):
@@ -276,9 +303,33 @@ def getProcessEvents(events, startProcessEvent, stallStates, endPhase, codeEvent
             processDict.update({numProcessTag: processId})
             processDict.update({dateTag: processStartDate})
             processDict.update({distanceTag: distance})
-            processDict.update({codeJudgeTag: processCodeJudge})
-            processDict.update({codeSubjectTag: processSubjectCode})
-            processDict.update({sectionTag: processSection})
+            if processCodeJudge in judgeDict.keys():
+                judgeID = judgeDict.get(processCodeJudge)
+            else:
+                if len(list(judgeDict.values())) == 0:
+                    judgeID = 0
+                else:
+                    judgeID = list(judgeDict.values())[-1] + 10000
+                judgeDict.update({processCodeJudge: judgeID})
+            processDict.update({codeJudgeTag: judgeID})
+            if processSubjectCode in subjectDict.keys():
+                subjectID = subjectDict.get(processSubjectCode)
+            else:
+                if len(list(subjectDict.values())) == 0:
+                    subjectID = 0
+                else:
+                    subjectID = list(subjectDict.values())[-1] + 10000
+                subjectDict.update({processSubjectCode: subjectID})
+            processDict.update({codeSubjectTag: subjectID})
+            if processSection in sectionDict.keys():
+                sectionID = sectionDict.get(processSection)
+            else:
+                if len(list(sectionDict.values())) == 0:
+                    sectionID = 0
+                else:
+                    sectionID = list(sectionDict.values())[-1] + 10000
+                sectionDict.update({processSection: sectionID})
+            processDict.update({sectionTag: sectionID})
             processDict.update({finishedTag: processFinished})
             finalDuration = int(durationSequenceComplete[-1])
             for j in range(len(processEventSequenceComplete)):

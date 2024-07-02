@@ -1,4 +1,4 @@
-# this page shows events duration and comparation.
+# this page shows events duration and comparison.
 
 import dash as ds
 import pandas as pd
@@ -7,8 +7,8 @@ import plotly.express as px
 import utils.Dataframe as frame
 import utils.FileOperation as file
 import utils.Getters as getter
-import utils.graph.ComparationGraph as comparation
 import utils.Utilities as utilities
+import utils.graph.ComparisonGraph as comparison
 
 # get dataframe with all events duration.
 df = getter.getEventsDurationFiltered()
@@ -18,12 +18,12 @@ eventTag = utilities.getTagName('eventTag')
 # return initial layout of page.
 def pageLayout():
     avgTag = utilities.getTagName('avgTag') 
+    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     countTag = utilities.getTagName('countTag') 
     dateTag = utilities.getTagName('dateTag') 
     event = utilities.getPlaceholderName('event') 
     finishedTag = utilities.getTagName('finishedTag') 
     judge = utilities.getPlaceholderName('judge') 
-    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     median = utilities.getPlaceholderName('median') 
     month = utilities.getPlaceholderName('month')
     monthYear = utilities.getPlaceholderName('monthYear') 
@@ -37,21 +37,23 @@ def pageLayout():
     trimesterYear = utilities.getPlaceholderName('trimesterYear')
     week = utilities.getPlaceholderName('week')
     year = utilities.getPlaceholderName('year')
+    # filter important events chosen by user. Those are taken from stored file. Those are taken from stored file.
     importantEvents = file.getDataFromTextFile('utils/preferences/importantEvents.txt')
     if importantEvents != None and len(importantEvents) > 0:
-        df_temp = df[df[codeEventTag].isin(importantEvents)]
-    types = frame.getGroupBy(df_temp, eventTag)
+        df = df[df[codeEventTag].isin(importantEvents)]
+    types = frame.getGroupBy(df, eventTag)
     typesSorted = sorted(types)
-    sections = frame.getGroupBy(df_temp, sectionTag)
-    subjects = frame.getGroupBy(df_temp, subjectTag)
-    judges = frame.getGroupBy(df_temp, codeJudgeTag)
-    finished = frame.getGroupBy(df_temp, finishedTag)
-    df_temp = pd.DataFrame({'A' : [], 'B': []})
-    fig = px.box(df_temp, x = 'A', y = 'B')
+    finished = frame.getGroupBy(df, finishedTag)
+    judges = frame.getGroupBy(df, codeJudgeTag)
+    sections = frame.getGroupBy(df, sectionTag)
+    subjects = frame.getGroupBy(df, subjectTag)
+    # since figure is constantly updated, initial data are empty for faster graph creation
+    df_start = pd.DataFrame({'A' : [], 'B': []})
+    fig = px.box(df_start, x = 'A', y = 'B')
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('DURATION COMPARISON GRAPHS', href='/comparationgraph'),
+        ds.dcc.Link('DURATION COMPARISON GRAPHS', href='/comparison'),
         ds.html.H2('PROCESS EVENTS DURATION', id = 'title-e'),
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-e', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.RadioItems([week, month, monthYear, trimester, trimesterYear, year], value = month, id = 'date-radioitem-e', inline = True, style = {'display':'none'}, inputStyle = {'margin-left': "20px"}),
@@ -77,13 +79,13 @@ def pageLayout():
         ds.dcc.Checklist([sectionTag, subjectTag, codeJudgeTag, finishedTag], value = [], id = 'choice-checklist-e', inline = True, style = {'display': 'none'}),
         ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = 'order-radioitem-e', inline = True, style = {'display': 'none'}),
         ds.dcc.Checklist([text], value = [], id = 'text-checklist-e'),
-        ds.dcc.Graph(id = 'comparation-graph-e', figure = fig)
+        ds.dcc.Graph(id = 'comparison-graph-e', figure = fig)
     ])
     return layout
 
 # callback with input and output.
 @ds.callback(
-    [ds.Output('comparation-graph-e', 'figure'),
+    [ds.Output('comparison-graph-e', 'figure'),
         ds.Output('event-dateranger-e', 'start_date'), 
         ds.Output('event-dateranger-e', 'end_date'),
         ds.Output('event-dateranger-e', 'style'),
@@ -119,9 +121,8 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, choices, order, text):
+    # filter important events chosen by user. Those are taken from stored file.
     importantEvents = file.getDataFromTextFile('utils/preferences/importantEvents.txt')
     if importantEvents != None and len(importantEvents) > 0:
-        df_temp = df[df[codeEventTag].isin(importantEvents)]
-    else:
-        df_temp = df
-    return comparation.typeComparationUpdate(df_temp, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, eventTag, sections, subjects, judges, finished, choices, order, text)
+        df = df[df[codeEventTag].isin(importantEvents)]
+    return comparison.typeComparisonUpdate(df, typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, eventTag, sections, subjects, judges, finished, choices, order, text)

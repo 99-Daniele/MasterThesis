@@ -5,15 +5,15 @@ def start():
     import dash as ds
 
     import pages.Home as homePage
-    import pages.Comparation as comparationPage
+    import pages.Comparison as comparisonPage
     import pages.Event as eventPage
     import pages.Preference as preferencePage
-    import pages.TypeEvent as typeEventPage
-    import pages.comparationGraph.EventComparation as eventComparationPage
-    import pages.comparationGraph.PhaseComparation as phaseComparationPage
-    import pages.comparationGraph.ProcessComparation as processComparationPage
-    import pages.comparationGraph.StateComparation as stateComparationPage
-    import pages.comparationGraph.TypeComparation as typeComparationPage
+    import pages.Composition as typeEventPage
+    import pages.comparisonGraph.EventComparison as eventComparisonPage
+    import pages.comparisonGraph.PhaseComparison as phaseComparisonPage
+    import pages.comparisonGraph.ProcessComparison as processComparisonPage
+    import pages.comparisonGraph.StateComparison as stateComparisonPage
+    import pages.comparisonGraph.ProcessComparisonByType as typeComparisonPage
     import pages.eventGraph.AllEventsScatter as allEventsPage
     import pages.eventGraph.PhaseEventsScatter as phaseEventsPage
     import pages.eventGraph.StateEventsScatter as stateEventsPage
@@ -21,11 +21,11 @@ def start():
     import pages.preferenceTable.EventPreference as eventPreferencePage
     import pages.preferenceTable.StatePreference as statePreferencePage
     import pages.preferenceTable.SubjectPreference as subjectPreferencePage
-    import pages.typeEventGraph.EventSequence as sequenceEventPage
-    import pages.typeEventGraph.PhaseEvents as eventsPhasePage
-    import pages.typeEventGraph.PhaseSequence as sequencePhasePage
-    import pages.typeEventGraph.StateEvents as eventsStatePage
-    import pages.typeEventGraph.StateSequence as sequenceStatePage
+    import pages.compositionGraph.EventSequence as sequenceEventPage
+    import pages.compositionGraph.PhaseEvents as eventsPhasePage
+    import pages.compositionGraph.PhaseSequence as sequencePhasePage
+    import pages.compositionGraph.StateEvents as eventsStatePage
+    import pages.compositionGraph.StateSequence as sequenceStatePage
 
     app = ds.Dash(__name__, suppress_callback_exceptions = True)
     app.layout = ds.html.Div([
@@ -38,29 +38,29 @@ def start():
             ds.Input('url', 'pathname'))
     def display_page(pathname):
         match pathname:
-            case '/comparationgraph':
-                return comparationPage.pageLayout()
-            case '/eventgraph':
+            case '/comparison':
+                return comparisonPage.pageLayout()
+            case '/event':
                 return eventPage.pageLayout()
             case '/preference':
                 return preferencePage.pageLayout()
-            case '/typeevent':
+            case '/composition':
                 return typeEventPage.pageLayout()
-            case '/comparationgraph/eventcomparation':
-                return eventComparationPage.pageLayout()
-            case '/comparationgraph/phasecomparation':
-                return phaseComparationPage.pageLayout()
-            case '/comparationgraph/processcomparation':
-                return processComparationPage.pageLayout()
-            case '/comparationgraph/statecomparation':
-                return stateComparationPage.pageLayout()
-            case '/comparationgraph/typecomparation':
-                return typeComparationPage.pageLayout()
-            case '/eventgraph/allevents':
+            case '/comparison/eventcomparison':
+                return eventComparisonPage.pageLayout()
+            case '/comparison/phasecomparison':
+                return phaseComparisonPage.pageLayout()
+            case '/comparison/processcomparison':
+                return processComparisonPage.pageLayout()
+            case '/comparison/statecomparison':
+                return stateComparisonPage.pageLayout()
+            case '/comparison/typecomparison':
+                return typeComparisonPage.pageLayout()
+            case '/event/allevents':
                 return allEventsPage.pageLayout()
-            case '/eventgraph/phaseevents':
+            case '/event/phaseevents':
                 return phaseEventsPage.pageLayout()
-            case '/eventgraph/stateevents':
+            case '/event/stateevents':
                 return stateEventsPage.pageLayout()
             case '/prediction':
                 return predictionErrorPage.pageLayout()
@@ -70,15 +70,15 @@ def start():
                 return statePreferencePage.pageLayout()
             case '/preference/subjectpreference':
                 return subjectPreferencePage.pageLayout()
-            case '/typeevent/stateevent':
+            case '/composition/stateevent':
                 return eventsStatePage.pageLayout()
-            case '/typeevent/phaseevent':
+            case '/composition/phaseevent':
                 return eventsPhasePage.pageLayout()
-            case '/typeevent/statesequence':
+            case '/composition/statesequence':
                 return sequenceStatePage.pageLayout()
-            case '/typeevent/phasesequence':
+            case '/composition/phasesequence':
                 return sequencePhasePage.pageLayout()
-            case '/typeevent/eventsequence':
+            case '/composition/eventsequence':
                 return sequenceEventPage.pageLayout()
             case _:
                 return homePage.pageLayout()

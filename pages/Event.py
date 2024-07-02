@@ -7,10 +7,10 @@ def pageLayout():
     layout = ds.html.Div([
         ds.dcc.Link('Home', href = '/'),
         ds.html.H2('EVENTS VISUALIZATION GRAPHS'),
-        ds.dcc.Link('Visualize All Events', href = '/eventgraph/allevents'),
+        ds.dcc.Link('Visualize All Events', href = '/event/allevents'),
         ds.html.Br(),
-        ds.dcc.Link('Visualiza Phase Events', href = '/eventgraph/phaseevents'),
+        ds.dcc.Link('Visualiza Phase Events', href = '/event/phaseevents'),
         ds.html.Br(),
-        ds.dcc.Link('Visualize State Events', href = '/eventgraph/stateevents')
+        ds.dcc.Link('Visualize State Events', href = '/event/stateevents')
     ])
     return layout

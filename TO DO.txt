@@ -1,7 +1,6 @@
 - disponibile per accesso esterno --> descrizione readme
 - dimensione grafici
-- df_temp e df copy()
-- df1, df2, df_data nomi migliori
 - predittore condivisibile
-- filtro durata
-- implement ui for alert and input data
+- errore grafico confronto
+- preference modifica
+- data updatemigliore visualizzazione

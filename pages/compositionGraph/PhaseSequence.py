@@ -12,37 +12,36 @@ import utils.Utilities as utilities
 # get dataframe with all events duration.
 df = getter.getPhasesDurationFiltered()
 phaseTag = utilities.getTagName('phaseTag')
-df[phaseTag] = df[phaseTag].astype(str)
 
 # return initial layout of page.
 def pageLayout():
     avgTag = utilities.getTagName('avgTag')
+    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
+    finishedTag = utilities.getTagName('finishedTag') 
+    judge = utilities.getPlaceholderName('judge') 
     median = utilities.getPlaceholderName('median')
     phase = utilities.getPlaceholderName('phase')
-    text = utilities.getPlaceholderName('text')
-    judge = utilities.getPlaceholderName('judge') 
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
-    subject = utilities.getPlaceholderName('subject')  
-    types = frame.getUniques(df, phaseTag)
-    finishedTag = utilities.getTagName('finishedTag') 
-    codeJudgeTag = utilities.getTagName('codeJudgeTag') 
-    median = utilities.getPlaceholderName('median') 
     sectionTag = utilities.getTagName('sectionTag')
-    subjectTag = utilities.getTagName('codeSubjectTag') 
+    subject = utilities.getPlaceholderName('subject') 
+    subjectTag = utilities.getTagName('subjectTag') 
+    text = utilities.getPlaceholderName('text') 
+    finished = frame.getGroupBy(df, finishedTag)
+    judges = frame.getGroupBy(df, codeJudgeTag)
     sections = frame.getGroupBy(df, sectionTag)
     subjects = frame.getGroupBy(df, subjectTag)
-    judges = frame.getGroupBy(df, codeJudgeTag)
-    finished = frame.getGroupBy(df, finishedTag)
-    df_temp = pd.DataFrame({'A' : (), 'B': ()})
-    types = sorted(types)
-    fig = px.box(df_temp, x = 'A', y = 'B')
+    phases = frame.getUniques(df, phaseTag)
+    phases = sorted(phases)
+    # since figure is constantly updated, initial data are empty for faster graph creation
+    df_start = pd.DataFrame({'A' : (), 'B': ()})
+    fig = px.box(df_start, x = 'A', y = 'B')
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
-        ds.dcc.Link('COMPOSITION GRAPHS', href='/typeevent'),
+        ds.dcc.Link('COMPOSITION GRAPHS', href='/composition'),
         ds.html.H2('PHASE SEQUENCES'),
-        ds.dcc.Dropdown(types, value = ['2'], multi = True, searchable = True, clearable = True, id = 'type-dropdown-phsq', placeholder = phase, style = {'width': 400}),
+        ds.dcc.Dropdown(phases, value = ['2'], multi = True, searchable = True, clearable = True, id = 'type-dropdown-phsq', placeholder = phase, style = {'width': 400}),
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-phsq', placeholder = section, style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-phsq', placeholder = subject, style = {'width': 400}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-phsq', placeholder = judge, style = {'width': 400}),
