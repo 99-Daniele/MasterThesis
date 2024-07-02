@@ -77,7 +77,7 @@ def getEventsInfo():
     if eventsInfoDataframe is None:
         eventsInfo = connect.getDataFromDatabase(connection, eventsInfoQuery)
         eventsInfoDataframe = frame.createEventsInfoDataFrame(eventsInfo, codeEventTag, descriptionTag, eventTag)
-        cache.updateCache('eventsInfo.json', eventsInfoDataframe)
+        cache.updateCacheDataframe('eventsInfo.json', eventsInfoDataframe)
     return eventsInfoDataframe
 
 # get states info dataframe.
@@ -91,7 +91,7 @@ def getStatesInfo():
     if statesInfoDataframe is None:
         statesInfo = connect.getDataFromDatabase(connection, statesInfoQuery)
         statesInfoDataframe = frame.createStatesInfoDataFrame(statesInfo, codeStateTag, descriptionTag, phaseTag, phaseDBTag, stateTag)
-        cache.updateCache('statesInfo.json', statesInfoDataframe)
+        cache.updateCacheDataframe('statesInfo.json', statesInfoDataframe)
     return statesInfoDataframe
 
 # get subjects info dataframe.
@@ -104,7 +104,7 @@ def getSubjectsInfo():
     if subjectsInfoDataframe is None:
         subjectsInfo = connect.getDataFromDatabase(connection, subjectsInfoQuery)
         subjectsInfoDataframe = frame.createSubjectsInfoDataFrame(subjectsInfo, codeSubjectTag, descriptionTag, ritualTag, subjectTag)
-        cache.updateCache('subjectsInfo.json', subjectsInfoDataframe)
+        cache.updateCacheDataframe('subjectsInfo.json', subjectsInfoDataframe)
     subjectsInfoDataframe[codeSubjectTag] = subjectsInfoDataframe[codeSubjectTag].astype(str)
     return subjectsInfoDataframe
 

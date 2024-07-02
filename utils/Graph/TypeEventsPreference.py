@@ -3,6 +3,7 @@
 import pandas as pd
 
 import utils.Cache as cache
+import utils.DataUpdate as update
 import utils.FileOperation as file
 import utils.Utilities as utilities
 
@@ -24,7 +25,8 @@ def updateData(data, oldData, tag, filename):
         newDf = oldData[~oldData[tag].isin(dfData[tag])]
         newDf = pd.concat([newDf, dfData])
         newDf = newDf.drop([countTag, durationTag], axis = 1).reset_index(drop = True)
-        cache.updateCache(filename, newDf)
+        cache.updateCacheDataframe(filename, newDf)
+        update.refreshData()
         return data, True
     return data, False
 

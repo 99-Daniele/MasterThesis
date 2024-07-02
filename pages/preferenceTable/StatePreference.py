@@ -11,7 +11,6 @@ import utils.graph.TypeEventsPreference as typeEvents
 df = getter.getStateNamesDataframe()
 codeStateTag = utilities.getTagName('codeStateTag')
 countTag = utilities.getTagName('countTag')
-descriptionTag = utilities.getTagName('descriptionTag')
 phaseTag = utilities.getTagName('phaseTag')
 phaseDBTag = utilities.getTagName('phaseDBTag')
 stateTag = utilities.getTagName('stateTag')
@@ -23,7 +22,6 @@ def pageLayout():
     code = utilities.getPlaceholderName('code')
     codeStateTag = utilities.getTagName('codeStateTag')
     count = utilities.getPlaceholderName('count')
-    description = utilities.getPlaceholderName('description')
     durationTag = utilities.getTagName('durationTag')
     duration = utilities.getPlaceholderName('duration')
     phase = utilities.getPlaceholderName('phase')
@@ -44,7 +42,6 @@ def pageLayout():
         ds.dash_table.DataTable(
             df.to_dict('records'), columns = [
                 {'name': code, 'id': codeStateTag, 'editable': False}, 
-                {'name': description, 'id': descriptionTag, 'editable': False}, 
                 {'name': state, 'id': stateTag, 'editable': True},  
                 {'name': phaseDB, 'id': phaseDBTag, 'editable': False}, 
                 {'name': phase, 'id': phaseTag, 'editable': True}, 
@@ -78,7 +75,6 @@ def update_dateframe(refreshButton, resetButton, downloadButton, importantIndex,
         dataDF.to_csv('cache/statesInfo.csv')
     if ds.ctx.triggered_id != None and 'reset-button' in ds.ctx.triggered_id:
         for d in data:
-            d.update({stateTag: d.get(descriptionTag)})
             d.update({phaseTag: d.get(phaseDBTag)})
         newData, display = typeEvents.updateData(data, df, codeStateTag, 'statesInfo.json')
         return newData, display, importantIndex

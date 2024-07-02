@@ -1,7 +1,8 @@
 - disponibile per accesso esterno --> descrizione readme
+- documentazione
+
 - dimensione grafici
-- predittore condivisibile
+- font size
+
 - errore grafico confronto
-- preference modifica
-- data update migliore visualizzazione
 - preference sezioni e tipo processi

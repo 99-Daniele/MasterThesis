@@ -3,7 +3,13 @@
 import utils.FileOperation as file
 
 # convert input data into json data and then write on file.
-def updateCache(filename, data):
+def updateCacheData(filename, data):
+    filename = "cache/" + filename
+    file.writeOnJsonFile(filename, data)
+    print(filename[:-5] + " updated!")
+
+# convert input dataframe into json data and then write on file.
+def updateCacheDataframe(filename, data):
     filename = "cache/" + filename
     jsonData = data.to_json(orient = 'split')
     file.writeOnJsonFile(filename, jsonData)
