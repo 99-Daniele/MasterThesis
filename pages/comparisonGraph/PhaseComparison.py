@@ -11,6 +11,7 @@ import utils.graph.ComparisonGraph as comparison
 
 # get dataframe with all phases duration.
 df = getter.getPhasesDurationFiltered()
+phaseTag = utilities.getTagName('phaseTag') 
 
 # return initial layout of page.
 def pageLayout():
@@ -24,7 +25,6 @@ def pageLayout():
     month = utilities.getPlaceholderName('month')
     monthYear = utilities.getPlaceholderName('monthYear') 
     phase = utilities.getPlaceholderName('phase') 
-    phaseTag = utilities.getTagName('phaseTag') 
     process = utilities.getPlaceholderName('process')  
     section = utilities.getPlaceholderName('section') 
     sectionTag = utilities.getTagName('sectionTag')

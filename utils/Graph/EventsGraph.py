@@ -92,7 +92,7 @@ def eventUpdate(df, startDate, endDate, symbol, type, minDate, maxDate, sections
     else:
         fig = px.scatter(newDF, x = dateTag, y = numProcessTag, color = type, color_discrete_map = colorMap, labels = {numProcessTag:'Process ID', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.95))   
     fig.update_layout(
-        font = dict(size = 18),
+        font = dict(size = 14),
         legend = dict(
             yanchor = "top",
             y = 0.99,

@@ -556,6 +556,8 @@ def getDurations(processDict, processId, processSubjectCode, processSubject, pro
         curr = events[i]
         next = events[i + 1]
         # currPhase and nextPhase are the phase of curr and next events.
+        print(curr)
+        print(next)
         currPhase = frame.getPhaseOfState(statesName, curr[codeStateTag], phaseTag)
         nextPhase = frame.getPhaseOfState(statesName, next[codeStateTag], phaseTag)
         # currPhaseDt and nextPhaseDt are the date of curr and next events.

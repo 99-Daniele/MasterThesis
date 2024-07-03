@@ -355,13 +355,13 @@ def processComparisonUpdate(df, avgChoice, dateType, startDate, endDate, minDate
         )
         if text == [textTag]:
             fig.add_traces(
-                px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 25)).data
+                px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 18)).data
             )
         else:
             fig.add_traces(
-                px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 25)).data
+                px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 18)).data
             )
-        fig.update_layout(xaxis_tickvals = xticks, font = dict(size = 18))
+        fig.update_layout(xaxis_tickvals = xticks, font = dict(size = 14))
         fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
         return fig, startDate, endDate, sectionStyle, subjectStyle, judgeStyle, finishedStyle, sequenceStyle, phaseSequenceStyle, eventStyle, eventRadioStyle, stateStyle, stateRadioStyle, phaseStyle, phaseRadioStyle, orderRadioStyle, sections, subjects, judges, finished, sequences, phaseSequences, event, state, phase, choicesOptions
     # if user has selected a parameter to compare, a process comparison duration graph is shown.
@@ -386,9 +386,9 @@ def processComparisonUpdate(df, avgChoice, dateType, startDate, endDate, minDate
             lambda t: t.update(name = frame.addCountToName(infoData, t.name, filterTag, countTag)) if t.name != frame.addTotCountToName(allData, countTag) else False
         )
         fig.for_each_trace(
-            lambda t: t.update(textfont_color = t.line.color, textposition = "top center", textfont_size = 25)
+            lambda t: t.update(textfont_color = t.line.color, textposition = "top center", textfont_size = 18)
         )
-        fig.update_layout(xaxis_tickvals = xticks, font = dict(size = 18))
+        fig.update_layout(xaxis_tickvals = xticks, font = dict(size = 14))
         fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != frame.addTotCountToName(allData, countTag) else False))
         fig.update_xaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
         fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
@@ -453,7 +453,7 @@ def typeComparisonUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate
             fig.add_traces(
                 px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
-        fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False, font = dict(size = 18))
+        fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False, font = dict(size = 14))
         fig.update_xaxes(tickangle = 45)
         fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
         return fig, startDate, endDate, dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, title
@@ -483,13 +483,13 @@ def typeComparisonUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate
             )
             if text == [textTag]:
                 fig.add_traces(
-                    px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 25)).data
+                    px.line(avgData, x = dateTag, y = quantileTag, text = countTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 18)).data
                 )
             else:
                 fig.add_traces(
-                    px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 25)).data
+                    px.line(avgData, x = dateTag, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 14)).data
                 )
-            fig.update_layout(xaxis_tickvals = xticks, font = dict(size = 18))
+            fig.update_layout(xaxis_tickvals = xticks, font = dict(size = 14))
             fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
             return fig, startDate, endDate, dateRangeStyle, resetStyle, dateRadioStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle, sections, subjects, judges, finished, title
         # if user selects comparison parameter, comparison type duration graph is shown.
@@ -501,7 +501,7 @@ def typeComparisonUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate
             [typeData, allData, infoData] = frame.getAvgDataFrameByTypeChoices(df_data, avgChoice, dateType, choices, order, None, None, None)
             xticks = frame.getUniques(allData, dateTag)
             if text == [textTag]:
-                fig = px.line(allData, x = dateTag, y = durationTag, text = countTag, labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.95)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
+                fig = px.line(allData, x = dateTag, y = durationTag, labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.95)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})
                 fig.add_traces(
                     px.line(typeData, x = dateTag, y = durationTag, text = countTag, color = filterTag, markers = True, width = utilities.getWidth(1.1), height = utilities.getHeight(1.1)).data
                 )
@@ -514,9 +514,9 @@ def typeComparisonUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate
                 lambda t: t.update(name = frame.addCountToName(infoData, t.name, filterTag, countTag)) if t.name != frame.addTotCountToName(allData, countTag) else False
             )
             fig.for_each_trace(
-                lambda t: t.update(textfont_color = t.line.color, textposition = "top center", textfont_size = 25)
+                lambda t: t.update(textfont_color = t.line.color, textposition = "top center", textfont_size = 18)
             )
-            fig.update_layout(xaxis_tickvals = xticks, font = dict(size = 18))
+            fig.update_layout(xaxis_tickvals = xticks, font = dict(size = 14))
             fig.update_traces(visible = "legendonly", selector = (lambda t: t if t.name != frame.addTotCountToName(allData, countTag) else False))
             fig.update_xaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
             fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
@@ -550,7 +550,7 @@ def parameterComparisonUpdate(df, avgChoice, tag, sections, judges, subjects, mo
         fig.add_traces(
             px.line(avgData, x = tag, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
         )
-    fig.update_layout(xaxis_tickvals = xticks, font = dict(size = 18))
+    fig.update_layout(xaxis_tickvals = xticks, font = dict(size = 14))
     fig.update_xaxes(tickangle = 45)
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
     return fig, title

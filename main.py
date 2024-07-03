@@ -204,4 +204,4 @@ if not os.path.isdir('cache'):
     restartData()
 
 if __name__ == '__main__':
-    displaySectionPreferences()
+    refreshData()

@@ -161,6 +161,8 @@ def getStateEvents():
     if stateEventsDataframe is None:
         update.refreshData()
         stateEventsDataframe = cache.getDataframe('stateEvents.json')
+    print(stateEventsDataframe)
+    exit()
     return stateEventsDataframe
 
 # get processes duration dataframe from cache file.

@@ -13,6 +13,7 @@ df = getter.getPredictedDurationDataframe()
 
 # return initial layout of page.
 def pageLayout():
+    global df
     avgTag = utilities.getTagName('avgTag') 
     countTag = utilities.getTagName('countTag') 
     durationFinalTag = utilities.getTagName('durationFinalTag') 
@@ -88,7 +89,7 @@ def pageLayout():
     )
     fig.data[-1].name = 'error50'
     fig.data[-1].legendgroup = '6'
-    fig.update_layout(font = dict(size = 22))
+    fig.update_layout(font = dict(size = 16))
     fig.update_traces(showlegend = True)
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
@@ -96,7 +97,7 @@ def pageLayout():
         ds.dash_table.DataTable(
             dfError.to_dict('records'),
             style_cell = {
-                'font-size': 25,
+                'font-size': 16,
                 'text-align': 'center'
             }),
         ds.dcc.Graph(figure = fig, id = 'prediction-graph')

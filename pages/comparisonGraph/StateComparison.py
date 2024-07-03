@@ -17,6 +17,7 @@ stateTag = utilities.getTagName('stateTag')
 
 # return initial layout of page.
 def pageLayout():
+    global df
     avgTag = utilities.getTagName('avgTag') 
     codeJudgeTag = utilities.getTagName('codeJudgeTag') 
     countTag = utilities.getTagName('countTag') 
@@ -120,6 +121,7 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(typeChoice, avgChoice, typeDate, startDate, endDate, minDate, maxDate, button, sections, subjects, judges, finished, choices, order, text):
+    global df
     # filter important states chosen by user. Those are taken from stored file.
     importantStates = file.getDataFromTextFile('utils/preferences/importantStates.txt')
     if importantStates != None and len(importantStates) > 0:

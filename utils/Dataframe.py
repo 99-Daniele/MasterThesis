@@ -656,7 +656,7 @@ def phaseColorMap(type, statesInfoDataframe):
     phaseTag = utilities.getTagName("phaseTag")
     map = {}
     for s in statesInfo:
-        key = s[type]
-        phase = s[phaseTag]
-        map.update({key: colors.get(str(phase))})
+        key = str(s[type])
+        phase = str(s[phaseTag])
+        map.update({key: colors.get(phase)})
     return map

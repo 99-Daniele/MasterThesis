@@ -17,6 +17,7 @@ eventTag = utilities.getTagName('eventTag')
 
 # return initial layout of page.
 def pageLayout():
+    global df
     avgTag = utilities.getTagName('avgTag')
     codeJudgeTag = utilities.getTagName('codeJudgeTag')
     event = utilities.getPlaceholderName('event')
@@ -76,6 +77,7 @@ def pageLayout():
 
 # return updated data based on user choice.
 def updateOutput(event, avg, text, section, subject, judge, finished):
+    global df
     # filter important events chosen by user. Those are taken from stored file. Those are taken from stored file.
     importantEvents = file.getDataFromTextFile('utils/preferences/importantEvents.txt')
     if importantEvents != None and len(importantEvents) > 0:

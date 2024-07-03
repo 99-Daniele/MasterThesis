@@ -1,6 +1,5 @@
 - disponibile per accesso esterno --> descrizione readme
 - documentazione
 
-- font size
-
 - errore grafico confronto
+- sistemare type duration far scomparire quando selezioni

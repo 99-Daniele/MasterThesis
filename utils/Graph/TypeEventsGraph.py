@@ -107,7 +107,7 @@ def typeUpdate(df, type, typeChoices, tagChoice, first, avgChoice, text, section
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
-    fig.update_layout(xaxis_tickvals = xticks, showlegend = False, font = dict(size = 18))
+    fig.update_layout(xaxis_tickvals = xticks, showlegend = False, font = dict(size = 14))
     fig.update_xaxes(tickangle = 45)
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
     return fig, sections, subjects, judges, finished
@@ -150,7 +150,7 @@ def typeSequenceUpdate(df, typeChoices, tagChoice, avgChoice, text, sections, su
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
-    fig.update_layout(xaxis_tickvals = xticks, showlegend = False, font = dict(size = 18))
+    fig.update_layout(xaxis_tickvals = xticks, showlegend = False, font = dict(size = 14))
     fig.update_xaxes(tickangle = 45)
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
     return fig, sections, subjects, judges, finished
