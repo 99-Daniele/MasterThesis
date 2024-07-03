@@ -19,6 +19,8 @@ def start():
     import pages.eventGraph.StateEventsScatter as stateEventsPage
     import pages.predictionGraph.PredictionError as predictionErrorPage
     import pages.preferenceTable.EventPreference as eventPreferencePage
+    import pages.preferenceTable.FinishedPreference as finishedPreferencePage
+    import pages.preferenceTable.SectionPreference as sectionPreferencePage
     import pages.preferenceTable.StatePreference as statePreferencePage
     import pages.preferenceTable.SubjectPreference as subjectPreferencePage
     import pages.compositionGraph.EventSequence as sequenceEventPage
@@ -66,6 +68,10 @@ def start():
                 return predictionErrorPage.pageLayout()
             case '/preference/eventpreference':
                 return eventPreferencePage.pageLayout()
+            case '/preference/finishedpreference':
+                return finishedPreferencePage.pageLayout()
+            case '/preference/sectionpreference':
+                return sectionPreferencePage.pageLayout()
             case '/preference/statepreference':
                 return statePreferencePage.pageLayout()
             case '/preference/subjectpreference':

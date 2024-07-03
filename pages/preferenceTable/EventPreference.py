@@ -1,4 +1,4 @@
-# this page allows user to change events parameters.
+# this page allows user to change events preferences.
 
 import dash as ds
 import pandas as pd

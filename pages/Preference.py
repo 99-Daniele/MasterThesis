@@ -11,6 +11,10 @@ def pageLayout():
         ds.html.Br(),
         ds.dcc.Link('Select Event Preference', href = '/preference/eventpreference'),
         ds.html.Br(),
-        ds.dcc.Link('Select Subject Preference', href = '/preference/subjectpreference')
+        ds.dcc.Link('Select Subject Preference', href = '/preference/subjectpreference'),
+        ds.html.Br(),
+        ds.dcc.Link('Select Section Preference', href = '/preference/sectionpreference'),
+        ds.html.Br(),
+        ds.dcc.Link('Select Process Type Preference', href = '/preference/finishedpreference')
     ])
     return layout

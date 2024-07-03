@@ -269,3 +269,19 @@ def getSubjectNamesDataframe():
     df = frame.createSubjectNameDataframeWithInfo(processDurationDataframe, subjectNamesDataframe)
     df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
     return df
+
+# get finished dataframe.
+def getFinishedDataframe():
+    durationTag = utilities.getTagName("durationTag")
+    processDurationDataframe = getProcessesDuration()
+    df = frame.creatFinishedDataframeWithInfo(processDurationDataframe)
+    df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
+    return df
+
+# get section dataframe.
+def getSectionDataframe():
+    durationTag = utilities.getTagName("durationTag")
+    processDurationDataframe = getProcessesDuration()
+    df = frame.creatSectionDataframeWithInfo(processDurationDataframe)
+    df[durationTag] = df[durationTag].apply(lambda x: float(str(x).replace(',', '')))
+    return df

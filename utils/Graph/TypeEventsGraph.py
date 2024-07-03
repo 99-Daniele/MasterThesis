@@ -81,6 +81,8 @@ def typeUpdate(df, type, typeChoices, tagChoice, first, avgChoice, text, section
     df_data = updateTypeData(newDF, sections, subjects, judges, finished)
     # parameters remaining choices are calculated based on user choices.
     [sections, subjects, judges, finished] = updateTypeDataBySelection(newDF, df_data, sections, subjects, judges, finished)
+    # allData contains all data with duration and type value.
+    # avgData contains for each different type the calculated average duration.
     [allData, avgData] = frame.getAvgStdDataFrameByTypeChoiceOrderedByPhase(df_data, tagChoice, avgChoice)   
     xticks = frame.getUniques(allData, tagChoice)
     # if it's an event graph color is unique, otherwise color is decised based on colorMap which associate to each phase a different color.
@@ -105,9 +107,6 @@ def typeUpdate(df, type, typeChoices, tagChoice, first, avgChoice, text, section
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
-            fig.add_traces(
-                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 25)).data
-            )
     fig.update_layout(xaxis_tickvals = xticks, showlegend = False, font = dict(size = 18))
     fig.update_xaxes(tickangle = 45)
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
@@ -124,13 +123,14 @@ def typeUpdate(df, type, typeChoices, tagChoice, first, avgChoice, text, section
 def typeSequenceUpdate(df, typeChoices, tagChoice, avgChoice, text, sections, subjects, judges, finished):
     durationTag = utilities.getTagName('durationTag')
     eventTag = utilities.getTagName('eventTag')
-    quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
     statesInfo = getter.getStatesInfo()
     newDF = df.copy()
     newDF = frame.selectFollowingRows(newDF, tagChoice, typeChoices)
     df_data = updateTypeData(newDF, sections, subjects, judges, finished) 
     [sections, subjects, judges, finished] = updateTypeDataBySelection(newDF, df_data, sections, subjects, judges, finished)
+    # allData contains all data with duration and type value.
+    # avgData contains for each different type the calculated average duration.
     [allData, avgData] = frame.getAvgStdDataFrameByTypeChoiceOrderedByPhase(df_data, tagChoice, avgChoice)
     xticks = frame.getUniques(allData, tagChoice)
     if tagChoice == eventTag:
@@ -140,10 +140,7 @@ def typeSequenceUpdate(df, typeChoices, tagChoice, avgChoice, text, sections, su
             fig = px.box(allData, x = tagChoice, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(1.1), points  = False)
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
-            )
-            fig.add_traces(
-                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 20)).data
-            )         
+            )       
     else:
         colorMap = frame.phaseColorMap(tagChoice, statesInfo)
         if text == [textTag]:
@@ -152,9 +149,6 @@ def typeSequenceUpdate(df, typeChoices, tagChoice, avgChoice, text, sections, su
             fig = px.box(allData, x = tagChoice, y = durationTag, color = tagChoice, color_discrete_map = colorMap, labels = {durationTag:'Duration', tagChoice:'ID'}, width = utilities.getWidth(1.1), height = utilities.getHeight(1.1), points  = False)
             fig.add_traces(
                 px.line(avgData, x = tagChoice, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
-            )
-            fig.add_traces(
-                px.line(avgData, x = tagChoice, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 20)).data
             )
     fig.update_layout(xaxis_tickvals = xticks, showlegend = False, font = dict(size = 18))
     fig.update_xaxes(tickangle = 45)

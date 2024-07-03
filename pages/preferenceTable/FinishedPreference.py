@@ -1,4 +1,4 @@
-# this page allows user to change subject preferences.
+# this page allows user to change process type preferences.
 
 import dash as ds
 import pandas as pd
@@ -8,54 +8,48 @@ import utils.Utilities as utilities
 import utils.graph.TypeEventsPreference as typeEvents
 
 # get dataframe with judge names. 
-df = getter.getSubjectNamesDataframe()
-codeSubjectTag = utilities.getTagName('codeSubjectTag')
+df = getter.getFinishedDataframe()
+finishedTag = utilities.getTagName('finishedTag')
 countTag = utilities.getTagName('countTag')
 newDF = df[df[countTag] > 0]
 
 # return initial layout of page.
 def pageLayout():
-    code = utilities.getPlaceholderName("code")
-    codeSubjectTag = utilities.getTagName('codeSubjectTag')
     count = utilities.getPlaceholderName('count')
     duration = utilities.getPlaceholderName('duration')
     durationTag = utilities.getTagName('durationTag')
-    ritualTag = utilities.getTagName('ritualTag')
-    subjectTag = utilities.getTagName('subjectTag')
     layout = ds.html.Div([
         ds.dcc.Link('HOME', href='/'),
         ds.html.Br(),
         ds.dcc.Link('USER PARAMETERS PREFERENCES', href='/preference'),
-        ds.html.H2('SUBJECTS USER PREFERENCES'),
-        ds.html.Button("DOWNLOAD", id = 'download-button-sbp'),
+        ds.html.H2('PROCESS TYPE USER PREFERENCES'),
+        ds.html.Button("DOWNLOAD", id = 'download-button-fp'),
         ds.dash_table.DataTable(
             newDF.to_dict('records'), columns = [
-                {'name': code, 'id': codeSubjectTag, 'editable': False},
-                {'name': subjectTag, 'id': subjectTag, 'editable': False},
-                {'name': ritualTag, 'id': ritualTag, 'editable': False},
+                {'name': finishedTag, 'id': finishedTag, 'editable': False},
                 {'name': count, 'id': countTag, 'editable': False},  
                 {'name': duration, 'id': durationTag, 'editable': False}],
             filter_action = "native",
             sort_action = "native",
             row_selectable = 'multi',
             style_cell = {'textAlign': 'left'},
-            id = "subjecttable"
+            id = "finishedtable"
         )
     ])
     return layout
 
 # callback with input and output.
 @ds.callback(
-    ds.Output('subjecttable', 'selected_rows'),
-    [ds.Input('subjecttable', 'selected_rows'),
-     ds.Input('download-button-sbp', 'n_clicks')],
-    ds.State('subjecttable', 'data')
+    ds.Output('finishedtable', 'selected_rows'),
+    [ds.Input('finishedtable', 'selected_rows'),
+     ds.Input('download-button-fp', 'n_clicks')],
+    ds.State('finishedtable', 'data')
 )
 
 # return updated data based on user choice.
 def update_dateframe(importantIndex, downloadButton, data):
     if ds.ctx.triggered_id != None and 'download-button' in ds.ctx.triggered_id:
         dataDF = pd.DataFrame(data)
-        dataDF.to_csv('cache/subjectsInfo.csv')
-    importantIndex = typeEvents.updateImportant(ds.ctx.triggered_id, data, codeSubjectTag, importantIndex, 'utils/preferences/importantSubjects.txt')
+        dataDF.to_csv('cache/finishedInfo.csv')
+    importantIndex = typeEvents.updateImportant(ds.ctx.triggered_id, data, finishedTag, importantIndex, 'utils/preferences/importantProcessStates.txt')
     return importantIndex

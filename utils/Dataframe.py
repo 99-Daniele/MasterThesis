@@ -82,9 +82,9 @@ def createTypeDurationsDataFrame(events, codeEventTag, codeJudgeTag, codeSubject
 
 # from states duration and state names list create state names dataframe with info.
 def createStateNameDataframeWithInfo(statesDuration, stateNames):
+    codeStateTag = utilities.getTagName('codeStateTag')
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
-    codeStateTag = utilities.getTagName('codeStateTag')
     # from statesDuration calculates mean duration and size of each state.
     statesDuration = statesDuration.groupby([codeStateTag]) \
         .agg({statesDuration.columns[2]: 'size', durationTag: 'mean'}) \
@@ -99,9 +99,9 @@ def createStateNameDataframeWithInfo(statesDuration, stateNames):
 
 # from events duration and event names list create event names dataframe with info.
 def createEventNameDataframeWithInfo(eventsDuration, eventNames):
+    codeEventTag = utilities.getTagName('codeEventTag')
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
-    codeEventTag = utilities.getTagName('codeEventTag')
     # from eventDuration calculates mean duration and size of each event.
     eventsDuration = eventsDuration.groupby([codeEventTag]) \
         .agg({eventsDuration.columns[2]: 'size', durationTag: 'mean'}) \
@@ -114,11 +114,11 @@ def createEventNameDataframeWithInfo(eventsDuration, eventNames):
     result = result.sort_values([codeEventTag]).reset_index(drop = True)
     return result
 
-# from subject duration and subject names list create subject names dataframe with info.
+# from process duration and subject names list create subject names dataframe with info.
 def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
+    codeSubjectTag = utilities.getTagName('codeSubjectTag')
     countTag = utilities.getTagName('countTag')
     durationTag = utilities.getTagName('durationTag')
-    codeSubjectTag = utilities.getTagName('codeSubjectTag')
     # from subjectsDuration calculates mean duration and size of each process subject.
     processDuration = processDuration.groupby([codeSubjectTag]) \
         .agg({processDuration.columns[2]: 'size', durationTag: 'mean'}) \
@@ -129,6 +129,32 @@ def createSubjectNameDataframeWithInfo(processDuration, subjectNames):
     result = result.fillna(0)
     result = result.sort_values([codeSubjectTag]).reset_index(drop = True)
     return result
+
+# from process duration create process types dataframe with info.
+def creatFinishedDataframeWithInfo(processDuration):
+    countTag = utilities.getTagName('countTag')
+    durationTag = utilities.getTagName('durationTag')
+    finishedTag = utilities.getTagName('finishedTag')
+    # from subjectsDuration calculates mean duration and size of each process subject.
+    processDuration = processDuration.groupby([finishedTag]) \
+        .agg({processDuration.columns[2]: 'size', durationTag: 'mean'}) \
+        .rename(columns = {processDuration.columns[2]:countTag}) \
+        .reset_index()
+    processDuration[durationTag] = processDuration[durationTag].astype(float).apply('{:,.2f}'.format)
+    return processDuration
+
+# from process duration create section dataframe with info.
+def creatSectionDataframeWithInfo(processDuration):
+    countTag = utilities.getTagName('countTag')
+    durationTag = utilities.getTagName('durationTag')
+    sectionTag = utilities.getTagName('sectionTag')
+    # from subjectsDuration calculates mean duration and size of each process subject.
+    processDuration = processDuration.groupby([sectionTag]) \
+        .agg({processDuration.columns[2]: 'size', durationTag: 'mean'}) \
+        .rename(columns = {processDuration.columns[2]:countTag}) \
+        .reset_index()
+    processDuration[durationTag] = processDuration[durationTag].astype(float).apply('{:,.2f}'.format)
+    return processDuration
 
 # from input df return another dataframe with size and mean/median duration group by date.
 def getAvgTotDataframeByDate(df, avgChoice):

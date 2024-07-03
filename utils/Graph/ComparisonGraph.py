@@ -345,6 +345,8 @@ def processComparisonUpdate(df, avgChoice, dateType, startDate, endDate, minDate
     # if user didn't select any parameter to compare, a simple process duration graph is shown.
     if choices == None or len(choices) == 0:
         orderRadioStyle = {'display': 'none'}
+        # allData contains all data with duration and date value.
+        # avgData contains for each different date the calculated average duration.
         [allData, avgData] = frame.getAvgStdDataFrameByDate(newDF, dateType, avgChoice)
         xticks = frame.getUniques(avgData, dateTag)
         fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.95), points = False)
@@ -365,6 +367,9 @@ def processComparisonUpdate(df, avgChoice, dateType, startDate, endDate, minDate
     # if user has selected a parameter to compare, a process comparison duration graph is shown.
     else:
         orderRadioStyle = {'display': 'block'}
+        # typeData contains all different types with average duration for all type.
+        # allData contains average duration of all data.
+        # infoData contains load info for all different types.
         [typeData, allData, infoData] = frame.getAvgDataFrameByTypeChoices(newDF, avgChoice, dateType, choices, order, eventChoice, stateChoice, phaseChoice)
         xticks = frame.getUniques(allData, dateTag)
         if text == [textTag]:
@@ -424,6 +429,8 @@ def typeComparisonUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate
     # if user didn't select anything, a simple duration of types graph is shown.
     if typeChoice == None:
         title = 'PROCESS ' + type.upper() + 'S DURATION'
+        # allData contains all data with duration and type value.
+        # avgData contains for each different type the calculated average duration.
         [allData, avgData] = frame.getAvgStdDataFrameByType(newDF, type, avgChoice) 
         xticks = frame.getUniques(allData, type)
         # since no selection has been made all components are hidden.
@@ -446,9 +453,6 @@ def typeComparisonUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate
             fig.add_traces(
                 px.line(avgData, x = type, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
             )
-            fig.add_traces(
-                px.line(avgData, x = type, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 25)).data
-            )
         fig.update_layout(xaxis_tickvals = xticks, legend_itemclick = False, legend_itemdoubleclick = False, font = dict(size = 18))
         fig.update_xaxes(tickangle = 45)
         fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
@@ -469,6 +473,8 @@ def typeComparisonUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate
         # if no comparison parameter is chosen by user, a simple type duration graph is shown.
         if choices == None or len(choices) == 0:
             orderRadioStyle = {'display': 'none'}
+            # allData contains all data with duration and date value.
+            # avgData contains for each different date the calculated average duration.
             [allData, avgData] = frame.getAvgStdDataFrameByDate(df_data, dateType, avgChoice)
             xticks = frame.getUniques(avgData, dateTag)
             fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Duration ' + type + " " + str(typeChoice) + ' [days]', dateTag:'Start Date ' + type + " " + str(typeChoice)}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.95), points = False)
@@ -489,6 +495,9 @@ def typeComparisonUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate
         # if user selects comparison parameter, comparison type duration graph is shown.
         else:
             orderRadioStyle = {'display': 'block'}
+            # typeData contains all different types with average duration for all type.
+            # allData contains average duration of all data.
+            # infoData contains load info for all different types.
             [typeData, allData, infoData] = frame.getAvgDataFrameByTypeChoices(df_data, avgChoice, dateType, choices, order, None, None, None)
             xticks = frame.getUniques(allData, dateTag)
             if text == [textTag]:
@@ -529,6 +538,8 @@ def parameterComparisonUpdate(df, avgChoice, tag, sections, judges, subjects, mo
     newDF = df.copy()
     # newDF is calculated as df filtered based on user choices.
     newDF = updateProcessTypeData(newDF, sections, subjects, judges, months)
+    # allData contains all data with duration and type value.
+    # avgData contains for each different type the calculated average duration.
     [allData, avgData] = frame.getAvgStdDataFrameByTypeQuantileFilter(newDF, tag, avgChoice)
     xticks = frame.getUniques(avgData, tag)
     # if text is selected by user then an histogram graph is shown, otherwise boxplot.
@@ -538,9 +549,6 @@ def parameterComparisonUpdate(df, avgChoice, tag, sections, judges, subjects, mo
         fig = px.box(allData, x = tag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Process Duration [days]', tag:tag}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.95), points = False)
         fig.add_traces(
             px.line(avgData, x = tag, y = durationTag, markers = True).update_traces(line_color = utilities.getLineColor()).data
-        )
-        fig.add_traces(
-            px.line(avgData, x = tag, y = quantileTag, markers = False).update_traces(line_color = utilities.getInvisibleColor(), textposition = "top center", textfont = dict(color = utilities.getCharColor(), size = 25)).data
         )
     fig.update_layout(xaxis_tickvals = xticks, font = dict(size = 18))
     fig.update_xaxes(tickangle = 45)

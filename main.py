@@ -147,6 +147,24 @@ def displaySubjectPreferences():
     ])
     app.run_server(debug = True)
 
+# display sections.
+def displaySectionPreferences():
+    import pages.preferenceTable.SectionPreference as sectionPreferencePage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = sectionPreferencePage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
+# display process types.
+def displayProcessTypePreferences():
+    import pages.preferenceTable.FinishedPreference as finishedPreferencePage
+    app = ds.Dash(__name__, suppress_callback_exceptions = True)
+    app.layout = ds.html.Div([
+        ds.html.Div(children = finishedPreferencePage.pageLayout())
+    ])
+    app.run_server(debug = True)
+
 # display prediction error pagse.
 def displayPredictionError():
     import pages.predictionGraph.PredictionError as predictionErrorPage
@@ -186,4 +204,4 @@ if not os.path.isdir('cache'):
     restartData()
 
 if __name__ == '__main__':
-    displayEventPreferences()
+    displaySectionPreferences()
