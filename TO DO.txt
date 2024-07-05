@@ -3,3 +3,10 @@
 
 - errore grafico confronto
 - sistemare type duration far scomparire quando selezioni
+
+-phase event
+-state event
+-process comparation
+-state preference
+
+-se tipo non in database fai retrieve con valore null
