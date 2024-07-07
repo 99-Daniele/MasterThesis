@@ -2,3 +2,4 @@ cache/
 utils/database/databaseCredentials.json
 *.pyc
 .vscode/
+TO DO.txt
