@@ -71,6 +71,7 @@ def eventUpdate(df, startDate, endDate, symbol, type, minDate, maxDate, sections
     newDF = df.copy()
     # newDF is calculated as df filtered based on user choices.
     newDF = updateDataframe(newDF, startDate, endDate, sections, subjects, judges)
+    newDF[phaseTag] = newDF[phaseTag].astype(str)
     newDF = newDF.sort_values(by = phaseTag).reset_index(drop = True)
     # parameters remaining choices are calculated based on user choices.
     [sections, subjects, judges] = updateTypesBySelection(df, newDF, startDate, endDate, sections, subjects, judges)

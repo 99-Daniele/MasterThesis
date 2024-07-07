@@ -347,7 +347,7 @@ def processComparisonUpdate(df, avgChoice, dateType, startDate, endDate, minDate
         orderRadioStyle = {'display': 'none'}
         # allData contains all data with duration and date value.
         # avgData contains for each different date the calculated average duration.
-        [allData, avgData] = frame.getAvgStdDataFrameByDate(newDF, dateType, avgChoice)
+        [allData, avgData] = frame.getAvgStdDataFrameByDate(df_data, dateType, avgChoice)
         xticks = frame.getUniques(avgData, dateTag)
         fig = px.box(allData, x = dateTag, y = durationTag, color_discrete_sequence = utilities.getBoxColor(), labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.95), points = False)
         fig.add_traces(
@@ -370,7 +370,7 @@ def processComparisonUpdate(df, avgChoice, dateType, startDate, endDate, minDate
         # typeData contains all different types with average duration for all type.
         # allData contains average duration of all data.
         # infoData contains load info for all different types.
-        [typeData, allData, infoData] = frame.getAvgDataFrameByTypeChoices(newDF, avgChoice, dateType, choices, order, eventChoice, stateChoice, phaseChoice)
+        [typeData, allData, infoData] = frame.getAvgDataFrameByTypeChoices(df_data, avgChoice, dateType, choices, order, eventChoice, stateChoice, phaseChoice)
         xticks = frame.getUniques(allData, dateTag)
         if text == [textTag]:
             fig = px.line(allData, x = dateTag, y = durationTag, labels = {durationTag:'Process Duration [days]', dateTag:'Process Start Date'}, width = utilities.getWidth(0.95), height = utilities.getHeight(0.95)).update_traces(showlegend = True, name = frame.addTotCountToName(allData, countTag), line_color = 'rgb(0, 0, 0)', line = {'width': 3})

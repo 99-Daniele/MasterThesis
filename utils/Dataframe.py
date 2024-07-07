@@ -300,7 +300,7 @@ def getAvgDataFrameByTypeChoices(df, avgChoice, datetype, typesChoice, order, ev
         df3[filterTag] = df3[filterTag].astype(str) + " - " + df4[types[i]].astype(str)
         i = i + 1
     # df3 is filtered by only important data.
-    df3 = keepOnlyImportant(df3, 0.5, 18)
+    df3 = keepOnlyImportant(df3, 0.75, 18)
     df3 = df3.sort_values([order], ascending = False).reset_index(drop = True)
     # order_dict and order_list frame the selected order of filter tag based on order user choice.
     order_dict = df3.set_index(filterTag)[order].to_dict()
