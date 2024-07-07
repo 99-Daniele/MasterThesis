@@ -10,8 +10,6 @@ import utils.graph.TypeEventsPreference as typeEvents
 # get dataframe with judge names. 
 df = getter.getSectionDataframe()
 sectionTag = utilities.getTagName('sectionTag')
-countTag = utilities.getTagName('countTag')
-newDF = df[df[countTag] > 0]
 
 # return initial layout of page.
 def pageLayout():

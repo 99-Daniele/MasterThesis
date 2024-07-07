@@ -65,8 +65,8 @@ def restartData():
     predictDuration()
     refreshData()
 
-# tests processes predictor.
-def predictTest():
+# tests of total processes predictor.
+def predictTotalTest():
     codeJudgeTag = utilities.getTagName("codeJudgeTag")
     codeSubjectTag = utilities.getTagName("codeSubjectTag")
     countTag = utilities.getTagName("countTag")
@@ -84,6 +84,27 @@ def predictTest():
     finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
     # calculate error prediction dataframe and save in cache.
     erorrPredictionDF = prediction.predictDurationsTestTotal(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag)
+    cache.updateCacheDataframe('predictions.json', erorrPredictionDF)
+
+# tests 80-20 processes predictor.
+def predict8020Test():
+    codeJudgeTag = utilities.getTagName("codeJudgeTag")
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    countTag = utilities.getTagName("countTag")
+    dateTag = utilities.getTagName("dateTag")
+    durationTag = utilities.getTagName("durationTag")
+    durationFinalTag = utilities.getTagName("durationFinalTag")
+    durationPredictedTag = utilities.getTagName("durationPredictedTag")
+    errorTag = utilities.getTagName("errorTag")
+    finishedTag = utilities.getTagName("finishedTag")
+    numProcessTag = utilities.getTagName("numProcessTag")
+    sectionTag = utilities.getTagName("sectionTag")
+    # retrieve processInfo from cache.
+    processInfo = getter.getProcessesInfo()
+    # keep only finished processes to be tested.
+    finishedProcesses = processInfo[processInfo[finishedTag] == utilities.getProcessState('finished')]
+    # calculate error prediction dataframe and save in cache.
+    erorrPredictionDF = prediction.predictDurationsTest8020(finishedProcesses, codeJudgeTag, codeSubjectTag, countTag, dateTag, durationTag, durationFinalTag, durationPredictedTag, errorTag, finishedTag, numProcessTag, sectionTag)
     cache.updateCacheDataframe('predictions.json', erorrPredictionDF)
 
 # predict unfinished processes duration.

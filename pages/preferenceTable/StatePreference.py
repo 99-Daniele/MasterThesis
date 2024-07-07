@@ -14,8 +14,6 @@ countTag = utilities.getTagName('countTag')
 phaseTag = utilities.getTagName('phaseTag')
 phaseDBTag = utilities.getTagName('phaseDBTag')
 stateTag = utilities.getTagName('stateTag')
-# for better readability only states that are registered at least one time in the database are shown.
-df = df[df[countTag] > 0]
 
 # return initial layout of page.
 def pageLayout():

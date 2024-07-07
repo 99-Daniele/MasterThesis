@@ -184,10 +184,15 @@ def refreshData():
     import utils.DataUpdate as update
     update.refreshData()
 
-# test prediction of unifinished processes.
-def predictTest():
+# test unfinished processes predictor. Test on all processes.
+def predictTotalTest():
     import utils.DataUpdate as update
-    update.predictTest()
+    update.predictTotalTest()
+
+# test unfinished processes predictor. Test on 80-20 processes.
+def predict8020Test():
+    import utils.DataUpdate as update
+    update.predict8020Test()
 
 # predicts duration of unfinished processes.
 def predictDuration():
@@ -204,4 +209,4 @@ if not os.path.isdir('cache'):
     restartData()
 
 if __name__ == '__main__':
-    refreshData()
+    displayStatePreferences()
