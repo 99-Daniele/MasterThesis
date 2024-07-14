@@ -40,7 +40,7 @@ def pageLayout():
         ds.html.H2("COMPARISON OF PROCESSES DURATION BASED ON " + section, id = 'title-tr'),        
         ds.dcc.RadioItems([avgTag, median], value = avgTag, id = 'avg-radioitem-tr', inline = True, inputStyle = {'margin-left': "20px"}),
         ds.dcc.Dropdown([sectionTag, codeJudgeTag, codeSubjectTag], value = sectionTag, multi = False, searchable = False, clearable = False, id = 'type-dropdown-tr', placeholder = typeTag, style = {'width': 400}),
-        ds.dcc.Dropdown(sections, multi = True, searchable = True, clearable = True, id = 'type-dropdown-se', placeholder = section, style = {'width': 400}),
+        ds.dcc.Dropdown(sections, multi = True, searchable = True, clearable = True, id = 'type-dropdown-se', placeholder = section, style = {'display': 'none'}),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, clearable = True, id = 'type-dropdown-j', placeholder = judge, style = {'width': 400}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, clearable = True, id = 'type-dropdown-su', placeholder = subject, style = {'width': 400}),
         ds.dcc.Dropdown(months, multi = True, searchable = True, clearable = True, id = 'type-dropdown-mt', placeholder = month, style = {'width': 400}),
@@ -52,7 +52,10 @@ def pageLayout():
 # callback with input and output.
 @ds.callback(
     [ds.Output('comparison-graph-tr', 'figure'),
-        ds.Output('title-tr', 'children')],
+        ds.Output('title-tr', 'children'),
+        ds.Output('type-dropdown-se', 'style'),
+        ds.Output('type-dropdown-j', 'style'),
+        ds.Output('type-dropdown-su', 'style'),],
     [ds.Input('avg-radioitem-tr', 'value'),
         ds.Input('type-dropdown-tr', 'value'),
         ds.Input('type-dropdown-se', 'value'),

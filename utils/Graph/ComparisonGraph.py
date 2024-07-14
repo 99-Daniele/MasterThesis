@@ -85,6 +85,23 @@ def hideAll():
     orderRadioStyle = {'display': 'none'}
     return [dateRangeStyle, dateCheckStyle, resetStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle]
 
+# return the style of dropdown as hidden or not based on user choices: if user choices one, then corresponding dropdown will be hidden and his values will reset.
+# this method is only for parameter comparison graph since there are only 3 paramters: sections, judges and subjects.
+def hideParameterChosen(choice):
+    codeJudgeTag = utilities.getTagName("codeJudgeTag")
+    codeSubjectTag = utilities.getTagName("codeSubjectTag")
+    sectionTag = utilities.getTagName("sectionTag")
+    judgeStyle = {'width': 400}
+    sectionStyle = {'width': 400}
+    subjectStyle = {'width': 400}
+    if choice == codeJudgeTag:
+        judgeStyle = {'display': 'none'}
+    elif choice == sectionTag:
+        sectionStyle = {'display': 'none'}
+    elif choice == codeSubjectTag:
+        subjectStyle = {'display': 'none'}
+    return [sectionStyle, judgeStyle, subjectStyle]
+
 # update data based on user choices on different parameters.
 # this method is only for process comparison graph since there are more parameters such as 'sequences' and 'phaseSequences'.
 def updateProcessData(df, startDate, endDate, sections, subjects, judges, finished, sequences, phaseSequences, eventChoice, eventRadio, stateChoice, stateRadio, phaseChoice, phaseRadio):
@@ -533,11 +550,12 @@ def typeComparisonUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate
 def parameterComparisonUpdate(df, avgChoice, tag, sections, judges, subjects, months, text):
     title = "COMPARISON OF PROCESSES DURATION BASED ON " + tag.upper()
     durationTag = utilities.getTagName('durationTag')
-    quantileTag = utilities.getTagName('quantileTag')
     textTag = utilities.getPlaceholderName("text")
     newDF = df.copy()
     # newDF is calculated as df filtered based on user choices.
     newDF = updateProcessTypeData(newDF, sections, subjects, judges, months)
+    # based on user choice, chosen compare parameters hide the related components.
+    [sectionStyle, judgeStyle, subjectStyle] = hideParameterChosen(tag)
     # allData contains all data with duration and type value.
     # avgData contains for each different type the calculated average duration.
     [allData, avgData] = frame.getAvgStdDataFrameByTypeQuantileFilter(newDF, tag, avgChoice)
@@ -553,4 +571,4 @@ def parameterComparisonUpdate(df, avgChoice, tag, sections, judges, subjects, mo
     fig.update_layout(xaxis_tickvals = xticks, font = dict(size = 14))
     fig.update_xaxes(tickangle = 45)
     fig.update_yaxes(gridcolor = utilities.getGridColor(), griddash = 'dash')
-    return fig, title
+    return fig, title, sectionStyle, judgeStyle, subjectStyle
