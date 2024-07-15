@@ -69,7 +69,7 @@ def pageLayout():
         ds.dcc.Dropdown(sections, multi = True, searchable = True, id = 'section-dropdown-ph', placeholder = section, style = {'display': 'none'}),
         ds.dcc.Dropdown(subjects, multi = True, searchable = True, id = 'subject-dropdown-ph', placeholder = subject, style = {'display': 'none'}, optionHeight = 80),
         ds.dcc.Dropdown(judges, multi = True, searchable = True, id = 'judge-dropdown-ph', placeholder = judge, style = {'display': 'none'}),
-        ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-ph', placeholder = process, style = {'display': 'none'}),
+        ds.dcc.Dropdown(finished, multi = True, searchable = False, id = 'finished-dropdown-ph', placeholder = process, style = {'width': 400}),
         ds.dcc.Checklist([sectionTag, subjectTag, codeJudgeTag, finishedTag], value = [], id = 'choice-checklist-ph', inline = True, style = {'display': 'none'}),
         ds.dcc.RadioItems([countTag, avgTag], value = countTag, id = 'order-radioitem-ph', inline = True, style = {'display': 'none'}),
         ds.dcc.Checklist([text], value = [], id = 'text-checklist-ph'),

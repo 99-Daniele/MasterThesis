@@ -80,7 +80,7 @@ def hideAll():
     sectionStyle = {'display': 'none'}
     subjectStyle = {'display': 'none'}
     judgeStyle = {'display': 'none'}
-    finishedStyle = {'display': 'none'}
+    finishedStyle = {'width': 400}
     choiceCheckStyle = {'display': 'none'}
     orderRadioStyle = {'display': 'none'}
     return [dateRangeStyle, dateCheckStyle, resetStyle, sectionStyle, subjectStyle, judgeStyle, finishedStyle, choiceCheckStyle, orderRadioStyle]
@@ -446,6 +446,7 @@ def typeComparisonUpdate(df, typeChoice, avgChoice, dateType, startDate, endDate
     # if user didn't select anything, a simple duration of types graph is shown.
     if typeChoice == None:
         title = 'PROCESS ' + type.upper() + 'S DURATION'
+        newDF = updateTypeData(newDF, startDate, endDate, sections, subjects, judges, finished)
         # allData contains all data with duration and type value.
         # avgData contains for each different type the calculated average duration.
         [allData, avgData] = frame.getAvgStdDataFrameByType(newDF, type, avgChoice) 
