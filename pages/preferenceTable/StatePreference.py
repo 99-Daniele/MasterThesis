@@ -40,7 +40,7 @@ def pageLayout():
         ds.dash_table.DataTable(
             df.to_dict('records'), columns = [
                 {'name': code, 'id': codeStateTag, 'editable': False}, 
-                {'name': state, 'id': stateTag, 'editable': True},  
+                {'name': state, 'id': stateTag, 'editable': False},  
                 {'name': phaseDB, 'id': phaseDBTag, 'editable': False}, 
                 {'name': phase, 'id': phaseTag, 'editable': True}, 
                 {'name': count, 'id': countTag, 'editable': False},  

@@ -88,4 +88,4 @@ def start():
                 return sequenceEventPage.pageLayout()
             case _:
                 return homePage.pageLayout()
-    app.run_server(debug = True)
+    app.run_server(debug = False)

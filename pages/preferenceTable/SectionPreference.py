@@ -14,6 +14,7 @@ sectionTag = utilities.getTagName('sectionTag')
 # return initial layout of page.
 def pageLayout():
     count = utilities.getPlaceholderName('count')
+    countTag = utilities.getTagName('countTag')
     duration = utilities.getPlaceholderName('duration')
     durationTag = utilities.getTagName('durationTag')
     layout = ds.html.Div([
@@ -23,7 +24,7 @@ def pageLayout():
         ds.html.H2('SECTION USER PREFERENCES'),
         ds.html.Button("DOWNLOAD", id = 'download-button-scp'),
         ds.dash_table.DataTable(
-            newDF.to_dict('records'), columns = [
+            df.to_dict('records'), columns = [
                 {'name': sectionTag, 'id': sectionTag, 'editable': False},
                 {'name': count, 'id': countTag, 'editable': False},  
                 {'name': duration, 'id': durationTag, 'editable': False}],
