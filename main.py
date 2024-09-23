@@ -33,6 +33,7 @@ def startApp():
     import utils.App as app
     app.start()
 
+# if cache is not present, restart data.
 if not os.path.isdir('cache'):
     restartData()
 
